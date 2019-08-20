@@ -3,6 +3,29 @@
 <?php include "03_menu.php"; ?>
 <?php
 
+
+
+// Ascertain what type of stocktake is active stocktake or impairment
+// THen add a filter to hide the ability to enable including the other kind
+
+
+
+
+
+
+
+
+$sql = "SELECT stk_type FROM smartdb.sm13_stk WHERE smm_delete_date IS NULL AND stk_include =1;";
+$result = $con->query($sql);
+if ($result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+        $system_stk_type = $row["stk_type"];
+    }}
+if(empty($system_stk_type)) {
+    $system_stk_type = "any";
+}
+
+
 $rw_stk = "";
 $sql = "SELECT * FROM smartdb.sm13_stk WHERE smm_delete_date IS NULL;";
 $result = $con->query($sql);
@@ -20,16 +43,27 @@ if ($result->num_rows > 0) {
         $stk_include        = $row["stk_include"];
         $journal_text       = $row["journal_text"];
         $rowcount_original  = $row["rowcount_original"];
+        $stk_type           = $row["stk_type"];
 
         if ($stk_include==1) {
             $flag_included  = $icon_spot_green;
-            $btn_toggle = "<a class='dropdown-item' href='05_action.php?act=save_stk_toggle&stkm_id=".$stkm_id."'>Exclude this stocktake</a>";
+            $btn_toggle = "<a class='dropdown-item' href='05_action.php?act=save_stk_toggle&stkm_id=".$stkm_id."'>Exclude this activity</a>";
             $btn_archive = "";
         }else{
             $flag_included  = $icon_spot_grey;
-            $btn_toggle = "<a class='dropdown-item' href='05_action.php?act=save_stk_toggle&stkm_id=".$stkm_id."'>Include this stocktake</a>";
+            $btn_toggle = "<a class='dropdown-item' href='05_action.php?act=save_stk_toggle&stkm_id=".$stkm_id."'>Include this activity</a>";
             $btn_archive = "<a class='dropdown-item' href='05_action.php?act=save_archive_stk&stkm_id=$stkm_id'>Archive</a>";
         }
+        // echo "<br><br><br><br>Iterant type:".$stk_type." - System type:".$system_stk_type;
+        if($system_stk_type==$stk_type){
+
+        }elseif($system_stk_type=="any"){
+        }else{
+            $btn_toggle = "<span class='dropdown-item'>Cannot include mixed activity types</span>";
+        }
+
+
+
         $sql = "SELECT 
                     sum(CASE WHEN first_found_flag = 1 THEN 1 ELSE 0 END) AS rowcount_firstfound,
                     sum(CASE WHEN res_completed = 1 THEN 1 ELSE 0 END) AS rowcount_completed,
@@ -43,7 +77,7 @@ if ($result->num_rows > 0) {
             $rowcount_other         = $row2["rowcount_other"];
         }}
 
-
+        $stk_type = ucfirst($stk_type);
 
         $btn_excel = "<a class='dropdown-item' href='05_action.php?act=get_excel&stkm_id=$stkm_id'>Output to excel</a>";
         $perc_complete = round((($rowcount_completed/($rowcount_original+$rowcount_firstfound+$rowcount_other))*100),2);
@@ -57,6 +91,7 @@ if ($result->num_rows > 0) {
                                 </div>
                             </div>";
         $rw_stk .= " <tr>
+                        <td>$stk_type</td>
                         <td>$flag_included</td>
                         <td>$stk_id</td>
                         <td>$stk_name</td>
@@ -127,8 +162,9 @@ $(document).ready(function() {
 <div class="container">
     <table id="table_assets" class="table">
             <tr>
+                <td>Type</td>
                 <td>Included</td>
-                <td>StkNo</td>
+                <td>ID</td>
                 <td>Name</td>
                 <td align='right'>Orig</td>
                 <td align='right'>Completed</td>

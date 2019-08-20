@@ -50,22 +50,54 @@ if (empty($date_last_update_check)) {
 $area_version_status    = "<span class='dropdown-item'>Up to date as of $version_publish_date</span>";
 $area_last_update       = "<h6 class='dropdown-header'>Last checked for updates: $date_last_update_check</h6>";
 
+
+
+
+
+
+
+
+
+
+
+
+
+$sql = "SELECT stk_type FROM smartdb.sm13_stk WHERE smm_delete_date IS NULL AND stk_include =1;";
+$result = $con->query($sql);
+if ($result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+        $system_stk_type = $row["stk_type"];
+    }}
+if(empty($system_stk_type)) {
+    $system_stk_type = "any";
+}
+
+
+
 $sql = "SELECT COUNT(*) as livecount FROM smartdb.sm13_stk WHERE stk_include = 1;";
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
         $livecount            = $row["livecount"];
 }}
-if($livecount>0){
+if($system_stk_type=="stocktake"){
     // $btn_stk = "<a href='10_stk.php' class='nav-link btn btn-sm btn-success'>Stocktake</a>";
     $btn_stk  = "<a href='10_stk.php' class='nav-link text-success'>Stocktake</a>";
     $btn_ff   = "<a href='12_ff.php' class='nav-link text-info'>Add First Found</a>";
     if ($latest_version_no>$smartm_software_version) {
         $area_version_status = "<span class='dropdown-item'>You cannot update software when you have open stocktakes</span>";
     }
+}elseif($system_stk_type=="impairment"){
+
+  $btn_stk  = "<a href='15_impairment.php' class='nav-link text-success'>Impairment</a>";
+  $btn_ff   = "";
+  if ($latest_version_no>$smartm_software_version) {
+      $area_version_status = "<span class='dropdown-item'>You cannot update software when you have open stocktakes</span>";
+  }
 }else{
-    $btn_stk  = "<span class='nav-link text-secondary' >Stocktake</span>";
-    $btn_ff   = "<span class='nav-link text-secondary'>Add First Found</span>";
+  // $btn_stk  = "<span class='nav-link text-secondary' >Stocktake</span>";
+  $btn_stk  = "";
+    $btn_ff   = "";
 
     if ($latest_version_no>$smartm_software_version) {
         $area_version_status = "<button type='button' class='dropdown-item btn btn-danger' data-toggle='modal' data-target='#modal_confirm_update'>Update to v$latest_version_no</button>";

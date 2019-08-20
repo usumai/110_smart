@@ -83,8 +83,13 @@ if ($act=='sys_pull_master') {
      $sql_save = "CREATE TABLE $dbname.sm12_rwr (`rr_id` INT(11) NOT NULL AUTO_INCREMENT,`Asset` VARCHAR(15) NULL DEFAULT NULL,`accNo` VARCHAR(5) NULL DEFAULT NULL, `InventNo` VARCHAR(30) NULL DEFAULT NULL, `AssetDesc1` VARCHAR(255) NULL DEFAULT NULL, `Class` VARCHAR(255) NULL DEFAULT NULL, `ParentName` VARCHAR(255) NULL DEFAULT NULL, `rr_included` int(11) DEFAULT NULL, PRIMARY KEY (`rr_id`),UNIQUE INDEX `rr_id_UNIQUE` (`rr_id` ASC));";
      mysqli_multi_query($con,$sql_save);
 
-     $sql_save = "CREATE TABLE $dbname.sm13_stk (`stkm_id` INT NOT NULL AUTO_INCREMENT,`stk_id` INT NULL,`stk_name` VARCHAR(255) NULL,`dpn_extract_date` DATETIME NULL,`dpn_extract_user` VARCHAR(255) NULL,`smm_extract_date` DATETIME NULL,`smm_extract_user` VARCHAR(255) NULL,`smm_delete_date` DATETIME NULL,`smm_delete_user` VARCHAR(255) NULL,`stk_include` INT NULL,`rowcount_original` INT NULL,`journal_text` LONGTEXT NULL,PRIMARY KEY (`stkm_id`),UNIQUE INDEX `stkm_id_UNIQUE` (`stkm_id` ASC));";
+     $sql_save = "CREATE TABLE $dbname.sm13_stk (`stkm_id` INT NOT NULL AUTO_INCREMENT,`stk_id` INT NULL,`stk_name` VARCHAR(255) NULL,`dpn_extract_date` DATETIME NULL,`dpn_extract_user` VARCHAR(255) NULL,`smm_extract_date` DATETIME NULL,`smm_extract_user` VARCHAR(255) NULL,`smm_delete_date` DATETIME NULL,`smm_delete_user` VARCHAR(255) NULL,`stk_include` INT NULL,`rowcount_original` INT NULL,`rowcount_firstfound` INT NULL,`rowcount_other` INT NULL,`rowcount_completed` INT NULL, `stk_type` VARCHAR(255) NULL, `journal_text` LONGTEXT NULL,PRIMARY KEY (`stkm_id`),UNIQUE INDEX `stkm_id_UNIQUE` (`stkm_id` ASC));";
      mysqli_multi_query($con,$sql_save);
+
+
+
+
+
 
      $log .= "<br>"."creating $dbname.sm14_ass ";
      $sql_save = "
@@ -277,6 +282,58 @@ if ($act=='sys_pull_master') {
      mysqli_multi_query($con,$sql_save);
      $sql_save = "INSERT INTO ".$dbname.".sm17_history (create_date, create_user, history_type, history_desc) VALUES ( NOW(),'System Robot','System Initialisation','The system initiated a new deployment');";
      mysqli_multi_query($con,$sql_save);
+ 
+     // $sql_save = "CREATE TABLE $dbname.sm20_is (`auto_isID` INT(11) NOT NULL AUTO_INCREMENT, `isID` INT(11), `create_date` DATETIME NULL,`create_user` VARCHAR(255) NULL,`isName` VARCHAR(255) NULL, `dpn_extract_date` DATETIME NULL, `dpn_extract_user` VARCHAR(255) NULL, `rowcount_original` INT(11), `rowcount_firstfound` INT(11), `rowcount_other` INT(11), `rowcount_completed` INT(11), PRIMARY KEY (`auto_isID`));";
+     // echo "<br><br>".$sql_save;
+     // mysqli_multi_query($con,$sql_save);
+ 
+     $sql_save = "CREATE TABLE $dbname.sm18_impairment (
+          
+     `auto_storageID` INT(11) NOT NULL AUTO_INCREMENT, 
+     
+     `stkm_id` INT(11),
+     `storageID` INT(11),
+     `rowNo` INT(11),
+     `DSTRCT_CODE` VARCHAR(255) NULL,
+     `WHOUSE_ID` VARCHAR(255) NULL,
+     `SUPPLY_CUST_ID` VARCHAR(255) NULL,
+     `SC_ACCOUNT_TYPE` VARCHAR(255) NULL,
+     `STOCK_CODE` VARCHAR(255) NULL,
+     `ITEM_NAME` VARCHAR(255) NULL,
+     `STK_DESC` VARCHAR(255) NULL,
+     `BIN_CODE` VARCHAR(255) NULL,
+     `INVENT_CAT` VARCHAR(255) NULL,
+     `INVENT_CAT_DESC` VARCHAR(255) NULL,
+     `TRACKING_IND` VARCHAR(255) NULL,
+     `SOH` INT(11),
+     `TRACKING_REFERENCE` VARCHAR(255) NULL,
+     `LAST_MOD_DATE` DATETIME NULL,
+
+     `sampleFlag` INT(11),
+     `serviceableFlag` INT(11), 
+     `isBackup` INT(11),
+     `isType` VARCHAR(255) NULL,
+     `targetID` INT(11),
+
+     
+     
+     `delete_date` datetime NULL,
+     `delete_user` VARCHAR(255) NULL,
+
+     `res_create_date` datetime NULL,
+     `res_update_user` VARCHAR(255) NULL,
+     `res_findings` VARCHAR(255) NULL,
+     `res_comment` text NULL,
+     `res_evidence_desc` VARCHAR(255) NULL,
+     `res_unserv_date` datetime NULL,
+     `res_children_count` int(11) NULL,
+     `res_parent_storageID` VARCHAR(255) NULL,
+     
+     PRIMARY KEY (`auto_storageID`));";
+     echo "<br><br>".$sql_save;
+     mysqli_multi_query($con,$sql_save);
+
+
 
      header("Location: index.php");
 
@@ -373,7 +430,7 @@ if ($act=='sys_pull_master') {
                     // print_r($assets) ;
           }
 
-          $sql_save = "INSERT INTO smartdb.sm13_stk (stk_id,stk_name,dpn_extract_date,dpn_extract_user,smm_extract_date,smm_extract_user,rowcount_original,journal_text) VALUES ('".$stk_id."','".$stk_name."','".$dpn_extract_date."','".$dpn_extract_user."',".$smm_extract_date.",".$smm_extract_user.",'".$rowcount_original."','".$journal_text."'); ";
+          $sql_save = "INSERT INTO smartdb.sm13_stk (stk_id,stk_name,dpn_extract_date,dpn_extract_user,smm_extract_date,smm_extract_user,rowcount_original,stk_type, journal_text) VALUES ('".$stk_id."','".$stk_name."','".$dpn_extract_date."','".$dpn_extract_user."',".$smm_extract_date.",".$smm_extract_user.",'".$rowcount_original."','stocktake','".$journal_text."'); ";
           if ($dev) { echo "<br>sql_save: ".$sql_save; }
           mysqli_multi_query($con,$sql_save);
 
@@ -449,6 +506,65 @@ if ($act=='sys_pull_master') {
 
 
           // $sql_save_history = "INSERT INTO ".$dbname.".smart_l10_history (create_date, create_user, history_type, history_desc, history_link) VALUES ( NOW(),'".$current_user."','Raw remainder file upload','User uploaded raw remainder V2 file','108_rr.php');";
+
+     }elseif ($arr['type']=="impairment") {
+          $stk_id                  = $arr['isID'];
+          $stk_name                = $arr['isName'];
+          $dpn_extract_date        = $arr['dpn_extract_date'];
+          $dpn_extract_user        = $arr['dpn_extract_user'];
+          $smm_extract_date        = $arr['smm_extract_date'];
+          $smm_extract_user        = $arr['smm_extract_user'];
+          $journal_text            = $arr['journal_text'];
+          $rowcount_original       = $arr['rowcount_original'];
+          $rowcount_firstfound     = $arr['rowcount_firstfound'];
+          $rowcount_other          = $arr['rowcount_other'];
+          $rowcount_completed      = $arr['rowcount_completed'];
+
+
+          if(empty($smm_extract_date)){
+               $smm_extract_date="null";
+          }else{
+               $smm_extract_date="'".$smm_extract_date."'";
+          }
+
+          $sql_save = "INSERT INTO smartdb.sm13_stk (stk_id,stk_name,dpn_extract_date,dpn_extract_user,smm_extract_date,smm_extract_user,rowcount_original,rowcount_firstfound, rowcount_other, rowcount_completed, stk_type, journal_text) VALUES ('".$stk_id."','".$stk_name."','".$dpn_extract_date."','".$dpn_extract_user."',".$smm_extract_date.",'".$smm_extract_user."','".$rowcount_original."','".$rowcount_firstfound."','".$rowcount_other."','".$rowcount_completed."','impairment','".$journal_text."'); ";
+          if (true) { echo "<br>sql_save: ".$sql_save; }
+          mysqli_multi_query($con,$sql_save);
+
+          $sql = "SELECT * FROM smartdb.sm13_stk ORDER BY stkm_id DESC LIMIT 1;";
+          $result = $con->query($sql);
+          if ($result->num_rows > 0) {
+               while($row = $result->fetch_assoc()) {
+                    $stkm_id_new    = $row["stkm_id"];
+          }}
+
+
+          $assets   = $arr['results'];
+          foreach($assets as $ass) {
+               foreach($ass as $fieldname => $fieldvalue) {
+                    $ass[$fieldname] = cleanvalue($ass[$fieldname]);
+               }
+
+
+               
+               $sql_save=" INSERT INTO smartdb.sm18_impairment (
+                    stkm_id, storageID, rowNo, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, res_findings, res_comment, res_evidence_desc, res_unserv_date, res_children_count, res_parent_storageID
+               ) VALUES(".
+               
+               $stkm_id_new.",".$ass['storageID'].",".$ass['rowNo'].",".$ass['DSTRCT_CODE'].",".$ass['WHOUSE_ID'].",".$ass['SUPPLY_CUST_ID'].",".$ass['SC_ACCOUNT_TYPE'].",".$ass['STOCK_CODE'].",".$ass['ITEM_NAME'].",".$ass['STK_DESC'].",".$ass['BIN_CODE'].",".$ass['INVENT_CAT'].",".$ass['INVENT_CAT_DESC'].",".$ass['TRACKING_IND'].",".$ass['SOH'].",".$ass['TRACKING_REFERENCE'].",".$ass['LAST_MOD_DATE'].",".$ass['sampleFlag'].",".$ass['serviceableFlag'].",".$ass['isBackup'].",".$ass['isType'].",".$ass['targetID'].",".$ass['delete_date'].",".$ass['delete_user'].",".$ass['res_create_date'].",".$ass['res_update_user'].",".$ass['res_findings'].",".$ass['res_comment'].",".$ass['res_evidence_desc'].",".$ass['res_unserv_date'].",".$ass['res_children_count'].",".$ass['res_parent_storageID']." ); ";
+               // echo "<br><br>".$sql_save;
+               mysqli_multi_query($con,$sql_save);
+          
+
+          }
+
+
+
+
+
+
+
+
 
      }
 
