@@ -4,6 +4,16 @@
 
 <?php
 
+// apply ajax calls to update db
+// create split cats
+// apply date picker
+// status maker
+// arming clear switch
+// Clear breaks
+
+
+
+
 $auto_storageID = $_GET["auto_storageID"];
 
 $sql = "SELECT * FROM smartdb.sm18_impairment WHERE auto_storageID = $auto_storageID";
@@ -29,17 +39,88 @@ if ($result->num_rows > 0) {
         $sampleFlag         = $row['sampleFlag'];
         $res_create_date    = $row['res_create_date'];
 
-        $flag_status = "<span class='text-danger'>NYC~</span>";
+        $complete = 'false';
         if(!empty($res_create_date)){
-            $flag_status = "<span class='text-success'>FIN~<br>$res_findings</span>";
+            $complete = 'true';
         }
 
 
 }}
 
+// $complete = 'true';
 ?>
 
-<br><br><br>
+
+<script type="text/javascript">
+let TRACKING_IND = "<?=$TRACKING_IND?>";
+let complete = <?=$complete?>;
+
+let dispQtrack  = TRACKING_IND=="Q";
+let dispStrack  = TRACKING_IND=="S";
+dispQtrack      = complete ? false : dispQtrack;
+dispStrack      = complete ? false : dispStrack;
+
+console.log("TRACKING_IND:"+TRACKING_IND);
+console.log("dispQtrack:"+dispQtrack);
+console.log("dispStrack:"+dispStrack);
+console.log("complete:"+complete);
+
+
+$(document).ready(function() {
+    
+    let menuright = $('#menuleft').html();
+    $('#menuright').html(menuright);
+
+    setPage()
+
+
+    $('.dispStrack').click(function(){
+        complete = true;
+        let resultSelection = $(this).val();
+        $("#resultSelection").val(resultSelection);
+        setPage()
+    });
+
+    $('.dispQtrack').click(function(){
+        complete = true;
+        let resultSelection = $(this).val();
+        $("#resultSelection").val(resultSelection);
+        setPage()
+    });
+
+
+
+    $('body').on('click', '#btnClear', function() {
+        complete = false;
+        setPage()
+    });
+
+
+
+    function setPage(){
+        dispQtrack = complete ? false : TRACKING_IND=="Q"
+        dispStrack = complete ? false : TRACKING_IND=="S"
+        $('.dispQtrack').toggle(dispQtrack);
+        $('.dispStrack').toggle(dispStrack);
+        $('.complete').toggle(complete);
+    }
+
+});
+</script>
+
+
+<style>
+.list-group-item{
+    margin-bottom:10px;
+}
+</style>
+
+
+
+<br><br>
+
+<div class='container-fluid'>
+
 <div class='row'>
     <div class='col'>
         <h1 class='display-4'>Bin impairment</h1>
@@ -47,21 +128,61 @@ if ($result->num_rows > 0) {
 </div>
 
 
+
 <div class='row'>
-    <div class='col-4'>
-        <table class='table'>
-            <tr><td></td><td></td></tr>
-            <tr><td>DSTRCT_CODE</td><td><?=$DSTRCT_CODE?></td></tr>
+
+    <div class='col-3 lead' id='menuleft'>
+        
+        <div class='text-center'><button class='btn btn-danger complete float-center' id='btnClear'>Clear</button></div>
+        <ul class="list-group list-group-flush text-center">
+            <li class="list-group-item dispStrack"><b>Item sighted</b></li>
+            <button class="list-group-item list-group-item-action list-group-item-success dispStrack" value='1'>Serviceable</button>
+            <button class="list-group-item list-group-item-action list-group-item-success dispStrack" value='2'>Unserviceable&nbsp;-&nbsp;with&nbsp;date</button>
+            <button class="list-group-item list-group-item-action list-group-item-success dispStrack" value='3'>Unserviceable&nbsp;-&nbsp;no&nbsp;date</button>
+
+            <li class="list-group-item dispQtrack"><b>Sighted&nbsp;or&nbsp;found&nbsp;evidence&nbsp;of&nbsp;all&nbsp;items</b></li>
+            <button class="list-group-item list-group-item-action list-group-item-success dispQtrack" value='4'>Serviceable</button>
+            <button class="list-group-item list-group-item-action list-group-item-success dispQtrack" value='5'>None&nbsp;serviceable&nbsp;-&nbsp;with&nbsp;date</button>
+            <button class="list-group-item list-group-item-action list-group-item-success dispQtrack" value='6'>None&nbsp;serviceable&nbsp;-&nbsp;no&nbsp;date</button>
+
+            <li class="list-group-item dispStrack"><b>Item not sighted, evidence provided</b></li>
+            <button class="list-group-item list-group-item-action list-group-item-warning dispStrack" value='7'>Serviceable</button>
+            <button class="list-group-item list-group-item-action list-group-item-warning dispStrack" value='8'>Unserviceable&nbsp;-&nbsp;with&nbsp;date</button>
+            <button class="list-group-item list-group-item-action list-group-item-warning dispStrack" value='9'>Unserviceable&nbsp;-&nbsp;no&nbsp;date</button>
+
+            <li class="list-group-item dispQtrack"><b>Split&nbsp;category</b></li>
+            <button class="list-group-item list-group-item-action list-group-item-warning dispQtrack" value='10'>One, some or all of the following:
+                <br>-Not all items were found 
+                <br>-Items were in different categories 
+                <br>-Found more than original quantity
+            </button>
+
+            <li class="list-group-item dispQtrack"><b>No items found, no evidence provided</b></li>
+            <button class="list-group-item list-group-item-action list-group-item-danger dispQtrack" value='11'>Not sighted - No evidence</button>
+
+            <li class="list-group-item dispStrack"><b>No items found, no evidence provided</b></li>
+            <button class="list-group-item list-group-item-action list-group-item-danger dispStrack" value='11'>Not sighted - No evidence</button>
+        </ul>
+    </div>
+
+    <div class='col-6 lead'>
+        <input type='text' class='form-control' id='resultSelection'>
+        <table class='table table-sm'>
+            <tr><td><b>District</b></td><td><?=$DSTRCT_CODE?></td></tr>
+            <tr><td><b>Warehouse</b></td><td><?=$WHOUSE_ID?></td></tr>
+            <tr><td><b>SCA</b></td><td><?=$SUPPLY_CUST_ID?></td></tr>
+            <tr><td><b>Bin</b></td><td><?=$BIN_CODE?></td></tr>
+            <tr><td><b>SOH</b></td><td><?=$SOH?></td></tr>
+            <tr><td nowrap><b>SC Account type</b></td><td><?=$SC_ACCOUNT_TYPE?></td></tr>
+            <tr><td nowrap><b>Tracking indicator</b></td><td><?=$TRACKING_IND?></td></tr>
+            <tr><td colspan='2'><b>Comments</b><textarea class='form-control' rows='5'></textarea></td></tr>
+            <tr><td><b>Date</b></td><td><input type='text' class='form-control' name='' readonly></td></tr>
+            <tr><td colspan='2'>###############<br>Split area!<br>###############</td></tr>
         </table>
     </div>
 
-    <div class='col-4'>
-        <div class="form-group"><label>DSTRCT_CODE</label><input type="text" v-model="ar.best_AssetDesc1" class="form-control" :disabled="ar.lock_limited" v-on:keyup="sync_data('AssetDesc1')"></div>
-        <div class="form-group"><label>WHOUSE_ID</label><input type="text" v-model="ar.best_AssetDesc2" class="form-control" :disabled="ar.lock_limited" v-on:keyup="sync_data('AssetDesc2')"></div>
-        <div class="form-group"><label>Asset Main No Text</label><input type="text" v-model="ar.best_AssetMainNoText" class="form-control" :disabled="ar.lock_all" v-on:keyup="sync_data('AssetMainNoText')"></div>
-        <div class="form-group"><label>Inventory</label><input type="text" v-model="ar.best_Inventory" class="form-control" :disabled="ar.lock_limited" v-on:keyup="sync_data('Inventory')"></div>
-        <div class="form-group"><label>InventNo</label><input type="text" v-model="ar.best_InventNo" class="form-control" :disabled="ar.lock_limited" v-on:keyup="sync_data('InventNo')"></div>
-    </div>
+    
+    <div class='col-3 lead' id='menuright'></div>
 
 </div>
 
