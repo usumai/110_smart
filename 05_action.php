@@ -1199,6 +1199,39 @@ echo $date_disp;
      }}
      echo json_encode($ar);
 
+}elseif ($act=='save_msi_bin_stk') {
+     $res_findings       = $_POST["res_findings"];
+     $auto_storageID     = $_POST["auto_storageID"];
+     print_r($_POST);
+
+     function clnr($fieldVal){
+          echo "<br>".$fieldVal;
+          if(empty($fieldVal)&&$fieldVal==''){
+               $fieldVal    = 'null';
+          }else{
+               $fieldVal = str_replace("'","''",$fieldVal);
+               $fieldVal    = "'".$fieldVal."'";
+          }
+          return $fieldVal;
+     }
+
+     if(!empty($_POST['res_unserv_date'])){
+          $res_unserv_date = clnr($_POST['res_unserv_date']);    
+     }else{
+          $res_unserv_date = 'null';
+
+     }
+
+     $res_comment = clnr($_POST["res_comment"]);
+
+     $sql = "UPDATE smartdb.sm18_impairment SET 
+               res_findings='$res_findings',  
+               res_comment=$res_comment,  
+               res_unserv_date=$res_unserv_date 
+               WHERE 
+               auto_storageID='$auto_storageID' ";
+
+     echo "<br>".$sql;
 }
 // echo $log;
 
