@@ -112,6 +112,7 @@ $(document).ready(function() {
                 <th>SOH</th>
                 <th>TrkInd</th>
                 <th>TrkRef</th>
+                <th>Type</th>
                 <th>Status</th>
                 <th class='text-right'>Action</th>
             </tr>
@@ -151,15 +152,23 @@ if ($result->num_rows > 0) {
         $TRACKING_REFERENCE = $row['TRACKING_REFERENCE'];
         $STK_DESC           = $row['STK_DESC'];
         $sampleFlag         = $row['sampleFlag'];
+        $isType             = $row['isType'];
         $res_create_date    = $row['res_create_date'];
+        $findingID          = $row['findingID'];
 
         $flag_status = "<span class='text-danger'>NYC~</span>";
         if(!empty($res_create_date)){
-            $flag_status = "<span class='text-success'>FIN~<br>$res_findings</span>";
+            $flag_status = "<span class='text-success'>FIN~</span>";
         }
 
-        $btnAction = "<a href='16_bin.php?auto_storageID=$auto_storageID' class='btn btn-primary'><span class='octicon octicon-zap' style='font-size:30px'></span></a>";
-        echo "<tr><td>".$btnAction."</td><td>".$DSTRCT_CODE."</td><td>".$WHOUSE_ID."</td><td>".$SUPPLY_CUST_ID."</td><td>".$BIN_CODE."</td><td>".$STOCK_CODE."</td><td>".$ITEM_NAME."</td><td>".substr($INVENT_CAT,0,2)."</td><td>".$SOH."</td><td>".$TRACKING_IND."</td><td>".$TRACKING_REFERENCE."</td><td>".$flag_status."</td><td class='text-right'>".$btnAction."</td></tr>";
+        if(($isType)=="R2F"){
+            $btnAction = "<a href='16_r2f.php?auto_storageID=$auto_storageID' class='btn btn-primary'><span class='octicon octicon-zap' style='font-size:30px'></span></a>";
+        }elseif(($isType)=="F2R"){
+            $btnAction = "<a href='17_f2r.php?BIN_CODE=$BIN_CODE' class='btn btn-primary'><span class='octicon octicon-zap' style='font-size:30px'></span></a>";
+        }
+
+
+        echo "<tr><td>".$btnAction."</td><td>".$DSTRCT_CODE."</td><td>".$WHOUSE_ID."</td><td>".$SUPPLY_CUST_ID."</td><td>".$BIN_CODE."</td><td>".$STOCK_CODE."</td><td>".$ITEM_NAME."</td><td>".substr($INVENT_CAT,0,2)."</td><td>".$SOH."</td><td>".$TRACKING_IND."</td><td>".$TRACKING_REFERENCE."</td><td>".$isType."</td><td>".$flag_status."</td><td class='text-right'>".$btnAction."</td></tr>";
 
 }}
 

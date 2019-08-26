@@ -326,7 +326,7 @@ if ($act=='sys_pull_master') {
      `res_comment` text NULL,
      `res_evidence_desc` VARCHAR(255) NULL,
      `res_unserv_date` datetime NULL,
-     `res_children_count` int(11) NULL,
+     `isChild` int(11) NULL,
      `res_parent_storageID` VARCHAR(255) NULL,
      
      PRIMARY KEY (`auto_storageID`));";
@@ -580,10 +580,10 @@ if ($act=='sys_pull_master') {
 
                
                $sql_save=" INSERT INTO smartdb.sm18_impairment (
-                    stkm_id, storageID, rowNo, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, res_children_count, res_parent_storageID
+                    stkm_id, storageID, rowNo, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID
                ) VALUES(".
                
-               $stkm_id_new.",".$ass['storageID'].",".$ass['rowNo'].",".$ass['DSTRCT_CODE'].",".$ass['WHOUSE_ID'].",".$ass['SUPPLY_CUST_ID'].",".$ass['SC_ACCOUNT_TYPE'].",".$ass['STOCK_CODE'].",".$ass['ITEM_NAME'].",".$ass['STK_DESC'].",".$ass['BIN_CODE'].",".$ass['INVENT_CAT'].",".$ass['INVENT_CAT_DESC'].",".$ass['TRACKING_IND'].",".$ass['SOH'].",".$ass['TRACKING_REFERENCE'].",".$ass['LAST_MOD_DATE'].",".$ass['sampleFlag'].",".$ass['serviceableFlag'].",".$ass['isBackup'].",".$ass['isType'].",".$ass['targetID'].",".$ass['delete_date'].",".$ass['delete_user'].",".$ass['res_create_date'].",".$ass['res_update_user'].",".$ass['findingID'].",".$ass['res_comment'].",".$ass['res_evidence_desc'].",".$ass['res_unserv_date'].",".$ass['res_children_count'].",".$ass['res_parent_storageID']." ); ";
+               $stkm_id_new.",".$ass['storageID'].",".$ass['rowNo'].",".$ass['DSTRCT_CODE'].",".$ass['WHOUSE_ID'].",".$ass['SUPPLY_CUST_ID'].",".$ass['SC_ACCOUNT_TYPE'].",".$ass['STOCK_CODE'].",".$ass['ITEM_NAME'].",".$ass['STK_DESC'].",".$ass['BIN_CODE'].",".$ass['INVENT_CAT'].",".$ass['INVENT_CAT_DESC'].",".$ass['TRACKING_IND'].",".$ass['SOH'].",".$ass['TRACKING_REFERENCE'].",".$ass['LAST_MOD_DATE'].",".$ass['sampleFlag'].",".$ass['serviceableFlag'].",".$ass['isBackup'].",".$ass['isType'].",".$ass['targetID'].",".$ass['delete_date'].",".$ass['delete_user'].",".$ass['res_create_date'].",".$ass['res_update_user'].",".$ass['findingID'].",".$ass['res_comment'].",".$ass['res_evidence_desc'].",".$ass['res_unserv_date'].",".$ass['isChild'].",".$ass['res_parent_storageID']." ); ";
                // echo "<br><br>".$sql_save;
                mysqli_multi_query($con,$sql_save);
           
@@ -1232,7 +1232,7 @@ echo $date_disp;
      echo json_encode($ar);
 
 }elseif ($act=='save_msi_bin_stk') {
-     $findingID       = $_POST["findingID"];
+     $findingID          = $_POST["findingID"];
      $auto_storageID     = $_POST["auto_storageID"];
      $storageID          = $_POST["storageID"];
      $res_update_user    = "";
@@ -1304,14 +1304,15 @@ echo $date_disp;
      $sql = "UPDATE smartdb.sm18_impairment SET 
                findingID='$findingID',  
                res_comment=$res_comment,  
-               res_unserv_date=$res_unserv_date 
+               res_unserv_date=$res_unserv_date,
+               res_create_date=NOW() 
                WHERE 
                auto_storageID='$auto_storageID' ";
      runSql($sql);
 
 
 
-     header("Location: 16_bin.php?auto_storageID=".$auto_storageID);
+     header("Location: 16_r2f.php?auto_storageID=".$auto_storageID);
 
 }elseif ($act=='save_clear_msi_bin') {
      $auto_storageID       = $_GET["auto_storageID"];
@@ -1331,8 +1332,85 @@ echo $date_disp;
      $sql = "DELETE FROM smartdb.sm18_impairment WHERE res_parent_storageID='$storageID' ";
      runSql($sql);
 
-     header("Location: 16_bin.php?auto_storageID=".$auto_storageID);
+     header("Location: 16_r2f.php?auto_storageID=".$auto_storageID);
 
+}elseif ($act=='save_f2r_nstr') {
+     $BIN_CODE = $_GET["BIN_CODE"];
+
+     // 100 indicates NSTR
+     $sql = "UPDATE smartdb.sm18_impairment SET 
+     res_create_date=NOW(),
+     res_update_user=NULL,
+     findingID=100
+     WHERE BIN_CODE='$BIN_CODE' ";
+     runSql($sql);
+
+     header("Location: 17_f2r.php?BIN_CODE=".$BIN_CODE);
+
+
+}elseif ($act=='save_f2r_extras') {
+     $BIN_CODE = $_GET["BIN_CODE"];
+
+     // 101 indicates waiting for extras
+     $sql = "UPDATE smartdb.sm18_impairment SET 
+     findingID=101
+     WHERE BIN_CODE='$BIN_CODE' ";
+     runSql($sql);
+
+     header("Location: 17_f2r.php?BIN_CODE=".$BIN_CODE);
+
+     
+}elseif ($act=='save_clear_f2r') {
+     $BIN_CODE       = $_GET["BIN_CODE"];
+
+     $sql = "UPDATE smartdb.sm18_impairment SET 
+     res_create_date=NULL,
+     res_update_user=NULL,
+     findingID=NULL,  
+     res_comment=NULL,  
+     res_evidence_desc=NULL,
+     res_unserv_date=NULL,
+     res_children_count=NULL
+     WHERE 
+     BIN_CODE='$BIN_CODE' ";
+     runSql($sql);
+
+     $sql = "DELETE FROM smartdb.sm18_impairment WHERE BIN_CODE='$BIN_CODE' AND isChild=1 ";
+     runSql($sql);
+
+     header("Location: 17_f2r.php?BIN_CODE=".$BIN_CODE);
+
+
+
+}elseif ($act=='save_f2r_add_extra') {
+     $BIN_CODE           = $_POST["BIN_CODE"];
+     $extraStockcode     = $_POST["extraStockcode"];
+     $extraName          = $_POST["extraName"];
+     $extraSOH           = $_POST["extraSOH"];
+     $res_update_user='';
+     $sql = "  INSERT INTO smartdb.sm18_impairment (
+          res_create_date,
+          res_update_user,
+          BIN_CODE, 
+          STOCK_CODE, 
+          ITEM_NAME, 
+          SOH,
+          isChild)
+     VALUES (
+          NOW(),
+          '$res_update_user',
+          '$BIN_CODE',
+          '$extraStockcode',
+          '$extraName',
+          '$extraSOH',
+          1
+          )";
+
+     runSql($sql);
+     header("Location: 17_f2r.php?BIN_CODE=".$BIN_CODE);
+
+
+     
 }
 // echo $log;
 
