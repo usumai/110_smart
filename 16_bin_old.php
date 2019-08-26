@@ -16,7 +16,6 @@
 
 $auto_storageID = $_GET["auto_storageID"];
 
-$arrSample = array();
 $sql = "SELECT * FROM smartdb.sm18_impairment WHERE auto_storageID = $auto_storageID";
 // $sql .= " LIMIT 500; ";   
 $result = $con->query($sql);
@@ -40,204 +39,216 @@ if ($result->num_rows > 0) {
         $sampleFlag         = $row['sampleFlag'];
         $res_create_date    = $row['res_create_date'];
         $res_update_user    = $row['res_update_user'];
-        $findingID          = $row['findingID'];
+        $res_findings       = $row['res_findings'];
         $res_comment        = $row['res_comment'];
         $res_unserv_date    = $row['res_unserv_date'];
+        $res_create_date    = $row['res_create_date'];
+        $res_create_date    = $row['res_create_date'];
+        $res_create_date    = $row['res_create_date'];
 
-        $arrSample[] = $row;
+        $complete = 'false';
+        if(!empty($res_create_date)){
+            $complete = 'true';
+        }
+
+
 }}
 
-
-if($findingID>0){  
-    $getBackBtn = "<div class='text-center complete'><div class='dropdown'><button class='btn btn-outline-danger complete dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='dispBtnClear'>Delete</button><div class='dropdown-menu bg-danger' aria-labelledby='dropdownMenuButton'>
-    <a class='dropdown-item bg-danger text-light' href='05_action.php?act=save_clear_msi_bin&auto_storageID=".$auto_storageID."'>I'm sure</a></div></div></div>";
-}else{
-    $getBackBtn = "<div class='text-center complete'><button class='btn btn-outline-dark' id='btnClear'>Back</button></div>";  
+if(empty($res_unserv_date)){
+    $res_unserv_date = "";
 }
 
 
-if ($findingID==11){
-    $splityTotal = 0;
-    $maxSplity = 0;
-    $sql = "SELECT auto_storageID, findingID AS splityResult, res_create_date, SOH AS splityCount, res_unserv_date AS splityDate FROM smartdb.sm18_impairment WHERE res_parent_storageID = $storageID";   
-    $result = $con->query($sql);
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) { 
-            $splitty_auto_storageID     = $row['auto_storageID']; 
-            if($splitty_auto_storageID>$maxSplity){
-                $maxSplity = $splitty_auto_storageID;
-            }
-            $arrSample['splitys'][] = $row;
-    }}
-    $arrSample['maxSplity']     = $maxSplity;
-
-}else{ 
-    $arrSample['splitys']       = [];
-    $arrSample['maxSplity']     = 0;
-}
- 
-
-$sql = "SELECT * FROM smartdb.sm19_imp_result_list";   
-$result = $con->query($sql);
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        $arrSample['rl'][] = $row;
-}}
-
-$arrSample = json_encode($arrSample);
+// $complete = 'true';
 ?>
 
 
-
-
-
-
-
-
-
-
-
 <script type="text/javascript">
-let arS = '<?=$arrSample?>'
-    arS = JSON.parse(arS);
-let fID = arS[0]['findingID'];
-let rl  = arS['rl'];
+let TRACKING_IND    = "<?=$TRACKING_IND?>";
+let complete        = <?=$complete?>;
+let SOH             = "<?=$SOH?>";
+console.log(SOH)
+SOH = Number(SOH)
+console.log(typeof SOH)
+let resultSelection=false;
 
-//Declare other global variables
-let dispQtrack,dispStrack,complete;
+let dispQtrack  = TRACKING_IND=="Q";
+let dispStrack  = TRACKING_IND=="S";
+dispQtrack      = complete ? false : dispQtrack;
+dispStrack      = complete ? false : dispStrack;
+
+
+resultOptions = {
+    1: {
+        'name':'Serial tracked - Item sighted - Serviceable',
+        'color':'success',
+        'reqDate':false,
+        'reqSplit':false,
+        'reqComment':false
+    },
+    2: {
+        'name':'Serial tracked - Item sighted - Unserviceable - with date',
+        'color':'success',
+        'reqDate':true,
+        'reqSplit':false,
+        'reqComment':false
+    },
+    3: {
+        'name':'Serial tracked - Item sighted - Unserviceable - no date',
+        'color':'success',
+        'reqDate':false,
+        'reqSplit':false,
+        'reqComment':false
+    },
+    4: {
+        'name':'Serial tracked - Item not sighted - Serviceable',
+        'color':'warning',
+        'reqDate':false,
+        'reqSplit':false,
+        'reqComment':false
+    },
+    5: {
+        'name':'Serial tracked - Item not sighted - Unserviceable - with date',
+        'color':'warning',
+        'reqDate':true,
+        'reqSplit':false,
+        'reqComment':false
+    },
+    6: {
+        'name':'Serial tracked - Item not sighted - Unserviceable - no date',
+        'color':'warning',
+        'reqDate':false,
+        'reqSplit':false,
+        'reqComment':false
+    },
+    7: {
+        'name':'Serial tracked - Item not found, no evidence provided',
+        'color':'danger',
+        'reqDate':false,
+        'reqSplit':false,
+        'reqComment':false
+    },
+
+    8: {
+        'name':'Quantity tracked - Sighted or found evidence of all items - All serviceable',
+        'color':'success',
+        'reqDate':false,
+        'reqSplit':false,
+        'reqComment':false
+    },
+    9: {
+        'name':'Quantity tracked - Sighted or found evidence of all items - None serviceable - with date',
+        'color':'success',
+        'reqDate':true,
+        'reqSplit':false,
+        'reqComment':false
+    },
+    10:{
+        'name':'Quantity tracked - Sighted or found evidence of all items - None serviceable - no date',
+        'color':'success',
+        'reqDate':false,
+        'reqSplit':false,
+        'reqComment':false
+    },
+    11:{
+        'name':'Quantity tracked - Split category - One, some or all of the following:<br>+ Not all items were found<br>+ Items were in different categories<br>+ Found more than original quantity',
+        'color':'warning',
+        'reqDate':false,
+        'reqSplit':true,
+        'reqComment':true
+    },
+    12:{
+        'name':'Quantity tracked - No items found, no evidence provided',
+        'color':'danger',
+        'reqDate':false,
+        'reqSplit':false,
+        'reqComment':true
+    }
+}
+
+
+
+
+
+
 
 $(document).ready(function() {
     
-    //Copy the menu to the other side of the page
     let menuright = $('#menuleft').html();
     $('#menuright').html(menuright);
 
-    //Create the splity option menu
-    let rls = [1,2,3,4,5,6,7];
-    let splityOptions = "";
-    for (let key in rls) {
-        splityOptions += "<option "
-        splityOptions += "value='"+rls[key]+"'  "
-        splityOptions += "class='list-group-item-"+arS['rl'][rls[key]-1]['color']+"'>"
-        splityOptions += arS['rl'][rls[key]-1]['findingName']
-        splityOptions += "</option>";
-    }
-    $('#splityResult').html(splityOptions);
-
-
-
-    //Initialise the page
     setPage()
 
-    function setPage(){  
-        if (arS[0]['findingID']){
-            complete        = true;
-        }else{
-            complete        = false;
-        }
 
-        // determine if the menu should be shown at all
-        dispQtrack = complete ? false : arS[0]['TRACKING_IND']=="Q"
-        dispStrack = complete ? false : arS[0]['TRACKING_IND']=="S"
-        $('.dispQtrack').toggle(dispQtrack);
-        $('.dispStrack').toggle(dispStrack);
-        $('.complete').toggle(complete);
-
-        if(arS[0]['findingID']){
-            let fID = arS[0]['findingID']
-
-            //Update the form values
-            $('#findingID').val(arS[0]['findingID']);   
-
-            // Publish display elements
-            $('#areaDate').toggle(arS['rl'][fID-1]['reqDate']==1);
-            $('#areaSplit').toggle(arS['rl'][fID-1]['reqSplit']==1);
-            $("#resultSelection").html("<b>"+arS['rl'][fID-1]['findingName']+"</b>");
-            $("#resultSelection").addClass('list-group-item-'+arS['rl'][fID-1]['color']);
-
-            //Disprove submission validation
-            $('#btnSubmit').show();
-
-            //Check if date required, date is set
-            let res_unserv_date = $('#res_unserv_date').val();
-            if(arS['rl'][fID-1]['reqDate']==1&& res_unserv_date.length<=0){
-                $('#btnSubmit').hide();
-            }
-
-            //Check if comment required, comment is set
-            let res_comment = $('#res_comment').val();
-            if(arS['rl'][fID-1]['reqComment']==1&& res_comment.length<=5){
-                $('#btnSubmit').hide();
-            }
-
-            //Check if splity values all add up sufficient to submit.
-            if(fID==11){
-
-
-                let splityRows      = "";
-                let totalSplitySOH  = 0;
-                let splityHidden    = "";
-                $('.splityRow').remove();
-                for (let key in arS['splitys']) {
-                    
-                    let splityCount     = arS['splitys'][key]['splityCount']
-                    let splityDate      = arS['splitys'][key]['splityDate']
-                    let splityResult    = arS['splitys'][key]['splityResult']
-                    let btnRemoveSplity = "<button type='button' class='btn btn-outline-dark btnRemoveSplity' value='"+key+"'><i class='fas fa-minus'></i></button>"
-
-
-                    if(!splityDate){
-                        splityDate = ''
-                    }
-                    
-                    splityRows += "<tr class='splityRow'><td>"+splityCount+"</td><td>"+arS['rl'][splityResult-1]['findingName']+"</td><td>"+splityDate+"</td><td>"+btnRemoveSplity+"</td></tr>"
-
-                    splityHidden+="<input type='hidden' name='splityRecord[]' value='"+key+"'>"
-                    splityHidden+="<input type='hidden' name='splityCount["+key+"]' value='"+splityCount+"'>"
-                    splityHidden+="<input type='hidden' name='splityResult["+key+"]' value='"+splityResult+"'>"
-                    splityHidden+="<input type='hidden' name='splityDate["+key+"]' value='"+splityDate+"'>"
-
-                    totalSplitySOH += Number(splityCount);
-                }
-                $('#splityTable tr:last').before(splityRows)
-                $('#splityTotal').text(totalSplitySOH);
-                $('#splityLanding').html(splityHidden)
-
-                if(totalSplitySOH<arS[0]['SOH']){
-                    $('#btnSubmit').hide();
-                }
-                
-            }
-        }else{
-            $('#areaDate').toggle(false);
-            $('#areaSplit').toggle(false);
-            $("#resultSelection").html('&nbsp;');
-            $("#resultSelection").removeClass('list-group-item-success');
-            $("#resultSelection").removeClass('list-group-item-warning');
-            $("#resultSelection").removeClass('list-group-item-danger');
-        }
-    }
-
-
-    //Events
     $('.dispStrack').click(function(){
-        arS[0]['findingID'] = $(this).val();
+        complete = true;
+        resultSelection = $(this).val();
         setPage()
     });
 
     $('.dispQtrack').click(function(){
-        arS[0]['findingID'] = $(this).val();
+        complete = true;
+        resultSelection = $(this).val();
         setPage()
     });
 
+    
     $(document).on('keyup', "#res_comment", function(){
         setPage()
     });
 
+
     $('body').on('click', '#btnClear', function() {
-        arS[0]['findingID'] = false;
+        complete = false;
+        resultSelection = false;
         setPage()
+        $("#resultSelection").html('&nbsp;');
     });
+
+
+    function setPage(){     
+        dispQtrack = complete ? false : TRACKING_IND=="Q"
+        dispStrack = complete ? false : TRACKING_IND=="S"
+        $('.dispQtrack').toggle(dispQtrack);
+        $('.dispStrack').toggle(dispStrack);
+        $('.complete').toggle(complete);
+
+        if(resultSelection){
+            $('#res_findings').val(resultSelection);   
+            $('#areaDate').toggle(resultOptions[resultSelection]['reqDate']);
+            $('#areaSplit').toggle(resultOptions[resultSelection]['reqSplit']);
+            $("#resultSelection").html("<b>"+resultOptions[resultSelection]['name']+"</b>");
+            $("#resultSelection").addClass('list-group-item-'+resultOptions[resultSelection]['color']);
+
+            $('#btnSubmit').show();
+
+            let res_unserv_date = $('#res_unserv_date').val();
+            if(resultOptions[resultSelection]['reqDate']&& res_unserv_date.length<=0){
+                $('#btnSubmit').hide();
+            }
+
+            let res_comment = $('#res_comment').val();
+            if(resultOptions[resultSelection]['reqComment']&& res_comment.length<=5){
+                $('#btnSubmit').hide();
+            }
+
+            if(resultSelection==11){//Split category
+                checkSplityAllGood()
+            }
+
+        }else{
+            $('#areaDate').toggle(false);
+            $('#areaSplit').toggle(false);
+            $("#resultSelection").removeClass('list-group-item-success');
+            $("#resultSelection").removeClass('list-group-item-warning');
+            $("#resultSelection").removeClass('list-group-item-danger');
+        }
+        
+
+    }
+
+
+
 
     $(".datepicker").datepicker({ dateFormat: 'yy-mm-dd' });
     $(".datepicker").change(function(){
@@ -249,8 +260,17 @@ $(document).ready(function() {
 
 
 
-//SPLITY SECTION
-//     validateSplity()
+    //SPLITY SECTION
+
+    validateSplity()
+
+    let splityCats = [1,2,3,4,5,6,7];
+    let splityOptions = "";
+    for (let key in splityCats) {
+        splityOptions += "<option value='"+splityCats[key]+"' class='list-group-item-"+resultOptions[splityCats[key]]['color']+"'>"+resultOptions[splityCats[key]]['name']+"</option>";
+    }
+    $('#splityResult').html(splityOptions);
+
     $(document).on('change', ".splity", function(){
         validateSplity()
     });
@@ -259,36 +279,6 @@ $(document).ready(function() {
         validateSplity()
     });
 
-    
-    // splityId=0;
-    $("#addSplity").click(function(){
-        arS['maxSplity']++;
-        newMaxS             = arS['maxSplity'];
-        let splityCount     = $('#splityCount').val();
-        let splityResult    = $('#splityResult').val();
-        let splityDate      = $('#splityDate').val();
-        
-        arS['splitys'][newMaxS] = {
-            splityCount,
-            splityResult,
-            splityDate
-        }
-        setPage()
-
-
-        $('#splityCount').val('');
-        $('#splityResult').val(1);
-        $('#splityDate').val('');
-        $("#addSplity").prop('disabled', true);
-    })
-
-    $(document).on('click', ".btnRemoveSplity", function(){
-        let splityId = $(this).val()
-        delete arS['splitys'][splityId]
-        setPage()
-    });
-
-    validateSplity()
     function validateSplity(){
         let splityCount     = $('#splityCount').val();
         let splityResult    = $('#splityResult').val();
@@ -303,32 +293,83 @@ $(document).ready(function() {
         }
 
         if(splityResult){
-            if(arS['rl'][splityResult-1]['reqDate']==1&& splityDate.length<=0){
+            if(resultOptions[splityResult]['reqDate']&& splityDate.length<=0){
                 $("#addSplity").prop('disabled', true);
             }
         }
     }
 
+    $("#addSplity").click(function(){
+        addSplity();
+    })
+
+    let splityTotal=0;
+    let splityId=0;
+
+    function addSplity(){
+        splityId++;
+        let splityCount     = $('#splityCount').val();
+        let splityResult    = $('#splityResult').val();
+        let splityDate      = $('#splityDate').val();
+
+        let btnRemoveSplity = "<button type='button' class='btn btn-outline-dark btnRemoveSplity' value='"+splityId+"'><i class='fas fa-minus'></i></button>"
+
+        $('#splityTable tr:last').before("<tr id='splityRow"+splityId+"'><td>"+splityCount+"</td><td>"+resultOptions[splityResult]['name']+"</td><td>"+splityDate+"</td><td>"+btnRemoveSplity+"</td></tr>")
+
+// $('#splityLanding').append(`<input type="hidden" id="splityRecord`+splityId+`" name="splityRecord`+splityId+` value="{'splityCount':'`+splityCount+`','splityResult':'`+splityResult+`','splityDate':'`+splityDate+`' }">`)
+
+$('#splityLanding').append("<input type='hidden' name='splityRecord[]' value='"+splityId+"'>")
+
+$('#splityLanding').append("<input type='hidden' name='splityCount["+splityId+"]' value='"+splityCount+"'>")
+$('#splityLanding').append("<input type='hidden' name='splityResult["+splityId+"]' value='"+splityResult+"'>")
+$('#splityLanding').append("<input type='hidden' name='splityDate["+splityId+"]' value='"+splityDate+"'>")
 
 
+        splityTotal += Number(splityCount);
+
+        console.log("splityTotal:"+splityTotal)
+        console.log(typeof splityTotal)
+        console.log("SOH:"+SOH)
+        console.log(typeof SOH)
+        console.log(splityTotal<SOH)
+        checkSplityAllGood()
+
+        $('#splityTotal').text(splityTotal);
+        $('#splityCount').val('');
+        $('#splityResult').val(1);
+        $('#splityDate').val('');
+        $("#addSplity").prop('disabled', true);
+    }
 
 
-//     function checkSplityAllGood(){
-//         $('#btnSubmit').show()
+    $(document).on('click', ".btnRemoveSplity", function(){
+        let splityId = $(this).val()
+        $("#splityRow"+splityId).remove()
 
-//         if(splityTotal<SOH){
-//             $('#btnSubmit').hide();
-//         }
-//         if(isNaN(splityTotal)){
-//             $('#btnSubmit').hide();
-//             splityTotal = 0
-//         }
-//         let res_comment = $('#res_comment').val();
-//         if(resultOptions[resultSelection]['reqComment']&& res_comment.length<=5){
-//             $('#btnSubmit').hide();
-//         }
+        splityTotal -= Number(splityCount);
+        $('#splityTotal').text(splityTotal);
 
-//     }
+        checkSplityAllGood()
+
+    });
+
+
+    function checkSplityAllGood(){
+        $('#btnSubmit').show()
+
+        if(splityTotal<SOH){
+            $('#btnSubmit').hide();
+        }
+        if(isNaN(splityTotal)){
+            $('#btnSubmit').hide();
+            splityTotal = 0
+        }
+        let res_comment = $('#res_comment').val();
+        if(resultOptions[resultSelection]['reqComment']&& res_comment.length<=5){
+            $('#btnSubmit').hide();
+        }
+
+    }
 
 
 
@@ -364,12 +405,8 @@ $(document).ready(function() {
 
     <div class='col-3 lead' id='menuleft'>
         
+        <div class='text-center'><div class="dropdown"><button class="btn btn-outline-danger complete dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id='dispBtnClear'>Clear</button><div class="dropdown-menu bg-danger" aria-labelledby="dropdownMenuButton"><button class='dropdown-item bg-danger text-light' id='btnClear'>I'm sure</button></div></div></div>
 
-
-            
-
-        <?=$getBackBtn?>
-    
 
         <ul class="list-group list-group-flush text-center">
 
@@ -418,7 +455,7 @@ $(document).ready(function() {
             <tr><td><b>SOH</b></td><td><?=$SOH?></td></tr>
             <tr><td nowrap><b>SC Account type</b></td><td><?=$SC_ACCOUNT_TYPE?></td></tr>
             <tr><td nowrap><b>Tracking indicator</b></td><td><?=$TRACKING_IND?></td></tr>
-            <tr><td colspan='2' class='complete'><b>Comments</b><textarea class='form-control' rows='5' name='res_comment' id='res_comment'><?=$res_comment?></textarea></td></tr>
+            <tr><td colspan='2'><b>Comments</b><textarea class='form-control' rows='5' name='res_comment' id='res_comment'><?=$res_comment?></textarea></td></tr>
             <tr id='areaDate'><td><b>Date</b></td><td><input type='text' class='form-control datepicker' name='res_unserv_date' id='res_unserv_date' value='<?=$res_unserv_date?>' readonly></td></tr>
             <tr id='areaSplit'><td colspan='2'>
                 <b>Split area</b><br>
@@ -447,7 +484,7 @@ $(document).ready(function() {
                     <span id='splityLanding'></span>
 
                     <input type='hidden' name='act' value='save_msi_bin_stk'>
-                    <input type='hidden' name='findingID' id='findingID' value='<?=$findingID?>'>
+                    <input type='hidden' name='res_findings' id='res_findings' value='<?=$res_findings?>'>
                     <input type='hidden' name='auto_storageID' value='<?=$auto_storageID?>'>
                     <input type='hidden' name='storageID' id='storageID' value='<?=$storageID?>'>
                     <input type='submit' id='btnSubmit' value='Save' class='btn btn-outline-dark float-right complete' >

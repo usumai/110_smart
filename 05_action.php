@@ -322,7 +322,7 @@ if ($act=='sys_pull_master') {
 
      `res_create_date` datetime NULL,
      `res_update_user` VARCHAR(255) NULL,
-     `res_findings` VARCHAR(255) NULL,
+     `findingID` VARCHAR(255) NULL,
      `res_comment` text NULL,
      `res_evidence_desc` VARCHAR(255) NULL,
      `res_unserv_date` datetime NULL,
@@ -332,6 +332,38 @@ if ($act=='sys_pull_master') {
      PRIMARY KEY (`auto_storageID`));";
      echo "<br><br>".$sql_save;
      mysqli_multi_query($con,$sql_save);
+
+
+     $sql_save = "CREATE TABLE $dbname.sm19_imp_result_list (
+          `findingID` INT(11) NOT NULL AUTO_INCREMENT, 
+          `findingName` VARCHAR(255) NULL,
+          `color` VARCHAR(255) NULL,
+          `reqDate` INT(11),
+          `reqSplit` INT(11),
+          `reqComment` INT(11),          
+          PRIMARY KEY (`findingID`));";
+          echo "<br><br>".$sql_save;
+          mysqli_multi_query($con,$sql_save);
+
+
+     $sql_save = "INSERT INTO $dbname.sm19_imp_result_list (findingName, color, reqDate, reqSplit, reqComment) VALUES 
+     ('Serial tracked - Item sighted - Serviceable','success',0,0,0),
+     ('Serial tracked - Item sighted - Unserviceable - with date','success',1,0,0),
+     ('Serial tracked - Item sighted - Unserviceable - no date','success',0,0,0),
+     ('Serial tracked - Item not sighted - Serviceable','warning',0,0,0),
+     ('Serial tracked - Item not sighted - Unserviceable - with date','warning',1,0,0),
+     ('Serial tracked - Item not sighted - Unserviceable - no date','warning',0,0,0),
+     ('Serial tracked - Item not found, no evidence provided','danger',0,0,0),
+     ('Quantity tracked - Sighted or found evidence of all items - All serviceable','success',0,0,0),
+     ('Quantity tracked - Sighted or found evidence of all items - None serviceable - with date','success',1,0,0),
+     ('Quantity tracked - Sighted or found evidence of all items - None serviceable - no date','success',0,0,0),
+     ('Quantity tracked - Split category - One, some or all of the following:<br>+ Not all items were found<br>+ Items were in different categories<br>+ Found more than original quantity','warning',0,1,1),
+     ('Quantity tracked - No items found, no evidence provided','danger',0,0,1)
+     ; "; 
+          // echo "<br><br>".$sql_save;
+          mysqli_multi_query($con,$sql_save);
+
+
 
 
 
@@ -548,10 +580,10 @@ if ($act=='sys_pull_master') {
 
                
                $sql_save=" INSERT INTO smartdb.sm18_impairment (
-                    stkm_id, storageID, rowNo, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, res_findings, res_comment, res_evidence_desc, res_unserv_date, res_children_count, res_parent_storageID
+                    stkm_id, storageID, rowNo, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, res_children_count, res_parent_storageID
                ) VALUES(".
                
-               $stkm_id_new.",".$ass['storageID'].",".$ass['rowNo'].",".$ass['DSTRCT_CODE'].",".$ass['WHOUSE_ID'].",".$ass['SUPPLY_CUST_ID'].",".$ass['SC_ACCOUNT_TYPE'].",".$ass['STOCK_CODE'].",".$ass['ITEM_NAME'].",".$ass['STK_DESC'].",".$ass['BIN_CODE'].",".$ass['INVENT_CAT'].",".$ass['INVENT_CAT_DESC'].",".$ass['TRACKING_IND'].",".$ass['SOH'].",".$ass['TRACKING_REFERENCE'].",".$ass['LAST_MOD_DATE'].",".$ass['sampleFlag'].",".$ass['serviceableFlag'].",".$ass['isBackup'].",".$ass['isType'].",".$ass['targetID'].",".$ass['delete_date'].",".$ass['delete_user'].",".$ass['res_create_date'].",".$ass['res_update_user'].",".$ass['res_findings'].",".$ass['res_comment'].",".$ass['res_evidence_desc'].",".$ass['res_unserv_date'].",".$ass['res_children_count'].",".$ass['res_parent_storageID']." ); ";
+               $stkm_id_new.",".$ass['storageID'].",".$ass['rowNo'].",".$ass['DSTRCT_CODE'].",".$ass['WHOUSE_ID'].",".$ass['SUPPLY_CUST_ID'].",".$ass['SC_ACCOUNT_TYPE'].",".$ass['STOCK_CODE'].",".$ass['ITEM_NAME'].",".$ass['STK_DESC'].",".$ass['BIN_CODE'].",".$ass['INVENT_CAT'].",".$ass['INVENT_CAT_DESC'].",".$ass['TRACKING_IND'].",".$ass['SOH'].",".$ass['TRACKING_REFERENCE'].",".$ass['LAST_MOD_DATE'].",".$ass['sampleFlag'].",".$ass['serviceableFlag'].",".$ass['isBackup'].",".$ass['isType'].",".$ass['targetID'].",".$ass['delete_date'].",".$ass['delete_user'].",".$ass['res_create_date'].",".$ass['res_update_user'].",".$ass['findingID'].",".$ass['res_comment'].",".$ass['res_evidence_desc'].",".$ass['res_unserv_date'].",".$ass['res_children_count'].",".$ass['res_parent_storageID']." ); ";
                // echo "<br><br>".$sql_save;
                mysqli_multi_query($con,$sql_save);
           
@@ -1200,12 +1232,12 @@ echo $date_disp;
      echo json_encode($ar);
 
 }elseif ($act=='save_msi_bin_stk') {
-     $res_findings       = $_POST["res_findings"];
+     $findingID       = $_POST["findingID"];
      $auto_storageID     = $_POST["auto_storageID"];
-     print_r($_POST);
-
+     $storageID          = $_POST["storageID"];
+     $res_update_user    = "";
      function clnr($fieldVal){
-          echo "<br>".$fieldVal;
+          // echo "<br>".$fieldVal;
           if(empty($fieldVal)&&$fieldVal==''){
                $fieldVal    = 'null';
           }else{
@@ -1215,25 +1247,106 @@ echo $date_disp;
           return $fieldVal;
      }
 
+
+
+     // print_r($_POST);
+
+     //Delete children
+     $sql = "DELETE FROM smartdb.sm18_impairment WHERE res_parent_storageID='$storageID' ";
+     runSql($sql);
+
+     if($findingID==11){
+
+          foreach ($_POST["splityRecord"] as $key => $value) {
+               $splityCount   = $_POST['splityCount'][$value];
+               $splityResult  = $_POST['splityResult'][$value];
+               $splityDate    = $_POST['splityDate'][$value];
+               // echo "<br><b>".$splityCount." - ".$splityResult." - ".$splityDate."</b>";
+               if(!empty($splityDate)){
+                    $splityDate = clnr($splityDate);    
+               }else{
+                    $splityDate = 'null';
+               }
+               $sql = "  INSERT INTO smartdb.sm18_impairment (
+                              res_create_date,
+                              res_update_user,
+                              findingID, 
+                              res_unserv_date, 
+                              res_parent_storageID, 
+                              SOH)
+                         VALUES (
+                              NOW(),
+                              '$res_update_user',
+                              '$splityResult',
+                              $splityDate,
+                              '$storageID',
+                              '$splityCount'
+                              )";
+
+               runSql($sql);
+          }
+
+          
+
+     }
+
+
+
+
      if(!empty($_POST['res_unserv_date'])){
           $res_unserv_date = clnr($_POST['res_unserv_date']);    
      }else{
           $res_unserv_date = 'null';
-
      }
 
      $res_comment = clnr($_POST["res_comment"]);
 
      $sql = "UPDATE smartdb.sm18_impairment SET 
-               res_findings='$res_findings',  
+               findingID='$findingID',  
                res_comment=$res_comment,  
                res_unserv_date=$res_unserv_date 
                WHERE 
                auto_storageID='$auto_storageID' ";
+     runSql($sql);
 
-     echo "<br>".$sql;
+
+
+     header("Location: 16_bin.php?auto_storageID=".$auto_storageID);
+
+}elseif ($act=='save_clear_msi_bin') {
+     $auto_storageID       = $_GET["auto_storageID"];
+
+     $sql = "UPDATE smartdb.sm18_impairment SET 
+     res_create_date=NULL,
+     res_update_user=NULL,
+     findingID=NULL,  
+     res_comment=NULL,  
+     res_evidence_desc=NULL,
+     res_unserv_date=NULL,
+     res_children_count=NULL
+     WHERE 
+     auto_storageID='$auto_storageID' ";
+     runSql($sql);
+
+     $sql = "DELETE FROM smartdb.sm18_impairment WHERE res_parent_storageID='$storageID' ";
+     runSql($sql);
+
+     header("Location: 16_bin.php?auto_storageID=".$auto_storageID);
+
 }
 // echo $log;
 
+
+function runSql($stmt){
+     global $con;
+     $log = "<br><br>".$stmt."<br>";
+     if (!mysqli_multi_query($con,$stmt)){
+          $save_error = mysqli_error($con);
+          $log .='failure: '.$save_error;
+     }else{
+          $log .='success';     
+     }
+     if (true){echo $log;}
+}
 
 ?>
