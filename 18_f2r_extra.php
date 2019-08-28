@@ -1,25 +1,36 @@
 <?php include "01_dbcon.php"; ?>
 <?php include "02_header.php"; ?>
 <?php include "03_menu.php"; ?>
-
 <?php
-
 $auto_storageID = $_GET["auto_storageID"];
 $BIN_CODE = $_GET["BIN_CODE"];
 
+$sql = "SELECT STOCK_CODE, ITEM_NAME, SOH, finalResult, finalResultPath FROM smartdb.sm18_impairment WHERE auto_storageID = '$auto_storageID'";
+// $sql .= " LIMIT 500; ";   
+$result = $con->query($sql);
+if ($result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {      
+        $finalResult        = $row['finalResult'];
+        $finalResultPath    = $row['finalResultPath'];
+}}
 ?>
 
 <script type="text/javascript">
-let ans = {
-    1 : "",
-    2 : "",
-    3 : "",
-    4 : "",
-    5 : "",
-    6 : "",
-    7 : "",
-    8 : "",
-    9 : "",
+let ans = '<?=$finalResultPath?>'
+if(ans==''){
+    ans = {
+        1 : "",
+        2 : "",
+        3 : "",
+        4 : "",
+        5 : "",
+        6 : "",
+        7 : "",
+        8 : "",
+        9 : "",
+    }
+}else{
+    ans = JSON.parse(ans)
 }
 
 let qns = {
@@ -70,33 +81,34 @@ let qns = {
     },
 }
 // console.log(qns)
-let path
+let path, finalResult
 $(document).ready(function() {
     
     setPage()
-
-
     function assessQuestion(qno){
-        path+="<br>Question: "+qns[qno]['name']
+        questionText ="<li class='list-group-item history'><b>"+qns[qno]['name']+"</b></li>"
+        path+=questionText
         if (ans[qno]){
-            path+="<br>Answer: "+ans[qno]
-            nextStep = ans[qno]=="Yes" ? qns[qno]['yesPath'] : qns[qno]['noPath']
+            btnRepeal = "&nbsp;<button type='button' class='btn btn-sm btn-outline-dark btnRepeal' value='"+qno+"'>X</button>"
+            if (ans[qno]=="Yes"){
+                nextStep = qns[qno]['yesPath']
+                path+="<li class='list-group-item list-group-item-success history'>Yes"+btnRepeal+"</li>"
+            }else{
+                nextStep = qns[qno]['noPath']
+                path+="<li class='list-group-item list-group-item-danger history'>No"+btnRepeal+"</li>"
+            }
         }else{
-            let btnYes = "<button type='button' class='btn btn-success question' value='Yes' data-qno='"+qno+"'>Yes</button>"
-            let btnNo = "<button type='button' class='btn btn-danger question' value='No' data-qno='"+qno+"'>No</button>"
-            path+="<br>Answer: Ability to answer"+btnYes+btnNo
+            let btnYes = "<button class='list-group-item list-group-item-action list-group-item-success question'  value='Yes' data-qno='"+qno+"'>Yes</button>"
+            let btnNo = "<button class='list-group-item list-group-item-action list-group-item-danger question'  value='No' data-qno='"+qno+"'>No</button>"
+            path+=btnYes+btnNo
             nextStep = "waiting"
         }
         return nextStep
     }
 
-
-
     function setPage(){
         path='';
         $('.question').toggle(false);
-        console.log(ans)
-        
 
         isFinished = false
         nextStep = 1
@@ -110,9 +122,18 @@ $(document).ready(function() {
         while ( isFinished == false);
         
         if (nextStep!='waiting'){
-            path+="<br><br>Final result: "+nextStep
+            // path+="<br><br>Final result: "+nextStep
+            finalResult         = nextStep
+            finalResult_disp    = nextStep
+            if (finalResult_disp=='nstr'){
+                finalResult_disp = "No further investigation"
+            }
+            path+="<li class='list-group-item'><b class='display-4'>"+finalResult_disp+"</b><br>Final result</li><br>"
+
+
+            path+="<button type='button' id='btnSave' class='btn btn-outline-dark'>Save</button>"
         }
-        $("#test").html(path);
+        $("#workingChain").html(path);
     }
 
 
@@ -124,11 +145,48 @@ $(document).ready(function() {
         setPage()
     })
 
+    $('body').on('click', '#btnSave', function() {
+        $.post("05_action.php",
+        {
+            act:            "save_f2r_extra",
+            auto_storageID: "<?=$auto_storageID?>",
+            BIN_CODE:       "<?=$BIN_CODE?>",
+            finalResult,
+            finalResultPath:JSON.stringify(ans)
+        },
+        function(data, status){
+            console.log(data);
+            if(data=="success"){
+                window.location.replace("17_f2r.php?BIN_CODE=<?=$BIN_CODE?>");
+            }
+        });
+    })
 
-    // $("#q1").toggle(ans[q1]=='q1n');
+    $('body').on('click', '.btnRepeal', function() {
+        let qno = $(this).val();
+        qno=Number(qno)
+        let deleteRest = false
+        for (let key in ans){
+            key=Number(key)
+            if(key==qno){
+                deleteRest = true
+            }
+            if(deleteRest){// console.log('deleting answer:'+key+'-'+ans[key])
+                ans[key]=''
+            }
+        }
+        setPage()
+    })
 
 });
 </script>
+
+<style>
+.history{
+    padding:1px;
+}
+</style>
+
 
 <br><br>
 
@@ -136,54 +194,18 @@ $(document).ready(function() {
 
 <div class='row'>
     <div class='col'>
-        <h1 class='display-4'>Extra stockcode investigation</h1>
+        <h1 class='display-4'>
+            Extra stockcode investigation
+            <a href='17_f2r.php?BIN_CODE=<?=$BIN_CODE?>' class='btn btn-outline-dark float-right'>Back</a>
+        </h1>
+        <div class='dropdown'><button class='btn btn-outline-danger dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='dispBtnClear'>Clear</button><div class='dropdown-menu bg-danger' aria-labelledby='dropdownMenuButton'><a class='dropdown-item bg-danger text-light' href='05_action.php?act=save_clear_f2r_extra&auto_storageID=<?=$auto_storageID?>&BIN_CODE=<?=$BIN_CODE?>'>I'm sure</a></div></div>
     </div>
 </div>
 
 <div class='row'>
-    <div class='col-6 lead' id='menuleft'>
-    <div id='test'></div>
-
-
-
+    <div class='col lead  auto-mx' id='menuleft'>
         <ul class="list-group list-group-flush text-center">
-
-<li class="list-group-item question q1"><b>Is the item a commonwealth asset?</b></li>
-<button class="list-group-item list-group-item-action list-group-item-success question q1 q1n" value='end' data-qno='1'>No</button>
-<button class="list-group-item list-group-item-action list-group-item-danger question q1 q1y" value='2' data-qno='1'>Yes</button>
-
-<li class="list-group-item question q2"><b>Is the item serial tracked?</b></li>
-<button class="list-group-item list-group-item-action list-group-item-success question q2" value='3' data-qno='2'>No</button>
-<button class="list-group-item list-group-item-action list-group-item-danger question q2" value='4' data-qno='2'>Yes</button>
-
-<li class="list-group-item question q3"><b>Does serial no. exists in WHS on MILIS?</b></li>
-<button class="list-group-item list-group-item-action list-group-item-success question q3" value='end' data-qno='3'>No</button>
-<button class="list-group-item list-group-item-action list-group-item-danger question q3" value='4' data-qno='3'>Yes</button>
-
-<li class="list-group-item question q4"><b>Check dues in/out status?</b></li>
-<button class="list-group-item list-group-item-action list-group-item-success question q4" value='5'>No</button>
-<button class="list-group-item list-group-item-action list-group-item-danger question q4" value='end'>Yes</button>
-
-<li class="list-group-item question q5"><b>Does it belong in a SCA?</b></li>
-<button class="list-group-item list-group-item-action list-group-item-success question q5" value='6'>No</button>
-<button class="list-group-item list-group-item-action list-group-item-danger question q5" value='end'>Yes</button>
-
-<li class="list-group-item question q6"><b>Does the item belong in this WHS?</b></li>
-<button class="list-group-item list-group-item-action list-group-item-success question q6" value='end'>No</button>
-<button class="list-group-item list-group-item-action list-group-item-danger question q6" value='7'>Yes</button>
-
-<li class="list-group-item question q7"><b>Verify inventory category. Does it fall under an exclusion list?</b></li>
-<button class="list-group-item list-group-item-action list-group-item-success question q7" value='8'>No</button>
-<button class="list-group-item list-group-item-action list-group-item-danger question q7" value='end'>Yes</button>
-
-<li class="list-group-item question q8"><b>Are there other MILIS bins in the warehouse that contain this item/stockcode?</b></li>
-<button class="list-group-item list-group-item-action list-group-item-success question q8" value='end'>No</button>
-<button class="list-group-item list-group-item-action list-group-item-danger question q8" value='9'>Yes</button>
-
-<li class="list-group-item question q9"><b>Is the physical SOH different to 1RB?</b></li>
-<button class="list-group-item list-group-item-action list-group-item-success question q9" value='FF'>No</button>
-<button class="list-group-item list-group-item-action list-group-item-danger question q9" value='LE'>Yes</button>
-
+            <div id='workingChain'></div>
         </ul>
     </div>
 </div>

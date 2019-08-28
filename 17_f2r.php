@@ -34,13 +34,13 @@ if ($result->num_rows > 0) {
         $res_comment        = $row['res_comment'];
         $res_unserv_date    = $row['res_unserv_date'];
 
-        $binC .= "<tr><td>$STOCK_CODE</td><td>$ITEM_NAME</td><td align='right'>$SOH</td><td></td></tr>";
+        $binC .= "<tr><td>$STOCK_CODE</td><td>$ITEM_NAME</td><td align='right'>$SOH</td><td>Original</td></tr>";
 
         $arrSample[] = $row;
 }}
 
 $binExtra = '';
-$sql = "SELECT * FROM smartdb.sm18_impairment WHERE BIN_CODE = '$BIN_CODE' AND isChild=1";
+$sql = "SELECT auto_storageID, STOCK_CODE, ITEM_NAME, SOH, finalResult FROM smartdb.sm18_impairment WHERE BIN_CODE = '$BIN_CODE' AND isChild=1";
 // $sql .= " LIMIT 500; ";   
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
@@ -49,25 +49,21 @@ if ($result->num_rows > 0) {
         $extraSTOCK_CODE         = $row['STOCK_CODE'];
         $extraITEM_NAME          = $row['ITEM_NAME'];
         $extraSOH                = $row['SOH'];
-        $extrafindingID          = $row['findingID'];
+        $finalResult            = $row['finalResult'];
 
-        $exTitle = "Investigate";
-        if($extrafindingID==102){
-            $exTitle = "FF";
-        }else if($extrafindingID==102){
-            $exTitle = "LE";
-        }else if($extrafindingID==103){
-            $exTitle = "NSTR";
+        if(empty($finalResult)){
+            $extraStatus = "<a href='18_f2r_extra.php?auto_storageID=$auto_storageID&BIN_CODE=$BIN_CODE' class='list-group-item list-group-item-danger btnInvestigate' style='padding:5px;text-decoration:none'>Investigate</a>";
+        }else{
+            $finalResultDisp = $finalResult;
+            if($finalResult=='nstr'){
+                $finalResultDisp = "No finding";
+            }
+            $extraStatus = "<a href='18_f2r_extra.php?auto_storageID=$auto_storageID&BIN_CODE=$BIN_CODE' class='list-group-item list-group-item-success btnInvestigate' style='padding:5px;text-decoration:none'>$finalResultDisp</a>";
         }
-        $extraStatus = "<a href='18_f2r_extra.php?auto_storageID=$auto_storageID&BIN_CODE=$BIN_CODE' class='btn btn-outline-dark btnInvestigate'>$exTitle</a>";
-        // $extraStatus = "<button type='button' class='btn btn-outline-dark btnInvestigate' value='$auto_storageID'>$exTitle</button>";
         $binExtra .= "<tr><td>$extraSTOCK_CODE</td><td>$extraITEM_NAME</td><td align='right'>$extraSOH</td><td>$extraStatus</td></tr>";
 
         $arrSample['extras'][] = $row;
 }}
-
-
-
 
 
 $arrSample = json_encode($arrSample);
@@ -106,7 +102,6 @@ $(document).ready(function() {
     setPage()
 
     function setPage(){
-        console.log(arS[0]['findingID'])
         findingName     = "&nbsp;";
         hideInitialMenu        = false;
         $("#resultSelection").removeClass('list-group-item-success');
@@ -120,33 +115,14 @@ $(document).ready(function() {
             hideInitialMenu        = true;
             findingName     = "You've found some additional stockcodes but havn't investigated them";
             $("#resultSelection").addClass('list-group-item-danger');
-        }else if(arS[0]['findingID']>101){
+        }else if(arS[0]['findingID']=102){
             hideInitialMenu        = true;
-            findingName     = "You've found some additional stockcodes and have investigated them";
+            findingName     = "You've found some additional stockcodes and have investigated them all";
             $("#resultSelection").addClass('list-group-item-warning');
         }
         $('.hideInitialMenu').toggle(!hideInitialMenu);
         $("#resultSelection").html("<b>"+findingName+"</b>");
     }
-
-//     $(document).on('keyup', "#res_comment", function(){
-//         setPage()
-//     });
-
-//     $('body').on('click', '.q1', function() {
-//         q1Ans = $(this).val();
-//         $('.q1').hide();
-//         // ###########################################
-//         // Add the effects that happen after q1 button is clicked
-//     });
-
-//     $(".datepicker").datepicker({ dateFormat: 'yy-mm-dd' });
-//     $(".datepicker").change(function(){
-//         setPage()
-//     })
-
-
-
 });
 </script>
 
@@ -175,22 +151,13 @@ $(document).ready(function() {
 
     <div class='col-3 lead' id='menuleft'>
         <ul class="list-group list-group-flush text-center">
-
             <?=$btnDelete?>
-            
             <?=$btnAdd?>
-
 
             <li class="list-group-item hideInitialMenu q1"><b>Are there any stockcodes in addition to this list?</b></li>
             <a class="list-group-item list-group-item-action list-group-item-success hideInitialMenu q1" href='05_action.php?act=save_f2r_nstr&BIN_CODE=<?=$BIN_CODE?>'>No</a>
 
             <a class="list-group-item list-group-item-action list-group-item-danger hideInitialMenu q1" href='05_action.php?act=save_f2r_extras&BIN_CODE=<?=$BIN_CODE?>'>Yes</a>
-
-
-            <!-- <li class="list-group-item q1"><b>Is the item a commonwealth asset?</b></li>
-            <button class="list-group-item list-group-item-action list-group-item-success q1" value='2'>Nope</button>
-            <button class="list-group-item list-group-item-action list-group-item-danger q1" value='1'>Yes!</button> -->
-
 
         </ul>
     </div>
@@ -205,25 +172,11 @@ $(document).ready(function() {
             <tr><td><b>SCA</b></td><td colspan='2' ><?=$SUPPLY_CUST_ID?></td><td></td></tr>
             <tr><td><b>Bin</b></td><td colspan='2' ><?=$BIN_CODE?></td><td></td></tr>
             <tr><td colspan='4'><b>Bin contents</b></td></tr>
-            <tr><td><b>Stockcode</b></td><td><b>Name</b></td><td align='right'><b>SOH</b></td><td></td></tr>
+            <tr><td><b>Stockcode</b></td><td><b>Name</b></td><td align='right'><b>SOH</b></td><td><b>Status</b></td></tr>
             <?=$binC?>
 
-
-            <tr><td colspan='4' class='bg-secondary'><b>Extras</b></td></tr
-            
-            <tr><td><b>Stockcode</b></td><td><b>Name</b></td><td align='right'><b>SOH</b></td><td><b>Status</b></td></tr>
-            
-            <tr><td>XXXXXXX</td><td>Xxxxx xxxxxxx</td><td align='right'><b>X</b></td><td>FF</td></tr>
-            
-            <tr><td>XXXXXXX</td><td>Xxxxx xxxxxxx</td><td align='right'><b>X</b></td><td>LE</td></tr>
-
-            <tr><td>XXXXXXX</td><td>Xxxxx xxxxxxx</td><td align='right'><b>X</b></td><td>NSTR</td></tr>
-
-            <tr><td>XXXXXXX</td><td>Xxxxx xxxxxxx</td><td align='right'><b>X</b></td><td><a class='btn btn-outline-dark'>Investigate</a></td></tr>
-
-
+            <tr><td colspan='4' class='text-center'><b><br>Extras</b></td></tr
             <?=$binExtra?>
-
 
             <tr><td colspan='3' class='hideInitialMenu'><b>Comments</b><textarea class='form-control' rows='5' name='res_comment' id='res_comment'><?=$res_comment?></textarea></td></tr>
         </table>

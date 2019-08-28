@@ -328,6 +328,9 @@ if ($act=='sys_pull_master') {
      `res_unserv_date` datetime NULL,
      `isChild` int(11) NULL,
      `res_parent_storageID` VARCHAR(255) NULL,
+
+     `finalResult` VARCHAR(255) NULL,
+     `finalResultPath` VARCHAR(255) NULL,
      
      PRIMARY KEY (`auto_storageID`));";
      echo "<br><br>".$sql_save;
@@ -1407,6 +1410,37 @@ echo $date_disp;
           )";
 
      runSql($sql);
+     checkExtrasFinished($BIN_CODE);
+     header("Location: 17_f2r.php?BIN_CODE=".$BIN_CODE);
+
+
+}elseif ($act=='save_f2r_extra') {
+     $auto_storageID     = $_POST["auto_storageID"];
+     $finalResult        = $_POST["finalResult"];
+     $finalResultPath    = $_POST["finalResultPath"];
+     $BIN_CODE           = $_POST["BIN_CODE"];
+
+     // $finalResultPath = json_decode($finalResultPath, false);
+     // echo "<br>".gettype($finalResultPath);
+     $sql = "UPDATE smartdb.sm18_impairment SET 
+     finalResult='$finalResult',
+     finalResultPath='".$finalResultPath."'
+     WHERE auto_storageID='$auto_storageID' ";
+     echo runSql($sql);
+
+     checkExtrasFinished($BIN_CODE);
+
+
+}elseif ($act=='save_clear_f2r_extra') {
+     $auto_storageID     = $_GET["auto_storageID"];
+     $BIN_CODE           = $_GET["BIN_CODE"];
+     $sql = "UPDATE smartdb.sm18_impairment SET 
+     finalResult=NULL,
+     finalResultPath=NULL
+     WHERE auto_storageID='$auto_storageID' ";
+     echo runSql($sql);
+     checkExtrasFinished($BIN_CODE);
+
      header("Location: 17_f2r.php?BIN_CODE=".$BIN_CODE);
 
 
@@ -1414,17 +1448,41 @@ echo $date_disp;
 }
 // echo $log;
 
-
 function runSql($stmt){
      global $con;
-     $log = "<br><br>".$stmt."<br>";
      if (!mysqli_multi_query($con,$stmt)){
           $save_error = mysqli_error($con);
-          $log .='failure: '.$save_error;
+          $log ='failure: '.$save_error;
      }else{
-          $log .='success';     
+          $log ='success';     
      }
-     if (true){echo $log;}
+     // echo "<br><br>".$stmt."<br>".$log;
+     return $log;
 }
+
+
+function checkExtrasFinished($BIN_CODE){
+     global $con;
+
+     $sql = "SELECT COUNT(*) AS extraCount, SUM(CASE WHEN finalResult IS NULL THEN 0 ELSE 1 END) AS extraComplete FROM smartdb.sm18_impairment WHERE BIN_CODE = '$BIN_CODE' AND isChild=1";
+     $result = $con->query($sql);
+     if ($result->num_rows > 0) {
+     while($row = $result->fetch_assoc()) {    
+          $extraCount    = $row['extraCount']; 
+          $extraComplete = $row['extraComplete'];  
+     }}
+     if($extraCount==$extraComplete){
+          $sql = "UPDATE smartdb.sm18_impairment SET 
+          findingID=102
+          WHERE BIN_CODE='$BIN_CODE' ";
+     }else{
+          $sql = "UPDATE smartdb.sm18_impairment SET 
+          findingID=101
+          WHERE BIN_CODE='$BIN_CODE' ";
+     }
+     runSql($sql);
+}
+
+
 
 ?>
