@@ -50,7 +50,7 @@ if ($result->num_rows > 0) {
 
 if($findingID>0){  
     $getBackBtn = "<div class='text-center complete'><div class='dropdown'><button class='btn btn-outline-danger complete dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='dispBtnClear'>Delete</button><div class='dropdown-menu bg-danger' aria-labelledby='dropdownMenuButton'>
-    <a class='dropdown-item bg-danger text-light' href='05_action.php?act=save_clear_msi_bin&auto_storageID=".$auto_storageID."'>I'm sure</a></div></div></div>";
+    <a class='dropdown-item bg-danger text-light' href='05_action.php?act=save_clear_msi_bin&auto_storageID=".$auto_storageID."&storageID=$storageID'>I'm sure</a></div></div></div>";
 }else{
     $getBackBtn = "<div class='text-center complete'><button class='btn btn-outline-dark' id='btnClear'>Back</button></div>";  
 }
@@ -130,6 +130,7 @@ $(document).ready(function() {
     setPage()
 
     function setPage(){  
+        console.log(arS[0]['findingID'])
         if (arS[0]['findingID']){
             complete        = true;
         }else{

@@ -102,8 +102,9 @@ $(document).ready(function() {
     setPage()
 
     function setPage(){
+        console.log(arS[0]['findingID'])
         findingName     = "&nbsp;";
-        hideInitialMenu        = false;
+        hideInitialMenu = false;
         $("#resultSelection").removeClass('list-group-item-success');
         $("#resultSelection").removeClass('list-group-item-warning');
         $("#resultSelection").removeClass('list-group-item-danger');
@@ -115,7 +116,7 @@ $(document).ready(function() {
             hideInitialMenu        = true;
             findingName     = "You've found some additional stockcodes but havn't investigated them";
             $("#resultSelection").addClass('list-group-item-danger');
-        }else if(arS[0]['findingID']=102){
+        }else if(arS[0]['findingID']==102){
             hideInitialMenu        = true;
             findingName     = "You've found some additional stockcodes and have investigated them all";
             $("#resultSelection").addClass('list-group-item-warning');

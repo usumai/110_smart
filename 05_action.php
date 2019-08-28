@@ -14,7 +14,7 @@ if ($act=='sys_pull_master') {
 	$output  = shell_exec($addr_git.' init 2>&1'); 
 	$output .= shell_exec($addr_git.' clean  -d  -f .');
 	$output .= shell_exec($addr_git.' reset --hard');  
-	$output .= shell_exec($addr_git.' pull https://github.com/usumai/smart_public.git');
+	$output .= shell_exec($addr_git.' pull https://github.com/usumai/110_smart.git');
 	echo "<pre>$output</pre>";
 
 	header("Location: index.php");
@@ -36,7 +36,7 @@ if ($act=='sys_pull_master') {
 	$output  = shell_exec($addr_git.' init 2>&1'); // The 2>&1 makes the command get all errors
 	$output .= shell_exec($addr_git.' add -A'); 
 	$output .= shell_exec($addr_git.' commit -m "auto commit"'); 
-	$output .= shell_exec($addr_git.' remote add origin https://github.com/usumai/smart_public.git'); 
+	$output .= shell_exec($addr_git.' remote add origin https://github.com/usumai/110_smart.git'); 
 	$output .= shell_exec($addr_git.' push -u origin master');
 	
 	echo "<pre>$output</pre>";
@@ -1318,7 +1318,8 @@ echo $date_disp;
      header("Location: 16_r2f.php?auto_storageID=".$auto_storageID);
 
 }elseif ($act=='save_clear_msi_bin') {
-     $auto_storageID       = $_GET["auto_storageID"];
+     $auto_storageID     = $_GET["auto_storageID"];
+     $storageID          = $_GET["storageID"];
 
      $sql = "UPDATE smartdb.sm18_impairment SET 
      res_create_date=NULL,
@@ -1326,10 +1327,10 @@ echo $date_disp;
      findingID=NULL,  
      res_comment=NULL,  
      res_evidence_desc=NULL,
-     res_unserv_date=NULL,
-     res_children_count=NULL
+     res_unserv_date=NULL
      WHERE 
      auto_storageID='$auto_storageID' ";
+     echo $sql;
      runSql($sql);
 
      $sql = "DELETE FROM smartdb.sm18_impairment WHERE res_parent_storageID='$storageID' ";
@@ -1372,8 +1373,7 @@ echo $date_disp;
      findingID=NULL,  
      res_comment=NULL,  
      res_evidence_desc=NULL,
-     res_unserv_date=NULL,
-     res_children_count=NULL
+     res_unserv_date=NULL
      WHERE 
      BIN_CODE='$BIN_CODE' ";
      runSql($sql);
