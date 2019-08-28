@@ -166,7 +166,7 @@ $(document).ready(function() {
 
     <form action='05_action.php' method='POST'>
         <table class='table table-sm'>
-            <tr><td colspan='4' id='resultSelection'>&nbsp;</td></tr>
+            <tr><td colspan='4' align='center' id='resultSelection'>&nbsp;</td></tr>
             <tr><td><b>District</b></td><td colspan='2' ><?=$DSTRCT_CODE?></td><td></td></tr>
             <tr><td><b>Warehouse</b></td><td colspan='2' ><?=$WHOUSE_ID?></td><td></td></tr>
             <tr><td><b>SCA</b></td><td colspan='2' ><?=$SUPPLY_CUST_ID?></td><td></td></tr>
