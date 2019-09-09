@@ -148,7 +148,7 @@ $(document).ready(function() {
     $('body').on('click', '#btnSave', function() {
         $.post("05_action.php",
         {
-            act:            "save_f2r_extra",
+            act:            "save_b2r_extra",
             auto_storageID: "<?=$auto_storageID?>",
             BIN_CODE:       "<?=$BIN_CODE?>",
             finalResult,
@@ -157,7 +157,7 @@ $(document).ready(function() {
         function(data, status){
             console.log(data);
             if(data=="success"){
-                window.location.replace("17_f2r.php?BIN_CODE=<?=$BIN_CODE?>");
+                window.location.replace("17_b2r.php?BIN_CODE=<?=$BIN_CODE?>");
             }
         });
     })
@@ -196,9 +196,9 @@ $(document).ready(function() {
     <div class='col'>
         <h1 class='display-4'>
             Extra stockcode investigation
-            <a href='17_f2r.php?BIN_CODE=<?=$BIN_CODE?>' class='btn btn-outline-dark float-right'>Back</a>
+            <a href='17_b2r.php?BIN_CODE=<?=$BIN_CODE?>' class='btn btn-outline-dark float-right'>Back</a>
         </h1>
-        <div class='dropdown'><button class='btn btn-outline-danger dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='dispBtnClear'>Clear</button><div class='dropdown-menu bg-danger' aria-labelledby='dropdownMenuButton'><a class='dropdown-item bg-danger text-light' href='05_action.php?act=save_clear_f2r_extra&auto_storageID=<?=$auto_storageID?>&BIN_CODE=<?=$BIN_CODE?>'>I'm sure</a></div></div>
+        <div class='dropdown'><button class='btn btn-outline-danger dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='dispBtnClear'>Clear</button><div class='dropdown-menu bg-danger' aria-labelledby='dropdownMenuButton'><a class='dropdown-item bg-danger text-light' href='05_action.php?act=save_clear_b2r_extra&auto_storageID=<?=$auto_storageID?>&BIN_CODE=<?=$BIN_CODE?>'>I'm sure</a></div></div>
     </div>
 </div>
 

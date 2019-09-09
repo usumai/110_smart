@@ -7,7 +7,7 @@
 $BIN_CODE = $_GET["BIN_CODE"];
 $binC='';
 $arrSample = array();
-$sql = "SELECT * FROM smartdb.sm18_impairment WHERE BIN_CODE = '$BIN_CODE'  AND isChild IS NULL";
+$sql = "SELECT * FROM smartdb.sm18_impairment WHERE BIN_CODE = '$BIN_CODE'  AND isChild IS NULL AND isType ='b2r' ";
 // $sql .= " LIMIT 500; ";   
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
@@ -52,13 +52,13 @@ if ($result->num_rows > 0) {
         $finalResult            = $row['finalResult'];
 
         if(empty($finalResult)){
-            $extraStatus = "<a href='18_f2r_extra.php?auto_storageID=$auto_storageID&BIN_CODE=$BIN_CODE' class='list-group-item list-group-item-danger btnInvestigate' style='padding:5px;text-decoration:none'>Investigate</a>";
+            $extraStatus = "<a href='18_b2r_extra.php?auto_storageID=$auto_storageID&BIN_CODE=$BIN_CODE' class='list-group-item list-group-item-danger btnInvestigate' style='padding:5px;text-decoration:none'>Investigate</a>";
         }else{
             $finalResultDisp = $finalResult;
             if($finalResult=='nstr'){
                 $finalResultDisp = "No finding";
             }
-            $extraStatus = "<a href='18_f2r_extra.php?auto_storageID=$auto_storageID&BIN_CODE=$BIN_CODE' class='list-group-item list-group-item-success btnInvestigate' style='padding:5px;text-decoration:none'>$finalResultDisp</a>";
+            $extraStatus = "<a href='18_b2r_extra.php?auto_storageID=$auto_storageID&BIN_CODE=$BIN_CODE' class='list-group-item list-group-item-success btnInvestigate' style='padding:5px;text-decoration:none'>$finalResultDisp</a>";
         }
         $binExtra .= "<tr><td>$extraSTOCK_CODE</td><td>$extraITEM_NAME</td><td align='right'>$extraSOH</td><td>$extraStatus</td></tr>";
 
@@ -70,9 +70,9 @@ $arrSample = json_encode($arrSample);
 
 $btnDelete=$btnAdd='';
 if(!empty($findingID)){
-    $btnDelete = "<div class='text-center'><div class='dropdown'><button class='btn btn-outline-danger dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='dispBtnClear'>Delete</button><div class='dropdown-menu bg-danger' aria-labelledby='dropdownMenuButton'><a class='dropdown-item bg-danger text-light' href='05_action.php?act=save_clear_f2r&BIN_CODE=".$BIN_CODE."'>I'm sure</a></div></div></div>";
+    $btnDelete = "<div class='text-center'><div class='dropdown'><button class='btn btn-outline-danger dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='dispBtnClear'>Delete</button><div class='dropdown-menu bg-danger' aria-labelledby='dropdownMenuButton'><a class='dropdown-item bg-danger text-light' href='05_action.php?act=save_clear_b2r&BIN_CODE=".$BIN_CODE."'>I'm sure</a></div></div></div>";
 
-    if($findingID>100){
+    if($findingID!=14){
         $btnAdd = "<br><br><br><button type='button' class='btn btn-outline-dark' data-toggle='modal' data-target='#modal_add_extra' v-if='ar.first_found_flag==1'>Register extra stockcode</button>";
     }
 
@@ -100,7 +100,28 @@ $(document).ready(function() {
 
 //     //Initialise the page
     setPage()
+    
+    $("#formAddExtra").validate({
+			rules: {
+				extraStockcode: {
+                    digits: true,
+					maxlength: 9
+				},
+				extraName: {
+					maxlength: 255
+				},
+				extraSOH: {
+                    digits: true,
+                    maxlength: 20
+				}
+			},
+			messages: {
+				firstname: "Please enter your firstname"
+			}
+		});
 
+
+    
     function setPage(){
         console.log(arS[0]['findingID'])
         findingName     = "&nbsp;";
@@ -108,15 +129,15 @@ $(document).ready(function() {
         $("#resultSelection").removeClass('list-group-item-success');
         $("#resultSelection").removeClass('list-group-item-warning');
         $("#resultSelection").removeClass('list-group-item-danger');
-        if (arS[0]['findingID']==100){
+        if (arS[0]['findingID']==14){
             hideInitialMenu        = true;
             findingName     = "No additional stockcodes were found";
             $("#resultSelection").addClass('list-group-item-success');
-        }else if(arS[0]['findingID']==101){
+        }else if(arS[0]['findingID']==15){
             hideInitialMenu        = true;
             findingName     = "You've found some additional stockcodes but havn't investigated them";
             $("#resultSelection").addClass('list-group-item-danger');
-        }else if(arS[0]['findingID']==102){
+        }else if(arS[0]['findingID']==16){
             hideInitialMenu        = true;
             findingName     = "You've found some additional stockcodes and have investigated them all";
             $("#resultSelection").addClass('list-group-item-warning');
@@ -156,9 +177,9 @@ $(document).ready(function() {
             <?=$btnAdd?>
 
             <li class="list-group-item hideInitialMenu q1"><b>Are there any stockcodes in addition to this list?</b></li>
-            <a class="list-group-item list-group-item-action list-group-item-success hideInitialMenu q1" href='05_action.php?act=save_f2r_nstr&BIN_CODE=<?=$BIN_CODE?>'>No</a>
+            <a class="list-group-item list-group-item-action list-group-item-success hideInitialMenu q1" href='05_action.php?act=save_b2r_nstr&BIN_CODE=<?=$BIN_CODE?>'>No</a>
 
-            <a class="list-group-item list-group-item-action list-group-item-danger hideInitialMenu q1" href='05_action.php?act=save_f2r_extras&BIN_CODE=<?=$BIN_CODE?>'>Yes</a>
+            <a class="list-group-item list-group-item-action list-group-item-danger hideInitialMenu q1" href='05_action.php?act=save_b2r_extras&BIN_CODE=<?=$BIN_CODE?>'>Yes</a>
 
         </ul>
     </div>
@@ -196,8 +217,6 @@ $(document).ready(function() {
 
 
 
-
-
 <form action='05_action.php' method='post' id='formAddExtra'>
     <div class="modal fade" id="modal_add_extra" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
@@ -214,19 +233,19 @@ $(document).ready(function() {
                 <br>
                 <br>
                 NSN/Stockcode
-                <input type="text" name="extraStockcode" class="form-control">
-                Stockcode description
-                <input type="text" name="extraName" class="form-control">
-                SOH
-                <input type="text" name="extraSOH" class="form-control">
+                <input type="text" name="extraStockcode" id="extraStockcode" class="form-control addSCFormInputs">
+                <br>Stockcode description
+                <input type="text" name="extraName" id="extraName" class="form-control addSCFormInputs">
+                <br>SOH
+                <input type="text" name="extraSOH" id="extraSOH" class="form-control addSCFormInputs">
 
                 <input type="hidden" name="BIN_CODE" value="<?=$BIN_CODE?>">
-                <input type="hidden" name="act" value="save_f2r_add_extra">
+                <input type="hidden" name="act" value="save_b2r_add_extra">
             </p>
             </div>
             <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
-            <input type="submit" class="btn btn-primary" value='Add'>
+            <input type="submit" class="btn btn-primary" value='Add' id='btnAddSC'>
             </div>
         </div>
         </div>

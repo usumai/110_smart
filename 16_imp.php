@@ -77,7 +77,7 @@ if ($findingID==11){
 }
  
 
-$sql = "SELECT * FROM smartdb.sm19_imp_result_list";   
+$sql = "SELECT * FROM smartdb.sm19_result_cats";   
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
@@ -130,7 +130,7 @@ $(document).ready(function() {
     setPage()
 
     function setPage(){  
-        console.log(arS[0]['findingID'])
+        // console.log(arS[0]['findingID'])
         if (arS[0]['findingID']){
             complete        = true;
         }else{
@@ -204,8 +204,12 @@ $(document).ready(function() {
                 $('#splityTotal').text(totalSplitySOH);
                 $('#splityLanding').html(splityHidden)
 
+                console.log('totalSplitySOH:'+totalSplitySOH);
+                console.log('SOH:'+arS[0]['SOH']);
                 if(totalSplitySOH<arS[0]['SOH']){
                     $('#btnSubmit').hide();
+                }else{
+                    $('#btnSubmit').show();
                 }
                 
             }
@@ -385,8 +389,10 @@ $(document).ready(function() {
             <button class="list-group-item list-group-item-action list-group-item-warning dispStrack" value='6'>Unserviceable&nbsp;-&nbsp;no&nbsp;date</button>
 
             <li class="list-group-item dispStrack"><b>No items found, no evidence provided</b></li>
-            <button class="list-group-item list-group-item-action list-group-item-danger dispStrack" value='7'>Not sighted - No evidence</button>
+            <button class="list-group-item list-group-item-action list-group-item-danger dispStrack" value='7'>Not in count</button>
 
+            <li class="list-group-item dispStrack"><b>In progress</b></li>
+            <button class="list-group-item list-group-item-action list-group-item-info dispStrack" value='13'>Come back to it later</button>
 
 
 
@@ -403,7 +409,10 @@ $(document).ready(function() {
             </button>
 
             <li class="list-group-item dispQtrack"><b>No items found, no evidence provided</b></li>
-            <button class="list-group-item list-group-item-action list-group-item-danger dispQtrack" value='12'>Not sighted - No evidence</button>
+            <button class="list-group-item list-group-item-action list-group-item-danger dispQtrack" value='12'>Not in count</button>
+
+            <li class="list-group-item dispQtrack"><b>In progress</b></li>
+            <button class="list-group-item list-group-item-action list-group-item-info dispQtrack" value='13'>Come back to it later</button>
         </ul>
     </div>
 

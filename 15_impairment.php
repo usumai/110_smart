@@ -130,6 +130,24 @@ $assetType = "";
 $rw_ass = "";
 
 
+
+
+
+
+$arF = array();
+$sql = "SELECT findingID, color AS fCol, resAbbr AS fAbr FROM smartdb.sm19_result_cats;";
+$result = $con->query($sql);
+if ($result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {    
+        $findingID  = $row['findingID'];    
+        $fCol       = $row['fCol'];   
+        $fAbr       = $row['fAbr'];
+        $arF['col'][$findingID] = $fCol;
+        $arF['abr'][$findingID] = $fAbr;
+}}
+
+
+
 $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_delete_date IS NULL";
 $sql = "SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude )";
 // $sql .= " LIMIT 500; ";   
@@ -156,16 +174,19 @@ if ($result->num_rows > 0) {
         $res_create_date    = $row['res_create_date'];
         $findingID          = $row['findingID'];
 
-        $flag_status = "<span class='text-danger'>NYC~</span>";
+        $flag_status = "<h4><span class='badge badge-secondary'>NYC~</span></h4>";
         if(!empty($res_create_date)){
-            $flag_status = "<span class='text-success'>FIN~</span>";
+            $fCol = $arF['col'][$findingID];
+            $fAbr = $arF['abr'][$findingID];
+            $flag_status = "<h4><span class='badge badge-$fCol'>FIN~$fAbr</span></h4>";
         }
 
-        if(($isType)=="R2F"){
-            $btnAction = "<a href='16_r2f.php?auto_storageID=$auto_storageID' class='btn btn-primary'><span class='octicon octicon-zap' style='font-size:30px'></span></a>";
-        }elseif(($isType)=="F2R"){
-            $btnAction = "<a href='17_f2r.php?BIN_CODE=$BIN_CODE' class='btn btn-primary'><span class='octicon octicon-zap' style='font-size:30px'></span></a>";
+        if(($isType)=="imp"){
+            $btnAction = "<a href='16_imp.php?auto_storageID=$auto_storageID' class='btn btn-primary'><span class='octicon octicon-zap' style='font-size:30px'></span></a>";
+        }elseif(($isType)=="b2r"){
+            $btnAction = "<a href='17_b2r.php?BIN_CODE=$BIN_CODE' class='btn btn-primary'><span class='octicon octicon-zap' style='font-size:30px'></span></a>";
         }
+
 
 
         echo "<tr><td>".$btnAction."</td><td>".$DSTRCT_CODE."</td><td>".$WHOUSE_ID."</td><td>".$SUPPLY_CUST_ID."</td><td>".$BIN_CODE."</td><td>".$STOCK_CODE."</td><td>".$ITEM_NAME."</td><td>".substr($INVENT_CAT,0,2)."</td><td>".$SOH."</td><td>".$TRACKING_IND."</td><td>".$TRACKING_REFERENCE."</td><td>".$isType."</td><td>".$flag_status."</td><td class='text-right'>".$btnAction."</td></tr>";

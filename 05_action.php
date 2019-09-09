@@ -4,6 +4,7 @@ if (isset($_POST["act"])) {
 }else{
 	$act = $_GET["act"];
 }
+$dbname = "smartdb";
 $addr_git = ' "\Program Files\Git\bin\git"  ';
 $log = "<br>"."Initialising action file";
 // mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
@@ -16,6 +17,9 @@ if ($act=='sys_pull_master') {
 	$output .= shell_exec($addr_git.' reset --hard');  
 	$output .= shell_exec($addr_git.' pull https://github.com/usumai/110_smart.git');
 	echo "<pre>$output</pre>";
+
+     $sql_save = "UPDATE $dbname.sm10_set SET smartm_software_version=5; ";
+     mysqli_multi_query($con,$sql_save);
 
 	header("Location: index.php");
 
@@ -337,31 +341,39 @@ if ($act=='sys_pull_master') {
      mysqli_multi_query($con,$sql_save);
 
 
-     $sql_save = "CREATE TABLE $dbname.sm19_imp_result_list (
+     $sql_save = "CREATE TABLE $dbname.sm19_result_cats (
           `findingID` INT(11) NOT NULL AUTO_INCREMENT, 
           `findingName` VARCHAR(255) NULL,
+          `isType` VARCHAR(30) NULL,
           `color` VARCHAR(255) NULL,
           `reqDate` INT(11),
           `reqSplit` INT(11),
-          `reqComment` INT(11),          
+          `reqComment` INT(11),
+          `resAbbr` VARCHAR(30),          
           PRIMARY KEY (`findingID`));";
           echo "<br><br>".$sql_save;
           mysqli_multi_query($con,$sql_save);
 
 
-     $sql_save = "INSERT INTO $dbname.sm19_imp_result_list (findingName, color, reqDate, reqSplit, reqComment) VALUES 
-     ('Serial tracked - Item sighted - Serviceable','success',0,0,0),
-     ('Serial tracked - Item sighted - Unserviceable - with date','success',1,0,0),
-     ('Serial tracked - Item sighted - Unserviceable - no date','success',0,0,0),
-     ('Serial tracked - Item not sighted - Serviceable','warning',0,0,0),
-     ('Serial tracked - Item not sighted - Unserviceable - with date','warning',1,0,0),
-     ('Serial tracked - Item not sighted - Unserviceable - no date','warning',0,0,0),
-     ('Serial tracked - Item not found, no evidence provided','danger',0,0,0),
-     ('Quantity tracked - Sighted or found evidence of all items - All serviceable','success',0,0,0),
-     ('Quantity tracked - Sighted or found evidence of all items - None serviceable - with date','success',1,0,0),
-     ('Quantity tracked - Sighted or found evidence of all items - None serviceable - no date','success',0,0,0),
-     ('Quantity tracked - Split category - One, some or all of the following:<br>+ Not all items were found<br>+ Items were in different categories<br>+ Found more than original quantity','warning',0,1,1),
-     ('Quantity tracked - No items found, no evidence provided','danger',0,0,1)
+     $sql_save = "INSERT INTO $dbname.sm19_result_cats (findingID, isType, findingName, color, reqDate, reqSplit, reqComment, resAbbr) VALUES 
+     (1, 'Serial tracked - Item sighted - Serviceable','imp','success',0,0,0,'SER'),
+     (2, 'Serial tracked - Item sighted - Unserviceable - with date','imp','success',1,0,1,'USWD'),
+     (3, 'Serial tracked - Item sighted - Unserviceable - no date','imp','success',0,0,1,'USND'),
+     (4, 'Serial tracked - Item not sighted - Serviceable','imp','warning',0,0,0,'SER'),
+     (5, 'Serial tracked - Item not sighted - Unserviceable - with date','imp','warning',1,0,1,'USWD'),
+     (6, 'Serial tracked - Item not sighted - Unserviceable - no date','imp','warning',0,0,1,'USND'),
+     (7, 'Serial tracked - Item not found, no evidence provided','imp','danger',0,0,0,'NIC'),
+     (8, 'Quantity tracked - Sighted or found evidence of all items - All serviceable','imp','success',0,0,0,'SER'),
+     (9, 'Quantity tracked - Sighted or found evidence of all items - None serviceable - with date','imp','success',1,0,0,'USWD'),
+     (10, 'Quantity tracked - Sighted or found evidence of all items - None serviceable - no date','imp','success',0,0,0,'USND'),
+     (11, 'Quantity tracked - Split category - One, some or all of the following:<br>+ Not all items were found<br>+ Items were in different categories<br>+ Found more than original quantity','imp','warning',0,1,1,'SPLT'),
+     (12, 'Quantity tracked - No items found, no evidence provided','imp','danger',0,0,1,'NIC'),
+     (13, 'In progress - Come back to it later','imp','info',0,0,0,'TBA'),
+
+
+     (14, 'No additional stockcodes were found','b2r','success',0,0,0,'NSTR'),
+     (15, 'You have found some additional stockcodes but have not investigated them','b2r','info',0,0,0,'TBA'),
+     (16, 'You have found some additional stockcodes and have investigated them all','b2r','warning',0,0,0,'INV')
      ; "; 
           // echo "<br><br>".$sql_save;
           mysqli_multi_query($con,$sql_save);
@@ -640,8 +652,8 @@ echo $date_disp;
              $dpn_extract_user     = $row["dpn_extract_user"];
              $journal_text         = $row["journal_text"];
      }}
-
-     $txt_file_link = "SMARTm_".$date_disp."_$stk_name.json";
+     $stk_name_disp = substr($stk_name, 30);
+     $txt_file_link = "SMARTm_".$date_disp."_$stk_name_disp.json";
      $fp = fopen($txt_file_link, 'w');
 
      $sql = "SELECT * FROM smartdb.sm10_set;";
@@ -1059,7 +1071,7 @@ echo $date_disp;
 
      $create_user = "";
      $fingerprint = TIME();
-     $sql_save = "INSERT INTO smartdb.sm14_ass (stkm_id, Asset, AssetDesc1, rr_id, genesis_cat, res_create_date, res_create_user, res_reason_code, res_completed, Class, res_comment, fingerprint) VALUES ('$stkm_id','$Asset','$AssetDesc1','$rr_id','Added from RR',NOW(),'$create_user','AF20',1,'$Class','Owner parent name: $ParentName', '$fingerprint'); ";
+     $sql_save = "INSERT INTO smartdb.sm14_ass (stkm_id, Asset, AssetDesc1, rr_id, genesis_cat, res_create_date, res_create_user, res_reason_code, res_completed, Class, res_comment, fingerprint, stk_include) VALUES ('$stkm_id','$Asset','$AssetDesc1','$rr_id','Added from RR',NOW(),'$create_user','AF20',1,'$Class','Owner parent name: $ParentName', '$fingerprint', 1); ";
      mysqli_multi_query($con,$sql_save);
 
      $sql = "SELECT MAX(ass_id) AS ass_id FROM smartdb.sm14_ass;";
@@ -1315,7 +1327,7 @@ echo $date_disp;
 
 
 
-     header("Location: 16_r2f.php?auto_storageID=".$auto_storageID);
+     header("Location: 16_imp.php?auto_storageID=".$auto_storageID);
 
 }elseif ($act=='save_clear_msi_bin') {
      $auto_storageID     = $_GET["auto_storageID"];
@@ -1336,35 +1348,35 @@ echo $date_disp;
      $sql = "DELETE FROM smartdb.sm18_impairment WHERE res_parent_storageID='$storageID' ";
      runSql($sql);
 
-     header("Location: 16_r2f.php?auto_storageID=".$auto_storageID);
+     header("Location: 16_imp.php?auto_storageID=".$auto_storageID);
 
-}elseif ($act=='save_f2r_nstr') {
+}elseif ($act=='save_b2r_nstr') {
      $BIN_CODE = $_GET["BIN_CODE"];
 
      // 100 indicates NSTR
      $sql = "UPDATE smartdb.sm18_impairment SET 
      res_create_date=NOW(),
      res_update_user=NULL,
-     findingID=100
-     WHERE BIN_CODE='$BIN_CODE' ";
+     findingID=14
+     WHERE BIN_CODE='$BIN_CODE' AND isType='b2r' ";
      runSql($sql);
 
-     header("Location: 17_f2r.php?BIN_CODE=".$BIN_CODE);
+     header("Location: 17_b2r.php?BIN_CODE=".$BIN_CODE);
 
 
-}elseif ($act=='save_f2r_extras') {
+}elseif ($act=='save_b2r_extras') {
      $BIN_CODE = $_GET["BIN_CODE"];
 
      // 101 indicates waiting for extras
      $sql = "UPDATE smartdb.sm18_impairment SET 
-     findingID=101
-     WHERE BIN_CODE='$BIN_CODE' ";
+     findingID=15
+     WHERE BIN_CODE='$BIN_CODE'  AND isType='b2r' ";
      runSql($sql);
 
-     header("Location: 17_f2r.php?BIN_CODE=".$BIN_CODE);
+     header("Location: 17_b2r.php?BIN_CODE=".$BIN_CODE);
 
      
-}elseif ($act=='save_clear_f2r') {
+}elseif ($act=='save_clear_b2r') {
      $BIN_CODE       = $_GET["BIN_CODE"];
 
      $sql = "UPDATE smartdb.sm18_impairment SET 
@@ -1375,17 +1387,18 @@ echo $date_disp;
      res_evidence_desc=NULL,
      res_unserv_date=NULL
      WHERE 
-     BIN_CODE='$BIN_CODE' ";
+     BIN_CODE='$BIN_CODE'  AND isType='b2r'";
      runSql($sql);
 
-     $sql = "DELETE FROM smartdb.sm18_impairment WHERE BIN_CODE='$BIN_CODE' AND isChild=1 ";
+     echo $sql;
+     $sql = "DELETE FROM smartdb.sm18_impairment WHERE BIN_CODE='$BIN_CODE' AND isChild=1 AND isType='b2r'";
      runSql($sql);
 
-     header("Location: 17_f2r.php?BIN_CODE=".$BIN_CODE);
+     header("Location: 17_b2r.php?BIN_CODE=".$BIN_CODE);
 
 
 
-}elseif ($act=='save_f2r_add_extra') {
+}elseif ($act=='save_b2r_add_extra') {
      $BIN_CODE           = $_POST["BIN_CODE"];
      $extraStockcode     = $_POST["extraStockcode"];
      $extraName          = $_POST["extraName"];
@@ -1398,7 +1411,8 @@ echo $date_disp;
           STOCK_CODE, 
           ITEM_NAME, 
           SOH,
-          isChild)
+          isChild,
+          isType)
      VALUES (
           NOW(),
           '$res_update_user',
@@ -1406,15 +1420,16 @@ echo $date_disp;
           '$extraStockcode',
           '$extraName',
           '$extraSOH',
-          1
+          1,
+          'b2r'
           )";
 
      runSql($sql);
      checkExtrasFinished($BIN_CODE);
-     header("Location: 17_f2r.php?BIN_CODE=".$BIN_CODE);
+     header("Location: 17_b2r.php?BIN_CODE=".$BIN_CODE);
 
 
-}elseif ($act=='save_f2r_extra') {
+}elseif ($act=='save_b2r_extra') {
      $auto_storageID     = $_POST["auto_storageID"];
      $finalResult        = $_POST["finalResult"];
      $finalResultPath    = $_POST["finalResultPath"];
@@ -1431,7 +1446,7 @@ echo $date_disp;
      checkExtrasFinished($BIN_CODE);
 
 
-}elseif ($act=='save_clear_f2r_extra') {
+}elseif ($act=='save_clear_b2r_extra') {
      $auto_storageID     = $_GET["auto_storageID"];
      $BIN_CODE           = $_GET["BIN_CODE"];
      $sql = "UPDATE smartdb.sm18_impairment SET 
@@ -1441,8 +1456,7 @@ echo $date_disp;
      echo runSql($sql);
      checkExtrasFinished($BIN_CODE);
 
-     header("Location: 17_f2r.php?BIN_CODE=".$BIN_CODE);
-
+     header("Location: 17_b2r.php?BIN_CODE=".$BIN_CODE);
 
      
 }
@@ -1464,7 +1478,7 @@ function runSql($stmt){
 function checkExtrasFinished($BIN_CODE){
      global $con;
 
-     $sql = "SELECT COUNT(*) AS extraCount, SUM(CASE WHEN finalResult IS NULL THEN 0 ELSE 1 END) AS extraComplete FROM smartdb.sm18_impairment WHERE BIN_CODE = '$BIN_CODE' AND isChild=1";
+     $sql = "SELECT COUNT(*) AS extraCount, SUM(CASE WHEN finalResult IS NULL THEN 0 ELSE 1 END) AS extraComplete FROM smartdb.sm18_impairment WHERE BIN_CODE = '$BIN_CODE' AND isChild=1 AND isType='b2r'";
      $result = $con->query($sql);
      if ($result->num_rows > 0) {
      while($row = $result->fetch_assoc()) {    
@@ -1473,11 +1487,11 @@ function checkExtrasFinished($BIN_CODE){
      }}
      if($extraCount==$extraComplete){
           $sql = "UPDATE smartdb.sm18_impairment SET 
-          findingID=102
+          findingID=16
           WHERE BIN_CODE='$BIN_CODE' ";
      }else{
           $sql = "UPDATE smartdb.sm18_impairment SET 
-          findingID=101
+          findingID=15
           WHERE BIN_CODE='$BIN_CODE' ";
      }
      runSql($sql);
