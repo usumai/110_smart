@@ -8,7 +8,7 @@ $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_
 $rws = "";
 $sql = "SELECT stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, STOCK_CODE, ITEM_NAME, isType, targetID, isBackup, COUNT(*) AS targetCount FROM smartdb.sm18_impairment WHERE delete_date IS NULL AND stkm_id IS NOT NULL GROUP BY stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, STOCK_CODE, ITEM_NAME, isType, targetID, isBackup ORDER BY isType, targetID, isBackup, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, STOCK_CODE";
 
-$sql = "SELECT stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, ITEM_NAME, isType, targetID, isBackup, 
+$sql = "SELECT stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, CASE WHEN isType='imp' THEN ITEM_NAME ELSE NULL END AS ITEM_NAME, isType, targetID, isBackup, 
 CASE WHEN isType='imp' THEN STOCK_CODE ELSE NULL END AS SC_disp, 
 CASE WHEN isType='b2r' THEN BIN_CODE ELSE NULL END AS BC_disp, 
 COUNT(*) AS targetCount 
@@ -16,11 +16,40 @@ COUNT(*) AS targetCount
 FROM smartdb.sm18_impairment 
 WHERE delete_date IS NULL AND stkm_id IN ($sqlInclude)
 
-GROUP BY stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, CASE WHEN isType='b2r' THEN BIN_CODE ELSE NULL END, CASE WHEN isType='imp' THEN STOCK_CODE ELSE NULL END, ITEM_NAME, isType, targetID, isBackup 
+GROUP BY stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, CASE WHEN isType='b2r' THEN BIN_CODE ELSE NULL END, CASE WHEN isType='imp' THEN STOCK_CODE ELSE NULL END, CASE WHEN isType='imp' THEN ITEM_NAME ELSE NULL END, isType, targetID, isBackup 
 
 ORDER BY isType, targetID, isBackup, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID";
 echo "<br><br><br>".$sql;
-// $sql .= " LIMIT 500; ";   
+
+
+$rws = '';
+$sql = "SELECT isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, STOCK_CODE, ITEM_NAME, isBackup, COUNT(*) AS targetItemCount FROM smartdb.sm18_impairment WHERE stkm_id IN ($sqlInclude) AND isType='imp' GROUP BY isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, STOCK_CODE, ITEM_NAME, isBackup"; 
+$result = $con->query($sql);
+if ($result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {   
+        $isType             = $row['isType'];
+        $targetID           = $row['targetID']; 
+        $stkm_id            = $row['stkm_id'];    
+        $DSTRCT_CODE        = $row['DSTRCT_CODE'];
+        $WHOUSE_ID          = $row['WHOUSE_ID'];
+        $SUPPLY_CUST_ID     = $row['SUPPLY_CUST_ID'];
+        $STOCK_CODE         = $row['STOCK_CODE'];
+        $ITEM_NAME          = $row['ITEM_NAME'];
+        $targetItemCount    = $row['targetItemCount'];
+        $isBackup           = $row['isBackup'];
+
+        $btnBackup = "<a href='05_action.php?act=save_toggle_imp_backup&stkm_id=$stkm_id&targetID=$targetID&STOCK_CODE=$STOCK_CODE&isType=$isType&isBackup=1' class='btn btn-outline-dark'>Primary</a>";
+        if($isBackup==1){
+            $btnBackup = "<a href='05_action.php?act=save_toggle_imp_backup&stkm_id=$stkm_id&targetID=$targetID&STOCK_CODE=$STOCK_CODE&isType=$isType&isBackup=0' class='btn btn-dark'>Backup</a>";
+        }
+        
+        $btnType = "<span class='badge badge-info'>IMP</span>";
+        
+        $rws.="<tr><td>$btnType</td><td>$targetID</td><td>$DSTRCT_CODE</td><td>$WHOUSE_ID</td><td>$SUPPLY_CUST_ID</td><td></td><td>$STOCK_CODE</td><td>$ITEM_NAME</td><td>$targetItemCount</td><td>$btnBackup</td></tr>";
+}}
+
+
+$sql = "SELECT isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, isBackup, COUNT(*) AS targetItemCount FROM smartdb.sm18_impairment WHERE stkm_id=1 AND isType='b2r' GROUP BY isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, isBackup";   
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {    
@@ -28,14 +57,10 @@ if ($result->num_rows > 0) {
         $DSTRCT_CODE        = $row['DSTRCT_CODE'];
         $WHOUSE_ID          = $row['WHOUSE_ID'];
         $SUPPLY_CUST_ID     = $row['SUPPLY_CUST_ID'];
-        // $BIN_CODE           = $row['BIN_CODE'];
-        // $STOCK_CODE         = $row['STOCK_CODE'];
-        $BIN_CODE           = $row['BC_disp'];
-        $STOCK_CODE         = $row['SC_disp'];
-        $ITEM_NAME          = $row['ITEM_NAME'];
+        $BIN_CODE           = $row['BIN_CODE'];
         $isType             = $row['isType'];
         $targetID           = $row['targetID'];
-        $targetCount        = $row['targetCount'];
+        $targetItemCount    = $row['targetItemCount'];
         $isBackup           = $row['isBackup'];
 
         $btnBackup = "<a href='05_action.php?act=save_toggle_imp_backup&stkm_id=$stkm_id&targetID=$targetID&BIN_CODE=$BIN_CODE&STOCK_CODE=$STOCK_CODE&isType=$isType&isBackup=1' class='btn btn-outline-dark'>Primary</a>";
@@ -44,11 +69,8 @@ if ($result->num_rows > 0) {
         }
         
         $btnType = "<span class='badge badge-primary'>B2R</span>";
-        if($isType=="imp"){
-            $btnType = "<span class='badge badge-info'>IMP</span>";
-        }
         
-        $rws.="<tr><td>$btnType</td><td>$targetID</td><td>$DSTRCT_CODE</td><td>$WHOUSE_ID</td><td>$SUPPLY_CUST_ID</td><td>$BIN_CODE</td><td>$STOCK_CODE</td><td>$ITEM_NAME</td><td>$targetCount</td><td>$btnBackup</td></tr>";
+        $rws.="<tr><td>$btnType</td><td>$targetID</td><td>$DSTRCT_CODE</td><td>$WHOUSE_ID</td><td>$SUPPLY_CUST_ID</td><td>$BIN_CODE</td><td></td><td></td><td>$targetItemCount</td><td>$btnBackup</td></tr>";
 }}
 
 ?>
