@@ -45,6 +45,8 @@ if ($result->num_rows > 0) {
         $rowcount_original  = $row["rowcount_original"];
         $stk_type           = $row["stk_type"];
 
+        $stk_name = substr($stk_name,0,50);
+
         if ($stk_include==1) {
             $flag_included  = $icon_spot_green;
             $btn_toggle = "<a class='dropdown-item' href='05_action.php?act=save_stk_toggle&stkm_id=".$stkm_id."'>Exclude this activity</a>";

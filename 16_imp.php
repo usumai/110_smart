@@ -43,6 +43,7 @@ if ($result->num_rows > 0) {
         $findingID          = $row['findingID'];
         $res_comment        = $row['res_comment'];
         $res_unserv_date    = $row['res_unserv_date'];
+        $LAST_MOD_DATE      = $row['LAST_MOD_DATE'];
 
         $arrSample[] = $row;
 }}
@@ -102,6 +103,7 @@ let arS = '<?=$arrSample?>'
     arS = JSON.parse(arS);
 let fID = arS[0]['findingID'];
 let rl  = arS['rl'];
+console.log(rl)
 
 //Declare other global variables
 let dispQtrack,dispStrack,complete;
@@ -428,6 +430,8 @@ $(document).ready(function() {
             <tr><td><b>SOH</b></td><td><?=$SOH?></td></tr>
             <tr><td nowrap><b>SC Account type</b></td><td><?=$SC_ACCOUNT_TYPE?></td></tr>
             <tr><td nowrap><b>Tracking indicator</b></td><td><?=$TRACKING_IND?></td></tr>
+            <tr><td nowrap><b>Tracking reference</b></td><td><?=$TRACKING_REFERENCE?></td></tr>
+            <tr><td nowrap><b>Last Mod Date</b></td><td><?=$LAST_MOD_DATE?></td></tr>
             <tr><td colspan='2' class='complete'><b>Comments</b><textarea class='form-control' rows='5' name='res_comment' id='res_comment'><?=$res_comment?></textarea></td></tr>
             <tr id='areaDate'><td><b>Date</b></td><td><input type='text' class='form-control datepicker' name='res_unserv_date' id='res_unserv_date' value='<?=$res_unserv_date?>' readonly></td></tr>
             <tr id='areaSplit'><td colspan='2'>

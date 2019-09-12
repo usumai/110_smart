@@ -355,7 +355,7 @@ if ($act=='sys_pull_master') {
           mysqli_multi_query($con,$sql_save);
 
 
-     $sql_save = "INSERT INTO $dbname.sm19_result_cats (findingID, isType, findingName, color, reqDate, reqSplit, reqComment, resAbbr) VALUES 
+     $sql_save = "INSERT INTO $dbname.sm19_result_cats (findingID, findingName, isType, color, reqDate, reqSplit, reqComment, resAbbr) VALUES 
      (1, 'Serial tracked - Item sighted - Serviceable','imp','success',0,0,0,'SER'),
      (2, 'Serial tracked - Item sighted - Unserviceable - with date','imp','success',1,0,1,'USWD'),
      (3, 'Serial tracked - Item sighted - Unserviceable - no date','imp','success',0,0,1,'USND'),
@@ -1352,6 +1352,7 @@ echo $date_disp;
 
 }elseif ($act=='save_b2r_nstr') {
      $BIN_CODE = $_GET["BIN_CODE"];
+     $stkm_id  = $_GET["stkm_id"];
 
      // 100 indicates NSTR
      $sql = "UPDATE smartdb.sm18_impairment SET 
@@ -1361,11 +1362,12 @@ echo $date_disp;
      WHERE BIN_CODE='$BIN_CODE' AND isType='b2r' ";
      runSql($sql);
 
-     header("Location: 17_b2r.php?BIN_CODE=".$BIN_CODE);
+     header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
 
 
 }elseif ($act=='save_b2r_extras') {
      $BIN_CODE = $_GET["BIN_CODE"];
+     $stkm_id  = $_GET["stkm_id"];
 
      // 101 indicates waiting for extras
      $sql = "UPDATE smartdb.sm18_impairment SET 
@@ -1373,11 +1375,12 @@ echo $date_disp;
      WHERE BIN_CODE='$BIN_CODE'  AND isType='b2r' ";
      runSql($sql);
 
-     header("Location: 17_b2r.php?BIN_CODE=".$BIN_CODE);
+     header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
 
      
 }elseif ($act=='save_clear_b2r') {
      $BIN_CODE       = $_GET["BIN_CODE"];
+     $stkm_id        = $_GET["stkm_id"];
 
      $sql = "UPDATE smartdb.sm18_impairment SET 
      res_create_date=NULL,
@@ -1394,7 +1397,7 @@ echo $date_disp;
      $sql = "DELETE FROM smartdb.sm18_impairment WHERE BIN_CODE='$BIN_CODE' AND isChild=1 AND isType='b2r'";
      runSql($sql);
 
-     header("Location: 17_b2r.php?BIN_CODE=".$BIN_CODE);
+     header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
 
 
 
@@ -1403,11 +1406,17 @@ echo $date_disp;
      $extraStockcode     = $_POST["extraStockcode"];
      $extraName          = $_POST["extraName"];
      $extraSOH           = $_POST["extraSOH"];
+     $stkm_id            = $_POST["stkm_id"];
+     $DSTRCT_CODE        = $_POST["DSTRCT_CODE"];
+     $WHOUSE_ID          = $_POST["WHOUSE_ID"];
      $res_update_user='';
      $sql = "  INSERT INTO smartdb.sm18_impairment (
           res_create_date,
           res_update_user,
+          stkm_id,
           BIN_CODE, 
+          DSTRCT_CODE, 
+          WHOUSE_ID, 
           STOCK_CODE, 
           ITEM_NAME, 
           SOH,
@@ -1416,7 +1425,10 @@ echo $date_disp;
      VALUES (
           NOW(),
           '$res_update_user',
+          '$stkm_id',
           '$BIN_CODE',
+          '$DSTRCT_CODE',
+          '$WHOUSE_ID',
           '$extraStockcode',
           '$extraName',
           '$extraSOH',
@@ -1426,7 +1438,7 @@ echo $date_disp;
 
      runSql($sql);
      checkExtrasFinished($BIN_CODE);
-     header("Location: 17_b2r.php?BIN_CODE=".$BIN_CODE);
+     header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
 
 
 }elseif ($act=='save_b2r_extra') {
@@ -1434,6 +1446,7 @@ echo $date_disp;
      $finalResult        = $_POST["finalResult"];
      $finalResultPath    = $_POST["finalResultPath"];
      $BIN_CODE           = $_POST["BIN_CODE"];
+     $stkm_id            = $_POST["stkm_id"];
 
      // $finalResultPath = json_decode($finalResultPath, false);
      // echo "<br>".gettype($finalResultPath);
@@ -1449,6 +1462,7 @@ echo $date_disp;
 }elseif ($act=='save_clear_b2r_extra') {
      $auto_storageID     = $_GET["auto_storageID"];
      $BIN_CODE           = $_GET["BIN_CODE"];
+     $stkm_id            = $_GET["stkm_id"];
      $sql = "UPDATE smartdb.sm18_impairment SET 
      finalResult=NULL,
      finalResultPath=NULL
@@ -1456,9 +1470,34 @@ echo $date_disp;
      echo runSql($sql);
      checkExtrasFinished($BIN_CODE);
 
-     header("Location: 17_b2r.php?BIN_CODE=".$BIN_CODE);
+     header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
 
+}elseif ($act=='save_toggle_imp_backup') {
+     $stkm_id       = $_GET["stkm_id"];
+     $targetID      = $_GET["targetID"];
+     $BIN_CODE      = $_GET["BIN_CODE"];
+     $STOCK_CODE    = $_GET["STOCK_CODE"];
+     $isType        = $_GET["isType"];
+     $isBackup      = $_GET["isBackup"];
      
+     if ($isBackup==1){
+          $isBackup = 1;
+     }else{
+          $isBackup = "NULL";
+     }
+
+
+     $sql = "UPDATE smartdb.sm18_impairment SET isBackup=$isBackup WHERE targetID='$targetID' AND stkm_id='$stkm_id' ";
+     if($isType=="imp"){
+          $sql .= " AND STOCK_CODE='$STOCK_CODE' AND isType='imp' ";
+     }else{
+          $sql .= " AND BIN_CODE='$BIN_CODE' AND isType='b2r' ";
+     }
+     echo $sql;
+     echo runSql($sql);
+
+     header("Location: 19_toggle.php");
+
 }
 // echo $log;
 

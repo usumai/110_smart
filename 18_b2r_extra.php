@@ -5,11 +5,12 @@
 $auto_storageID = $_GET["auto_storageID"];
 $BIN_CODE = $_GET["BIN_CODE"];
 
-$sql = "SELECT STOCK_CODE, ITEM_NAME, SOH, finalResult, finalResultPath FROM smartdb.sm18_impairment WHERE auto_storageID = '$auto_storageID'";
+$sql = "SELECT stkm_id, STOCK_CODE, ITEM_NAME, SOH, finalResult, finalResultPath FROM smartdb.sm18_impairment WHERE auto_storageID = '$auto_storageID'";
 // $sql .= " LIMIT 500; ";   
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {      
+        $stkm_id            = $row['stkm_id'];
         $finalResult        = $row['finalResult'];
         $finalResultPath    = $row['finalResultPath'];
 }}
@@ -151,13 +152,14 @@ $(document).ready(function() {
             act:            "save_b2r_extra",
             auto_storageID: "<?=$auto_storageID?>",
             BIN_CODE:       "<?=$BIN_CODE?>",
+            stkm_id:       "<?=$stkm_id?>",
             finalResult,
             finalResultPath:JSON.stringify(ans)
         },
         function(data, status){
             console.log(data);
             if(data=="success"){
-                window.location.replace("17_b2r.php?BIN_CODE=<?=$BIN_CODE?>");
+                window.location.replace("17_b2r.php?BIN_CODE=<?=$BIN_CODE?>&stkm_id=<?=$stkm_id?>");
             }
         });
     })
@@ -196,9 +198,9 @@ $(document).ready(function() {
     <div class='col'>
         <h1 class='display-4'>
             Extra stockcode investigation
-            <a href='17_b2r.php?BIN_CODE=<?=$BIN_CODE?>' class='btn btn-outline-dark float-right'>Back</a>
+            <a href='17_b2r.php?BIN_CODE=<?=$BIN_CODE?>&stkm_id=<?=$stkm_id?>' class='btn btn-outline-dark float-right'>Back</a>
         </h1>
-        <div class='dropdown'><button class='btn btn-outline-danger dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='dispBtnClear'>Clear</button><div class='dropdown-menu bg-danger' aria-labelledby='dropdownMenuButton'><a class='dropdown-item bg-danger text-light' href='05_action.php?act=save_clear_b2r_extra&auto_storageID=<?=$auto_storageID?>&BIN_CODE=<?=$BIN_CODE?>'>I'm sure</a></div></div>
+        <div class='dropdown'><button class='btn btn-outline-danger dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='dispBtnClear'>Clear</button><div class='dropdown-menu bg-danger' aria-labelledby='dropdownMenuButton'><a class='dropdown-item bg-danger text-light' href='05_action.php?act=save_clear_b2r_extra&auto_storageID=<?=$auto_storageID?>&BIN_CODE=<?=$BIN_CODE?>&stkm_id=<?=$stkm_id?>'>I'm sure</a></div></div>
     </div>
 </div>
 

@@ -5,7 +5,7 @@
 
 
 $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_delete_date IS NULL";
-$sql = "SELECT COUNT(*) as count_total, SUM(CASE WHEN res_create_date IS NOT NULL AND delete_date IS NULL THEN 1 ELSE 0 END) AS count_complete FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude )";
+$sql = "SELECT COUNT(*) as count_total, SUM(CASE WHEN res_create_date IS NOT NULL AND delete_date IS NULL AND findingID<>13 THEN 1 ELSE 0 END) AS count_complete FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude) AND isBackup IS NULL";
 
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
@@ -90,7 +90,6 @@ $(document).ready(function() {
     <div class="row">
         <div class="col">
             <h2><?=$count_complete?>/<?=$count_total?> total (<?=$perc_complete?>%)&nbsp;
-            <button class="btn btn-primary btn_search_term" data-search_term="IS~">Add Impairment Samples filter</button>&nbsp;
             <button class="btn btn-primary btn_search_term" data-search_term="FIN~">Add completed filter</button>&nbsp;
             <button class="btn btn-primary btn_search_term" data-search_term="NYC~">Add incomplete filter</button>&nbsp;
             <button class="btn btn-warning btn_search_term_clear">Clear search terms</button></h2>
@@ -149,12 +148,13 @@ if ($result->num_rows > 0) {
 
 
 $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_delete_date IS NULL";
-$sql = "SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude )";
+$sql = "SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND isBackup IS NULL";
 // $sql .= " LIMIT 500; ";   
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {    
         $auto_storageID     = $row['auto_storageID'];    
+        $stkm_id            = $row['stkm_id'];  
         $storageID          = $row['storageID'];
         $rowNo              = $row['rowNo'];
         $DSTRCT_CODE        = $row['DSTRCT_CODE'];
@@ -179,17 +179,22 @@ if ($result->num_rows > 0) {
             $fCol = $arF['col'][$findingID];
             $fAbr = $arF['abr'][$findingID];
             $flag_status = "<h4><span class='badge badge-$fCol'>FIN~$fAbr</span></h4>";
+            if ($findingID==13){
+                $flag_status = "<h4><span class='badge badge-$fCol'>NYC~$fAbr</span></h4>";
+            }
         }
 
         if(($isType)=="imp"){
+            $flag_type = "<h4><span class='badge badge-dark'>IMP</span></h4>";
             $btnAction = "<a href='16_imp.php?auto_storageID=$auto_storageID' class='btn btn-primary'><span class='octicon octicon-zap' style='font-size:30px'></span></a>";
         }elseif(($isType)=="b2r"){
-            $btnAction = "<a href='17_b2r.php?BIN_CODE=$BIN_CODE' class='btn btn-primary'><span class='octicon octicon-zap' style='font-size:30px'></span></a>";
+            $flag_type = "<h4><span class='badge badge-dark'>B2R</span></h4>";
+            $btnAction = "<a href='17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id' class='btn btn-primary'><span class='octicon octicon-zap' style='font-size:30px'></span></a>";
         }
 
 
 
-        echo "<tr><td>".$btnAction."</td><td>".$DSTRCT_CODE."</td><td>".$WHOUSE_ID."</td><td>".$SUPPLY_CUST_ID."</td><td>".$BIN_CODE."</td><td>".$STOCK_CODE."</td><td>".$ITEM_NAME."</td><td>".substr($INVENT_CAT,0,2)."</td><td>".$SOH."</td><td>".$TRACKING_IND."</td><td>".$TRACKING_REFERENCE."</td><td>".$isType."</td><td>".$flag_status."</td><td class='text-right'>".$btnAction."</td></tr>";
+        echo "<tr><td>".$btnAction."</td><td>".$DSTRCT_CODE."</td><td>".$WHOUSE_ID."</td><td>".$SUPPLY_CUST_ID."</td><td>".$BIN_CODE."</td><td>".$STOCK_CODE."</td><td>".$ITEM_NAME."</td><td>".substr($INVENT_CAT,0,2)."</td><td>".$SOH."</td><td>".$TRACKING_IND."</td><td>".$TRACKING_REFERENCE."</td><td>".$flag_type."</td><td>".$flag_status."</td><td class='text-right'>".$btnAction."</td></tr>";
 
 }}
 

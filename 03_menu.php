@@ -87,6 +87,7 @@ if($system_stk_type=="stocktake"){
     if ($latest_version_no>$smartm_software_version) {
         $area_version_status = "<span class='dropdown-item'>You cannot update software when you have open stocktakes</span>";
     }
+    $area_backups = "";
 }elseif($system_stk_type=="impairment"){
 
   $btn_stk  = "<a href='15_impairment.php' class='nav-link text-success'>Impairment</a>";
@@ -94,6 +95,7 @@ if($system_stk_type=="stocktake"){
   if ($latest_version_no>$smartm_software_version) {
       $area_version_status = "<span class='dropdown-item'>You cannot update software when you have open stocktakes</span>";
   }
+  $area_backups = "<a class='dropdown-item' href='19_toggle.php'>Toggle primary/backup</a>";
 }else{
   // $btn_stk  = "<span class='nav-link text-secondary' >Stocktake</span>";
   $btn_stk  = "";
@@ -130,6 +132,12 @@ $menu_software = $area_last_update . $area_version_status.$btn_push_master ;
 
 <script>
 $( function() {
+
+  if("<?=$system_stk_type?>"!="stocktake"){
+    $("#tags").hide()
+  }
+
+
     $( "#tags" ).autocomplete({
         source: function( request, response ) {
             $.ajax( {
@@ -194,7 +202,9 @@ $( function() {
                         <a class='dropdown-item' href='06_admin.php'>Archived Stocktakes</a>
                         <button type='button' class='dropdown-item btn btn-danger' data-toggle='modal' data-target='#modal_confirm_reset'>Reset all data</button>
                         <a class="dropdown-item" href="05_action.php?act=save_invertcolors">Invert Colour Scheme</a>
+                        <?=$area_backups?>
                         <?=$area_rr?>
+                        
                     </div>
                 </li>
                 <li class="nav-item">

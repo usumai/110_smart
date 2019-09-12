@@ -5,9 +5,10 @@
 <?php
 
 $BIN_CODE = $_GET["BIN_CODE"];
+$stkm_id = $_GET["stkm_id"];
 $binC='';
 $arrSample = array();
-$sql = "SELECT * FROM smartdb.sm18_impairment WHERE BIN_CODE = '$BIN_CODE'  AND isChild IS NULL AND isType ='b2r' ";
+$sql = "SELECT * FROM smartdb.sm18_impairment WHERE BIN_CODE = '$BIN_CODE'  AND isChild IS NULL AND isType ='b2r' AND stkm_id = $stkm_id";
 // $sql .= " LIMIT 500; ";   
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
@@ -40,7 +41,7 @@ if ($result->num_rows > 0) {
 }}
 
 $binExtra = '';
-$sql = "SELECT auto_storageID, STOCK_CODE, ITEM_NAME, SOH, finalResult FROM smartdb.sm18_impairment WHERE BIN_CODE = '$BIN_CODE' AND isChild=1";
+$sql = "SELECT auto_storageID, STOCK_CODE, ITEM_NAME, SOH, finalResult FROM smartdb.sm18_impairment WHERE BIN_CODE = '$BIN_CODE' AND isChild=1 AND stkm_id = $stkm_id";
 // $sql .= " LIMIT 500; ";   
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
@@ -52,13 +53,13 @@ if ($result->num_rows > 0) {
         $finalResult            = $row['finalResult'];
 
         if(empty($finalResult)){
-            $extraStatus = "<a href='18_b2r_extra.php?auto_storageID=$auto_storageID&BIN_CODE=$BIN_CODE' class='list-group-item list-group-item-danger btnInvestigate' style='padding:5px;text-decoration:none'>Investigate</a>";
+            $extraStatus = "<a href='18_b2r_extra.php?auto_storageID=$auto_storageID&BIN_CODE=$BIN_CODE&stkm_id=".$stkm_id."' class='list-group-item list-group-item-danger btnInvestigate' style='padding:5px;text-decoration:none'>Investigate</a>";
         }else{
             $finalResultDisp = $finalResult;
             if($finalResult=='nstr'){
                 $finalResultDisp = "No finding";
             }
-            $extraStatus = "<a href='18_b2r_extra.php?auto_storageID=$auto_storageID&BIN_CODE=$BIN_CODE' class='list-group-item list-group-item-success btnInvestigate' style='padding:5px;text-decoration:none'>$finalResultDisp</a>";
+            $extraStatus = "<a href='18_b2r_extra.php?auto_storageID=$auto_storageID&BIN_CODE=$BIN_CODE&stkm_id=".$stkm_id."' class='list-group-item list-group-item-success btnInvestigate' style='padding:5px;text-decoration:none'>$finalResultDisp</a>";
         }
         $binExtra .= "<tr><td>$extraSTOCK_CODE</td><td>$extraITEM_NAME</td><td align='right'>$extraSOH</td><td>$extraStatus</td></tr>";
 
@@ -70,7 +71,7 @@ $arrSample = json_encode($arrSample);
 
 $btnDelete=$btnAdd='';
 if(!empty($findingID)){
-    $btnDelete = "<div class='text-center'><div class='dropdown'><button class='btn btn-outline-danger dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='dispBtnClear'>Delete</button><div class='dropdown-menu bg-danger' aria-labelledby='dropdownMenuButton'><a class='dropdown-item bg-danger text-light' href='05_action.php?act=save_clear_b2r&BIN_CODE=".$BIN_CODE."'>I'm sure</a></div></div></div>";
+    $btnDelete = "<div class='text-center'><div class='dropdown'><button class='btn btn-outline-danger dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='dispBtnClear'>Delete</button><div class='dropdown-menu bg-danger' aria-labelledby='dropdownMenuButton'><a class='dropdown-item bg-danger text-light' href='05_action.php?act=save_clear_b2r&BIN_CODE=".$BIN_CODE."&stkm_id=".$stkm_id."'>I'm sure</a></div></div></div>";
 
     if($findingID!=14){
         $btnAdd = "<br><br><br><button type='button' class='btn btn-outline-dark' data-toggle='modal' data-target='#modal_add_extra' v-if='ar.first_found_flag==1'>Register extra stockcode</button>";
@@ -177,9 +178,9 @@ $(document).ready(function() {
             <?=$btnAdd?>
 
             <li class="list-group-item hideInitialMenu q1"><b>Are there any stockcodes in addition to this list?</b></li>
-            <a class="list-group-item list-group-item-action list-group-item-success hideInitialMenu q1" href='05_action.php?act=save_b2r_nstr&BIN_CODE=<?=$BIN_CODE?>'>No</a>
+            <a class="list-group-item list-group-item-action list-group-item-success hideInitialMenu q1" href='05_action.php?act=save_b2r_nstr&BIN_CODE=<?=$BIN_CODE?>&stkm_id=<?=$stkm_id?>'>No</a>
 
-            <a class="list-group-item list-group-item-action list-group-item-danger hideInitialMenu q1" href='05_action.php?act=save_b2r_extras&BIN_CODE=<?=$BIN_CODE?>'>Yes</a>
+            <a class="list-group-item list-group-item-action list-group-item-danger hideInitialMenu q1" href='05_action.php?act=save_b2r_extras&BIN_CODE=<?=$BIN_CODE?>&stkm_id=<?=$stkm_id?>'>Yes</a>
 
         </ul>
     </div>
@@ -240,6 +241,9 @@ $(document).ready(function() {
                 <input type="text" name="extraSOH" id="extraSOH" class="form-control addSCFormInputs">
 
                 <input type="hidden" name="BIN_CODE" value="<?=$BIN_CODE?>">
+                <input type="hidden" name="stkm_id" value="<?=$stkm_id?>">
+                <input type="hidden" name="DSTRCT_CODE" value="<?=$DSTRCT_CODE?>">
+                <input type="hidden" name="WHOUSE_ID" value="<?=$WHOUSE_ID?>">
                 <input type="hidden" name="act" value="save_b2r_add_extra">
             </p>
             </div>
