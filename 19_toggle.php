@@ -5,21 +5,6 @@
 <?php
 
 $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_delete_date IS NULL";
-$rws = "";
-$sql = "SELECT stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, STOCK_CODE, ITEM_NAME, isType, targetID, isBackup, COUNT(*) AS targetCount FROM smartdb.sm18_impairment WHERE delete_date IS NULL AND stkm_id IS NOT NULL GROUP BY stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, STOCK_CODE, ITEM_NAME, isType, targetID, isBackup ORDER BY isType, targetID, isBackup, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, STOCK_CODE";
-
-$sql = "SELECT stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, CASE WHEN isType='imp' THEN ITEM_NAME ELSE NULL END AS ITEM_NAME, isType, targetID, isBackup, 
-CASE WHEN isType='imp' THEN STOCK_CODE ELSE NULL END AS SC_disp, 
-CASE WHEN isType='b2r' THEN BIN_CODE ELSE NULL END AS BC_disp, 
-COUNT(*) AS targetCount 
-
-FROM smartdb.sm18_impairment 
-WHERE delete_date IS NULL AND stkm_id IN ($sqlInclude)
-
-GROUP BY stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, CASE WHEN isType='b2r' THEN BIN_CODE ELSE NULL END, CASE WHEN isType='imp' THEN STOCK_CODE ELSE NULL END, CASE WHEN isType='imp' THEN ITEM_NAME ELSE NULL END, isType, targetID, isBackup 
-
-ORDER BY isType, targetID, isBackup, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID";
-echo "<br><br><br>".$sql;
 
 
 $rws = '';

@@ -148,7 +148,7 @@ if ($result->num_rows > 0) {
 
 
 $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_delete_date IS NULL";
-$sql = "SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND isBackup IS NULL";
+$sql = "SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND isBackup IS NULL AND isType='imp'";
 // $sql .= " LIMIT 500; ";   
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
@@ -183,14 +183,9 @@ if ($result->num_rows > 0) {
                 $flag_status = "<h4><span class='badge badge-$fCol'>NYC~$fAbr</span></h4>";
             }
         }
-
-        if(($isType)=="imp"){
-            $flag_type = "<h4><span class='badge badge-dark'>IMP</span></h4>";
-            $btnAction = "<a href='16_imp.php?auto_storageID=$auto_storageID' class='btn btn-primary'><span class='octicon octicon-zap' style='font-size:30px'></span></a>";
-        }elseif(($isType)=="b2r"){
-            $flag_type = "<h4><span class='badge badge-dark'>B2R</span></h4>";
-            $btnAction = "<a href='17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id' class='btn btn-primary'><span class='octicon octicon-zap' style='font-size:30px'></span></a>";
-        }
+        
+        $flag_type = "<h4><span class='badge badge-dark'>IMP</span></h4>";
+        $btnAction = "<a href='16_imp.php?auto_storageID=$auto_storageID' class='btn btn-primary'><span class='octicon octicon-zap' style='font-size:30px'></span></a>";
 
 
 
@@ -199,6 +194,42 @@ if ($result->num_rows > 0) {
 }}
 
 
+
+
+
+
+$sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_delete_date IS NULL";
+$sql = "SELECT  stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, findingID, SUM(SOH) AS sumSOH  FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND isBackup IS NULL AND isType='b2r' GROUP BY stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, findingID 
+";
+// $sql .= " LIMIT 500; ";   
+$result = $con->query($sql);
+if ($result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {        
+        $stkm_id            = $row['stkm_id'];  
+        $DSTRCT_CODE        = $row['DSTRCT_CODE'];
+        $WHOUSE_ID          = $row['WHOUSE_ID'];
+        $SUPPLY_CUST_ID     = $row['SUPPLY_CUST_ID'];
+        $BIN_CODE           = $row['BIN_CODE'];
+        $findingID          = $row['findingID'];
+        $sumSOH             = $row['sumSOH'];
+
+        $flag_status = "<h4><span class='badge badge-secondary'>NYC~</span></h4>";
+        if(!empty($findingID)){
+            $fCol = $arF['col'][$findingID];
+            $fAbr = $arF['abr'][$findingID];
+            $flag_status = "<h4><span class='badge badge-$fCol'>FIN~$fAbr</span></h4>";
+            if ($findingID==13){
+                $flag_status = "<h4><span class='badge badge-$fCol'>NYC~$fAbr</span></h4>";
+            }
+        }
+        $flag_type = "<h4><span class='badge badge-dark'>B2R</span></h4>";
+        $btnAction = "<a href='17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id' class='btn btn-primary'><span class='octicon octicon-zap' style='font-size:30px'></span></a>";
+
+
+
+        echo "<tr><td>".$btnAction."</td><td>".$DSTRCT_CODE."</td><td>".$WHOUSE_ID."</td><td>".$SUPPLY_CUST_ID."</td><td>".$BIN_CODE."</td><td></td><td></td><td></td><td>".$sumSOH."</td><td></td><td></td><td>".$flag_type."</td><td>".$flag_status."</td><td class='text-right'>".$btnAction."</td></tr>";
+
+}}
 
 ?>
 

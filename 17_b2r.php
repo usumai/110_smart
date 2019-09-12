@@ -8,34 +8,23 @@ $BIN_CODE = $_GET["BIN_CODE"];
 $stkm_id = $_GET["stkm_id"];
 $binC='';
 $arrSample = array();
-$sql = "SELECT * FROM smartdb.sm18_impairment WHERE BIN_CODE = '$BIN_CODE'  AND isChild IS NULL AND isType ='b2r' AND stkm_id = $stkm_id";
+$sql = "SELECT STOCK_CODE, ITEM_NAME, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, res_comment, findingID, SUM(SOH) AS sumSOH FROM smartdb.sm18_impairment WHERE BIN_CODE = '$BIN_CODE'  AND isChild IS NULL AND isType ='b2r' AND stkm_id = $stkm_id
+GROUP BY STOCK_CODE, ITEM_NAME, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, res_comment, findingID
+";
 // $sql .= " LIMIT 500; ";   
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {    
-        $auto_storageID     = $row['auto_storageID'];    
-        $storageID          = $row['storageID'];
-        $rowNo              = $row['rowNo'];
+        $STOCK_CODE         = $row['STOCK_CODE'];
+        $ITEM_NAME          = $row['ITEM_NAME'];
         $DSTRCT_CODE        = $row['DSTRCT_CODE'];
         $WHOUSE_ID          = $row['WHOUSE_ID'];
         $SUPPLY_CUST_ID     = $row['SUPPLY_CUST_ID'];
-        $SC_ACCOUNT_TYPE    = $row['SC_ACCOUNT_TYPE'];
-        $STOCK_CODE         = $row['STOCK_CODE'];
-        $ITEM_NAME          = $row['ITEM_NAME'];
-        $BIN_CODE           = $row['BIN_CODE'];
-        $INVENT_CAT         = $row['INVENT_CAT'];
-        $TRACKING_IND       = $row['TRACKING_IND'];
-        $SOH                = $row['SOH'];
-        $TRACKING_REFERENCE = $row['TRACKING_REFERENCE'];
-        $STK_DESC           = $row['STK_DESC'];
-        $sampleFlag         = $row['sampleFlag'];
-        $res_create_date    = $row['res_create_date'];
-        $res_update_user    = $row['res_update_user'];
-        $findingID          = $row['findingID'];
+        $sumSOH             = $row['sumSOH'];
         $res_comment        = $row['res_comment'];
-        $res_unserv_date    = $row['res_unserv_date'];
+        $findingID          = $row['findingID'];
 
-        $binC .= "<tr><td>$STOCK_CODE</td><td>$ITEM_NAME</td><td align='right'>$SOH</td><td>Original</td></tr>";
+        $binC .= "<tr><td>$STOCK_CODE</td><td>$ITEM_NAME</td><td align='right'>$sumSOH</td><td>Original</td></tr>";
 
         $arrSample[] = $row;
 }}
