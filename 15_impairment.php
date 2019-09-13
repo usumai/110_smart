@@ -37,12 +37,22 @@ $imp_count_total    = fnClNum($imp_count_total);
 $imp_count_complete = fnClNum($imp_count_complete);
 
 
-$sql = "SELECT  COUNT(DISTINCT BIN_CODE) AS b2r_count_total, SUM(CASE WHEN findingID IS NULL THEN 1 ELSE 0 END) AS b2r_count_complete FROM smartdb.sm18_impairment 
+$sql = "SELECT  COUNT(DISTINCT BIN_CODE) AS b2r_count_total FROM smartdb.sm18_impairment 
 WHERE isType='b2r' AND isBackup IS NULL AND stkm_id IN ($sqlInclude) ";
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
         $b2r_count_total    = $row["b2r_count_total"];
+}}
+$sql = "SELECT  COUNT(DISTINCT BIN_CODE) AS b2r_count_complete
+        FROM smartdb.sm18_impairment 
+        WHERE isType='b2r' 
+        AND isBackup IS NULL 
+        AND stkm_id IN ($sqlInclude)
+        AND findingID IS NOT NULL";
+$result = $con->query($sql);
+if ($result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
         $b2r_count_complete = $row["b2r_count_complete"];
 }}
 $b2r_count_total    = fnClNum($b2r_count_total);
