@@ -4,19 +4,53 @@
 <?php
 
 
-$sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_delete_date IS NULL";
-$sql = "SELECT COUNT(*) as count_total, SUM(CASE WHEN res_create_date IS NOT NULL AND delete_date IS NULL AND findingID<>13 THEN 1 ELSE 0 END) AS count_complete FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude) AND isBackup IS NULL";
+function fnClNum($fv){
+    $fv = (empty($fv) ? 0 : $fv);
+    $fv = (is_nan($fv) ? 0 : $fv);
+    return $fv;
+}
 
+function fnPerc($tot,$sub){
+    $tot = fnClNum($tot);
+    $sub = fnClNum($sub);
+    if($tot>0){
+        $perc = $sub/$tot;
+        $perc = round(($perc*100),2);
+    }else{
+        $perc = 0;
+    }
+    return $perc;
+}
+
+
+$sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_delete_date IS NULL";
+
+$sql = "SELECT COUNT(*) as imp_count_total, SUM(CASE WHEN res_create_date IS NOT NULL AND delete_date IS NULL AND findingID<>13 THEN 1 ELSE 0 END) AS imp_count_complete FROM smartdb.sm18_impairment  
+WHERE isType='imp' AND isBackup IS NULL AND stkm_id IN ($sqlInclude)";
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
-        $count_total    = $row["count_total"];
-        $count_complete = $row["count_complete"];
+        $imp_count_total    = $row["imp_count_total"];
+        $imp_count_complete = $row["imp_count_complete"];
 }}
-$perc_complete = 0;
-if ($count_total>0&&$count_complete>0) {
-    $perc_complete = round(($count_complete/$count_total)*100,0); 
-}
+$imp_count_total    = fnClNum($imp_count_total);
+$imp_count_complete = fnClNum($imp_count_complete);
+
+
+$sql = "SELECT  COUNT(DISTINCT BIN_CODE) AS b2r_count_total, SUM(CASE WHEN findingID IS NULL THEN 1 ELSE 0 END) AS b2r_count_complete FROM smartdb.sm18_impairment 
+WHERE isType='b2r' AND isBackup IS NULL AND stkm_id IN ($sqlInclude) ";
+$result = $con->query($sql);
+if ($result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+        $b2r_count_total    = $row["b2r_count_total"];
+        $b2r_count_complete = $row["b2r_count_complete"];
+}}
+$b2r_count_total    = fnClNum($b2r_count_total);
+$b2r_count_complete = fnClNum($b2r_count_complete);
+
+$count_total    = $imp_count_total      + $b2r_count_total;
+$count_complete = $imp_count_complete   + $b2r_count_complete;
+$perc_complete  = fnPerc($count_total,$count_complete)
 
 ?>
 

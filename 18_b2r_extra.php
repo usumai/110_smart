@@ -42,13 +42,13 @@ let qns = {
     },
     2:{
         name:   "Is the item serial tracked?",
-        yesPath:"4",
-        noPath: "3",
+        yesPath:"3",
+        noPath: "4",
     },
     3:{
         name:   "Does serial no. exists in WHS on MILIS?",
         yesPath:"4",
-        noPath: "nstr",
+        noPath: "FF",
     },
     4:{
         name:   "Check dues in/out status?",

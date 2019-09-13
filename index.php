@@ -9,8 +9,23 @@
 // THen add a filter to hide the ability to enable including the other kind
 
 
+function fnClNum($fv){
+    $fv = (empty($fv) ? 0 : $fv);
+    $fv = (is_nan($fv) ? 0 : $fv);
+    return $fv;
+}
 
-
+function fnPerc($tot,$sub){
+    $tot = fnClNum($tot);
+    $sub = fnClNum($sub);
+    if($tot>0){
+        $perc = $sub/$tot;
+        $perc = round(($perc*100),2);
+    }else{
+        $perc = 0;
+    }
+    return $perc;
+}
 
 
 
@@ -65,34 +80,130 @@ if ($result->num_rows > 0) {
         }
 
 
-
-        $sql = "SELECT 
-                    sum(CASE WHEN first_found_flag = 1 THEN 1 ELSE 0 END) AS rowcount_firstfound,
-                    sum(CASE WHEN res_completed = 1 THEN 1 ELSE 0 END) AS rowcount_completed,
-                    sum(CASE WHEN rr_id IS NOT NULL THEN 1 ELSE 0 END) AS rowcount_other
-                FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id AND delete_date IS NULL";
-        $result2 = $con->query($sql);
-        if ($result2->num_rows > 0) {
-        while($row2 = $result2->fetch_assoc()) {
-            $rowcount_firstfound    = $row2["rowcount_firstfound"];
-            $rowcount_completed     = $row2["rowcount_completed"];
-            $rowcount_other         = $row2["rowcount_other"];
-        }}
-
         $stk_type = ucfirst($stk_type);
 
         $btn_excel = "<a class='dropdown-item' href='05_action.php?act=get_excel&stkm_id=$stkm_id'>Output to excel</a>";
-        $perc_complete = round((($rowcount_completed/($rowcount_original+$rowcount_firstfound+$rowcount_other))*100),2);
         $btn_export = "<a class='dropdown-item' href='05_action.php?act=get_export_stk&stkm_id=$stkm_id'>Export Stocktake</a>";
-
         $btn_action     = " <div class='dropdown'>
                                 <button class='btn btn-outline-dark dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Action</button>
                                 <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
                                     $btn_toggle $btn_export $btn_excel $btn_archive
-                                    
                                 </div>
                             </div>";
-        $rw_stk .= " <tr>
+
+
+
+
+        if ($stk_type=="Impairment"){
+            //Get impairment stats
+            $sql = "SELECT 
+                        count(*) AS rc_imp_total,
+                        sum(CASE WHEN res_create_date IS NOT NULL	AND isBackup IS NULL 	THEN 1 ELSE 0 END) AS rc_imp_complete_primary,
+                        sum(CASE WHEN res_create_date IS NOT NULL	AND isBackup = 1		THEN 1 ELSE 0 END) AS rc_imp_complete_backup,
+                        sum(CASE WHEN res_create_date IS NULL		AND isBackup IS NULL 	THEN 1 ELSE 0 END) AS rc_imp_incomplete_primary,
+                        sum(CASE WHEN res_create_date IS NULL 		AND isBackup = 1 		THEN 1 ELSE 0 END) AS rc_imp_incomplete_backup
+                    FROM
+                        smartdb.sm18_impairment
+                    WHERE stkm_id=$stkm_id
+                    AND isType='imp'";
+            $result2 = $con->query($sql);
+            if ($result2->num_rows > 0) {
+            while($row2 = $result2->fetch_assoc()) {
+                $rc_imp_total               = $row2["rc_imp_total"];
+                $rc_imp_complete_primary    = $row2["rc_imp_complete_primary"];
+                $rc_imp_complete_backup     = $row2["rc_imp_complete_backup"];
+                $rc_imp_incomplete_primary  = $row2["rc_imp_incomplete_primary"];
+                $rc_imp_incomplete_backup   = $row2["rc_imp_incomplete_backup"];
+            }}
+            //Get b2r stats
+            $sql = "SELECT 
+                        COUNT(*) AS rc_b2r_total,
+                        SUM(CASE WHEN findingID IS NOT NULL AND isBackup IS NULL THEN 1 ELSE 0 END) AS rc_b2r_complete_primary,
+                        SUM(CASE WHEN findingID IS NOT NULL AND isBackup IS NULL THEN 1 ELSE 0 END) AS rc_b2r_complete_backup,
+                        SUM(CASE WHEN findingID IS NULL AND isBackup IS NULL THEN 1 ELSE 0 END) AS rc_b2r_incomplete_primary,
+                        SUM(CASE WHEN findingID IS NULL AND isBackup =1 THEN 1 ELSE 0 END) AS rc_b2r_incomplete_backup
+                    FROM
+                        (
+                            SELECT BIN_CODE, findingID, isBackup
+                            FROM smartdb.sm18_impairment
+                            WHERE stkm_id=$stkm_id
+                            AND isType='b2r'
+                            GROUP BY BIN_CODE, findingID, isBackup
+                        ) AS vtGroup";
+            $result2 = $con->query($sql);
+            if ($result2->num_rows > 0) {
+            while($row2 = $result2->fetch_assoc()) {
+                $rc_b2r_total               = $row2["rc_b2r_total"];
+                $rc_b2r_complete_primary    = $row2["rc_b2r_complete_primary"];
+                $rc_b2r_complete_backup     = $row2["rc_b2r_complete_backup"];
+                $rc_b2r_incomplete_primary  = $row2["rc_b2r_incomplete_primary"];
+                $rc_b2r_incomplete_backup   = $row2["rc_b2r_incomplete_backup"];
+            }}
+            
+            $sql = "SELECT COUNT(*) AS rc_b2r_inv_total
+                    FROM smartdb.sm18_impairment
+                    WHERE stkm_id=$stkm_id
+                    AND isType='b2r'
+                    AND isBackup IS NULL
+                    AND isChild=1";
+            $result2 = $con->query($sql);
+            if ($result2->num_rows > 0) {
+            while($row2 = $result2->fetch_assoc()) {
+                $rc_b2r_inv_total   = $row2["rc_b2r_inv_total"];
+            }}
+
+            // fnClNum($fv)
+            $rowcount_firstfound = 0;
+
+            $rc_imp_primary_total = $rc_imp_complete_primary + $rc_imp_incomplete_primary;
+            $perc_complete_imp = fnPerc($rc_imp_primary_total,$rc_imp_complete_primary);
+
+
+            $rc_b2r_primary_total = $rc_b2r_complete_primary + $rc_b2r_incomplete_primary;
+            $perc_complete_b2r = fnPerc($rc_b2r_primary_total,$rc_b2r_complete_primary);
+
+            $rw_stk .= " <tr>
+                            <td>$stk_type</td>
+                            <td>$flag_included</td>
+                            <td>$stk_id</td>
+                            <td>$stk_name<span class='float-right'>Impairment:</span></td>
+                            <td align='right'>$rc_imp_primary_total</td>
+                            <td align='right'>$rc_imp_complete_primary</td>
+                            <td align='right'>$perc_complete_imp%</td>
+                            <td align='right'>NA</td>
+                            <td align='right'>NA</td>
+                            <td align='right'></td>
+                        </tr>";
+            $rw_stk .= " <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td><span class='float-right'>B2R:</span></td>
+                            <td align='right'>$rc_b2r_primary_total</td>
+                            <td align='right'>$rc_b2r_complete_primary</td>
+                            <td align='right'>$perc_complete_b2r%</td>
+                            <td align='right'>$rc_b2r_inv_total</td>
+                            <td align='right'>NA</td>
+                            <td align='right'>$btn_action</td>
+                        </tr>";
+
+
+        }elseif ($stk_type=="Stocktake") {
+            $sql = "SELECT 
+                        sum(CASE WHEN first_found_flag = 1 THEN 1 ELSE 0 END) AS rowcount_firstfound,
+                        sum(CASE WHEN res_completed = 1 THEN 1 ELSE 0 END) AS rowcount_completed,
+                        sum(CASE WHEN rr_id IS NOT NULL THEN 1 ELSE 0 END) AS rowcount_other
+                    FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id AND delete_date IS NULL";
+            $result2 = $con->query($sql);
+            if ($result2->num_rows > 0) {
+            while($row2 = $result2->fetch_assoc()) {
+                $rowcount_firstfound    = $row2["rowcount_firstfound"];
+                $rowcount_completed     = $row2["rowcount_completed"];
+                $rowcount_other         = $row2["rowcount_other"];
+            }}
+            $perc_complete = round((($rowcount_completed/($rowcount_original+$rowcount_firstfound+$rowcount_other))*100),2);
+
+            $rw_stk .= " <tr>
                         <td>$stk_type</td>
                         <td>$flag_included</td>
                         <td>$stk_id</td>
@@ -104,6 +215,13 @@ if ($result->num_rows > 0) {
                         <td align='right'>$rowcount_other</td>
                         <td align='right'>$btn_action</td>
                     </tr>";
+        }
+
+
+
+        
+
+        
 }}
 ?>
 
