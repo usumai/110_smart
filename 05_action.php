@@ -335,6 +335,7 @@ if ($act=='sys_pull_master') {
 
      `finalResult` VARCHAR(255) NULL,
      `finalResultPath` VARCHAR(255) NULL,
+     `fingerprint` varchar(255) DEFAULT NULL,
      
      PRIMARY KEY (`auto_storageID`));";
      echo "<br><br>".$sql_save;
@@ -555,8 +556,8 @@ if ($act=='sys_pull_master') {
           // $sql_save_history = "INSERT INTO ".$dbname.".smart_l10_history (create_date, create_user, history_type, history_desc, history_link) VALUES ( NOW(),'".$current_user."','Raw remainder file upload','User uploaded raw remainder V2 file','108_rr.php');";
 
      }elseif ($arr['type']=="impairment") {
-          $stk_id                  = $arr['isID'];
-          $stk_name                = $arr['isName'];
+          $stk_id                  = $arr['stk_id'];
+          $stk_name                = $arr['stk_name'];
           $dpn_extract_date        = $arr['dpn_extract_date'];
           $dpn_extract_user        = $arr['dpn_extract_user'];
           $smm_extract_date        = $arr['smm_extract_date'];
@@ -595,10 +596,10 @@ if ($act=='sys_pull_master') {
 
                
                $sql_save=" INSERT INTO smartdb.sm18_impairment (
-                    stkm_id, storageID, rowNo, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID
+                    stkm_id, storageID, rowNo, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID, fingerprint
                ) VALUES(".
                
-               $stkm_id_new.",".$ass['storageID'].",".$ass['rowNo'].",".$ass['DSTRCT_CODE'].",".$ass['WHOUSE_ID'].",".$ass['SUPPLY_CUST_ID'].",".$ass['SC_ACCOUNT_TYPE'].",".$ass['STOCK_CODE'].",".$ass['ITEM_NAME'].",".$ass['STK_DESC'].",".$ass['BIN_CODE'].",".$ass['INVENT_CAT'].",".$ass['INVENT_CAT_DESC'].",".$ass['TRACKING_IND'].",".$ass['SOH'].",".$ass['TRACKING_REFERENCE'].",".$ass['LAST_MOD_DATE'].",".$ass['sampleFlag'].",".$ass['serviceableFlag'].",".$ass['isBackup'].",".$ass['isType'].",".$ass['targetID'].",".$ass['delete_date'].",".$ass['delete_user'].",".$ass['res_create_date'].",".$ass['res_update_user'].",".$ass['findingID'].",".$ass['res_comment'].",".$ass['res_evidence_desc'].",".$ass['res_unserv_date'].",".$ass['isChild'].",".$ass['res_parent_storageID']." ); ";
+               $stkm_id_new.",".$ass['storageID'].",".$ass['rowNo'].",".$ass['DSTRCT_CODE'].",".$ass['WHOUSE_ID'].",".$ass['SUPPLY_CUST_ID'].",".$ass['SC_ACCOUNT_TYPE'].",".$ass['STOCK_CODE'].",".$ass['ITEM_NAME'].",".$ass['STK_DESC'].",".$ass['BIN_CODE'].",".$ass['INVENT_CAT'].",".$ass['INVENT_CAT_DESC'].",".$ass['TRACKING_IND'].",".$ass['SOH'].",".$ass['TRACKING_REFERENCE'].",".$ass['LAST_MOD_DATE'].",".$ass['sampleFlag'].",".$ass['serviceableFlag'].",".$ass['isBackup'].",".$ass['isType'].",".$ass['targetID'].",".$ass['delete_date'].",".$ass['delete_user'].",".$ass['res_create_date'].",".$ass['res_update_user'].",".$ass['findingID'].",".$ass['res_comment'].",".$ass['res_evidence_desc'].",".$ass['res_unserv_date'].",".$ass['isChild'].",".$ass['res_parent_storageID'].",".$ass['fingerprint']." ); ";
                // echo "<br><br>".$sql_save;
                mysqli_multi_query($con,$sql_save);
           
@@ -634,13 +635,8 @@ if ($act=='sys_pull_master') {
      $date_disp = $mydate['year'].$month_disp.$day_disp."_".$hours_disp.$minutes_disp.$seconds_disp;
 
 echo $date_disp;
-     $sql = "SELECT *  FROM smartdb.sm14_ass WHERE stkm_id = $stkm_id AND delete_date IS NULL ;";
-     $arr_asset = array();
-     $result = $con->query($sql);
-     if ($result->num_rows > 0) {
-         while($r = $result->fetch_assoc()) {
-             $arr_asset[] = $r;
-     }}
+
+
 
      $sql = "SELECT * FROM smartdb.sm13_stk WHERE stkm_id=$stkm_id;";
      $result = $con->query($sql);
@@ -650,8 +646,23 @@ echo $date_disp;
              $stk_name             = $row["stk_name"];
              $dpn_extract_date     = $row["dpn_extract_date"];
              $dpn_extract_user     = $row["dpn_extract_user"];
+             $stk_type             = $row["stk_type"];
              $journal_text         = $row["journal_text"];
      }}
+
+     if ($stk_type=='stocktake'){
+          $sql = "SELECT *  FROM smartdb.sm14_ass WHERE stkm_id = $stkm_id AND delete_date IS NULL ;";
+     }else{
+          $sql = "SELECT *  FROM smartdb.sm18_impairment WHERE stkm_id = $stkm_id AND delete_date IS NULL ;";
+     }
+     $arr_asset = array();
+     $result = $con->query($sql);
+     if ($result->num_rows > 0) {
+         while($r = $result->fetch_assoc()) {
+             $arr_asset[] = $r;
+     }}
+
+
      $stk_name_disp = substr($stk_name, 30);
      $txt_file_link = "SMARTm_".$date_disp."_$stk_name_disp.json";
      $fp = fopen($txt_file_link, 'w');
@@ -680,7 +691,7 @@ echo $date_disp;
      }}
 
      $response = array();
-     $response['import']['type']                  = "stocktake";
+     $response['import']['type']                  = $stk_type;
      $response['import']['stkm_id']               = $stkm_id;
      $response['import']['stk_id']                = $stk_id;
      $response['import']['stk_name']              = $stk_name;
@@ -1270,6 +1281,7 @@ echo $date_disp;
      $sql = "DELETE FROM smartdb.sm18_impairment WHERE res_parent_storageID='$storageID' ";
      runSql($sql);
 
+     $fingerprint        = time();
      if($findingID==11){
 
           foreach ($_POST["splityRecord"] as $key => $value) {
@@ -1288,14 +1300,16 @@ echo $date_disp;
                               findingID, 
                               res_unserv_date, 
                               res_parent_storageID, 
-                              SOH)
+                              SOH,
+                              fingerprint)
                          VALUES (
                               NOW(),
                               '$res_update_user',
                               '$splityResult',
                               $splityDate,
                               '$storageID',
-                              '$splityCount'
+                              '$fingerprint',
+                              ''
                               )";
 
                runSql($sql);
@@ -1320,7 +1334,8 @@ echo $date_disp;
                findingID='$findingID',  
                res_comment=$res_comment,  
                res_unserv_date=$res_unserv_date,
-               res_create_date=NOW() 
+               res_create_date=NOW(),
+               fingerprint='$fingerprint'
                WHERE 
                auto_storageID='$auto_storageID' ";
      runSql($sql);
@@ -1339,7 +1354,8 @@ echo $date_disp;
      findingID=NULL,  
      res_comment=NULL,  
      res_evidence_desc=NULL,
-     res_unserv_date=NULL
+     res_unserv_date=NULL,
+     fingerprint=NULL
      WHERE 
      auto_storageID='$auto_storageID' ";
      echo $sql;
@@ -1354,11 +1370,13 @@ echo $date_disp;
      $BIN_CODE = $_GET["BIN_CODE"];
      $stkm_id  = $_GET["stkm_id"];
 
+     $fingerprint        = time();
      // 100 indicates NSTR
      $sql = "UPDATE smartdb.sm18_impairment SET 
      res_create_date=NOW(),
      res_update_user=NULL,
-     findingID=14
+     findingID=14,
+     fingerprint='$fingerprint'
      WHERE BIN_CODE='$BIN_CODE' AND isType='b2r' ";
      runSql($sql);
 
@@ -1369,9 +1387,11 @@ echo $date_disp;
      $BIN_CODE = $_GET["BIN_CODE"];
      $stkm_id  = $_GET["stkm_id"];
 
+     $fingerprint        = time();
      // 101 indicates waiting for extras
      $sql = "UPDATE smartdb.sm18_impairment SET 
-     findingID=15
+     findingID=15,
+     fingerprint='$fingerprint'
      WHERE BIN_CODE='$BIN_CODE'  AND isType='b2r' ";
      runSql($sql);
 
@@ -1388,7 +1408,8 @@ echo $date_disp;
      findingID=NULL,  
      res_comment=NULL,  
      res_evidence_desc=NULL,
-     res_unserv_date=NULL
+     res_unserv_date=NULL,
+     fingerprint=NULL
      WHERE 
      BIN_CODE='$BIN_CODE'  AND isType='b2r'";
      runSql($sql);
@@ -1421,7 +1442,8 @@ echo $date_disp;
           ITEM_NAME, 
           SOH,
           isChild,
-          isType)
+          isType,
+          fingerprint)
      VALUES (
           NOW(),
           '$res_update_user',
@@ -1433,7 +1455,8 @@ echo $date_disp;
           '$extraName',
           '$extraSOH',
           1,
-          'b2r'
+          'b2r',
+          '$fingerprint'
           )";
 
      runSql($sql);
@@ -1517,6 +1540,7 @@ function runSql($stmt){
 function checkExtrasFinished($BIN_CODE){
      global $con;
 
+     $fingerprint        = time();
      $sql = "SELECT COUNT(*) AS extraCount, SUM(CASE WHEN finalResult IS NULL THEN 0 ELSE 1 END) AS extraComplete FROM smartdb.sm18_impairment WHERE BIN_CODE = '$BIN_CODE' AND isChild=1 AND isType='b2r'";
      $result = $con->query($sql);
      if ($result->num_rows > 0) {
@@ -1526,7 +1550,8 @@ function checkExtrasFinished($BIN_CODE){
      }}
      if($extraCount==$extraComplete){
           $sql = "UPDATE smartdb.sm18_impairment SET 
-          findingID=16
+          findingID=16,
+          fingerprint='$fingerprint'
           WHERE BIN_CODE='$BIN_CODE' ";
      }else{
           $sql = "UPDATE smartdb.sm18_impairment SET 

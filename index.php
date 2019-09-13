@@ -27,8 +27,9 @@ function fnPerc($tot,$sub){
     return $perc;
 }
 
-
-
+$page_stk_id        = 0;
+$flag_merge_enabled = 1;
+$merge_count        = 0;
 
 $sql = "SELECT stk_type FROM smartdb.sm13_stk WHERE smm_delete_date IS NULL AND stk_include =1;";
 $result = $con->query($sql);
@@ -73,7 +74,11 @@ if ($result->num_rows > 0) {
         }
         // echo "<br><br><br><br>Iterant type:".$stk_type." - System type:".$system_stk_type;
         if($system_stk_type==$stk_type){
-
+            if ($stk_include==1) {
+                $page_stk_id        = ($page_stk_id==0 ? $stk_id : $page_stk_id);//Set the first page stk
+                $flag_merge_enabled = ($page_stk_id==$stk_id ? $flag_merge_enabled : 0);//If any of the enabled stocktakes are different to the first one, then disable merge
+                $merge_count        = ($page_stk_id==$stk_id ? ++$merge_count : $merge_count);//Keep a count of how many stocktakes with the same number there are
+            }
         }elseif($system_stk_type=="any"){
         }else{
             $btn_toggle = "<span class='dropdown-item'>Cannot include mixed activity types</span>";
@@ -220,9 +225,14 @@ if ($result->num_rows > 0) {
 
 
         
-
         
 }}
+$btnMerge = "";
+if ($merge_count==2&&$flag_merge_enabled==1){
+    $btnMerge = "<a href='20_merge.php' class='btn btn-outline-primary float-right'>Merge</a>";
+}
+// echo "<br><br><br><br>Merge enabled:$flag_merge_enabled";
+// echo "<br><br><br><br>Merge count:$merge_count";
 ?>
 
 <style>
@@ -275,7 +285,7 @@ $(document).ready(function() {
 </script>
 <main role="main" class="flex-shrink-0">
 	<div class="container">
-		<h1 class="mt-5">SMART Mobile</h1>
+		<h1 class="mt-5 display-4">SMART Mobile</h1>
 	</div>
 </main>
 
@@ -297,7 +307,8 @@ $(document).ready(function() {
             <?=$rw_stk?>
         </tbody>
     </table>
-    
+    <?=$btnMerge?>
+    <br><hr>
     <form action="05_action.php" method="post" enctype="multipart/form-data" id="form_upload">
         <h5 class="card-title">Upload file</h5>
         <h6 class="card-subtitle mb-2 text-muted">Stocktake and Raw Remainder</h6>
