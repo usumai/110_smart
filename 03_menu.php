@@ -80,6 +80,7 @@ if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
         $livecount            = $row["livecount"];
 }}
+$area_backups = "";
 if($system_stk_type=="stocktake"){
     // $btn_stk = "<a href='10_stk.php' class='nav-link btn btn-sm btn-success'>Stocktake</a>";
     $btn_stk  = "<a href='10_stk.php' class='nav-link text-success'>Stocktake</a>";

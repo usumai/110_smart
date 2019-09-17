@@ -60,6 +60,8 @@ if ($result->num_rows > 0) {
         $journal_text       = $row["journal_text"];
         $rowcount_original  = $row["rowcount_original"];
         $stk_type           = $row["stk_type"];
+        $merge_lock         = $row["merge_lock"];
+
 
         $stk_name = substr($stk_name,0,50);
 
@@ -82,6 +84,11 @@ if ($result->num_rows > 0) {
         }elseif($system_stk_type=="any"){
         }else{
             $btn_toggle = "<span class='dropdown-item'>Cannot include mixed activity types</span>";
+        }
+
+
+        if($merge_lock==1){
+            $btn_toggle = "<a class='dropdown-item' href='20_merge.php?stkm_id=".$stkm_id."'>Complete merge activity</a>";
         }
 
 
@@ -168,6 +175,7 @@ if ($result->num_rows > 0) {
             $perc_complete_b2r = fnPerc($rc_b2r_primary_total,$rc_b2r_complete_primary);
 
             $rw_stk .= " <tr>
+                            <td>$stkm_id</td>
                             <td>$stk_type</td>
                             <td>$flag_included</td>
                             <td>$stk_id</td>
@@ -180,6 +188,7 @@ if ($result->num_rows > 0) {
                             <td align='right'></td>
                         </tr>";
             $rw_stk .= " <tr>
+                            <td></td>
                             <td></td>
                             <td></td>
                             <td></td>
@@ -208,7 +217,8 @@ if ($result->num_rows > 0) {
             }}
             $perc_complete = round((($rowcount_completed/($rowcount_original+$rowcount_firstfound+$rowcount_other))*100),2);
 
-            $rw_stk .= " <tr>
+            $rw_stk .= "<tr>
+                        <td>$stkm_id</td>
                         <td>$stk_type</td>
                         <td>$flag_included</td>
                         <td>$stk_id</td>
@@ -229,7 +239,7 @@ if ($result->num_rows > 0) {
 }}
 $btnMerge = "";
 if ($merge_count==2&&$flag_merge_enabled==1){
-    $btnMerge = "<a href='20_merge.php' class='btn btn-outline-primary float-right'>Merge</a>";
+    $btnMerge = "<a href='05_action.php?act=save_merge_initiate' class='btn btn-outline-primary float-right'>Merge</a>";
 }
 // echo "<br><br><br><br>Merge enabled:$flag_merge_enabled";
 // echo "<br><br><br><br>Merge count:$merge_count";
@@ -292,6 +302,7 @@ $(document).ready(function() {
 <div class="container">
     <table id="table_assets" class="table">
             <tr>
+                <td>ID</td>
                 <td>Type</td>
                 <td>Included</td>
                 <td>ID</td>
