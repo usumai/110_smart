@@ -1673,6 +1673,8 @@ echo $date_disp;
                       'Needs comparison', vtsql1.auto_storageID AS asID1, vtsql2.auto_storageID AS asID2
                       FROM $sql1, $sql2 
                       WHERE vtsql1.storageID = vtsql2.storageID
+                      AND vtsql1.fingerprint IS NOT NULL
+                      AND vtsql2.fingerprint IS NOT NULL
                       AND vtsql1.fingerprint <> vtsql2.fingerprint";
           $sql_allgood        = "$sql_a UNION $sql_b UNION $sql_c UNION $sql_d UNION $sql_e UNION $sql_f UNION $sql_g ";
           $sql_needscomparison= $sql_h;
