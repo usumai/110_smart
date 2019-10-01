@@ -176,9 +176,18 @@ $img_list = "<div class='row'><div class='col-12'><div class='form-group'><h2>Im
 
 
 $btn_camera = "<br><br><a href='13_camera.php?ass_id=".$ass_id."' class='btn btn-secondary text-center'  v-if='ar.show_camera_btn'><span class='octicon octicon-device-camera' style='font-size:30px'></span></a>";
-$btn_copy = "<button type='button' class='btn btn-outline-dark' data-toggle='modal' data-target='#modal_copy' v-if='ar.first_found_flag==1'>Copy this asset</button>"; 
+// $btn_copy = "<button type='button' class='btn btn-outline-dark' data-toggle='modal' data-target='#modal_copy' v-if='ar.first_found_flag==1'>Copy this asset</button>"; 
+$btn_copy = "<button type='button' class='btn btn-outline-dark' data-toggle='modal' data-target='#modal_copy' v-if='ar.first_found_flag==1'>Add to template</button>"; 
 
-
+$listTemplates = "";
+$sql = "SELECT * FROM smartdb.sm13_stk WHERE stk_id=0";
+$result = $con->query($sql);
+if ($result->num_rows > 0) {
+	while($row = $result->fetch_assoc()) {
+		$stkm_id		= $row['stkm_id'];
+		$stk_name		= $row['stk_name'];
+		$listTemplates .= "<option value='$stkm_id'>$stk_name</option>";
+}}
 ?>
 
 
@@ -196,7 +205,11 @@ $btn_copy = "<button type='button' class='btn btn-outline-dark' data-toggle='mod
 
 <script>
 $( function() {
-	$( ".datepicker" ).datepicker({ dateFormat: 'yy-mm-dd' });
+	$( ".datepicker" ).datepicker({ 
+		dateFormat: 'yy-mm-dd',
+		changeMonth: true,
+		changeYear: true 
+	});
 
 	$('.thumb_photo').click(function(){
 		let filename = $(this).val();
@@ -617,9 +630,13 @@ $( function() {
 						<br>How many assets would you like to create?
 						<br>
 
-						      	<input type="text" name="duplicate_count" class="form-control">
+								<select name="stkm_id" class="form-control">
+									<?=$listTemplates?>
+								</select>
+						      	<!-- <input type="text" name="duplicate_count" class="form-control"> -->
 						      	<input type="hidden" name="ass_id" value="<?=$ass_id?>">
-						      	<input type="hidden" name="act" value="save_copy_asset">
+						      	<!-- <input type="hidden" name="act" value="save_copy_asset"> -->
+						      	<input type="hidden" name="act" value="save_add_to_template">
 					</p>
 			      </div>
 			      <div class="modal-footer">
@@ -677,6 +694,10 @@ The DPN upload process is working, but it isn't doing the supernumery things to 
 
 <br><br><br>
 <script>
+function isNumeric(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
 let app = new Vue({
 	el: '#asset_page',
 	data: <?=$json_asset?>,
@@ -692,6 +713,11 @@ let app = new Vue({
 			let best_fv = this.ar['best_'+field_name];
 			if (field_name=="comment") {
 				best_fv = res_fv;
+			}
+			if (field_name=="comment"&&isNumeric(res_fv)){
+				best_fv = res_fv;
+			}else{
+				best_fv = orig_fv;
 			}
 			console.log("Field name:"+field_name);
 			console.log("Field value:"+best_fv);

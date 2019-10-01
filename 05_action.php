@@ -495,6 +495,8 @@ if ($act=='sys_pull_master') {
           $dpn_extract_user        = $arr['dpn_extract_user'];
           $smm_extract_date        = cleanvalue($arr['smm_extract_date']);
           $smm_extract_user        = cleanvalue($arr['smm_extract_user']);
+          $smm_extract_date        = NULL;
+          $smm_extract_user        = NULL;
           $journal_text            = $arr['journal_text'];
           $rowcount_original       = $arr['rowcount_original'];
           $rowcount_firstfound     = $arr['rowcount_firstfound'];
@@ -537,9 +539,15 @@ if ($act=='sys_pull_master') {
                     $ass[$fieldname] = cleanvalue($ass[$fieldname]);
                }
                $sql_save=" INSERT INTO smartdb.sm14_ass ($tags) VALUES(".$ass['create_date'].",".$ass['create_user'].",".$ass['delete_date'].",".$ass['delete_user'].",".$stkm_id_new.",".$ass['storage_id'].",".$ass['stk_include'].",".$ass['Asset'].",".$ass['Subnumber'].",".$ass['impairment_code'].",".$ass['genesis_cat'].",".$ass['first_found_flag'].",".$ass['rr_id'].",".$ass['fingerprint'].",".$ass['res_create_date'].",".$ass['res_create_user'].",".$ass['res_reason_code'].",".$ass['res_reason_code_desc'].",".$ass['res_impairment_completed'].",".$ass['res_completed'].",".$ass['res_comment'].",".$ass['AssetDesc1'].",".$ass['AssetDesc2'].",".$ass['AssetMainNoText'].",".$ass['Class'].",".$ass['classDesc'].",".$ass['assetType'].",".$ass['Inventory'].",".$ass['Quantity'].",".$ass['SNo'].",".$ass['InventNo'].",".$ass['accNo'].",".$ass['Location'].",".$ass['Room'].",".$ass['State'].",".$ass['latitude'].",".$ass['longitude'].",".$ass['CurrentNBV'].",".$ass['AcqValue'].",".$ass['OrigValue'].",".$ass['ScrapVal'].",".$ass['ValMethod'].",".$ass['RevOdep'].",".$ass['CapDate'].",".$ass['LastInv'].",".$ass['DeactDate'].",".$ass['PlRetDate'].",".$ass['CCC_ParentName'].",".$ass['CCC_GrandparentName'].",".$ass['GrpCustod'].",".$ass['CostCtr'].",".$ass['WBSElem'].",".$ass['Fund'].",".$ass['RspCCtr'].",".$ass['CoCd'].",".$ass['PlateNo'].",".$ass['Vendor'].",".$ass['Mfr'].",".$ass['UseNo'].",".$ass['res_AssetDesc1'].",".$ass['res_AssetDesc2'].",".$ass['res_AssetMainNoText'].",".$ass['res_Class'].",".$ass['res_classDesc'].",".$ass['res_assetType'].",".$ass['res_Inventory'].",".$ass['res_Quantity'].",".$ass['res_SNo'].",".$ass['res_InventNo'].",".$ass['res_accNo'].",".$ass['res_Location'].",".$ass['res_Room'].",".$ass['res_State'].",".$ass['res_latitude'].",".$ass['res_longitude'].",".$ass['res_CurrentNBV'].",".$ass['res_AcqValue'].",".$ass['res_OrigValue'].",".$ass['res_ScrapVal'].",".$ass['res_ValMethod'].",".$ass['res_RevOdep'].",".$ass['res_CapDate'].",".$ass['res_LastInv'].",".$ass['res_DeactDate'].",".$ass['res_PlRetDate'].",".$ass['res_CCC_ParentName'].",".$ass['res_CCC_GrandparentName'].",".$ass['res_GrpCustod'].",".$ass['res_CostCtr'].",".$ass['res_WBSElem'].",".$ass['res_Fund'].",".$ass['res_RspCCtr'].",".$ass['res_CoCd'].",".$ass['res_PlateNo'].",".$ass['res_Vendor'].",".$ass['res_Mfr'].",".$ass['res_UseNo'].",".$ass['res_isq_5'].",".$ass['res_isq_6'].",".$ass['res_isq_7'].",".$ass['res_isq_8'].",".$ass['res_isq_9'].",".$ass['res_isq_10'].",".$ass['res_isq_13'].",".$ass['res_isq_14'].",".$ass['res_isq_15']." ); ";
-               // echo "<br><br>".$sql_save;
+               echo "<br><br>".$sql_save;
                mysqli_multi_query($con,$sql_save);
           }
+
+          
+          $sql = "UPDATE smartdb.sm14_ass SET stk_include=0 WHERE stkm_id=$stkm_id_new; ";
+          runSql($sql);
+
+
      }elseif ($arr['type']=="raw remainder v2") {
           $extract_date  = $arr['extract_date'];
           $extract_user  = $arr['extract_user'];
@@ -816,7 +824,7 @@ echo $date_disp;
           $save_error = mysqli_error($con);
           echo 'failure'.$save_error;
      }else{
-          echo 'success';     
+          echo 'success'.$sql_save;     
      }
 
      $create_user = '';
@@ -1159,6 +1167,11 @@ echo $date_disp;
 }elseif ($act=='get_asset_list') {
      $search_term = $_GET["search_term"];     
      $ar = array();
+
+
+     $limitsql = "(SELECT * FROM smartdb.sm14_ass WHERE stkm_id IN (SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include = 1 )) AS vtIncludedAssets";
+
+
      $sql = "  SELECT *, 
                CASE WHEN res_AssetDesc1 IS NULL THEN AssetDesc1 ELSE res_AssetDesc1 END AS best_AssetDesc1,
                CASE WHEN res_AssetDesc2 IS NULL THEN AssetDesc2 ELSE res_AssetDesc2 END AS best_AssetDesc2,
@@ -1167,7 +1180,7 @@ echo $date_disp;
                CASE WHEN res_Location IS NULL THEN Location ELSE res_Location END AS best_Location,
                CASE WHEN res_Room IS NULL THEN Room ELSE res_Room END AS best_Room
 
-               FROM smartdb.sm14_ass 
+               FROM $limitsql
 
                WHERE storage_id LIKE '%$search_term%'
                OR stk_include LIKE '%$search_term%'
@@ -1288,6 +1301,20 @@ echo $date_disp;
                $arr["value"]  = $row["ass_id"];
                $ar[]          = $arr;
      }}
+     $sql = "  SELECT COUNT(*) AS rwrCount FROM smartdb.sm12_rwr
+               WHERE Asset LIKE '%$search_term%'
+               OR InventNo LIKE '%$search_term%'
+               OR AssetDesc1 LIKE '%$search_term%'";
+     $result = $con->query($sql);
+     if ($result->num_rows > 0) {
+     while($row = $result->fetch_assoc()) {
+          $arr = array();
+          $arr["Asset"]       = "Raw remainder results";
+          $arr["value"]       = "RR";
+          $arr["Subnumber"]   = $row["rwrCount"];
+          $ar[]               = $arr;
+     }}
+     
      echo json_encode($ar);
 
 }elseif ($act=='save_msi_bin_stk') {
@@ -1554,6 +1581,31 @@ echo $date_disp;
 
      header("Location: 19_toggle.php");
 
+
+     
+
+
+}elseif ($act=='save_createtemplatefile') {
+
+     $sql = "  INSERT INTO smartdb.sm13_stk (stk_id, stk_name,stk_type) VALUES (0,'TEMPLATE','TEMPLATE')";
+     runSql($sql);
+     header("Location: index.php");
+
+
+}elseif ($act=='save_add_to_template') {
+     $stkm_id       = $_GET["stkm_id"];//Template id
+     $ass_id        = $_GET["ass_id"];
+
+     $fingerprint        = time();
+     $sql = " INSERT INTO smartdb.sm14_ass (create_date, stkm_id, storage_id, Asset, Subnumber, impairment_code, genesis_cat, first_found_flag, rr_id, fingerprint, res_create_date, res_create_user, res_reason_code, res_reason_code_desc, res_impairment_completed, res_completed, res_comment, AssetDesc1, AssetDesc2, AssetMainNoText, Class, classDesc, assetType, Inventory, Quantity, SNo, InventNo, accNo, Location, Room, State, latitude, longitude, CurrentNBV, AcqValue, OrigValue, ScrapVal, ValMethod, RevOdep, CapDate, LastInv, DeactDate, PlRetDate, CCC_ParentName, CCC_GrandparentName, GrpCustod, CostCtr, WBSElem, Fund, RspCCtr, CoCd, PlateNo, Vendor, Mfr, UseNo, res_AssetDesc1, res_AssetDesc2, res_AssetMainNoText, res_Class, res_classDesc, res_assetType, res_Inventory, res_Quantity, res_SNo, res_InventNo, res_accNo, res_Location, res_Room, res_State, res_latitude, res_longitude, res_CurrentNBV, res_AcqValue, res_OrigValue, res_ScrapVal, res_ValMethod, res_RevOdep, res_CapDate, res_LastInv, res_DeactDate, res_PlRetDate, res_CCC_ParentName, res_CCC_GrandparentName, res_GrpCustod, res_CostCtr, res_WBSElem, res_Fund, res_RspCCtr, res_CoCd, res_PlateNo, res_Vendor, res_Mfr, res_UseNo, res_isq_5, res_isq_6, res_isq_7, res_isq_8, res_isq_9, res_isq_10, res_isq_13, res_isq_14, res_isq_15)
+     SELECT Now(), $stkm_id, storage_id, Asset, Subnumber, impairment_code, genesis_cat, first_found_flag, rr_id, '$fingerprint', res_create_date, res_create_user, res_reason_code, res_reason_code_desc, res_impairment_completed, res_completed, res_comment, AssetDesc1, AssetDesc2, AssetMainNoText, Class, classDesc, assetType, Inventory, Quantity, SNo, InventNo, accNo, Location, Room, State, latitude, longitude, CurrentNBV, AcqValue, OrigValue, ScrapVal, ValMethod, RevOdep, CapDate, LastInv, DeactDate, PlRetDate, CCC_ParentName, CCC_GrandparentName, GrpCustod, CostCtr, WBSElem, Fund, RspCCtr, CoCd, PlateNo, Vendor, Mfr, UseNo, res_AssetDesc1, res_AssetDesc2, res_AssetMainNoText, res_Class, res_classDesc, res_assetType, res_Inventory, res_Quantity, res_SNo, res_InventNo, res_accNo, res_Location, res_Room, res_State, res_latitude, res_longitude, res_CurrentNBV, res_AcqValue, res_OrigValue, res_ScrapVal, res_ValMethod, res_RevOdep, res_CapDate, res_LastInv, res_DeactDate, res_PlRetDate, res_CCC_ParentName, res_CCC_GrandparentName, res_GrpCustod, res_CostCtr, res_WBSElem, res_Fund, res_RspCCtr, res_CoCd, res_PlateNo, res_Vendor, res_Mfr, res_UseNo, res_isq_5, res_isq_6, res_isq_7, res_isq_8, res_isq_9, res_isq_10, res_isq_13, res_isq_14, res_isq_15
+     FROM smartdb.sm14_ass
+     WHERE ass_id =$ass_id ;";
+     // echo "<br><br><br>$sql";
+     runSql($sql);
+     header("Location: 11_ass.php?ass_id=".$ass_id);
+     
+
 }elseif ($act=='save_merge_initiate') {
      // Ascertain what type of stocktake it is - GA or IS
      // Get details of existing stocktakes - name, counts
@@ -1697,52 +1749,85 @@ echo $date_disp;
           
           $sql_a = "  SELECT vtsql1.storage_id AS stID1, vtsql1.fingerprint AS fp1, 
                          vtsql2.storage_id AS stID2, vtsql2.fingerprint AS fp2, 
-                      'Full match', vtsql1.ass_id
+                      'Storage match', vtsql1.ass_id
                       FROM $sql1, $sql2 
                       WHERE vtsql1.storage_id = vtsql2.storage_id
                       AND  vtsql1.fingerprint = vtsql2.fingerprint";
-          
+          $help_log = "<br><br><br><b>Storage match</b><br>$sql_a";
           $sql_b = "  SELECT vtsql1.storage_id AS stID1, vtsql1.fingerprint AS fp1, 
                          vtsql2.storage_id AS stID2, vtsql2.fingerprint AS fp2,  
-                      'Only STK1 result', vtsql1.ass_id
+                      'Storage result - only STK1', vtsql1.ass_id
                       FROM $sql1, $sql2 
                       WHERE vtsql1.storage_id = vtsql2.storage_id
                       AND vtsql1.fingerprint IS NOT NULL
                       AND vtsql2.fingerprint IS NULL";
+          $help_log.= "<br><br><br><b>Storage result - only STK1</b><br>$sql_b";
           
           $sql_c = "  SELECT vtsql1.storage_id AS stID1, vtsql1.fingerprint AS fp1, 
                          vtsql2.storage_id AS stID2, vtsql2.fingerprint AS fp2,   
-                      'Only STK2 result', vtsql2.ass_id
+                      'Storage result - only STK2', vtsql2.ass_id
                       FROM $sql1, $sql2 
                       WHERE vtsql1.storage_id = vtsql2.storage_id
                       AND vtsql1.fingerprint IS NULL
                       AND vtsql2.fingerprint IS NOT NULL";
+          $help_log.= "<br><br><br><b>Storage result - only STK2</b><br>$sql_c";
           
           $sql_d = "  SELECT vtsql1.storage_id AS stID1, vtsql1.fingerprint AS fp1, 
                          vtsql2.storage_id AS stID2, vtsql2.fingerprint AS fp2,  
                       'FF match', vtsql1.ass_id
-                      FROM $sql1, $sql2 
-                      WHERE vtsql1.storage_id IS NULL
-                      AND vtsql2.storage_id IS NULL
-                      AND  vtsql1.fingerprint = vtsql2.fingerprint";
+                      FROM 
+                         (SELECT ass_id, storage_id, fingerprint FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id_one AND storage_id IS NULL) AS vtsql1,
+                         (SELECT ass_id, storage_id, fingerprint FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id_two AND storage_id IS NULL) AS vtsql2
+                      WHERE vtsql1.fingerprint = vtsql2.fingerprint";
+          $help_log.= "<br><br><br><b>FF match</b><br>$sql_d";
           
-          $sql_e = "  SELECT vtsql1.storage_id AS stID1, vtsql1.fingerprint AS fp1, 
-                         vtsql2.storage_id AS stID2, vtsql2.fingerprint AS fp2,  
-                      'FF stk1', vtsql1.ass_id
-                      FROM $sql1, $sql2 
-                      WHERE vtsql1.storage_id IS NULL
-                      AND vtsql2.storage_id IS NULL
-                      AND vtsql1.fingerprint IS NOT NULL
-                      AND vtsql2.fingerprint IS NULL";
+          // $sql_e = "  SELECT vtsql1.storage_id AS stID1, vtsql1.fingerprint AS fp1, 
+          //                vtsql2.storage_id AS stID2, vtsql2.fingerprint AS fp2,  
+          //             'FF stk1', vtsql1.ass_id
+          //             FROM $sql1, $sql2 
+          //             WHERE vtsql1.storage_id IS NULL
+          //             AND vtsql2.storage_id IS NULL
+          //             AND vtsql1.fingerprint IS NOT NULL
+          //             AND vtsql2.fingerprint IS NULL";
+          $sql_e = "     SELECT NULL AS stID1, fingerprint AS fp1, NULL AS stID2, NULL AS fp2,
+          'FF stk1', ass_id
+          FROM smartdb.sm14_ass 
+          WHERE stkm_id = $stkm_id_one 
+          AND storage_id IS NULL
+          AND fingerprint IS NOT NULL
+          AND ass_id NOT IN (
+              SELECT 
+              vtsql1.ass_id
+              FROM
+              (SELECT ass_id, storage_id, fingerprint FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id_one AND storage_id IS NULL) AS vtsql1,
+              (SELECT ass_id, storage_id, fingerprint FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id_two AND storage_id IS NULL) AS vtsql2
+              WHERE vtsql1.fingerprint = vtsql2.fingerprint
+          )";          
+          $help_log.= "<br><br><br><b>FF stk1</b><br>$sql_e";
           
-          $sql_f = "  SELECT vtsql1.storage_id AS stID1, vtsql1.fingerprint AS fp1, 
-                         vtsql2.storage_id AS stID2, vtsql2.fingerprint AS fp2,  
-                      'FF stk2', vtsql2.ass_id
-                      FROM $sql1, $sql2 
-                      WHERE vtsql1.storage_id IS NULL
-                      AND vtsql2.storage_id IS NULL
-                      AND vtsql1.fingerprint IS NULL
-                      AND vtsql2.fingerprint IS NOT NULL";
+          // $sql_f = "  SELECT vtsql1.storage_id AS stID1, vtsql1.fingerprint AS fp1, 
+          //                vtsql2.storage_id AS stID2, vtsql2.fingerprint AS fp2,  
+          //             'FF stk2', vtsql2.ass_id
+          //             FROM $sql1, $sql2 
+          //             WHERE vtsql1.storage_id IS NULL
+          //             AND vtsql2.storage_id IS NULL
+          //             AND vtsql1.fingerprint IS NULL
+          //             AND vtsql2.fingerprint IS NOT NULL";
+          $sql_f = "     SELECT NULL AS stID1, NULL AS fp1, NULL AS stID2, fingerprint AS fp2,
+          'FF stk2', ass_id
+          FROM smartdb.sm14_ass 
+          WHERE stkm_id = $stkm_id_two 
+          AND storage_id IS NULL
+          AND fingerprint IS NOT NULL
+          AND ass_id NOT IN (
+               SELECT 
+               vtsql2.ass_id
+               FROM
+              (SELECT ass_id, storage_id, fingerprint FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id_one AND storage_id IS NULL) AS vtsql1,
+              (SELECT ass_id, storage_id, fingerprint FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id_two AND storage_id IS NULL) AS vtsql2
+               WHERE vtsql1.fingerprint = vtsql2.fingerprint
+          )";
+          $help_log.= "<br><br><br><b>FF stk2</b><br>$sql_f";
           
           $sql_g = "  SELECT vtsql1.storage_id AS stID1, vtsql1.fingerprint AS fp1, 
                          vtsql2.storage_id AS stID2, vtsql2.fingerprint AS fp2,  
@@ -1751,6 +1836,7 @@ echo $date_disp;
                       WHERE vtsql1.storage_id = vtsql2.storage_id
                       AND vtsql1.fingerprint IS NULL
                       AND vtsql2.fingerprint IS NULL";
+          $help_log.= "<br><br><br><b>No result</b><br>$sql_g";
           
           $sql_h = "  SELECT vtsql1.storage_id AS stID1, vtsql1.fingerprint AS fp1, 
                          vtsql2.storage_id AS stID2, vtsql2.fingerprint AS fp2,   
@@ -1760,14 +1846,20 @@ echo $date_disp;
                       AND vtsql1.fingerprint IS NOT NULL
                       AND vtsql2.fingerprint IS NOT NULL
                       AND vtsql1.fingerprint <> vtsql2.fingerprint";
+          $help_log.= "<br><br><br><b>Needs comparison</b><br>$sql_h";
+
+
           $sql_allgood        = "$sql_a UNION $sql_b UNION $sql_c UNION $sql_d UNION $sql_e UNION $sql_f UNION $sql_g ";
+          $help_log.= "<br><br><br><b>sql_allgood</b>$sql_allgood";
           // $sql_allgood_disp   = "$sql_a <br><br> $sql_b <br><br> $sql_c <br><br> $sql_d <br><br> $sql_e <br><br> $sql_f <br><br> $sql_g ";
           $sql_needscomparison= $sql_h;
+          $help_log.= "<br><br><br><b>sql_needscomparison</b><br>$sql_h";
+          echo $help_log;
           // echo "<br><br><br>$sql_allgood_disp<br><br> $sql_h ";
           // echo "<br><br><br>$sql_allgood";
 
           $sql = "  INSERT INTO smartdb.sm14_ass (create_date, create_user, delete_date, delete_user, stkm_id, storage_id, stk_include, Asset, Subnumber, impairment_code, genesis_cat, first_found_flag, rr_id, fingerprint, res_create_date, res_create_user, res_reason_code, res_reason_code_desc, res_impairment_completed, res_completed, res_comment, AssetDesc1, AssetDesc2, AssetMainNoText, Class, classDesc, assetType, Inventory, Quantity, SNo, InventNo, accNo, Location, Room, State, latitude, longitude, CurrentNBV, AcqValue, OrigValue, ScrapVal, ValMethod, RevOdep, CapDate, LastInv, DeactDate, PlRetDate, CCC_ParentName, CCC_GrandparentName, GrpCustod, CostCtr, WBSElem, Fund, RspCCtr, CoCd, PlateNo, Vendor, Mfr, UseNo, res_AssetDesc1, res_AssetDesc2, res_AssetMainNoText, res_Class, res_classDesc, res_assetType, res_Inventory, res_Quantity, res_SNo, res_InventNo, res_accNo, res_Location, res_Room, res_State, res_latitude, res_longitude, res_CurrentNBV, res_AcqValue, res_OrigValue, res_ScrapVal, res_ValMethod, res_RevOdep, res_CapDate, res_LastInv, res_DeactDate, res_PlRetDate, res_CCC_ParentName, res_CCC_GrandparentName, res_GrpCustod, res_CostCtr, res_WBSElem, res_Fund, res_RspCCtr, res_CoCd, res_PlateNo, res_Vendor, res_Mfr, res_UseNo, res_isq_5, res_isq_6, res_isq_7, res_isq_8, res_isq_9, res_isq_10, res_isq_13, res_isq_14, res_isq_15)
-          SELECT create_date, create_user, delete_date, delete_user, $new_stkm_id, storage_id, stk_include, Asset, Subnumber, impairment_code, genesis_cat, first_found_flag, rr_id, fingerprint, res_create_date, res_create_user, res_reason_code, res_reason_code_desc, res_impairment_completed, res_completed, res_comment, AssetDesc1, AssetDesc2, AssetMainNoText, Class, classDesc, assetType, Inventory, Quantity, SNo, InventNo, accNo, Location, Room, State, latitude, longitude, CurrentNBV, AcqValue, OrigValue, ScrapVal, ValMethod, RevOdep, CapDate, LastInv, DeactDate, PlRetDate, CCC_ParentName, CCC_GrandparentName, GrpCustod, CostCtr, WBSElem, Fund, RspCCtr, CoCd, PlateNo, Vendor, Mfr, UseNo, res_AssetDesc1, res_AssetDesc2, res_AssetMainNoText, res_Class, res_classDesc, res_assetType, res_Inventory, res_Quantity, res_SNo, res_InventNo, res_accNo, res_Location, res_Room, res_State, res_latitude, res_longitude, res_CurrentNBV, res_AcqValue, res_OrigValue, res_ScrapVal, res_ValMethod, res_RevOdep, res_CapDate, res_LastInv, res_DeactDate, res_PlRetDate, res_CCC_ParentName, res_CCC_GrandparentName, res_GrpCustod, res_CostCtr, res_WBSElem, res_Fund, res_RspCCtr, res_CoCd, res_PlateNo, res_Vendor, res_Mfr, res_UseNo, res_isq_5, res_isq_6, res_isq_7, res_isq_8, res_isq_9, res_isq_10, res_isq_13, res_isq_14, res_isq_15
+          SELECT create_date, create_user, delete_date, delete_user, $new_stkm_id, storage_id, 0, Asset, Subnumber, impairment_code, genesis_cat, first_found_flag, rr_id, fingerprint, res_create_date, res_create_user, res_reason_code, res_reason_code_desc, res_impairment_completed, res_completed, res_comment, AssetDesc1, AssetDesc2, AssetMainNoText, Class, classDesc, assetType, Inventory, Quantity, SNo, InventNo, accNo, Location, Room, State, latitude, longitude, CurrentNBV, AcqValue, OrigValue, ScrapVal, ValMethod, RevOdep, CapDate, LastInv, DeactDate, PlRetDate, CCC_ParentName, CCC_GrandparentName, GrpCustod, CostCtr, WBSElem, Fund, RspCCtr, CoCd, PlateNo, Vendor, Mfr, UseNo, res_AssetDesc1, res_AssetDesc2, res_AssetMainNoText, res_Class, res_classDesc, res_assetType, res_Inventory, res_Quantity, res_SNo, res_InventNo, res_accNo, res_Location, res_Room, res_State, res_latitude, res_longitude, res_CurrentNBV, res_AcqValue, res_OrigValue, res_ScrapVal, res_ValMethod, res_RevOdep, res_CapDate, res_LastInv, res_DeactDate, res_PlRetDate, res_CCC_ParentName, res_CCC_GrandparentName, res_GrpCustod, res_CostCtr, res_WBSElem, res_Fund, res_RspCCtr, res_CoCd, res_PlateNo, res_Vendor, res_Mfr, res_UseNo, res_isq_5, res_isq_6, res_isq_7, res_isq_8, res_isq_9, res_isq_10, res_isq_13, res_isq_14, res_isq_15
           FROM smartdb.sm14_ass
           WHERE ass_id IN (SELECT ass_id FROM ($sql_allgood) AS vt_merge_allgood);";
           // echo "<br><br><br>$sql";
@@ -1798,7 +1890,7 @@ echo $date_disp;
      // echo "<br><br><br>$sql";
      runSql($sql);
 
-     header("Location: 20_merge.php?stkm_id=$new_stkm_id");
+     // header("Location: 20_merge.php?stkm_id=$new_stkm_id");
 
 }elseif ($act=='save_merge_select') {
      $stkm_id                 = $_GET["stkm_id"];
@@ -1810,6 +1902,8 @@ echo $date_disp;
      runSql($sql);
      
      header("Location: 20_merge.php?stkm_id=$stkm_id");
+
+
 
 }elseif ($act=='save_merge_finalise') {
      $stkm_id                 = $_GET["stkm_id"];
@@ -1829,6 +1923,7 @@ echo $date_disp;
           SELECT $stkm_id, storageID, rowNo, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID, finalResult, finalResultPath, fingerprint
           FROM smartdb.sm18_impairment
           WHERE auto_storageID IN ($sub)";
+          
      }elseif($stk_type=="stocktake"){
           $sub = "SELECT selected_auto_storageID FROM smartdb.sm20_quarantine WHERE stkm_id = $stkm_id";
           $sql = "  INSERT INTO smartdb.sm14_ass (create_date, create_user, delete_date, delete_user, stkm_id, storage_id, stk_include, Asset, Subnumber, impairment_code, genesis_cat, first_found_flag, rr_id, fingerprint, res_create_date, res_create_user, res_reason_code, res_reason_code_desc, res_impairment_completed, res_completed, res_comment, AssetDesc1, AssetDesc2, AssetMainNoText, Class, classDesc, assetType, Inventory, Quantity, SNo, InventNo, accNo, Location, Room, State, latitude, longitude, CurrentNBV, AcqValue, OrigValue, ScrapVal, ValMethod, RevOdep, CapDate, LastInv, DeactDate, PlRetDate, CCC_ParentName, CCC_GrandparentName, GrpCustod, CostCtr, WBSElem, Fund, RspCCtr, CoCd, PlateNo, Vendor, Mfr, UseNo, res_AssetDesc1, res_AssetDesc2, res_AssetMainNoText, res_Class, res_classDesc, res_assetType, res_Inventory, res_Quantity, res_SNo, res_InventNo, res_accNo, res_Location, res_Room, res_State, res_latitude, res_longitude, res_CurrentNBV, res_AcqValue, res_OrigValue, res_ScrapVal, res_ValMethod, res_RevOdep, res_CapDate, res_LastInv, res_DeactDate, res_PlRetDate, res_CCC_ParentName, res_CCC_GrandparentName, res_GrpCustod, res_CostCtr, res_WBSElem, res_Fund, res_RspCCtr, res_CoCd, res_PlateNo, res_Vendor, res_Mfr, res_UseNo, res_isq_5, res_isq_6, res_isq_7, res_isq_8, res_isq_9, res_isq_10, res_isq_13, res_isq_14, res_isq_15)

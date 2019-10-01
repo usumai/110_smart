@@ -230,6 +230,20 @@ if ($result->num_rows > 0) {
                         <td align='right'>$rowcount_other</td>
                         <td align='right'>$btn_action</td>
                     </tr>";
+        }elseif ($stk_type=="TEMPLATE") {
+            $rw_stk .= "<tr>
+                        <td></td>
+                        <td>TEMPLATE</td>
+                        <td>$flag_included</td>
+                        <td></td>
+                        <td>Template file</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td align='right'>$btn_action</td>
+                    </tr>";
         }
 
 

@@ -129,18 +129,38 @@ $area_rr = $drpd_div."<h6 class='dropdown-header'>Raw remainder</h6>".$status_rr
 $menu_software = $area_last_update . $area_version_status.$btn_push_master ;
 
 
+
+
+
+$listTmplt = "";
+$sqlsub = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_id=0";
+$sql = "SELECT * FROM smartdb.sm14_ass WHERE stkm_id IN ($sqlsub) ORDER BY AssetDesc1";
+// echo "<br><br><br>$sql";
+$result = $con->query($sql);
+if ($result->num_rows > 0) {
+	while($row = $result->fetch_assoc()) {
+		$ass_id         = $row['ass_id'];
+		$res_AssetDesc1 = $row['res_AssetDesc1'];
+		$res_AssetDesc2 = $row['res_AssetDesc2'];
+    $listTmplt .= "<a class='dropdown-item' href='05_action.php?act=save_usetemplate&ass_id=$ass_id'>ASASS$res_AssetDesc1</a>";
+    
+}}
+
+
 ?>
 
 <script>
 $( function() {
+  $("#tags").focus();
 
   if("<?=$system_stk_type?>"!="stocktake"){
     $("#tags").hide()
   }
-
+  let search_term = "";
 
     $( "#tags" ).autocomplete({
         source: function( request, response ) {
+            search_term = request.term;
             $.ajax( {
                 url: "05_action.php",
                 data: {
@@ -157,8 +177,14 @@ $( function() {
             });
         },
         select: function( event, ui ) {
-            // console.log("Selected: " + ui.item.value + " aka " + ui.item.id )
-            window.location.href = "11_ass.php?ass_id="+ui.item.value;
+            // console.log("Selected: " + ui.item.value + " aka " + ui.item )
+            // console.log(ui.item)
+            // console.log(search_term)
+            if(ui.item.Asset=="Raw remainder results"){
+              window.location.href = "14_rr.php?search_term="+search_term;
+            }else{
+              window.location.href = "11_ass.php?ass_id="+ui.item.value;
+            }
         }
     })
 
@@ -169,10 +195,14 @@ $( function() {
                // $arr["Location"]         = $row["Location"];
                // $arr["Room"]             = $row["Room"];
     .autocomplete( "instance" )._renderItem = function( ul, item ) {
+      if (item.Asset == "Raw remainder results"){
+        row = "<div><b>Raw remainder count:</b>"+item.Subnumber+"</div>" 
+      }else{
+        row = "<div><b>"+item.Asset+"-"+item.Subnumber+"</b>:"+item.AssetDesc1+"<br>"+item.status_compl+" InventNo["+item.InventNo+"] Serial["+item.SNo+"] Location["+item.Location+""+item.Room+"]</div>"
+      }
+
       return $( "<li>" )
-        .append( 
-            "<div><b>"+item.Asset+"-"+item.Subnumber+"</b>:"+item.AssetDesc1+
-            "<br>"+item.status_compl+" InventNo["+item.InventNo+"] Serial["+item.SNo+"] Location["+item.Location+""+item.Room+"]</div>" )
+        .append(row)
         .appendTo( ul );
     };
 
@@ -203,9 +233,11 @@ $( function() {
                         <a class='dropdown-item' href='06_admin.php'>Archived Stocktakes</a>
                         <button type='button' class='dropdown-item btn btn-danger' data-toggle='modal' data-target='#modal_confirm_reset'>Reset all data</button>
                         <a class="dropdown-item" href="05_action.php?act=save_invertcolors">Invert Colour Scheme</a>
+                        <a class="dropdown-item" href="05_action.php?act=save_createtemplatefile">Create template file</a>
                         <?=$area_backups?>
                         <?=$area_rr?>
                         
+                        <?=$listTmplt?>
                     </div>
                 </li>
                 <li class="nav-item">
