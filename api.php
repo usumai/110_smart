@@ -91,7 +91,7 @@ if ($act=='get_system'){
 }elseif ($act=='save_check_version'){
      $test_internet = @fsockopen("www.example.com", 80); //website, port  (try 80 or 443)
      if ($test_internet){
-          $URL = 'https://raw.githubusercontent.com/usumai/110_smart/master/08_version.php';
+          $URL = 'https://raw.githubusercontent.com/usumai/110_smart/master/08_version.json';
           $ch = curl_init();
           curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
           curl_setopt($ch, CURLOPT_URL, $URL);
