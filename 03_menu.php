@@ -141,7 +141,7 @@ $(function(){
 		if ($('.dropdown').find('#dropdownHelp').is(":hidden")){
 			$('#dropdownHelp').dropdown('toggle');
 		}
-		$('#areaVersionAction').html("<span class='dropdown-item'>Checking server version</span>");
+		$('#areaVersionAction').html("<span class='dropdown-item text-warning'>Checking server version<br><div class='spinner-border' role='status'><span class='sr-only'>Loading...</span></div></span>");
 		let nextAction = fnDo("save_check_version","CheckUpdates",1)
 		// console.log(nextAction)
     })

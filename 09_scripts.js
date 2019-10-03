@@ -93,7 +93,7 @@ function fnSetMenu(sys){
 
     
 
-    menuHelp    = "<a class='nav-link dropdown-toggle "+styleUpdateAvailable+"' href='#'data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Help</a><div class='dropdown-menu' aria-labelledby='dropdown01' id='dropdownHelp' >"+helpContents+menuUpdate+"</div>"
+    menuHelp    = "<a class='nav-link dropdown-toggle "+styleUpdateAvailable+"' href='#'data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='headingHelp'>Help</a><div class='dropdown-menu' aria-labelledby='dropdown01' id='dropdownHelp' >"+helpContents+menuUpdate+"</div>"
     menuVersion = ""
     $("#menuHelp").html(menuHelp);
     $("#menuAdd").html(menuAdd);
@@ -105,6 +105,7 @@ function fnCheckUpdates(data){
     if(data["test_results"]=="Check performed"){
         if(data["versionLocal"]<data["versionRemote"]){
             newButton  = "<button type='button' class='dropdown-item btn text-danger' data-toggle='modal' data-target='#modal_confirm_update'>Update available</button>"
+            $("#headingHelp").addClass("text-danger")
         }else{
             newButton = "You are up to date"
         }
