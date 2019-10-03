@@ -5,8 +5,8 @@ if (isset($_POST["act"])) {
 	$act = $_GET["act"];
 }
 
-$this_version_no  = 7;
-$date_version_published = "2019-10-02 00:00:00";
+$this_version_no  = 5;
+$date_version_published = "2019-10-03 00:00:00";
 // Steps for relesing a new version:
 // 1. Update the version info above with version number one more than current
 // 2. Update the 08_version.json as per above details
