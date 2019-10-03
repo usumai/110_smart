@@ -107,7 +107,7 @@ function fnCheckUpdates(data){
             newButton  = "<button type='button' class='dropdown-item btn text-danger' data-toggle='modal' data-target='#modal_confirm_update'>Update available</button>"
             $("#headingHelp").addClass("text-danger")
         }else{
-            newButton = "You are up to date"
+            newButton  = "<span class='dropdown-item text-primary'>You are up to date</span>"
         }
     }else{
         newButton  = "<span class='dropdown-item text-primary'>Please connect to the internet and try again</span><button type='button' class='dropdown-item btn' id='btnCheckForUpdates'>Check for updates</button>"

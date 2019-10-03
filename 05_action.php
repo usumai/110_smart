@@ -7,7 +7,11 @@ if (isset($_POST["act"])) {
 
 $this_version_no  = 7;
 $date_version_published = "2019-10-02 00:00:00";
-// Also need to update 08_version.json - they should mirror each other
+// Steps for relesing a new version:
+// 1. Update the version info above with version number one more than current
+// 2. Update the 08_version.json as per above details
+// 3. Delete json and xls files from directory to stop any leaks
+// 4. Push local to master using toolshelf
 
 // echo $act;
 $dbname = "smartdb";
