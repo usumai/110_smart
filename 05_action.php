@@ -4,6 +4,12 @@ if (isset($_POST["act"])) {
 }else{
 	$act = $_GET["act"];
 }
+
+$this_version_no  = 7;
+$date_version_published = "2019-10-02 00:00:00";
+// Also need to update 08_version.json
+
+// echo $act;
 $dbname = "smartdb";
 $addr_git = ' "\Program Files\Git\bin\git"  ';
 $log = "<br>"."Initialising action file";
@@ -75,10 +81,10 @@ if ($act=='sys_pull_master') {
    $sql_save = "CREATE DATABASE $dbname;";
    mysqli_multi_query($con,$sql_save); 
 
-     $sql_save = "CREATE TABLE $dbname.sm10_set (`smartm_id` INT(11) NOT NULL AUTO_INCREMENT,`create_date` DATETIME NULL DEFAULT NULL,`delete_date` DATETIME NULL DEFAULT NULL,`update_date` DATETIME NULL DEFAULT NULL,`active_profile_id` INT NULL DEFAULT NULL,`last_access_date` DATETIME NULL,`last_access_profile_id` INT(11) NULL,`smartm_software_version` INT(11) NULL,`smartm_db_version` INT(11) NULL,`rr_extract_date` DATETIME NULL, `rr_extract_user` VARCHAR(255) NULL DEFAULT NULL,`journal_id` INT(11) NULL,`help_shown` INT(11) NULL,`theme_type` INT(11) NULL,`date_last_update_check` DATETIME NULL, PRIMARY KEY (`smartm_id`),UNIQUE INDEX `smartm_id_UNIQUE` (`smartm_id` ASC));";
+     $sql_save = "CREATE TABLE $dbname.sm10_set (`smartm_id` INT(11) NOT NULL AUTO_INCREMENT,`create_date` DATETIME NULL DEFAULT NULL,`delete_date` DATETIME NULL DEFAULT NULL,`update_date` DATETIME NULL DEFAULT NULL,`active_profile_id` INT NULL DEFAULT NULL,`last_access_date` DATETIME NULL,`last_access_profile_id` INT(11) NULL,`rr_extract_date` DATETIME NULL, `rr_extract_user` VARCHAR(255) NULL DEFAULT NULL,`journal_id` INT(11) NULL,`help_shown` INT(11) NULL,`theme_type` INT(11) NULL,`versionLocal` INT(11) NULL,`versionRemote` INT(11) NULL,`date_last_update_check` DATETIME NULL, PRIMARY KEY (`smartm_id`),UNIQUE INDEX `smartm_id_UNIQUE` (`smartm_id` ASC));";
      mysqli_multi_query($con,$sql_save);
 
-    $sql_save = "INSERT INTO $dbname.sm10_set (create_date, update_date, last_access_date, journal_id, help_shown, theme_type, smartm_software_version) VALUES (NOW(), NOW(), NOW(),1,0,0,7); ";
+    $sql_save = "INSERT INTO $dbname.sm10_set (create_date, update_date, last_access_date, journal_id, help_shown, theme_type, versionLocal, versionRemote, date_last_update_check) VALUES (NOW(), NOW(), NOW(),1,0,0, $this_version_no, $this_version_no, '$date_version_published'); ";
      mysqli_multi_query($con,$sql_save);
 
      $sql_save = "CREATE TABLE $dbname.sm11_pro (`profile_id` INT(11) NOT NULL AUTO_INCREMENT,`create_date` DATETIME NULL DEFAULT NULL,`delete_date` DATETIME NULL DEFAULT NULL,`update_date` DATETIME NULL DEFAULT NULL,`profile_name` VARCHAR(255) NULL DEFAULT NULL,`profile_drn` VARCHAR(255) NULL DEFAULT NULL,`profile_phone_number` VARCHAR(255) NULL DEFAULT NULL,`profile_pic` LONGTEXT NULL DEFAULT NULL,`profile_color_a` VARCHAR(255) NULL DEFAULT NULL,`profile_color_b` VARCHAR(255) NULL DEFAULT NULL,PRIMARY KEY (`profile_id`),UNIQUE INDEX `profile_id_UNIQUE` (`profile_id` ASC));";
@@ -469,34 +475,17 @@ if ($act=='sys_pull_master') {
      $arr_full      = json_decode($fileContents, true);
      $arr           = $arr_full['import'];
 
-     function cleanvalue($fieldvalue) {
-          $fieldvalue = str_replace("'", "\'", $fieldvalue);
-          $fieldvalue = str_replace('"', '\"', $fieldvalue);
-          // $fieldvalue = str_replace("""", "/""", $fieldvalue);
-          if ($fieldvalue=="") {
-               $fieldvalue="NULL";
-          }elseif (empty($fieldvalue)) {
-               $fieldvalue="NULL";
-          }elseif ($fieldvalue=="NULL") {
-               $fieldvalue="NULL";
-          }elseif ($fieldvalue=="null") {
-               $fieldvalue="NULL";
-          }else{
-               $fieldvalue="'".$fieldvalue."'";
-          }
-          return $fieldvalue;
-     }
 
-     // echo "<br>Type:" .$arr['type'];
+     echo "<br>Type:" .$arr['type'];
      if ($arr['type']=="stocktake") {
           $stk_id                  = $arr['stk_id'];
           $stk_name                = $arr['stk_name'];
-          $dpn_extract_date        = $arr['dpn_extract_date'];
-          $dpn_extract_user        = $arr['dpn_extract_user'];
+          $dpn_extract_date        = cleanvalue($arr['dpn_extract_date']);
+          $dpn_extract_user        = cleanvalue($arr['dpn_extract_user']);
           $smm_extract_date        = cleanvalue($arr['smm_extract_date']);
           $smm_extract_user        = cleanvalue($arr['smm_extract_user']);
-          $smm_extract_date        = NULL;
-          $smm_extract_user        = NULL;
+          // $smm_extract_date        = NULL;
+          // $smm_extract_user        = NULL;
           $journal_text            = $arr['journal_text'];
           $rowcount_original       = $arr['rowcount_original'];
           $rowcount_firstfound     = $arr['rowcount_firstfound'];
@@ -509,10 +498,14 @@ if ($act=='sys_pull_master') {
                     // print_r($assets) ;
           }
 
-          $sql_save = "INSERT INTO smartdb.sm13_stk (stk_id,stk_name,dpn_extract_date,dpn_extract_user,smm_extract_date,smm_extract_user,rowcount_original,stk_type, journal_text) VALUES ('".$stk_id."','".$stk_name."','".$dpn_extract_date."','".$dpn_extract_user."',".$smm_extract_date.",".$smm_extract_user.",'".$rowcount_original."','stocktake','".$journal_text."'); ";
+          // $sql_save = "INSERT INTO smartdb.sm13_stk (stk_id,stk_name,dpn_extract_date,dpn_extract_user,smm_extract_date,smm_extract_user,rowcount_original,stk_type, journal_text) VALUES ('".$stk_id."','".$stk_name."',".$dpn_extract_date.",".$dpn_extract_user.",".$smm_extract_date.",".$smm_extract_user.",'".$rowcount_original."','stocktake','".$journal_text."'); ";
+          $sql_save = "INSERT INTO smartdb.sm13_stk (stk_id,stk_name,rowcount_original,stk_type, journal_text) VALUES ('".$stk_id."','".$stk_name."','".$rowcount_original."','stocktake','".$journal_text."'); ";
+
+
           if ($dev) { echo "<br>sql_save: ".$sql_save; }
           mysqli_multi_query($con,$sql_save);
-
+          echo "<br><br>sql_save: ".$sql_save."<br><br>";
+          
           $sql = "SELECT * FROM smartdb.sm13_stk ORDER BY stkm_id DESC LIMIT 1;";
           $result = $con->query($sql);
           if ($result->num_rows > 0) {
@@ -539,7 +532,7 @@ if ($act=='sys_pull_master') {
                     $ass[$fieldname] = cleanvalue($ass[$fieldname]);
                }
                $sql_save=" INSERT INTO smartdb.sm14_ass ($tags) VALUES(".$ass['create_date'].",".$ass['create_user'].",".$ass['delete_date'].",".$ass['delete_user'].",".$stkm_id_new.",".$ass['storage_id'].",".$ass['stk_include'].",".$ass['Asset'].",".$ass['Subnumber'].",".$ass['impairment_code'].",".$ass['genesis_cat'].",".$ass['first_found_flag'].",".$ass['rr_id'].",".$ass['fingerprint'].",".$ass['res_create_date'].",".$ass['res_create_user'].",".$ass['res_reason_code'].",".$ass['res_reason_code_desc'].",".$ass['res_impairment_completed'].",".$ass['res_completed'].",".$ass['res_comment'].",".$ass['AssetDesc1'].",".$ass['AssetDesc2'].",".$ass['AssetMainNoText'].",".$ass['Class'].",".$ass['classDesc'].",".$ass['assetType'].",".$ass['Inventory'].",".$ass['Quantity'].",".$ass['SNo'].",".$ass['InventNo'].",".$ass['accNo'].",".$ass['Location'].",".$ass['Room'].",".$ass['State'].",".$ass['latitude'].",".$ass['longitude'].",".$ass['CurrentNBV'].",".$ass['AcqValue'].",".$ass['OrigValue'].",".$ass['ScrapVal'].",".$ass['ValMethod'].",".$ass['RevOdep'].",".$ass['CapDate'].",".$ass['LastInv'].",".$ass['DeactDate'].",".$ass['PlRetDate'].",".$ass['CCC_ParentName'].",".$ass['CCC_GrandparentName'].",".$ass['GrpCustod'].",".$ass['CostCtr'].",".$ass['WBSElem'].",".$ass['Fund'].",".$ass['RspCCtr'].",".$ass['CoCd'].",".$ass['PlateNo'].",".$ass['Vendor'].",".$ass['Mfr'].",".$ass['UseNo'].",".$ass['res_AssetDesc1'].",".$ass['res_AssetDesc2'].",".$ass['res_AssetMainNoText'].",".$ass['res_Class'].",".$ass['res_classDesc'].",".$ass['res_assetType'].",".$ass['res_Inventory'].",".$ass['res_Quantity'].",".$ass['res_SNo'].",".$ass['res_InventNo'].",".$ass['res_accNo'].",".$ass['res_Location'].",".$ass['res_Room'].",".$ass['res_State'].",".$ass['res_latitude'].",".$ass['res_longitude'].",".$ass['res_CurrentNBV'].",".$ass['res_AcqValue'].",".$ass['res_OrigValue'].",".$ass['res_ScrapVal'].",".$ass['res_ValMethod'].",".$ass['res_RevOdep'].",".$ass['res_CapDate'].",".$ass['res_LastInv'].",".$ass['res_DeactDate'].",".$ass['res_PlRetDate'].",".$ass['res_CCC_ParentName'].",".$ass['res_CCC_GrandparentName'].",".$ass['res_GrpCustod'].",".$ass['res_CostCtr'].",".$ass['res_WBSElem'].",".$ass['res_Fund'].",".$ass['res_RspCCtr'].",".$ass['res_CoCd'].",".$ass['res_PlateNo'].",".$ass['res_Vendor'].",".$ass['res_Mfr'].",".$ass['res_UseNo'].",".$ass['res_isq_5'].",".$ass['res_isq_6'].",".$ass['res_isq_7'].",".$ass['res_isq_8'].",".$ass['res_isq_9'].",".$ass['res_isq_10'].",".$ass['res_isq_13'].",".$ass['res_isq_14'].",".$ass['res_isq_15']." ); ";
-               echo "<br><br>".$sql_save;
+               // echo "<br><br>".$sql_save;
                mysqli_multi_query($con,$sql_save);
           }
 
@@ -593,8 +586,8 @@ if ($act=='sys_pull_master') {
           // $sql_save_history = "INSERT INTO ".$dbname.".smart_l10_history (create_date, create_user, history_type, history_desc, history_link) VALUES ( NOW(),'".$current_user."','Raw remainder file upload','User uploaded raw remainder V2 file','108_rr.php');";
 
      }elseif ($arr['type']=="impairment") {
-          $stk_id                  = $arr['stk_id'];
-          $stk_name                = $arr['stk_name'];
+          $stk_id                  = $arr['isID'];
+          $stk_name                = $arr['isName'];
           $dpn_extract_date        = $arr['dpn_extract_date'];
           $dpn_extract_user        = $arr['dpn_extract_user'];
           $smm_extract_date        = $arr['smm_extract_date'];
@@ -761,6 +754,93 @@ echo $date_disp;
          exit;
      }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}elseif ($act=='save_archive_return'){
+     $stkm_id = $_GET["stkm_id"];  
+
+     $sql = "SELECT * FROM smartdb.sm10_set;";
+     $result = $con->query($sql);
+     if ($result->num_rows > 0) {
+         while($row = $result->fetch_assoc()) {
+             $active_profile_id    = $row["active_profile_id"];
+     }}
+
+     $sql = "UPDATE smartdb.sm13_stk SET smm_delete_date=NOW(),smm_delete_user='$active_profile_id' WHERE stkm_id = $stkm_id;";
+     // echo $sql_save;
+     echo runSql($sql);
+
+}elseif ($act=='get_menu_details'){
+
+     $sql = "SELECT stk_type FROM smartdb.sm13_stk WHERE smm_delete_date IS NULL AND stk_include =1;";
+     $result = $con->query($sql);
+     if ($result->num_rows > 0) {
+         while($row = $result->fetch_assoc()) {
+             $system_stk_type = $row["stk_type"];
+         }}
+     if(empty($system_stk_type)) {
+         $system_stk_type = "notset";
+     }
+     echo $system_stk_type;
+
+
+
+}elseif ($act=='save_toggle_stk_return'){
+     $stkm_id = $_GET["stkm_id"];  
+     
+     $sql = "SELECT * FROM smartdb.sm13_stk WHERE stkm_id = ".$stkm_id.";";
+     $result = $con->query($sql);
+     if ($result->num_rows > 0) {
+          while($row = $result->fetch_assoc()) {
+               $stkm_id       = $row["stkm_id"];
+               $stk_include   = $row["stk_include"];
+     }}
+     if ($stk_include==1) {
+          $sql_save_stk = "UPDATE smartdb.sm13_stk SET stk_include=0 WHERE stkm_id = $stkm_id;";
+          $sql_save_ass = "UPDATE smartdb.sm14_ass SET stk_include=0 WHERE stkm_id = $stkm_id;";
+     }else{
+          $sql_save_stk = "UPDATE smartdb.sm13_stk SET stk_include=1 WHERE stkm_id = $stkm_id;";
+          $sql_save_ass = "UPDATE smartdb.sm14_ass SET stk_include=1 WHERE stkm_id = $stkm_id;";
+     }
+     $sql = $sql_save_stk.$sql_save_ass;
+     $res = runSql($sql);
+     if($res=="success"){
+          $res = ($stk_include==0) ? "Included" : "Excluded";
+     }else{
+          $res = "failed".$res;
+     }
+     echo $res;
+     
+}elseif ($act=='get_SystemStkType'){
+     // Get what the tool is configured for: stocktake, impairment or nothing
+     
+     $sql = "SELECT stk_type FROM smartdb.sm13_stk WHERE smm_delete_date IS NULL AND stk_include =1;";
+     $result = $con->query($sql);
+     if ($result->num_rows > 0) {
+         while($row = $result->fetch_assoc()) {
+             $system_stk_type = $row["stk_type"];
+         }}
+     if(empty($system_stk_type)) {
+         $system_stk_type = "notset";
+     }
+     echo $system_stk_type;
+
 }elseif ($act=='save_archive_stk'){
      $stkm_id = $_GET["stkm_id"];
 
@@ -776,6 +856,42 @@ echo $date_disp;
      echo $sql_save;
      mysqli_multi_query($con,$sql_save);
      header("Location: index.php");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }elseif ($act=='save_copy_asset'){
      $ass_id             = $_GET["ass_id"];
@@ -1587,7 +1703,7 @@ echo $date_disp;
 
 }elseif ($act=='save_createtemplatefile') {
 
-     $sql = "  INSERT INTO smartdb.sm13_stk (stk_id, stk_name,stk_type) VALUES (0,'TEMPLATE','TEMPLATE')";
+     $sql = "  INSERT INTO smartdb.sm13_stk (stk_id, stk_name,stk_type) VALUES (0,'template','template')";
      runSql($sql);
      header("Location: index.php");
 
@@ -1604,7 +1720,25 @@ echo $date_disp;
      // echo "<br><br><br>$sql";
      runSql($sql);
      header("Location: 11_ass.php?ass_id=".$ass_id);
-     
+
+}elseif ($act=='save_initiate_template') {
+     $ass_id        = $_POST["ass_id"];
+     $stkm_id       = $_POST["stkm_id"];
+     $fingerprint   = time();
+
+     $sql = " INSERT INTO smartdb.sm14_ass (create_date, stkm_id, storage_id, Asset, Subnumber, impairment_code, genesis_cat, first_found_flag, rr_id, fingerprint, res_create_date, res_create_user, res_reason_code, res_reason_code_desc, res_impairment_completed, res_completed, res_comment, AssetDesc1, AssetDesc2, AssetMainNoText, Class, classDesc, assetType, Inventory, Quantity, SNo, InventNo, accNo, Location, Room, State, latitude, longitude, CurrentNBV, AcqValue, OrigValue, ScrapVal, ValMethod, RevOdep, CapDate, LastInv, DeactDate, PlRetDate, CCC_ParentName, CCC_GrandparentName, GrpCustod, CostCtr, WBSElem, Fund, RspCCtr, CoCd, PlateNo, Vendor, Mfr, UseNo, res_AssetDesc1, res_AssetDesc2, res_AssetMainNoText, res_Class, res_classDesc, res_assetType, res_Inventory, res_Quantity, res_SNo, res_InventNo, res_accNo, res_Location, res_Room, res_State, res_latitude, res_longitude, res_CurrentNBV, res_AcqValue, res_OrigValue, res_ScrapVal, res_ValMethod, res_RevOdep, res_CapDate, res_LastInv, res_DeactDate, res_PlRetDate, res_CCC_ParentName, res_CCC_GrandparentName, res_GrpCustod, res_CostCtr, res_WBSElem, res_Fund, res_RspCCtr, res_CoCd, res_PlateNo, res_Vendor, res_Mfr, res_UseNo, res_isq_5, res_isq_6, res_isq_7, res_isq_8, res_isq_9, res_isq_10, res_isq_13, res_isq_14, res_isq_15)
+     SELECT Now(), $stkm_id, storage_id, Asset, Subnumber, impairment_code, genesis_cat, first_found_flag, rr_id, '$fingerprint', res_create_date, res_create_user, res_reason_code, res_reason_code_desc, res_impairment_completed, res_completed, res_comment, AssetDesc1, AssetDesc2, AssetMainNoText, Class, classDesc, assetType, Inventory, Quantity, SNo, InventNo, accNo, Location, Room, State, latitude, longitude, CurrentNBV, AcqValue, OrigValue, ScrapVal, ValMethod, RevOdep, CapDate, LastInv, DeactDate, PlRetDate, CCC_ParentName, CCC_GrandparentName, GrpCustod, CostCtr, WBSElem, Fund, RspCCtr, CoCd, PlateNo, Vendor, Mfr, UseNo, res_AssetDesc1, res_AssetDesc2, res_AssetMainNoText, res_Class, res_classDesc, res_assetType, res_Inventory, res_Quantity, res_SNo, res_InventNo, res_accNo, res_Location, res_Room, res_State, res_latitude, res_longitude, res_CurrentNBV, res_AcqValue, res_OrigValue, res_ScrapVal, res_ValMethod, res_RevOdep, res_CapDate, res_LastInv, res_DeactDate, res_PlRetDate, res_CCC_ParentName, res_CCC_GrandparentName, res_GrpCustod, res_CostCtr, res_WBSElem, res_Fund, res_RspCCtr, res_CoCd, res_PlateNo, res_Vendor, res_Mfr, res_UseNo, res_isq_5, res_isq_6, res_isq_7, res_isq_8, res_isq_9, res_isq_10, res_isq_13, res_isq_14, res_isq_15
+     FROM smartdb.sm14_ass WHERE ass_id = $ass_id ;";
+     runSql($sql);
+
+     $sql = "SELECT ass_id FROM smartdb.sm14_ass ORDER BY ass_id DESC LIMIT 1";
+     $result = $con->query($sql);
+     if ($result->num_rows > 0) {
+     while($row = $result->fetch_assoc()) {
+          $new_ass_id	= $row["ass_id"];
+     }}
+
+     header("Location: 11_ass.php?ass_id=".$new_ass_id);
 
 }elseif ($act=='save_merge_initiate') {
      // Ascertain what type of stocktake it is - GA or IS
@@ -1958,6 +2092,28 @@ function runSql($stmt){
      return $log;
 }
 
+
+function cleanvalue($fieldvalue) {
+     // $fieldvalue = str_replace("'", "\'", $fieldvalue);
+     // $fieldvalue = str_replace('"', '\"', $fieldvalue);
+     $fieldvalue = str_replace("'", "''", $fieldvalue);
+     $fieldvalue = str_replace('"', '""', $fieldvalue);
+     // $fieldvalue = str_replace("""", "/""", $fieldvalue);
+     if ($fieldvalue=="") {
+          $fieldvalue="NULL";
+     }elseif (empty($fieldvalue)) {
+          $fieldvalue="NULL";
+     }elseif ($fieldvalue=="NULL") {
+          $fieldvalue="NULL";
+     }elseif ($fieldvalue=="null") {
+          $fieldvalue="NULL";
+     }elseif (strlen($fieldvalue)==0) {
+          $fieldvalue="NULL";
+     }else{
+          $fieldvalue="'".$fieldvalue."'";
+     }
+     return $fieldvalue;
+}
 
 function checkExtrasFinished($BIN_CODE){
      global $con;
