@@ -104,7 +104,6 @@ if ($act=='get_system'){
           $version_publish_date    = $json["version_publish_date"];
 
           $sql_save = "UPDATE smartdb.sm10_set SET date_last_update_check=NOW(), versionRemote=$latest_version_no; ";
-
           mysqli_multi_query($con,$sql_save);
           $test_results = "Check performed";
 

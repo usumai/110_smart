@@ -5,9 +5,9 @@ if (isset($_POST["act"])) {
 	$act = $_GET["act"];
 }
 
-$this_version_no  = 6;
+$this_version_no  = 7;
 $date_version_published = "2019-10-02 00:00:00";
-// Also need to update 08_version.json
+// Also need to update 08_version.json - they should mirror each other
 
 // echo $act;
 $dbname = "smartdb";

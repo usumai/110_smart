@@ -70,14 +70,14 @@ function fnSetMenu(sys){
     // Update available
     // Check for updates
     // if (sys["sett"][0]["versionLocal"]==sys["sett"][0]["versionRemote"]){
-    btnVAction  = "<div id='areaVersionAction'><div class='dropdown-item'>Up to date as of "+sys["sett"][0]["date_last_update_check"]+"</div><button type='button' class='dropdown-item btn' id='btnCheckForUpdates'>Check for updates</button></div>"
+    btnVAction  = "<div id='areaVersionAction'><button type='button' class='dropdown-item btn' id='btnCheckForUpdates'>Check for updates</button></div>"
     // }else 
     styleUpdateAvailable =""
     if (sys["sett"][0]["versionLocal"]<sys["sett"][0]["versionRemote"]){
         btnVAction  = "<button type='button' class='dropdown-item btn text-danger' data-toggle='modal' data-target='#modal_confirm_update'>Update available</button>"
         styleUpdateAvailable = " text-danger "
     }
-    menuUpdate  = "<div class='dropdown-divider'></div><h6 class='dropdown-header'>Software version</h6>"+btnVAction
+    menuUpdate  = "<div class='dropdown-divider'></div><h6 class='dropdown-header'>Software version<span class='float-right'>v"+sys["sett"][0]["versionLocal"]+"</span></h6>"+btnVAction
     menuAdd = ""
     $("#menuSearch").hide();
     if(system_stk_type=="stocktake"){
