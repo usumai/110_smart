@@ -141,7 +141,7 @@ $(function(){
 		if ($('.dropdown').find('#dropdownHelp').is(":hidden")){
 			$('#dropdownHelp').dropdown('toggle');
 		}
-		$('#btnCheckForUpdates').text("Checking server version");
+		$('#areaVersionAction').html("<span class='dropdown-item'>Checking server version</span>");
 		let nextAction = fnDo("save_check_version","CheckUpdates",1)
 		// console.log(nextAction)
     })
@@ -355,3 +355,5 @@ $(function(){
     </div>
   </div>
 </div>
+
+
