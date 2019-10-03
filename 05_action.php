@@ -24,10 +24,9 @@ if ($act=='sys_pull_master') {
 	$output .= shell_exec($addr_git.' pull https://github.com/usumai/110_smart.git');
 	echo "<pre>$output</pre>";
 
-     $sql_save = "UPDATE $dbname.sm10_set SET smartm_software_version=7; ";
      mysqli_multi_query($con,$sql_save);
-
-	header("Location: index.php");
+     
+	header("Location: 05_action.php?act=sys_initialise");
 
 }elseif ($act=='sys_open_image_folder') {
     // $output  = shell_exec('cd/'); 
@@ -54,17 +53,13 @@ if ($act=='sys_pull_master') {
 	header("Location: index.php");
 
 
-}elseif ($act=='sys_check_for_updates') {
-     //This file updates the local software with the currently published software
-
-     header("Location: index.php");
 
 }elseif ($act=='sys_initialise') {
      $dbname = "smartdb";
 
-   $log .= "<br>"."creating database: $dbname";
-   $sql_save = "CREATE DATABASE $dbname;";
-   mysqli_multi_query($con,$sql_save); 
+     $log .= "<br>"."creating database: $dbname";
+     $sql_save = "CREATE DATABASE $dbname;";
+     mysqli_multi_query($con,$sql_save); 
 
      header("Location: 05_action.php?act=sys_reset_data");
 
