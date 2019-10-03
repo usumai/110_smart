@@ -91,7 +91,7 @@ if ($act=='get_system'){
 }elseif ($act=='save_check_version'){
      $test_internet = @fsockopen("www.example.com", 80); //website, port  (try 80 or 443)
      if ($test_internet){
-          $URL = 'https://raw.githubusercontent.com/usumai/smart_public/master/08_version.json';
+          $URL = 'https://raw.githubusercontent.com/usumai/110_smart/master/08_version.php';
           $ch = curl_init();
           curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
           curl_setopt($ch, CURLOPT_URL, $URL);
@@ -100,19 +100,30 @@ if ($act=='get_system'){
           $data = curl_exec($ch);
           curl_close($ch);
           $json = json_decode($data, true);
-          $latest_version_no      = $json["latest_version_no"];
-          $version_publish_date   = $json["version_publish_date"];
+          $latest_version_no       = $json["latest_version_no"];
+          $version_publish_date    = $json["version_publish_date"];
 
           $sql_save = "UPDATE smartdb.sm10_set SET date_last_update_check=NOW(), versionRemote=$latest_version_no; ";
-          $test_results = "CHECKED VERSION";
+
           mysqli_multi_query($con,$sql_save);
+          $test_results = "Check performed";
 
      }else{
           $test_results = "Internet is required to check the version";
      }
 
+     // Compare remote to local and advise if update button should be displayed
+     $sql = "SELECT versionLocal, versionRemote FROM smartdb.sm10_set";
+     $result = $con->query($sql);
+     if ($result->num_rows > 0) {
+          while($row = $result->fetch_assoc()) {
+          $versionLocal	= $row["versionLocal"];
+          $versionRemote	= $row["versionRemote"];
+     }}
      $data  = [];
-     $data["test_results"] = $test_results;
+     $data["versionLocal"]    = $versionLocal;
+     $data["versionRemote"]   = $versionRemote;
+     $data["test_results"]    = $test_results;
      $data = json_encode($data);
      echo $data;
 
