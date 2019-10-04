@@ -46,7 +46,6 @@ function fnMakeIndexTable(sys){
 
 function fnLoadTemplates(templateData){
     for (let template in templateData){
-        console.log(templateData[template])
         $("#dropdown_adds").append("<button type='button' class='dropdown-item btn btnInitTemplate' data-toggle='modal' data-target='#modal_initiate_template' value='"+templateData[template]["ass_id"]+"'>"+templateData[template]["res_AssetDesc1"]+"</button>")
     }
 }
@@ -61,17 +60,11 @@ function fnSetMenu(sys){
     btnReset            = "<button type='button' class='dropdown-item btn btn-danger' data-toggle='modal' data-target='#modal_confirm_reset'>Reset all data</button>"
     btnInverColor       = "<a class='dropdown-item' href='05_action.php?act=save_invertcolors'>Invert Colour Scheme</a>"
     btnCreateTemplate   = "<a class='dropdown-item' href='05_action.php?act=save_createtemplatefile'>Create template file</a>"
+    btnBackups          = "<a class='dropdown-item' href='19_toggle.php'>Toggle primary/backup</a>"
     // <?=$area_rr?>
 
-    console.log(sys)
     helpContents=btnArchives+btnReset+btnInverColor
-
-    // Has two states:
-    // Update available
-    // Check for updates
-    // if (sys["sett"][0]["versionLocal"]==sys["sett"][0]["versionRemote"]){
     btnVAction  = "<div id='areaVersionAction'><button type='button' class='dropdown-item btn' id='btnCheckForUpdates'>Check for updates</button></div>"
-    // }else 
     styleUpdateAvailable =""
     if (sys["sett"][0]["versionLocal"]<sys["sett"][0]["versionRemote"]){
         btnVAction  = "<button type='button' class='dropdown-item btn text-danger' data-toggle='modal' data-target='#modal_confirm_update'>Update available</button>"
@@ -83,21 +76,19 @@ function fnSetMenu(sys){
     if(system_stk_type=="stocktake"){
         $(".initiateBTN").html("<a href='10_stk.php' class='nav-link text-success' >Stocktake</a>");
         $("#menuSearch").show();
+        $("#tags").focus();
         helpContents += btnImages+btnCreateTemplate
         menuAdd = "<a class='nav-link dropdown-toggle' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>First found</a><div class='dropdown-menu' aria-labelledby='dropdown01' id='dropdown_adds'>"+btnFF+"<div class='dropdown-divider'></div><h6 class='dropdown-header'>Templates</h6></div>"
     }else if(system_stk_type=="impairment"){
-        $(".initiateBTN").html("<a href='10_stk.php' class='nav-link text-success' >Impairment</a>");
+        $(".initiateBTN").html("<a href='15_impairment.php' class='nav-link text-success' >Impairment</a>");
+        helpContents += btnBackups
     }else{
         $(".initiateBTN").html("");
     }
 
-    
-
     menuHelp    = "<a class='nav-link dropdown-toggle "+styleUpdateAvailable+"' href='#'data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='headingHelp'>Help</a><div class='dropdown-menu' aria-labelledby='dropdown01' id='dropdownHelp' >"+helpContents+menuUpdate+"</div>"
-    menuVersion = ""
     $("#menuHelp").html(menuHelp);
     $("#menuAdd").html(menuAdd);
-    $("#menuVersion").html(menuVersion);
 }
 
 
@@ -188,7 +179,7 @@ function fnMakeToggleButton(stk_arr, system_stk_type){
     if(stk_include==1){// Included
         btnToggle = "<button type='button' class='btn btn-sm btn-success btnToggle toggleBTN"+stk_arr["stkm_id"]+"' value='"+stk_arr["stkm_id"]+"'>Included</button>";
     }else if(stk_include!=1&&system_stk_type!="notset"&&system_stk_type!=stk_type){// not included and system set no matches
-        btnToggle = "<button type='button' class='btn btn-sm btn-outline-dark btnToggle'>NA</button>"
+        btnToggle = "<button type='button' class='btn btn-sm btn-outline-dark'>NA</button>"
     }else{
         btnToggle = "<button type='button' class='btn btn-sm btn-outline-dark btnToggle toggleBTN"+stk_arr["stkm_id"]+"' value='"+stk_arr["stkm_id"]+"'>Avaliable</button>"
     }

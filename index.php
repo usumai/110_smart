@@ -39,7 +39,9 @@ $(function() {
                 let btnStyle = (data=="Included") ? "btn-success" : "btn-outline-dark";
                 $(".toggleBTN"+stkm_id).addClass(btnStyle);
             }
-            fnMakeIndexTable()
+            fnDo("get_system","MakeIndexTable",0)
+            fnDo("get_system","SetMenu",0)
+            fnDo("get_templates","LoadTemplates",0)
         });
     })
 

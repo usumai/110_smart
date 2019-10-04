@@ -126,6 +126,91 @@ if ($act=='get_system'){
      $data = json_encode($data);
      echo $data;
 
+}elseif ($act=='save_AssetFieldValue'){
+     $fieldName     = $_POST["fieldName"];  
+     $fieldValue    = $_POST["fieldValue"]; 
+     $ass_id        = $_POST["ass_id"];  
+     // $fieldName = $fieldName=="res_comment" ? $fieldName : "res_".$fieldName;
+     // $fieldValue = $fieldValue=="##NULL##" ? "NULL" : "'".$fieldValue."'";
+
+     $sql = "UPDATE smartdb.sm14_ass SET $fieldName='$fieldValue' WHERE ass_id = $ass_id;";
+     // echo $sql;
+     runSql($sql);
+
+     $sql = "SELECT $fieldName FROM smartdb.sm14_ass  WHERE ass_id = $ass_id;";
+     $result = $con->query($sql);
+     if ($result->num_rows > 0) {
+          while($row = $result->fetch_assoc()) {
+          $confirmedValue	= $row[$fieldName];
+     }}
+     echo $confirmedValue;
+
+
+}elseif ($act=='save_ResetAssetResults'){ 
+     $ass_id        = $_POST["ass_id"];  
+
+
+     $sql = "  UPDATE smartdb.sm14_ass SET 
+               res_AssetDesc1 = AssetDesc1,
+               res_AssetDesc2 = AssetDesc2,
+               res_AssetMainNoText = AssetMainNoText,
+               res_Class = Class,
+               res_classDesc = classDesc,
+               res_assetType = assetType,
+               res_Inventory = Inventory,
+               res_Quantity = Quantity,
+               res_SNo = SNo,
+               res_InventNo = InventNo,
+               res_accNo = accNo,
+               res_Location = Location,
+               res_State = State,
+               res_latitude = latitude,
+               res_longitude = longitude,
+               res_CurrentNBV = CurrentNBV,
+               res_AcqValue = AcqValue,
+               res_OrigValue = OrigValue,
+               res_ScrapVal = ScrapVal,
+               res_ValMethod = ValMethod,
+               res_RevOdep = RevOdep,
+               res_CapDate = CapDate,
+               res_LastInv = LastInv,
+               res_DeactDate = DeactDate,
+               res_PlRetDate = PlRetDate,
+               res_CCC_ParentName = CCC_ParentName,
+               res_CCC_GrandparentName = CCC_GrandparentName,
+               res_GrpCustod = GrpCustod,
+               res_CostCtr = CostCtr,
+               res_WBSElem = WBSElem,
+               res_Fund = Fund,
+               res_RspCCtr = RspCCtr,
+               res_CoCd = CoCd,
+               res_PlateNo = PlateNo,
+               res_Vendor = Vendor,
+               res_Mfr = Mfr,
+               res_UseNo = UseNo,
+               res_reason_code = NULL
+               WHERE ass_id = $ass_id;";
+     // echo $sql;
+     runSql($sql);
+
+     $data = [];
+     $sql = "SELECT * FROM smartdb.sm14_ass WHERE ass_id=$ass_id";
+     $result = $con->query($sql);
+     if ($result->num_rows > 0) {
+      while($r = $result->fetch_assoc()) {
+         $data["asset"] = $r;
+     }}
+     
+     $reasoncodes = [];
+     $sql = "SELECT * FROM smartdb.sm15_rc ";
+     $result = $con->query($sql);
+     if ($result->num_rows > 0) {
+      while($r = $result->fetch_assoc()) {
+         $data["reasoncodes"][] = $r;
+     }}
+     $data = json_encode($data);
+     echo $data;
+
 }elseif ($act=='save_toggle_stk_return'){
      $stkm_id = $_GET["stkm_id"];  
      
