@@ -46,8 +46,18 @@ $( function() {
     let colRed  = "#FFCDD2";
     let colAmber= "#FFE0B2";
 
+    tempData["lockSettings"] = [];
+    tempData["lockSettings"] = {
+        "FF": "00000 000000 000000 000000 00000",
+        "NF": "11111 111111 111111 111111 11111",
+        "ND": "00100 111111 000000 000000 00000",
+        "AF": "00000 000000 000000 000000 00000",
+    }
+
+
 
     console.log(data)
+    console.log(tempData)
     tempData["arrRC"]=[];
     for (let rc in data["reasoncodes"]){
         let res_reason_code = data["reasoncodes"][rc]["res_reason_code"];
@@ -57,7 +67,7 @@ $( function() {
         let rc_section      = data["reasoncodes"][rc]["rc_section"];
         let btnRCL = "<div class='col-2'><button class='btn btn-info rc_select' value='"+res_reason_code+"'>"+res_reason_code+"</button></div>"
         let btnRCR = "<div class='col-2'><button class='btn btn-info rc_select float-right' value='"+res_reason_code+"'>"+res_reason_code+"</button></div>"
-        let rowRC  = "<div class='row rc_option rc_section"+rc_section+"'>"+btnRCL+"<div class='col-8'><b>"+rc_desc+"</b>"+rc_long_desc+" <br>Example: "+rc_examples+"</div>"+btnRCR+"</div>"
+        let rowRC  = "<div class='row rc_option rc_section"+rc_section+"'>"+btnRCL+"<div class='col-8'><b>"+rc_desc+"</b> "+rc_long_desc+" <br>Example: "+rc_examples+"</div>"+btnRCR+"</div>"
         
         tempData["arrRC"][res_reason_code]=rc_desc;
         $("#areaRCs").append(rowRC)
@@ -88,15 +98,6 @@ $( function() {
             if(originalFV!=currentFV){
                 $(this).css("background-color",colGreen)
             }
-
-            // if($(this).prop('disabled')){
-            //     $(this).css("background-color","white")
-            // }else{
-            //     $(this).css("background-color","#e9ecef")
-            // }
-
-
-
         })        
     }
 
@@ -170,18 +171,12 @@ $( function() {
     $(".btnClearSure").click(function(){
         data["asset"]["res_reason_code"]= null
         tempData["tempReasonCat"]       = null
-        // fnSaveReasonCode("##NULL##")
-        //Needs to write all original details over the result set and set reasoncode to null
         $.post("api.php",{
             act:    "save_ResetAssetResults",
             ass_id: data["asset"]["ass_id"]
         },
         function(res, status){
-            console.log("Before")
-            console.log(data)
             data = JSON.parse(res)
-            console.log("After")
-            console.log(data)
             fnInitialSetup()
             setPage()
             $(".txy").css("background-color","#e9ecef")
@@ -227,22 +222,21 @@ $( function() {
         $(".rc_option").hide();
         $("#res_reason_code").text("");
         let res_reason_code = data["asset"]["res_reason_code"];
-        console.log("Set page reason code:"+res_reason_code)
         if(res_reason_code){// Asset is finished!
             $("#res_reason_code").text(res_reason_code+" - "+tempData["arrRC"][res_reason_code]);
             $(".btnClear").show();
             $("#areaInputs").show();
             $(".txy").prop('disabled', false);
             fnAssessColor()
-        }else if(tempData["tempReasonCat"]=="notfound"){console.log("Select a not found reason code")
+        }else if(tempData["tempReasonCat"]=="notfound"){//Select a not found reason code
             $(".btnCancel").show();
             $("#areaRCs").show();
             $(".rc_sectionNF").show();
-        }else if(tempData["tempReasonCat"]=="error"){console.log("Select an error reason code")
+        }else if(tempData["tempReasonCat"]=="error"){//Select an error reason code
             $(".btnCancel").show();
             $("#areaRCs").show();
             $(".rc_sectionERR").show();
-        }else{console.log("This asset has not been assessed")
+        }else{//his asset has not been assessed
             $(".txy").prop('disabled', true);
             // $(".txy").css("background-color","#e9ecef")
             $(".rcCat").show();
@@ -252,6 +246,7 @@ $( function() {
 
     function fnRunValidation(changedFV, validation){
         let res = [];
+        
         if(validation=="string"){
             res["test"] = /([a-z0-9])$/.test(changedFV)
             res["note"] = "Must only contain alphanumeric characters up to 250 long";
@@ -265,6 +260,7 @@ $( function() {
             res["test"] = /([a-z0-9])$/.test(changedFV)
             res["note"] = "Must only contain alphanumeric characters up to 3000 long";
         }
+        res["note"] = res["test"] ? "All clear" : res["note"];
         console.log(res)
         return res;
     }

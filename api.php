@@ -163,6 +163,7 @@ if ($act=='get_system'){
                res_InventNo = InventNo,
                res_accNo = accNo,
                res_Location = Location,
+               res_Room = Room,
                res_State = State,
                res_latitude = latitude,
                res_longitude = longitude,
