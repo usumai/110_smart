@@ -65,7 +65,8 @@ $icon_spot_grey     = "<span class='octicon octicon-primitive-dot text-secondary
         <!-- <link rel="stylesheet" href="includes/datatables/dataTables.bootstrap4.min.css"> -->
         <script src="includes/jquery-3.4.1.min.js"></script>
 	    <script src="includes/jquery.validate.min.js"></script>
-        <script src="includes/jquery-ui.js"></script>   
+        <script src="includes/jquery-ui.js"></script>  
+        <script src="09_scripts.js"></script> 
         <style type="text/css">
             body {
                 padding-top: 1rem;

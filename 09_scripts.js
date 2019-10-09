@@ -45,9 +45,11 @@ function fnMakeIndexTable(sys){
 }
 
 function fnLoadTemplates(templateData){
+    let templateList="";
     for (let template in templateData){
-        $("#dropdown_adds").append("<button type='button' class='dropdown-item btn btnInitTemplate' data-toggle='modal' data-target='#modal_initiate_template' value='"+templateData[template]["ass_id"]+"'>"+templateData[template]["res_AssetDesc1"]+"</button>")
+        templateList += "<button type='button' class='dropdown-item btn btnInitTemplate' data-toggle='modal' data-target='#modal_initiate_template' value='"+templateData[template]["ass_id"]+"'>"+templateData[template]["res_AssetDesc1"]+"</button>"
     }
+    $("#areaTemplates").html(templateList);
 }
 
 
@@ -78,7 +80,7 @@ function fnSetMenu(sys){
         $("#menuSearch").show();
         $("#tags").focus();
         helpContents += btnImages+btnCreateTemplate
-        menuAdd = "<a class='nav-link dropdown-toggle' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>First found</a><div class='dropdown-menu' aria-labelledby='dropdown01' id='dropdown_adds'>"+btnFF+"<div class='dropdown-divider'></div><h6 class='dropdown-header'>Templates</h6></div>"
+        menuAdd = "<a class='nav-link dropdown-toggle' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='menuFF'>First found</a><div class='dropdown-menu' aria-labelledby='dropdown01' id='dropdown_adds'>"+btnFF+"<div class='dropdown-divider'></div><h6 class='dropdown-header'>Templates <a href='21_templates.php' class='float-right'>Edit</a></h6><div id='areaTemplates'></div></div>"
     }else if(system_stk_type=="impairment"){
         $(".initiateBTN").html("<a href='15_impairment.php' class='nav-link text-success' >Impairment</a>");
         helpContents += btnBackups

@@ -5,12 +5,12 @@
 $ass_id	= $_GET["ass_id"];
 
 
-$data = [];
+$pdata = [];
 $sql = "SELECT * FROM smartdb.sm14_ass WHERE ass_id=$ass_id";
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
  while($r = $result->fetch_assoc()) {
-    $data["asset"] = $r;
+    $pdata["asset"] = $r;
 }}
 
 $reasoncodes = [];
@@ -18,9 +18,15 @@ $sql = "SELECT * FROM smartdb.sm15_rc ";
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
  while($r = $result->fetch_assoc()) {
-    $data["reasoncodes"][] = $r;
+    $pdata["reasoncodes"][] = $r;
 }}
-$data = json_encode($data);
+$sdata = json_encode($pdata);
+
+
+
+
+
+
 
 ?>
 
@@ -39,7 +45,7 @@ $data = json_encode($data);
 
 <script>
 $( function() {
-    let data = <?=$data?>;
+    let data = <?=$sdata?>;
     let tempData = [];
 
     let colGreen= "#78e090";
@@ -80,6 +86,19 @@ $( function() {
 	});
 
 
+    function fnGetImgGallery() {
+        let ImgGallery = "Images TBA"
+        $.post("api.php",{
+            act:    "get_ImgGallery",
+            ass_id: data["asset"]["ass_id"]
+        },
+        function(ImgGallery, status){
+            $('#areaImgGallery').html(ImgGallery);
+        });
+    }
+
+
+
     function fnInitialSetup(){
         $(".tf").each(function(){
             let fieldName = $(this).data("name");
@@ -89,10 +108,15 @@ $( function() {
         })
 
         $(".txy").each(function(){// Initially populate the asset fields with the current db result data - highlight changes
-            // 
             let fieldName   = $(this).data("name");
             let originalFV  = data["asset"][fieldName];
             let currentFV   = data["asset"]["res_"+fieldName];
+            if(originalFV!=null&&originalFV!=undefined){
+                originalFV = originalFV.substring(10,19)==" 00:00:00" ? originalFV.substring(0,10) : originalFV;
+            }
+            if(currentFV!=null&&currentFV!=undefined){
+                currentFV = currentFV.substring(10,19)==" 00:00:00" ? currentFV.substring(0,10) : currentFV;
+            }
             $(this).val(currentFV);
 
             if(originalFV!=currentFV){
@@ -101,32 +125,42 @@ $( function() {
         })        
     }
 
-
-
-
+    $(".txy").change(function(){
+        fnTxyEdit($(this))
+    })
     $(".txy").keyup(function(){// Event fires when field is edited
+        fnTxyEdit($(this))
+    })
+
+    $("#ta_comment").keyup(function(){// Event fires when field is edited
+        fnTxyEdit($(this))
+    })
+
+    function fnTxyEdit(thisElement){
         console.log("Changed")
-        let fieldName   = $(this).data("name");
-        let validation  = $(this).data("vld");
+        let fieldName   = thisElement.data("name");
+        let validation  = thisElement.data("vld");
         let originalFV  = data["asset"][fieldName];
         let currentFV   = data["asset"]["res_"+fieldName];
-        let changedFV   = $(this).val();
-        let thisElement = $(this);
-        $(this).css("background-color","white")
-
+        let changedFV   = thisElement.val();
+        changedFV       = changedFV.toUpperCase() 
+        // if (changedFV==""){
+        //     changedFV="NULL"
+        // }
+        thisElement.css("background-color","white")
         if (!tempData["validationNote"+fieldName]){
             tempData["validationNote"+fieldName] = true
-            $(this).after("<p id='validationNote"+fieldName+"' class='text-danger'></p>");
+            thisElement.after("<p id='validationNote"+fieldName+"' class='text-danger'></p>");
         }
         $("#validationNote"+fieldName).hide();
 
         let validRes    = fnRunValidation(changedFV, validation)
         if(!validRes["test"]){//Failed validation
-            $(this).css("background-color",colRed)
+            thisElement.css("background-color",colRed)
             $("#validationNote"+fieldName).text(validRes["note"]);
             $("#validationNote"+fieldName).show();
         }else{
-            $(this).css("background-color",colAmber)
+            thisElement.css("background-color",colAmber)
             fieldName = fieldName=="res_comment" ? fieldName : "res_"+fieldName;
             $.post("api.php",{
                 act: "save_AssetFieldValue",
@@ -135,8 +169,28 @@ $( function() {
                 fieldValue: changedFV
             },
             function(confirmedFV, status){
+                console.log("confirmedFV:["+confirmedFV+"]")
+                console.log("changedFV  :["+changedFV+"]")
+                console.log("originalFV :["+originalFV+"]")
+                console.log("confirmedFV type:["+typeof confirmedFV+"]")
+                console.log("changedFV  type:["+typeof changedFV+"]")
+                console.log("originalFV  type:["+typeof originalFV+"]")
+                confirmedFV = confirmedFV.substring(10,19)==" 00:00:00" ? confirmedFV.substring(0,10) : confirmedFV;
                 if(changedFV==confirmedFV){//Saved successfully
                     data["asset"][fieldName] = confirmedFV
+
+
+                    if (originalFV==null&&confirmedFV==''){//This set of conditions happens when both original and confirmed are blank, however they return differnt ways of saying that. This is purely cosmetic.
+                        console.log("Null detected")
+                        originalFV="null"
+                        confirmedFV="null"
+                    }
+                console.log("confirmedFV:["+confirmedFV+"]")
+                console.log("changedFV  :["+changedFV+"]")
+                console.log("originalFV :["+originalFV+"]")
+                console.log("confirmedFV type:["+typeof confirmedFV+"]")
+                console.log("changedFV  type:["+typeof changedFV+"]")
+                console.log("originalFV  type:["+typeof originalFV+"]")
                     if(originalFV==confirmedFV){// Value hasn't changed from the very original
                         thisElement.css("background-color","white")
                     }else{// Value has saved and is different from original
@@ -148,7 +202,36 @@ $( function() {
                 }
             });
         }
-    })
+    }
+
+
+    $(document).on('click', '.thumb_photo', function(){
+    // $(".thumb_photo").click(function(){
+        let filename = $(this).val();
+        console.log(filename)
+
+        let btnPD = "	<div class='dropdown'> "
+            btnPD+= "	    <button class='nav-link btn btn-outline-dark dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Delete</button>"
+            btnPD+= "	    <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>"
+            btnPD+= "	        <button class='dropdown-item btn_delete_photo' value='"+filename+"' data-dismiss='modal' >I'm sure</a>"
+            btnPD+= "	    </div>"
+            btnPD+= "	</div>"
+
+        $("#imageFrame").html("<img src='images/"+filename+"' width='100%'>"+btnPD);
+    });
+
+    $(document).on('click', '.btn_delete_photo', function(){
+        let filename = $(this).val();
+        console.log("Delete this photo:"+filename)
+        $.post("api.php",{
+            act: "save_delete_photo",
+            filename:  filename
+        },
+        function(res, status){
+            fnGetImgGallery()
+        });
+    });
+
 
     $(".rcCat").click(function(){
         catSelection = $(this).val();
@@ -167,6 +250,20 @@ $( function() {
         setPage(data)
     });
 
+    $("#btnTemplate").click(function(){
+        $(this).hide();
+        console.log(data["asset"]["ass_id"])
+        $.post("api.php",{
+            act:    "save_CreateTemplateAsset",
+            ass_id: data["asset"]["ass_id"]
+
+        },
+        function(res, status){
+            fnDo("get_templates","LoadTemplates",1)
+            $("#menuAdd").effect( "bounce", {times:4}, 500 );
+        }); 
+        
+    });
 
     $(".btnClearSure").click(function(){
         data["asset"]["res_reason_code"]= null
@@ -207,12 +304,6 @@ $( function() {
         });
     }
 
-    function fnAssessColor(){
-
-    }
-
-
-
     function setPage(){
         $(".rcCat").hide();
         $(".btnCancel").hide();
@@ -220,6 +311,9 @@ $( function() {
         $("#areaRCs").hide();
         $("#areaInputs").hide();
         $(".rc_option").hide();
+        $("#btnTemplate").hide();
+        $(".btnDeleteFF").hide();
+        $(".btnCamera").hide();
         $("#res_reason_code").text("");
         let res_reason_code = data["asset"]["res_reason_code"];
         if(res_reason_code){// Asset is finished!
@@ -227,7 +321,14 @@ $( function() {
             $(".btnClear").show();
             $("#areaInputs").show();
             $(".txy").prop('disabled', false);
-            fnAssessColor()
+            $(".btnCamera").show();
+            if(res_reason_code.substring(0,2)=="FF"){
+                $("#btnTemplate").show();
+                $(".btnClear").hide();
+                $(".btnDeleteFF").show();
+            }else if(res_reason_code=="ND10"){
+                $("#tags").focus();
+            }
         }else if(tempData["tempReasonCat"]=="notfound"){//Select a not found reason code
             $(".btnCancel").show();
             $("#areaRCs").show();
@@ -248,11 +349,11 @@ $( function() {
         let res = [];
         
         if(validation=="string"){
-            res["test"] = /([a-z0-9])$/.test(changedFV)
+            res["test"] = /([A-Za-z0-9 ])$/.test(changedFV)
             res["note"] = "Must only contain alphanumeric characters up to 250 long";
         }else if(validation=="date"){
             res["test"] = /([a-z0-9])$/.test(changedFV)
-            res["note"] = "Must only contain a date";
+            res["note"] = "Must only contain a date. Use the date selector.";
         }else if(validation=="number"){
             res["test"] = /([0-9])$/.test(changedFV)
             res["note"] = "Must only contain numeric characters";
@@ -260,20 +361,32 @@ $( function() {
             res["test"] = /([a-z0-9])$/.test(changedFV)
             res["note"] = "Must only contain alphanumeric characters up to 3000 long";
         }
+        if(changedFV==""){
+            res["test"] = true
+            res["note"] = "";
+        }
+
         res["note"] = res["test"] ? "All clear" : res["note"];
         console.log(res)
         return res;
     }
 
+    console.log("<?=$ass_id?>")
     fnInitialSetup()
     setPage(data)
-
+    fnGetImgGallery()
 });
 </script>
 
 <style>
 .hdz{
     display:none
+}
+.txy{
+    text-transform: uppercase
+}
+.btnCamera{
+    margin-top:40px;
 }
 </style>
 
@@ -285,6 +398,7 @@ $( function() {
 		<div class='col-12 col-md-1 col-xl-1 bd-sidebar'><nav class='nav flex-column'><span class='assStatus'></span></nav></div>
 		<div class='col-10'>
             <h2>
+
                 Asset:<span class='tf' data-name='Asset'></span>-<span class='tf' data-name='Subnumber'></span>: 
                 <span class='tf' data-name='AssetDesc1'></span> (<span class='tf' data-name='AssetDesc2'></span>)
             </h2>
@@ -307,6 +421,15 @@ $( function() {
                         </div>
                     </div>
                     <button type='button' class='btn btn-danger btnCancel hdz'>Cancel</button>
+                    <div class='dropdown btnDeleteFF hdz'>
+                        <button class='nav-link btn btn-outline-dark dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Delete</button>
+                        <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
+                            <a href='05_action.php?act=save_delete_first_found&ass_id=<?=$ass_id?>' class='dropdown-item bg-danger text-light '>I'm sure</a>
+                        </div>
+                    </div>
+
+                    <a href='13_camera.php?ass_id=<?=$ass_id?>' class='btn btn-secondary text-center btnCamera'><span class='octicon octicon-device-camera' style='font-size:30px'></span></a>
+
                 </span>
             </nav>
 <!-- $btn_deleteff $btn_camera -->
@@ -336,6 +459,9 @@ $( function() {
 						<div class="form-group"><label>InventNo</label>
                             <input type="text" class="form-control txy" data-name="InventNo" data-vld="string">
                         </div>
+						<div class="form-group"><label>Manufacturer</label>
+                            <input type="text" class="form-control txy" data-name="Mfr" data-vld="string">
+                        </div>
 					</div>
 					<div class='col-2'>
 						<div class="form-group"><label>Serial No</label>
@@ -361,20 +487,20 @@ $( function() {
 						<div class="form-group"><label>Class</label>
                             <input type="text" class="form-control txy" data-name="Class" data-vld="string">
                         </div>
-						<div class="form-group"><label>accNo</label>
-                            <input type="text" class="form-control txy" data-name="accNo" data-vld="string">
+						<div class="form-group"><label>GrpCustod</label>
+                            <input type="text" class="form-control txy" data-name="GrpCustod" data-vld="string">
                         </div>
 						<div class="form-group"><label>CapDate</label>
-                            <input type="text" class="form-control txy" data-name="CapDate" data-vld="string">
+                            <input type="text" class="form-control txy datepicker" data-name="CapDate" data-vld="date" readonly>
                         </div>
 						<div class="form-group"><label>LastInv (YYYY-MM-DD)</label>
-                            <input type="text" class="form-control txy" data-name="LastInv" data-vld="string">
+                            <input type="text" class="form-control txy datepicker" data-name="LastInv" data-vld="date" readonly>
                         </div>
 						<div class="form-group"><label>DeactDate</label>
-                            <input type="text" class="form-control txy" data-name="DeactDate" data-vld="string">
+                            <input type="text" class="form-control txy datepicker" data-name="DeactDate" data-vld="date" readonly>
                         </div>
 						<div class="form-group"><label>PlRetDate</label>
-                            <input type="text" class="form-control txy" data-name="PlRetDate" data-vld="string">
+                            <input type="text" class="form-control txy datepicker" data-name="PlRetDate" data-vld="date" readonly>
                         </div>
 					</div>
 					<div class='col-2'>
@@ -413,94 +539,30 @@ $( function() {
 						<div class="form-group"><label>RevOdep</label>
                             <input type="text" class="form-control txy" data-name="RevOdep" data-vld="string">
                         </div>
-						<?=$btn_copy?>
+                        <br><button type='button' id='btnTemplate' class='btn btn-outline-dark' data-toggle='modal' data-target='#modal_copy'>Add to template</button>
 					</div>
 				</div>
 
-				<?=$img_list?>
-				
+                
+                <div class='row'>
+                    <div class='col-12'>
+                        <div class='form-group'>
+                            <h2>Images</h2>
+                            <div id='areaImgGallery'></div>
+                        </div>
+                    </div>
+                </div>
+
+
 
 				<div class='row'>
 					<div class='col-12'>
 						<div class="form-group"><h2>Comments</h2>
-							<!-- <input type="text"> -->
-							<textarea v-model="ar.res_comment" class= "form-control" v-on:keyup="sync_data('comment')" rows='5'></textarea>
+							<textarea class="form-control" id='ta_comment' rows='5'></textarea>
 						</div>
 					</div>
 				</div>
 			</span>
-
-
-
-
-
-
-			<div class="modal fade" id="modal_show_pic" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-			  <div class="modal-dialog modal-lg" role="document">
-			    <div class="modal-content">
-			      <div class="modal-header">
-			        <h5 class="modal-title" id="exampleModalLabel">Photo</h5>
-			        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-			          <span aria-hidden="true">&times;</span>
-			        </button>
-			      </div>
-			      <div class="modal-body">  
-					<?=$images?> 
-			      </div>
-			      <div class="modal-footer">
-			        <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
-			      </div>
-			    </div>
-			  </div>
-			</div>
-
-
-			<form action='05_action.php' method='get'>
-			<div class="modal fade" id="modal_copy" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-			  <div class="modal-dialog modal-lg" role="document">
-			    <div class="modal-content">
-			      <div class="modal-header">
-			        <h5 class="modal-title" id="exampleModalLabel">Copy this asset</h5>
-			        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-			          <span aria-hidden="true">&times;</span>
-			        </button>
-			      </div>
-			      <div class="modal-body">  
-					<p class="lead">
-						You can copy this asset to a brand new asset, it will copy every aspect of this asset as you've entered it. This is only available for first founds.
-						<br>How many assets would you like to create?
-						<br>
-
-								<select name="stkm_id" class="form-control">
-									<?=$listTemplates?>
-								</select>
-						      	<!-- <input type="text" name="duplicate_count" class="form-control"> -->
-						      	<input type="hidden" name="ass_id" value="<?=$ass_id?>">
-						      	<!-- <input type="hidden" name="act" value="save_copy_asset"> -->
-						      	<input type="hidden" name="act" value="save_add_to_template">
-					</p>
-			      </div>
-			      <div class="modal-footer">
-			        <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
-	        		<input type="submit" class="btn btn-primary" value='Copy'>
-			      </div>
-			    </div>
-			  </div>
-			</div>
-			</form>
-<!-- 
-DPN export is called json_update
-Add history
-Add fix me portal - inherent in the install file - what about delete db?
-Add merge
-Add user login
-Auto answer impairment questions on asset error
-
-The DPN upload process is working, but it isn't doing the supernumery things to clean up and finalise the upload
- -->
-
-
-
 		</div>
 		<div class='col-12 col-md-1 col-xl-1 bd-sidebar text-right'  >
 			<nav class='nav flex-column'>
@@ -515,6 +577,14 @@ The DPN upload process is working, but it isn't doing the supernumery things to 
                         </div>
                     </div>
                     <button type='button' class='btn btn-danger btnCancel hdz'>Cancel</button>
+                    <div class='dropdown btnDeleteFF hdz mr-0 float-right'>
+                        <button class='nav-link btn btn-outline-dark dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Delete</button>
+                        <div class='dropdown-menu dropdown-menu-right' aria-labelledby='dropdownMenuButton'>
+                            <a href='05_action.php?act=save_delete_first_found&ass_id=<?=$ass_id?>' class='dropdown-item bg-danger text-light '>I'm sure</a>
+                        </div>
+                    </div>
+
+                    <a href='13_camera.php?ass_id=<?=$ass_id?>' class='btn btn-secondary text-center btnCamera float-right'><span class='octicon octicon-device-camera' style='font-size:30px'></span></a>
                 </span>
             </nav>
 		</div>
@@ -522,7 +592,15 @@ The DPN upload process is working, but it isn't doing the supernumery things to 
 
 
 
+<!-- 
+DPN export is called json_update
+Add history
+Add fix me portal - inherent in the install file - what about delete db?
+Add merge
+Add user login
 
+The DPN upload process is working, but it isn't doing the supernumery things to clean up and finalise the upload
+ -->
 
 
 
@@ -531,18 +609,30 @@ The DPN upload process is working, but it isn't doing the supernumery things to 
 
 
 	</div><!-- End main page row -->
+</div>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 
-
-
-<br><br><br><br><br><br><br><br><br><br><br>
-
-
-
+<div class="modal" id="modal_show_pic" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Photo</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">  
+                <div id='imageFrame'></div>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+            </div>
+        </div>
+    </div>
 </div>
 
-<br><br><br>
-<script>
-</script>
+
+
 
 
 

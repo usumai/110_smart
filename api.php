@@ -48,8 +48,7 @@ if ($act=='get_system'){
 }elseif ($act=='get_templates'){
 
      $data = [];
-     $sqlsub = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_id=0 and smm_delete_date IS NULL";
-     $sql = "SELECT ass_id, res_AssetDesc1 FROM smartdb.sm14_ass WHERE stkm_id IN ($sqlsub) AND delete_date IS NULL ORDER BY AssetDesc1";
+     $sql = "SELECT ass_id, res_AssetDesc1 FROM smartdb.sm14_ass WHERE flagTemplate=1 AND delete_date IS NULL ORDER BY AssetDesc1";
      // echo $sql;
      $result = $con->query($sql);
      if ($result->num_rows > 0) {
@@ -126,13 +125,53 @@ if ($act=='get_system'){
      $data = json_encode($data);
      echo $data;
 
+}elseif ($act=='get_ImgGallery'){
+     $ass_id   = $_POST["ass_id"];   
+
+     $sql = "SELECT Asset, Subnumber, fingerprint FROM smartdb.sm14_ass WHERE ass_id=$ass_id";
+     $result = $con->query($sql);
+     if ($result->num_rows > 0) {
+          while($row = $result->fetch_assoc()) {
+          $Asset	     = $row["Asset"];
+          $Subnumber     = $row["Subnumber"];
+          $fingerprint   = $row["fingerprint"];
+     }}
+
+     $a        = scandir("images/");
+     $img_list = "";
+     $images 	= "";
+     if ($Asset=="First found") {
+          $photo_name_test	= $fingerprint;
+     }else{
+          $photo_name_test	= $Asset.'-'.$Subnumber;
+     }
+     foreach ($a as $key => $photo_name) {
+          $photo_name_parts = explode("_",$photo_name);
+         if ($photo_name_parts[0]==$photo_name_test)  {
+               $img_list .= "<button type='button' class='btn thumb_photo' value='".$photo_name."' data-toggle='modal' data-target='#modal_show_pic'><img src='images/".$photo_name."?".time()."' width='200px'></button>"; 
+         }
+     }
+     
+     echo $img_list;
+
+
+
+
+}elseif ($act=='save_delete_photo'){
+     $filename     = "images/".$_POST["filename"];
+     echo $filename;
+     $myFileLink = fopen($filename, 'w') or die("can't open file");
+     fclose($myFileLink);
+     unlink($filename) or die("Couldn't delete file");
+
+
 }elseif ($act=='save_AssetFieldValue'){
      $fieldName     = $_POST["fieldName"];  
      $fieldValue    = $_POST["fieldValue"]; 
      $ass_id        = $_POST["ass_id"];  
      // $fieldName = $fieldName=="res_comment" ? $fieldName : "res_".$fieldName;
      // $fieldValue = $fieldValue=="##NULL##" ? "NULL" : "'".$fieldValue."'";
-
+     // $fieldValue = strtoupper($fieldValue);
      $sql = "UPDATE smartdb.sm14_ass SET $fieldName='$fieldValue' WHERE ass_id = $ass_id;";
      // echo $sql;
      runSql($sql);
@@ -145,6 +184,17 @@ if ($act=='get_system'){
      }}
      echo $confirmedValue;
 
+
+}elseif ($act=='save_CreateTemplateAsset') {
+     $ass_id        = $_POST["ass_id"];
+
+     $fingerprint        = time();
+     $sql = " INSERT INTO smartdb.sm14_ass (create_date, stkm_id, storage_id, Asset, Subnumber, impairment_code, genesis_cat, first_found_flag, rr_id, fingerprint, res_create_date, res_create_user, res_reason_code, res_reason_code_desc, res_impairment_completed, res_completed, res_comment, AssetDesc1, AssetDesc2, AssetMainNoText, Class, classDesc, assetType, Inventory, Quantity, SNo, InventNo, accNo, Location, Room, State, latitude, longitude, CurrentNBV, AcqValue, OrigValue, ScrapVal, ValMethod, RevOdep, CapDate, LastInv, DeactDate, PlRetDate, CCC_ParentName, CCC_GrandparentName, GrpCustod, CostCtr, WBSElem, Fund, RspCCtr, CoCd, PlateNo, Vendor, Mfr, UseNo, res_AssetDesc1, res_AssetDesc2, res_AssetMainNoText, res_Class, res_classDesc, res_assetType, res_Inventory, res_Quantity, res_SNo, res_InventNo, res_accNo, res_Location, res_Room, res_State, res_latitude, res_longitude, res_CurrentNBV, res_AcqValue, res_OrigValue, res_ScrapVal, res_ValMethod, res_RevOdep, res_CapDate, res_LastInv, res_DeactDate, res_PlRetDate, res_CCC_ParentName, res_CCC_GrandparentName, res_GrpCustod, res_CostCtr, res_WBSElem, res_Fund, res_RspCCtr, res_CoCd, res_PlateNo, res_Vendor, res_Mfr, res_UseNo, flagTemplate)
+     SELECT Now(), stkm_id, storage_id, Asset, Subnumber, impairment_code, genesis_cat, first_found_flag, rr_id, '$fingerprint', res_create_date, res_create_user, res_reason_code, res_reason_code_desc, res_impairment_completed, res_completed, res_comment, AssetDesc1, AssetDesc2, AssetMainNoText, Class, classDesc, assetType, Inventory, Quantity, SNo, InventNo, accNo, Location, Room, State, latitude, longitude, CurrentNBV, AcqValue, OrigValue, ScrapVal, ValMethod, RevOdep, CapDate, LastInv, DeactDate, PlRetDate, CCC_ParentName, CCC_GrandparentName, GrpCustod, CostCtr, WBSElem, Fund, RspCCtr, CoCd, PlateNo, Vendor, Mfr, UseNo, res_AssetDesc1, res_AssetDesc2, res_AssetMainNoText, res_Class, res_classDesc, res_assetType, res_Inventory, res_Quantity, res_SNo, res_InventNo, res_accNo, res_Location, res_Room, res_State, res_latitude, res_longitude, res_CurrentNBV, res_AcqValue, res_OrigValue, res_ScrapVal, res_ValMethod, res_RevOdep, res_CapDate, res_LastInv, res_DeactDate, res_PlRetDate, res_CCC_ParentName, res_CCC_GrandparentName, res_GrpCustod, res_CostCtr, res_WBSElem, res_Fund, res_RspCCtr, res_CoCd, res_PlateNo, res_Vendor, res_Mfr, res_UseNo, 1
+     FROM smartdb.sm14_ass
+     WHERE ass_id =$ass_id ;";
+     echo "<br><br><br>$sql";
+     echo runSql($sql);
 
 }elseif ($act=='save_ResetAssetResults'){ 
      $ass_id        = $_POST["ass_id"];  

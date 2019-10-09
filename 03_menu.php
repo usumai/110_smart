@@ -32,7 +32,7 @@ if ($result->num_rows > 0) {
 
 ?>
 
-<script src="09_scripts.js"></script>
+
 <script>
 $(function(){
 	fnDo("get_system","SetMenu",0)
@@ -41,6 +41,7 @@ $(function(){
     $(document).on('click', '.btnInitTemplate', function(){ 
 		let ass_id = $(this).val();
 		$("#ass_id").val(ass_id);
+		console.log(ass_id)
 	})
 	
     $(document).on('click', '#btnCheckForUpdates', function(e){ 
