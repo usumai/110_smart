@@ -60,7 +60,57 @@ $( function() {
         "AF": "00000 000000 000000 000000 00000",
     }
 
-
+    tempData["valdStgs"] = [];
+    tempData["valdStgs"] = {
+        "default": {
+            "type":"string",
+            "maxlen":"250"
+        },
+        "CurrentNBV": {
+            "type":"number",
+            "maxlen":"250",
+            "maxnum":"100000000000"
+        },
+        "AcqValue": {
+            "type":"number",
+            "maxlen":"250",
+            "maxnum":"100000000000"
+        },
+        "OrigValue": {
+            "type":"number",
+            "maxlen":"250",
+            "maxnum":"100000000000"
+        },
+        "ScrapVal": {
+            "type":"number",
+            "maxlen":"250",
+            "maxnum":"100000000000"
+        },
+        "CapDate": {
+            "type":"date",
+            "maxlen":"250",
+            "maxnum":"100000000000"
+        },
+        "LastInv": {
+            "type":"date",
+            "maxlen":"250",
+            "maxnum":"100000000000"
+        },
+        "DeactDate": {
+            "type":"date",
+            "maxlen":"250",
+            "maxnum":"100000000000"
+        },
+        "PlRetDate": {
+            "type":"date",
+            "maxlen":"250",
+            "maxnum":"100000000000"
+        },
+        "res_comment": {
+            "type":"text",
+            "maxlen":"2000"
+        },
+    }
 
     console.log(data)
     console.log(tempData)
@@ -97,8 +147,6 @@ $( function() {
         });
     }
 
-
-
     function fnInitialSetup(){
         $(".tf").each(function(){
             let fieldName = $(this).data("name");
@@ -111,18 +159,22 @@ $( function() {
             let fieldName   = $(this).data("name");
             let originalFV  = data["asset"][fieldName];
             let currentFV   = data["asset"]["res_"+fieldName];
-            if(originalFV!=null&&originalFV!=undefined){
-                originalFV = originalFV.substring(10,19)==" 00:00:00" ? originalFV.substring(0,10) : originalFV;
-            }
-            if(currentFV!=null&&currentFV!=undefined){
-                currentFV = currentFV.substring(10,19)==" 00:00:00" ? currentFV.substring(0,10) : currentFV;
-            }
+            currentFV = fieldName=="res_comment" ? data["asset"]["res_comment"] : currentFV;
+
+
+            let validSettings   = (fieldName in tempData["valdStgs"]) ? tempData["valdStgs"][fieldName] : tempData["valdStgs"]["default"];
+            let vldtType        = ("type" in validSettings) ? validSettings["type"] : tempData["valdStgs"]["default"]["type"];
+
+            currentFV = vldtType=="date" ? fnCleanDate(currentFV) : currentFV
+            hasBeenChanged = fnCompare(originalFV, currentFV, vldtType)
+
             $(this).val(currentFV);
 
-            if(originalFV!=currentFV){
+            if(!hasBeenChanged){
                 $(this).css("background-color",colGreen)
             }
-        })        
+        })     
+        
     }
 
     $(".txy").change(function(){
@@ -132,32 +184,36 @@ $( function() {
         fnTxyEdit($(this))
     })
 
-    $("#ta_comment").keyup(function(){// Event fires when field is edited
-        fnTxyEdit($(this))
-    })
-
     function fnTxyEdit(thisElement){
-        console.log("Changed")
-        let fieldName   = thisElement.data("name");
-        let validation  = thisElement.data("vld");
-        let originalFV  = data["asset"][fieldName];
-        let currentFV   = data["asset"]["res_"+fieldName];
-        let changedFV   = thisElement.val();
-        changedFV       = changedFV.toUpperCase() 
-        // if (changedFV==""){
-        //     changedFV="NULL"
-        // }
-        thisElement.css("background-color","white")
-        if (!tempData["validationNote"+fieldName]){
+        let fieldName       = thisElement.data("name");
+        let valOriginal     = data["asset"][fieldName];
+        let valCurrent      = data["asset"]["res_"+fieldName];
+        let valEntered      = thisElement.val();
+        if(fieldName=="res_comment"){
+            valCurrent      = data["asset"]["res_comment"];
+        }else{
+            valEntered      = valEntered.toUpperCase()
+        } 
+        let validSettings   = (fieldName in tempData["valdStgs"]) ? tempData["valdStgs"][fieldName] : tempData["valdStgs"]["default"];
+        let vldtType        = ("type" in validSettings) ? validSettings["type"] : tempData["valdStgs"]["default"]["type"];
+        let vldtMaxLen      = ("maxlen" in validSettings) ? validSettings["maxlen"] : tempData["valdStgs"]["default"]["maxlen"];
+        let vldtMaxNum      = ("maxnum" in validSettings) ? validSettings["maxnum"] : tempData["valdStgs"]["default"]["maxnum"];
+
+        if (!tempData["validationNote"+fieldName]){//Initiate a note variable in the temp array
             tempData["validationNote"+fieldName] = true
             thisElement.after("<p id='validationNote"+fieldName+"' class='text-danger'></p>");
         }
         $("#validationNote"+fieldName).hide();
 
-        let validRes    = fnRunValidation(changedFV, validation)
-        if(!validRes["test"]){//Failed validation
+        validity = fnValidate(valEntered, vldtType, vldtMaxLen, vldtMaxNum);
+
+        console.log(validity)
+
+        thisElement.css("background-color","white")
+
+        if(!validity["result"]){//Failed validation
             thisElement.css("background-color",colRed)
-            $("#validationNote"+fieldName).text(validRes["note"]);
+            $("#validationNote"+fieldName).text(validity["msg"]);
             $("#validationNote"+fieldName).show();
         }else{
             thisElement.css("background-color",colAmber)
@@ -166,32 +222,16 @@ $( function() {
                 act: "save_AssetFieldValue",
                 ass_id:     data["asset"]["ass_id"],
                 fieldName:  fieldName,
-                fieldValue: changedFV
+                fieldValue: valEntered
             },
-            function(confirmedFV, status){
-                console.log("confirmedFV:["+confirmedFV+"]")
-                console.log("changedFV  :["+changedFV+"]")
-                console.log("originalFV :["+originalFV+"]")
-                console.log("confirmedFV type:["+typeof confirmedFV+"]")
-                console.log("changedFV  type:["+typeof changedFV+"]")
-                console.log("originalFV  type:["+typeof originalFV+"]")
-                confirmedFV = confirmedFV.substring(10,19)==" 00:00:00" ? confirmedFV.substring(0,10) : confirmedFV;
-                if(changedFV==confirmedFV){//Saved successfully
-                    data["asset"][fieldName] = confirmedFV
+            function(res, status){
+                let valConfirmed = res
+                savedCorrectly = fnCompare(valEntered, valConfirmed, vldtType)
 
-
-                    if (originalFV==null&&confirmedFV==''){//This set of conditions happens when both original and confirmed are blank, however they return differnt ways of saying that. This is purely cosmetic.
-                        console.log("Null detected")
-                        originalFV="null"
-                        confirmedFV="null"
-                    }
-                console.log("confirmedFV:["+confirmedFV+"]")
-                console.log("changedFV  :["+changedFV+"]")
-                console.log("originalFV :["+originalFV+"]")
-                console.log("confirmedFV type:["+typeof confirmedFV+"]")
-                console.log("changedFV  type:["+typeof changedFV+"]")
-                console.log("originalFV  type:["+typeof originalFV+"]")
-                    if(originalFV==confirmedFV){// Value hasn't changed from the very original
+                if(savedCorrectly){//Saved successfully
+                    data["asset"][fieldName] = valConfirmed
+                    differsFromOrig = fnCompare(valOriginal, valConfirmed, vldtType)
+                    if(differsFromOrig){// Value hasn't changed from the very original
                         thisElement.css("background-color","white")
                     }else{// Value has saved and is different from original
                         thisElement.css("background-color",colGreen)
@@ -204,11 +244,9 @@ $( function() {
         }
     }
 
-
     $(document).on('click', '.thumb_photo', function(){
     // $(".thumb_photo").click(function(){
         let filename = $(this).val();
-        console.log(filename)
 
         let btnPD = "	<div class='dropdown'> "
             btnPD+= "	    <button class='nav-link btn btn-outline-dark dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Delete</button>"
@@ -222,7 +260,6 @@ $( function() {
 
     $(document).on('click', '.btn_delete_photo', function(){
         let filename = $(this).val();
-        console.log("Delete this photo:"+filename)
         $.post("api.php",{
             act: "save_delete_photo",
             filename:  filename
@@ -252,7 +289,6 @@ $( function() {
 
     $("#btnTemplate").click(function(){
         $(this).hide();
-        console.log(data["asset"]["ass_id"])
         $.post("api.php",{
             act:    "save_CreateTemplateAsset",
             ass_id: data["asset"]["ass_id"]
@@ -274,6 +310,7 @@ $( function() {
         },
         function(res, status){
             data = JSON.parse(res)
+            console.log(data)
             fnInitialSetup()
             setPage()
             $(".txy").css("background-color","#e9ecef")
@@ -294,7 +331,7 @@ $( function() {
         },
         function(confirmedFV, status){
             // console.log("new_reason_code:"+new_reason_code)
-            // console.log("confirmedFV:"+confirmedFV)
+            console.log("confirmedFV:"+confirmedFV)
             if(new_reason_code==confirmedFV){
                 // console.log("Saved successfully")
                 data["asset"]["res_reason_code"] = new_reason_code
@@ -345,33 +382,7 @@ $( function() {
         }
     }
 
-    function fnRunValidation(changedFV, validation){
-        let res = [];
-        
-        if(validation=="string"){
-            res["test"] = /([A-Za-z0-9 ])$/.test(changedFV)
-            res["note"] = "Must only contain alphanumeric characters up to 250 long";
-        }else if(validation=="date"){
-            res["test"] = /([a-z0-9])$/.test(changedFV)
-            res["note"] = "Must only contain a date. Use the date selector.";
-        }else if(validation=="number"){
-            res["test"] = /([0-9])$/.test(changedFV)
-            res["note"] = "Must only contain numeric characters";
-        }else if(validation=="text"){
-            res["test"] = /([a-z0-9])$/.test(changedFV)
-            res["note"] = "Must only contain alphanumeric characters up to 3000 long";
-        }
-        if(changedFV==""){
-            res["test"] = true
-            res["note"] = "";
-        }
 
-        res["note"] = res["test"] ? "All clear" : res["note"];
-        console.log(res)
-        return res;
-    }
-
-    console.log("<?=$ass_id?>")
     fnInitialSetup()
     setPage(data)
     fnGetImgGallery()
@@ -558,7 +569,7 @@ $( function() {
 				<div class='row'>
 					<div class='col-12'>
 						<div class="form-group"><h2>Comments</h2>
-							<textarea class="form-control" id='ta_comment' rows='5'></textarea>
+							<textarea class="form-control txy" id='ta_comment'  data-name="res_comment" rows='5'></textarea>
 						</div>
 					</div>
 				</div>

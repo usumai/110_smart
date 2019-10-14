@@ -12,6 +12,7 @@ $dbname = "smartdb";
 
 if ($act=='get_system'){
     $stks = $sett = [];
+
     $sql = "SELECT * FROM smartdb.sm13_stk WHERE smm_delete_date IS NULL;";
     $result = $con->query($sql);
     if ($result->num_rows > 0) {
@@ -44,6 +45,10 @@ if ($act=='get_system'){
     $sys = json_encode($sys);
     echo $sys;
 
+}elseif ($act=='save_RemoveTemplate'){
+     $ass_id = $_POST["ass_id"];  
+     $sql = "UPDATE smartdb.sm14_ass SET delete_date=NOW(),delete_user='$active_profile_id' WHERE ass_id = $ass_id;";
+     echo runSql($sql);
 
 }elseif ($act=='get_templates'){
 
@@ -176,14 +181,21 @@ if ($act=='get_system'){
      // echo $sql;
      runSql($sql);
 
-     $sql = "SELECT $fieldName FROM smartdb.sm14_ass  WHERE ass_id = $ass_id;";
+     $sql = "SELECT $fieldName, stkm_id FROM smartdb.sm14_ass  WHERE ass_id = $ass_id;";
+
      $result = $con->query($sql);
      if ($result->num_rows > 0) {
           while($row = $result->fetch_assoc()) {
-          $confirmedValue	= $row[$fieldName];
+               $confirmedValue	= $row[$fieldName];
+               $stkm_id	          = $row["stkm_id"];
      }}
      echo $confirmedValue;
 
+     if($fieldName=="res_reason_code"){
+          fnCalcStats($stkm_id);
+     }
+
+     
 
 }elseif ($act=='save_CreateTemplateAsset') {
      $ass_id        = $_POST["ass_id"];
@@ -250,6 +262,7 @@ if ($act=='get_system'){
      if ($result->num_rows > 0) {
       while($r = $result->fetch_assoc()) {
          $data["asset"] = $r;
+         $stkm_id = $r['stkm_id'];
      }}
      
      $reasoncodes = [];
@@ -261,6 +274,7 @@ if ($act=='get_system'){
      }}
      $data = json_encode($data);
      echo $data;
+     fnCalcStats($stkm_id);
 
 }elseif ($act=='save_toggle_stk_return'){
      $stkm_id = $_GET["stkm_id"];  
@@ -388,6 +402,29 @@ function checkExtrasFinished($BIN_CODE){
           WHERE BIN_CODE='$BIN_CODE' ";
      }
      runSql($sql);
+}
+
+
+
+
+function fnCalcStats($stkm_id){
+     global $con;
+
+
+     $sql_rc_orig = "SELECT SUM(CASE WHEN storage_id IS NOT NULL AND flagTemplate IS NULL THEN 1 ELSE 0 END) AS rc_orig FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id";
+
+     $sql_rc_orig_complete = "SELECT SUM(CASE WHEN storage_id IS NOT NULL AND flagTemplate IS NULL  AND res_reason_code IS NOT NULL THEN 1 ELSE 0 END) AS rc_orig_complete FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id";
+
+     $sql_rc_extras = "SELECT SUM(CASE WHEN  first_found_flag=1 AND flagTemplate IS NULL THEN 1 WHEN rr_id IS NOT NULL AND flagTemplate IS NULL THEN 1 ELSE 0 END) AS rc_extras FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id";
+
+     $sql_save = "UPDATE smartdb.sm13_stk SET 
+          rc_orig=($sql_rc_orig),
+          rc_orig_complete=($sql_rc_orig_complete),
+          rc_extras=($sql_rc_extras)
+          WHERE stkm_id = $stkm_id;";
+     // echo $sql_save;
+     mysqli_multi_query($con,$sql_save);
+
 }
 
 ?>

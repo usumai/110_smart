@@ -94,8 +94,7 @@ $(function() {
                 <td>Name</td>
                 <td align='right'>Orig</td>
                 <td align='right'>Completed</td>
-                <td align='right'>FF</td>
-                <td align='right'>RR</td>
+                <td align='right'>Extra</td>
                 <td align='right'>Status</td>
                 <td align='right'>Archive</td>
                 <td align='right'>Excel</td>

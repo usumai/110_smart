@@ -19,7 +19,6 @@ function fnDo(api, nextFn, sL){
         
         fns(sL,"Data returned:")
         fns(sL,data)
-
         data = JSON.parse(data);
         fns(sL,"Converted data:")
         fns(sL,data)
@@ -30,6 +29,10 @@ function fnDo(api, nextFn, sL){
 }
 function fns(showLog, contentToLog){
     if (showLog){console.log(contentToLog)}    
+}
+
+function isNumeric(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
 function fnMakeIndexTable(sys){
@@ -112,17 +115,21 @@ function fnCheckUpdates(data){
 function fnRB_stocktake(stk_arr, sys){
     let system_stk_type = sys["system_stk_type"]
     let btnToggle = fnMakeToggleButton(stk_arr, system_stk_type);
+
+    let rc_orig = stk_arr['rc_orig'] ? stk_arr['rc_orig'] : 0;
+    let rc_orig_complete = stk_arr['rc_orig_complete'] ? stk_arr['rc_orig_complete'] : 0;
+    let rc_extras = stk_arr['rc_extras'] ? stk_arr['rc_extras'] : 0;
+    let rc_perc = rc_orig ? Math.round((rc_orig_complete/rc_orig)*100,2) : 0
     let row = "<tr id='row"+stk_arr['stkm_id']+"'>"
     row += "<td>"+btnToggle+"</td>"
     row += "<td>"+stk_arr['stkm_id']+"</td>"
     row += "<td>"+stk_arr['stk_type']+"</td>"
     row += "<td>"+stk_arr['stk_id']+"</td>"
     row += "<td>"+stk_arr['stk_name']+"</td>"
-    row += "<td align='right'>"+stk_arr['rowcount_original']+"</td>"
-    row += "<td></td>"
-    row += "<td></td>"
-    row += "<td></td>"
-    row += "<td></td>"
+    row += "<td align='right'>"+rc_orig+"</td>"
+    row += "<td align='right'>"+rc_orig_complete+"</td>"
+    row += "<td align='right'>"+rc_extras+"</td>"
+    row += "<td align='right'>"+rc_perc+"%</td>"
     row += "<td align='right'>"+btnArchive+"</td>"
     row += "<td align='right'>"+btnExcel+"</td>"
     row += "<td align='right'>"+btnExport+"</td>"
@@ -139,8 +146,7 @@ function fnRB_impairment(stk_arr, sys){
     row += "<td>"+stk_arr['stk_type']+"</td>"
     row += "<td>"+stk_arr['stk_id']+"</td>"
     row += "<td>"+stk_arr['stk_name']+"</td>"
-    row += "<td align='right'>"+stk_arr['rowcount_original']+"</td>"
-    row += "<td></td>"
+    row += "<td align='right'>"+stk_arr['rc_orig']+"</td>"
     row += "<td></td>"
     row += "<td></td>"
     row += "<td></td>"
@@ -160,8 +166,7 @@ function fnRB_template(stk_arr, sys){
     row += "<td>Template</td>"
     row += "<td></td>"
     row += "<td>"+stk_arr['stk_name']+"</td>"
-    row += "<td align='right'>"+stk_arr['rowcount_original']+"</td>"
-    row += "<td></td>"
+    row += "<td align='right'>"+stk_arr['rc_orig']+"</td>"
     row += "<td></td>"
     row += "<td></td>"
     row += "<td></td>"
@@ -188,3 +193,72 @@ function fnMakeToggleButton(stk_arr, system_stk_type){
     return btnToggle; 
 }
 
+// ##################################################################
+// ########################### VALIDATION ###########################
+// ##################################################################
+
+function fnValidate(fieldValue, fieldType, fieldMaxLen, fieldMaxNum){
+    let validity    = [];
+    let msg         = "";
+   let valid        = true;
+     
+
+    if (fieldType=="string"&&valid){
+        valid   = /([a-zA-Z0-9 \s\-/.,&])$/.test(fieldValue) ? valid : false
+        msg     = valid ? msg : "That isn't valid text"
+    }
+    if (fieldType=="number"&&valid){
+        valid   = !isNaN(parseFloat(fieldValue)) && isFinite(fieldValue)  ? valid : false
+        msg     = valid ? msg : "That isn't a valid number"
+    }
+    if (fieldType=="date"&&valid){
+        valid   = valid
+        msg     = valid ? msg : "That isn't a valid date"
+    }
+    if (fieldType=="text"&&valid){
+        valid   = /([a-zA-Z0-9 \s\-/.,&])$/.test(fieldValue) ? valid : false
+        msg     = valid ? msg : "That isn't valid text"
+    }
+    // if (fieldType=="number"&&valid){//This doesn't work
+    //     // valid   = fieldValue<fieldMaxNum;
+    //     // msg     = valid ? msg : "That number must be less than "+fieldMaxNum
+    // }
+    if (fieldMaxLen&&valid){
+        valid   = fieldValue.length<fieldMaxLen ? valid : false
+        msg     = valid ? msg : "Must be less than "+fieldMaxLen+" characters";
+    }
+    if (fieldValue.length==0){
+        valid   =  true;
+        msg     =  ""
+    }
+    
+    validity["result"]  = valid;
+    validity["msg"]     = msg
+    return validity
+}
+
+
+function fnCleanDate(valOne){
+    return valOne ? valOne.substring(0,10) : valOne;
+}
+
+function fnCompare(valOne, valTwo, expectedType){
+    let log="expectedType: "+expectedType+"\n\nPre-treatment\nvalOne: "+valOne+"\nvalTwo: "+valTwo+"\nvalOne type: "+ typeof valOne+"\nvalTwo type: "+ typeof valTwo
+    // Treatments go here - they clean both values in order to make a comparison
+    if (expectedType=="date"){// test for date
+        valOne = valOne ? valOne.substring(0,10) : false;
+        valTwo = valTwo ? valTwo.substring(0,10) : false;
+    }
+    if (expectedType=="number"){
+        valOne = parseFloat(valOne) 
+        valTwo = parseFloat(valTwo) 
+    }
+    //Test for every combination of both being null/empty
+    valOne = valOne ? valOne : null;
+    valTwo = valTwo ? valTwo : null;
+
+    comparison =  (valOne==valTwo)
+    log+="\n\nPost-treatment \nvalOne: "+valOne+"\nvalTwo: "+valTwo+"\nvalOne type: "+ typeof valOne+"\nvalTwo type: "+ typeof valTwo+"\n\ncomparison: "+comparison
+    // console.log(log)
+    return comparison
+}
