@@ -295,6 +295,7 @@ $( function() {
 
         },
         function(res, status){
+            console.log(res)
             fnDo("get_templates","LoadTemplates",1)
             $("#menuAdd").effect( "bounce", {times:4}, 500 );
         }); 
