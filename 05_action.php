@@ -162,7 +162,7 @@ if ($act=='sys_pull_master') {
           // $sql_save = "INSERT INTO smartdb.sm13_stk (stk_id,stk_name,dpn_extract_date,dpn_extract_user,smm_extract_date,smm_extract_user,rowcount_original,stk_type, journal_text) VALUES ('".$stk_id."','".$stk_name."',".$dpn_extract_date.",".$dpn_extract_user.",".$smm_extract_date.",".$smm_extract_user.",'".$rowcount_original."','stocktake','".$journal_text."'); ";
           $sql_save = "INSERT INTO smartdb.sm13_stk (stk_id,stk_name,rc_orig,stk_type, journal_text) VALUES ('".$stk_id."','".$stk_name."','".$rc_orig."','stocktake','".$journal_text."'); ";
 
-echo "<br>sql_save: ".$sql_save;
+// echo "<br>sql_save: ".$sql_save;
           if ($dev) { echo "<br>sql_save: ".$sql_save; }
           mysqli_multi_query($con,$sql_save);
           echo "<br><br>sql_save: ".$sql_save."<br><br>";
@@ -192,8 +192,8 @@ echo "<br>sql_save: ".$sql_save;
                foreach($ass as $fieldname => $fieldvalue) {
                     $ass[$fieldname] = cleanvalue($ass[$fieldname]);
                }
-               $sql_save=" INSERT INTO smartdb.sm14_ass ($tags) VALUES(".$ass['create_date'].",".$ass['create_user'].",".$ass['delete_date'].",".$ass['delete_user'].",".$stkm_id_new.",".$ass['storage_id'].",".$ass['stk_include'].",".$ass['Asset'].",".$ass['Subnumber'].",".$ass['genesis_cat'].",".$ass['first_found_flag'].",".$ass['rr_id'].",".$ass['fingerprint'].",".$ass['res_create_date'].",".$ass['res_create_user'].",".$ass['res_reason_code'].",".$ass['res_reason_code_desc'].",".$ass['res_impairment_completed'].",".$ass['res_completed'].",".$ass['res_comment'].",".$ass['AssetDesc1'].",".$ass['AssetDesc2'].",".$ass['AssetMainNoText'].",".$ass['Class'].",".$ass['classDesc'].",".$ass['assetType'].",".$ass['Inventory'].",".$ass['Quantity'].",".$ass['SNo'].",".$ass['InventNo'].",".$ass['accNo'].",".$ass['Location'].",".$ass['Room'].",".$ass['State'].",".$ass['latitude'].",".$ass['longitude'].",".$ass['CurrentNBV'].",".$ass['AcqValue'].",".$ass['OrigValue'].",".$ass['ScrapVal'].",".$ass['ValMethod'].",".$ass['RevOdep'].",".$ass['CapDate'].",".$ass['LastInv'].",".$ass['DeactDate'].",".$ass['PlRetDate'].",".$ass['CCC_ParentName'].",".$ass['CCC_GrandparentName'].",".$ass['GrpCustod'].",".$ass['CostCtr'].",".$ass['WBSElem'].",".$ass['Fund'].",".$ass['RspCCtr'].",".$ass['CoCd'].",".$ass['PlateNo'].",".$ass['Vendor'].",".$ass['Mfr'].",".$ass['UseNo'].",".$ass['res_AssetDesc1'].",".$ass['res_AssetDesc2'].",".$ass['res_AssetMainNoText'].",".$ass['res_Class'].",".$ass['res_classDesc'].",".$ass['res_assetType'].",".$ass['res_Inventory'].",".$ass['res_Quantity'].",".$ass['res_SNo'].",".$ass['res_InventNo'].",".$ass['res_accNo'].",".$ass['res_Location'].",".$ass['res_Room'].",".$ass['res_State'].",".$ass['res_latitude'].",".$ass['res_longitude'].",".$ass['res_CurrentNBV'].",".$ass['res_AcqValue'].",".$ass['res_OrigValue'].",".$ass['res_ScrapVal'].",".$ass['res_ValMethod'].",".$ass['res_RevOdep'].",".$ass['res_CapDate'].",".$ass['res_LastInv'].",".$ass['res_DeactDate'].",".$ass['res_PlRetDate'].",".$ass['res_CCC_ParentName'].",".$ass['res_CCC_GrandparentName'].",".$ass['res_GrpCustod'].",".$ass['res_CostCtr'].",".$ass['res_WBSElem'].",".$ass['res_Fund'].",".$ass['res_RspCCtr'].",".$ass['res_CoCd'].",".$ass['res_PlateNo'].",".$ass['res_Vendor'].",".$ass['res_Mfr'].",".$ass['res_UseNo']."); ";
-               // echo "<br><br>".$sql_save;
+               $sql_save=" INSERT INTO smartdb.sm14_ass ($tags) VALUES(".$ass['create_date'].",".$ass['create_user'].",".$ass['delete_date'].",".$ass['delete_user'].",".$stkm_id_new.",".$ass['storage_id'].",".$ass['stk_include'].",".$ass['Asset'].",".$ass['Subnumber'].",".$ass['genesis_cat'].",".$ass['first_found_flag'].",".$ass['rr_id'].",".$ass['fingerprint'].",".$ass['res_create_date'].",".$ass['res_create_user'].",".$ass['res_reason_code'].",".$ass['res_reason_code_desc'].",".$ass['res_completed'].",".$ass['res_comment'].",".$ass['AssetDesc1'].",".$ass['AssetDesc2'].",".$ass['AssetMainNoText'].",".$ass['Class'].",".$ass['classDesc'].",".$ass['assetType'].",".$ass['Inventory'].",".$ass['Quantity'].",".$ass['SNo'].",".$ass['InventNo'].",".$ass['accNo'].",".$ass['Location'].",".$ass['Room'].",".$ass['State'].",".$ass['latitude'].",".$ass['longitude'].",".$ass['CurrentNBV'].",".$ass['AcqValue'].",".$ass['OrigValue'].",".$ass['ScrapVal'].",".$ass['ValMethod'].",".$ass['RevOdep'].",".$ass['CapDate'].",".$ass['LastInv'].",".$ass['DeactDate'].",".$ass['PlRetDate'].",".$ass['CCC_ParentName'].",".$ass['CCC_GrandparentName'].",".$ass['GrpCustod'].",".$ass['CostCtr'].",".$ass['WBSElem'].",".$ass['Fund'].",".$ass['RspCCtr'].",".$ass['CoCd'].",".$ass['PlateNo'].",".$ass['Vendor'].",".$ass['Mfr'].",".$ass['UseNo'].",".$ass['res_AssetDesc1'].",".$ass['res_AssetDesc2'].",".$ass['res_AssetMainNoText'].",".$ass['res_Class'].",".$ass['res_classDesc'].",".$ass['res_assetType'].",".$ass['res_Inventory'].",".$ass['res_Quantity'].",".$ass['res_SNo'].",".$ass['res_InventNo'].",".$ass['res_accNo'].",".$ass['res_Location'].",".$ass['res_Room'].",".$ass['res_State'].",".$ass['res_latitude'].",".$ass['res_longitude'].",".$ass['res_CurrentNBV'].",".$ass['res_AcqValue'].",".$ass['res_OrigValue'].",".$ass['res_ScrapVal'].",".$ass['res_ValMethod'].",".$ass['res_RevOdep'].",".$ass['res_CapDate'].",".$ass['res_LastInv'].",".$ass['res_DeactDate'].",".$ass['res_PlRetDate'].",".$ass['res_CCC_ParentName'].",".$ass['res_CCC_GrandparentName'].",".$ass['res_GrpCustod'].",".$ass['res_CostCtr'].",".$ass['res_WBSElem'].",".$ass['res_Fund'].",".$ass['res_RspCCtr'].",".$ass['res_CoCd'].",".$ass['res_PlateNo'].",".$ass['res_Vendor'].",".$ass['res_Mfr'].",".$ass['res_UseNo'].",".$ass['flagTemplate']."); ";
+               //  echo "<br><br>".$sql_save;
                mysqli_multi_query($con,$sql_save);
           }
 
@@ -345,8 +345,21 @@ echo $date_disp;
              $rc_orig              = $row["rc_orig"];
              $rc_orig_complete     = $row["rc_orig_complete"];
              $rc_extras            = $row["rc_extras"];
+     }}
+
+
+
+
+     
+     $sql = "SELECT COUNT(*) AS rc_totalSent FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id AND flagTemplate IS NULL ";
+     $result = $con->query($sql);
+     if ($result->num_rows > 0) {
+         while($row = $result->fetch_assoc()) {
              $rc_totalSent         = $row["rc_totalSent"];
      }}
+
+
+
 
      if ($stk_type=='stocktake'){
           $sql = "SELECT *  FROM smartdb.sm14_ass WHERE stkm_id = $stkm_id AND delete_date IS NULL ;";
@@ -372,21 +385,6 @@ echo $date_disp;
              $smm_create_user    = $row["active_profile_id"];
      }}
      $smm_create_date = $mydate['year']."-".$month_disp."-".$day_disp;
-
-     $sql = " SELECT 
-                    sum(CASE WHEN storage_id IS NOT NULL THEN 1 ELSE 0 END) AS rowcount_original,
-                    sum(CASE WHEN first_found_flag = 1 THEN 1 ELSE 0 END) AS rowcount_firstfound,
-                    sum(CASE WHEN res_completed = 1 THEN 1 ELSE 0 END) AS rowcount_completed,
-                    sum(CASE WHEN rr_id IS NOT NULL THEN 1 ELSE 0 END) AS rowcount_other
-               FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id AND delete_date IS NULL";
-     $result2 = $con->query($sql);
-     if ($result2->num_rows > 0) {
-       while($row2 = $result2->fetch_assoc()) {
-           $rowcount_original      = $row2["rc_orig"];
-           $rowcount_firstfound    = $row2["rowcount_firstfound"];
-           $rowcount_completed     = $row2["rowcount_completed"];
-           $rowcount_other         = $row2["rowcount_other"];
-     }}
 
      $response = array();
      $response['import']['type']                  = $stk_type;
@@ -633,7 +631,7 @@ echo $date_disp;
      $cherry=0;
      $contents = "";
      $header   = "<html><body><table border='1'><tr>";
-     $sql = "SELECT *  FROM smartdb.sm14_ass WHERE stkm_id = $stkm_id LIMIT 100;";
+     $sql = "SELECT *  FROM smartdb.sm14_ass WHERE stkm_id = $stkm_id;";
      $arr_asset = array();
      $result = $con->query($sql);
      if ($result->num_rows > 0) {
@@ -894,20 +892,14 @@ echo $date_disp;
      $rr_id    = $_GET["rr_id"];
      $stkm_id  = $_GET["stkm_id"];
 
-     $sql = "SELECT * FROM smartdb.sm12_rwr WHERE rr_id=$rr_id;";
-     $result = $con->query($sql);
-     if ($result->num_rows > 0) {
-          while($row = $result->fetch_assoc()) {
-               $Asset         = $row["Asset"];
-               $AssetDesc1    = $row["AssetDesc1"];
-               $Class         = $row["Class"];
-               $ParentName    = $row["ParentName"];
-     }}
-
      $create_user = "";
      $fingerprint = TIME();
-     $sql_save = "INSERT INTO smartdb.sm14_ass (stkm_id, Asset, AssetDesc1, rr_id, genesis_cat, res_create_date, res_create_user, res_reason_code, res_completed, Class, res_comment, fingerprint, stk_include) VALUES ('$stkm_id','$Asset','$AssetDesc1','$rr_id','Added from RR',NOW(),'$create_user','AF20',1,'$Class','Owner parent name: $ParentName', '$fingerprint', 1); ";
-     mysqli_multi_query($con,$sql_save);
+
+     $sql = " INSERT INTO smartdb.sm14_ass (create_date, create_user,
+     stkm_id, Asset, AssetDesc1, rr_id, genesis_cat, res_create_date, res_create_user, res_reason_code, res_completed, Class, res_comment, fingerprint, stk_include, res_AssetDesc1, res_Class)
+     SELECT Now(), '$create_user', $stkm_id, Asset, AssetDesc1, rr_id, 'Added from RR', Now(), '$create_user', 'AF20', 1, Class, ParentName, '$fingerprint', 1,  AssetDesc1, Class  FROM smartdb.sm12_rwr WHERE rr_id=$rr_id;";
+     // echo $sql;
+     mysqli_multi_query($con,$sql);
 
      $sql = "SELECT MAX(ass_id) AS ass_id FROM smartdb.sm14_ass;";
      // echo "<br><br>".$sql;
@@ -918,12 +910,9 @@ echo $date_disp;
      }}
 
      $sql_save = "UPDATE smartdb.sm12_rwr SET rr_included=1 WHERE rr_id='$rr_id';";
-     echo "<br><br>".$sql_save;
+     // echo "<br><br>".$sql_save;
      mysqli_multi_query($con,$sql_save);
-
-     // $sql_save_history = "INSERT INTO ".$dbname.".smart_l10_history (create_date, create_user, history_type, history_desc, history_link) VALUES ( NOW(),'".$create_user."','Added an asset from the RR list','Ass_id ".$ass_id." was added from the RR list','102_asset.php?ass_id=".$ass_id."');";
-     // mysqli_multi_query($con,$sql_save_history);
-
+     fnCalcStats($stkm_id);
      header("Location: 11_ass.php?ass_id=".$ass_id);
 
 }elseif ($act=='get_rawremainder_asset_count') {
@@ -977,7 +966,6 @@ echo $date_disp;
                OR res_create_user LIKE '%$search_term%'
                OR res_reason_code LIKE '%$search_term%'
                OR res_reason_code_desc LIKE '%$search_term%'
-               OR res_impairment_completed LIKE '%$search_term%'
                OR res_completed LIKE '%$search_term%'
                OR res_comment LIKE '%$search_term%'
                OR AssetDesc1 LIKE '%$search_term%'
@@ -1817,6 +1805,7 @@ function fnCalcStats($stkm_id){
 
      $sql_rc_extras = "SELECT SUM(CASE WHEN  first_found_flag=1 AND flagTemplate IS NULL THEN 1 WHEN rr_id IS NOT NULL AND flagTemplate IS NULL THEN 1 ELSE 0 END) AS rc_extras FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id";
 
+
      $sql_save = "UPDATE smartdb.sm13_stk SET 
           rc_orig=($sql_rc_orig),
           rc_orig_complete=($sql_rc_orig_complete),
@@ -1886,8 +1875,7 @@ function fnInitiateDatabase(){
 
 
      $log .= "<br>"."creating $dbname.sm14_ass ";
-     $sql_save = "
-               CREATE TABLE `$dbname`.`sm14_ass` (
+     $sql_save = "CREATE TABLE `$dbname`.`sm14_ass` (
                `ass_id` int(11) NOT NULL AUTO_INCREMENT,
                `create_date` datetime DEFAULT NULL,
                `create_user` varchar(255) DEFAULT NULL,
@@ -1905,12 +1893,10 @@ function fnInitiateDatabase(){
                `rr_id` int(11) DEFAULT NULL,
                `fingerprint` varchar(255) DEFAULT NULL,
 
-
                `res_create_date` datetime DEFAULT NULL,
                `res_create_user` varchar(255) DEFAULT NULL,
                `res_reason_code` varchar(255) DEFAULT NULL,
                `res_reason_code_desc` varchar(255) DEFAULT NULL,
-               `res_impairment_completed` int(1) DEFAULT NULL,
                `res_completed` int(1) DEFAULT NULL,
                `res_comment` varchar(255) DEFAULT NULL,
 
@@ -1994,6 +1980,7 @@ function fnInitiateDatabase(){
                `res_UseNo` varchar(255) DEFAULT NULL,
 
                `flagTemplate` int(11) DEFAULT NULL,
+
                PRIMARY KEY (`ass_id`),
                UNIQUE KEY `ass_id_UNIQUE` (`ass_id`)
                ) ENGINE=InnoDB DEFAULT CHARSET=latin1;";

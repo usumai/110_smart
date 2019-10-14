@@ -40,8 +40,8 @@ function fnMakeIndexTable(sys){
     let stks = sys["stks"]
     for (let stk in stks){
         btnArchive = "<button type='button' class='btn btn-sm btn-outline-dark float-right btnArchive' value='"+stks[stk]["stkm_id"]+"'>Archive</button>"
-        btnExport = "<a class='btn btn-sm btn-outline-dark float-right' href='05_action.php?act=get_export_stk&stkm_id=$stkm_id'>Export</a>"
-        btnExcel = "<a class='btn btn-sm btn-outline-dark float-right' href='05_action.php?act=get_excel&stkm_id=$stkm_id'>Excel</a>"
+        btnExport = "<a class='btn btn-sm btn-outline-dark float-right' href='05_action.php?act=get_export_stk&stkm_id="+stks[stk]["stkm_id"]+"'>Export</a>"
+        btnExcel = "<a class='btn btn-sm btn-outline-dark float-right' href='05_action.php?act=get_excel&stkm_id="+stks[stk]["stkm_id"]+"'>Excel</a>"
         let row = eval("fnRB_"+stks[stk]["stk_type"]+"(stks[stk], sys)");
         $("#tbl_stk tbody").append(row);
     }

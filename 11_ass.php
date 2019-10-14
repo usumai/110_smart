@@ -364,6 +364,10 @@ $( function() {
                 $("#btnTemplate").show();
                 $(".btnClear").hide();
                 $(".btnDeleteFF").show();
+            }else if(res_reason_code=="AF20"){
+                $(".btnClear").hide();
+                $(".btnDeleteFF").show();
+                $("#tags").focus();
             }else if(res_reason_code=="ND10"){
                 $("#tags").focus();
             }
