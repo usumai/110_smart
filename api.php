@@ -407,15 +407,16 @@ function checkExtrasFinished($BIN_CODE){
 
 
 
+
 function fnCalcStats($stkm_id){
      global $con;
 
+     $sql_rc_orig = "SELECT SUM(CASE WHEN storage_id IS NOT NULL AND flagTemplate IS NULL THEN 1 ELSE 0 END) AS rc_orig FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id AND delete_date IS NULL ";
 
-     $sql_rc_orig = "SELECT SUM(CASE WHEN storage_id IS NOT NULL AND flagTemplate IS NULL THEN 1 ELSE 0 END) AS rc_orig FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id";
+     $sql_rc_orig_complete = "SELECT SUM(CASE WHEN storage_id IS NOT NULL AND flagTemplate IS NULL  AND res_reason_code IS NOT NULL THEN 1 ELSE 0 END) AS rc_orig_complete FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id AND delete_date IS NULL ";
 
-     $sql_rc_orig_complete = "SELECT SUM(CASE WHEN storage_id IS NOT NULL AND flagTemplate IS NULL  AND res_reason_code IS NOT NULL THEN 1 ELSE 0 END) AS rc_orig_complete FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id";
+     $sql_rc_extras = "SELECT SUM(CASE WHEN  first_found_flag=1 AND flagTemplate IS NULL THEN 1 WHEN rr_id IS NOT NULL AND flagTemplate IS NULL THEN 1 ELSE 0 END) AS rc_extras FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id AND delete_date IS NULL ";
 
-     $sql_rc_extras = "SELECT SUM(CASE WHEN  first_found_flag=1 AND flagTemplate IS NULL THEN 1 WHEN rr_id IS NOT NULL AND flagTemplate IS NULL THEN 1 ELSE 0 END) AS rc_extras FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id";
 
      $sql_save = "UPDATE smartdb.sm13_stk SET 
           rc_orig=($sql_rc_orig),

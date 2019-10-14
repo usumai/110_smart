@@ -381,6 +381,7 @@ $( function() {
             $(".rc_sectionERR").show();
         }else{//his asset has not been assessed
             $(".txy").prop('disabled', true);
+            $("#ta_comment").prop('disabled', false);
             // $(".txy").css("background-color","#e9ecef")
             $(".rcCat").show();
             $("#areaInputs").show();
