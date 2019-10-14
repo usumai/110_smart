@@ -63,11 +63,15 @@ function fnSetMenu(sys){
     btnImages           = "<a class='dropdown-item' href='05_action.php?act=sys_open_image_folder'>Image folder</a>"
     btnArchives         = "<a class='dropdown-item' href='06_admin.php'>Archived Stocktakes</a>"
     btnReset            = "<button type='button' class='dropdown-item btn btn-danger' data-toggle='modal' data-target='#modal_confirm_reset'>Reset all data</button>"
+    
     btnInverColor       = "<a class='dropdown-item' href='05_action.php?act=save_invertcolors'>Invert Colour Scheme</a>"
     btnCreateTemplate   = "<a class='dropdown-item' href='05_action.php?act=save_createtemplatefile'>Create template file</a>"
     btnBackups          = "<a class='dropdown-item' href='19_toggle.php'>Toggle primary/backup</a>"
     // <?=$area_rr?>
-
+    
+    menuRR  = "<div class='dropdown-divider'></div><h6 class='dropdown-header'>Raw Remainder</h6><span class='dropdown-item'>Assets loaded: "+sys["sett"][0]["rr_count"]+"</span>"
+    console.log("sys")
+    console.log(sys)
     helpContents=btnArchives+btnReset+btnInverColor
     btnVAction  = "<div id='areaVersionAction'><button type='button' class='dropdown-item btn' id='btnCheckForUpdates'>Check for updates</button></div>"
     styleUpdateAvailable =""
@@ -76,6 +80,8 @@ function fnSetMenu(sys){
         styleUpdateAvailable = " text-danger "
     }
     menuUpdate  = "<div class='dropdown-divider'></div><h6 class='dropdown-header'>Software version<span class='float-right'>v"+sys["sett"][0]["versionLocal"]+"</span></h6>"+btnVAction
+
+
     menuAdd = ""
     $("#menuSearch").hide();
     if(system_stk_type=="stocktake"){
@@ -91,7 +97,7 @@ function fnSetMenu(sys){
         $(".initiateBTN").html("");
     }
 
-    menuHelp    = "<a class='nav-link dropdown-toggle "+styleUpdateAvailable+"' href='#'data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='headingHelp'>Help</a><div class='dropdown-menu' aria-labelledby='dropdown01' id='dropdownHelp' >"+helpContents+menuUpdate+"</div>"
+    menuHelp    = "<a class='nav-link dropdown-toggle "+styleUpdateAvailable+"' href='#'data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='headingHelp'>Help</a><div class='dropdown-menu' aria-labelledby='dropdown01' id='dropdownHelp' >"+helpContents+menuRR+menuUpdate+"</div>"
     $("#menuHelp").html(menuHelp);
     $("#menuAdd").html(menuAdd);
 }
