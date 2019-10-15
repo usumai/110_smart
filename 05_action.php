@@ -5,7 +5,7 @@ if (isset($_POST["act"])) {
 	$act = $_GET["act"];
 }
 $exportFileVersion=1;
-$this_version_no  = 5;
+$this_version_no  = 6;
 $date_version_published = "2019-10-03 00:00:00";
 // Steps for relesing a new version:
 // 1. Update the version info above with version number one more than current
@@ -30,7 +30,7 @@ if ($act=='sys_pull_master') {
 
      mysqli_multi_query($con,$sql_save);
      
-	header("Location: 05_action.php?act=sys_initialise");
+	header("Location: 05_action.php?act=sys_reset_data");
 
 }elseif ($act=='sys_open_image_folder') {
     // $output  = shell_exec('cd/'); 
