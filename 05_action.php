@@ -1760,13 +1760,13 @@ function runSql($stmt){
 }
 
 
-function fnAddHist($history_type, $history_desc){
-     global $current_user;
-     $history_type = cleanvalue($history_type);
-     $history_desc = cleanvalue($history_desc);
-     $sql = "INSERT INTO smartdb.sm17_history (create_date, create_user, history_type, history_desc) VALUES ( NOW(),'$current_user','$history_type','$history_desc');";
-     runSql($sql);
-}
+// function fnAddHist($history_type, $history_desc){
+//      global $current_user;
+//      $history_type = cleanvalue($history_type);
+//      $history_desc = cleanvalue($history_desc);
+//      $sql = "INSERT INTO smartdb.sm17_history (create_date, create_user, history_type, history_desc) VALUES ( NOW(),'$current_user','$history_type','$history_desc');";
+//      runSql($sql);
+// }
 
 
 function cleanvalue($fieldvalue) {
