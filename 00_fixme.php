@@ -22,6 +22,6 @@ $output .= shell_exec($addr_git.' pull https://github.com/usumai/110_smart.git')
 echo "<pre>$output</pre>";
 
 
-// header("Location: index.php");
+header("Location: index.php");
 
 ?>
