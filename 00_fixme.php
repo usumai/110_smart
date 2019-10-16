@@ -1,4 +1,16 @@
 <?php
+
+
+echo "<pre>Establishing database connection</pre>";
+$con = new mysqli($servername, $username, $password);
+// Check connection
+if ($con->connect_error) {
+    die("Connection failed: " . $con->connect_error);
+} 
+echo "<pre>Dropping database</pre>";
+$sql_save = "DROP DATABASE $dbname;";
+mysqli_multi_query($con,$sql_save); 
+
 $addr_git= ' "\Program Files\Git\bin\git"  ';
 $output  = shell_exec($addr_git.' init 2>&1'); 
 $output .= shell_exec($addr_git.' clean  -d  -f .');
