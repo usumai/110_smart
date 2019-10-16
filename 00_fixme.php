@@ -1,9 +1,9 @@
 <?php
 
 
-$hostname = "localhost";
-$username = "root";
-$password = "";
+$servername = "";
+$username   = "root";
+$password   = "";
 echo "<pre>Establishing database connection</pre>";
 $con = new mysqli($servername, $username, $password);
 // Check connection
