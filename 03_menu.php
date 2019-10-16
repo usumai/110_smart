@@ -41,7 +41,7 @@ $(function(){
     $(document).on('click', '.btnInitTemplate', function(){ 
 		let ass_id = $(this).val();
 		$("#ass_id").val(ass_id);
-		console.log(ass_id)
+		// console.log(ass_id)
 	})
 	
     $(document).on('click', '#btnCheckForUpdates', function(e){ 
@@ -50,7 +50,7 @@ $(function(){
 			$('#dropdownHelp').dropdown('toggle');
 		}
 		$('#areaVersionAction').html("<span class='dropdown-item text-warning'>Checking server version<br><div class='spinner-border text-center' role='status'><span class='sr-only'>Loading...</span></div></span>");
-		let nextAction = fnDo("save_check_version","CheckUpdates",1)
+		let nextAction = fnDo("save_check_version","CheckUpdates",0)
     })
 
     $( "#tags" ).autocomplete({
