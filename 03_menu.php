@@ -108,7 +108,7 @@ $(function(){
                 <li class="nav-item dropdown" id='menuHelp'></li>
                 <!-- <li class="nav-item dropdown" id='basic'><a href='00_status.html' class='nav-link text-secondary'>Fix</a></li> -->
             </ul>
-            <span class="nav-item dropdown" id='basic'><a href='00_status.html' class='nav-link text-light'>Fix</a></span>
+            <!-- <span class="nav-item dropdown" id='basic'><a href='00_status.html' class='nav-link text-light'>Reset</a></span> -->
             <span class='initiateBTN'></span>
         </div>
     </nav>
