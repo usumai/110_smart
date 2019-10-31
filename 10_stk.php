@@ -3,7 +3,7 @@
 <?php include "03_menu.php"; ?>
 <?php
 
-$sql = "SELECT  COUNT(*) as count_total, SUM(CASE WHEN res_reason_code IS NOT NULL THEN 1 ELSE 0 END) AS count_complete  FROM smartdb.sm14_ass WHERE stk_include = 1 AND delete_date IS NULL;";
+$sql = "SELECT  COUNT(*) as count_total, SUM(CASE WHEN res_reason_code IS NOT NULL THEN 1 ELSE 0 END) AS count_complete  FROM smartdb.sm14_ass WHERE stk_include = 1 AND delete_date IS NULL AND flagTemplate IS NULL;";
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
@@ -111,7 +111,7 @@ $(document).ready(function() {
         </thead>
         <tbody>
         <?php
-        $sql = "    SELECT ass_id, Asset, Subnumber, res_Class, res_Location, res_Room, res_AssetDesc1, res_AssetDesc2, res_InventNo, res_SNo, res_CurrentNBV, res_reason_code FROM smartdb.sm14_ass WHERE stk_include=1 AND delete_date IS NULL";
+        $sql = "    SELECT ass_id, Asset, Subnumber, res_Class, res_Location, res_Room, res_AssetDesc1, res_AssetDesc2, res_InventNo, res_SNo, res_CurrentNBV, res_reason_code FROM smartdb.sm14_ass WHERE stk_include=1 AND delete_date IS NULL AND flagTemplate IS NULL";
         // $sql .= " LIMIT 500; ";   
         $result = $con->query($sql);
         if ($result->num_rows > 0) {
