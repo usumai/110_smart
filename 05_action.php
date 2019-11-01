@@ -387,8 +387,9 @@ echo $date_disp;
      }}
 
 
-     $stk_name_disp = substr($stk_name, 30);
+     $stk_name_disp = substr($stk_name, 0, 30);
      $txt_file_link = "SMARTm_".$date_disp."_$stk_name_disp.json";
+     // $txt_file_link = "$stk_name_disp.json";
      $fp = fopen($txt_file_link, 'w');
 
      $sql = "SELECT * FROM smartdb.sm10_set;";
