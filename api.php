@@ -177,7 +177,12 @@ if ($act=='get_system'){
      // $fieldName = $fieldName=="res_comment" ? $fieldName : "res_".$fieldName;
      // $fieldValue = $fieldValue=="##NULL##" ? "NULL" : "'".$fieldValue."'";
      // $fieldValue = strtoupper($fieldValue);
-     $sql = "UPDATE smartdb.sm14_ass SET $fieldName='$fieldValue' WHERE ass_id = $ass_id;";
+     $fingerprint        = time();
+     $sqlUpdateFingerprint='';
+     if ($fieldName=="res_reason_code"){ 
+          $sqlUpdateFingerprint = ", fingerprint=$fingerprint";
+     }
+     $sql = "UPDATE smartdb.sm14_ass SET $fieldName='$fieldValue' $sqlUpdateFingerprint WHERE ass_id = $ass_id;";
      // echo $sql;
      runSql($sql);
 

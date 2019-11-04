@@ -5,8 +5,8 @@ if (isset($_POST["act"])) {
 	$act = $_GET["act"];
 }
 // $exportFileVersion=7;
-$this_version_no  = 8;
-$date_version_published = "2019-10-31 00:00:00";
+$this_version_no  = 9;
+$date_version_published = "2019-11-04 00:00:00";
 // Steps for relesing a new version:
 // 1. Update the version info above with version number one more than current
 // 2. Update the 08_version.json as per above details
@@ -107,7 +107,19 @@ if ($act=='sys_pull_master') {
      mysqli_multi_query($con,$sql_save);
      header("Location: ".$_SERVER['HTTP_REFERER']);
 
-
+}elseif ($act=='get_check_merge_criteria') {
+     $sql = "SELECT COUNT(DISTINCT stk_id) as CountDistinctStk, COUNT(*) AS CountActiveStks FROM smartdb.sm13_stk WHERE stk_include = 1";
+     $result = $con->query($sql);
+     if ($result->num_rows > 0) {
+          while($row = $result->fetch_assoc()) {
+               $CountDistinctStk   = $row["CountDistinctStk"];
+               $CountActiveStks    = $row["CountActiveStks"];
+     }}
+     $mergeEnagbled=0;
+     if ($CountDistinctStk==1&&$CountActiveStks==2){
+          $mergeEnagbled=1;
+     }
+     echo $mergeEnagbled;
 
 }elseif ($act=='save_stk_toggle') {
      $stkm_id = $_GET["stkm_id"];
@@ -1424,33 +1436,17 @@ echo $date_disp;
                if ($cherry==0){
                     $cherry=1;
                     $stkm_id_one    = $row["stkm_id"];
-                    $journal_text_a = $row["journal_text"];
                }else{
                     $stkm_id_two    = $row["stkm_id"];
-                    $journal_text_b = $row["journal_text"];
                }
                $stk_id             = $row["stk_id"];
                $stk_name           = $row["stk_name"];
                $dpn_extract_date   = $row["dpn_extract_date"];
-               $rowcount_original  = $row["rowcount_original"];
                $stk_type           = $row["stk_type"];
      }}
 
-     if ($journal_text_a==$journal_text_b){
-          $journal_text_m = $journal_text_a;
-     }elseif(strpos($journal_text_a, $journal_text_b) !== false){
-          // Check if string B is in string A
-          $journal_text_m = $journal_text_a;
-     }elseif(strpos($journal_text_b, $journal_text_a) !== false){
-          // Check if string A is in string B
-          $journal_text_m = $journal_text_b;
-     }else{
-          // Combine both together
-          $journal_text_m = $journal_text_a.$journal_text_b;
-     }
-
-     $sql = "  INSERT INTO smartdb.sm13_stk (stk_id, stk_name,dpn_extract_date,rowcount_original,stk_type,journal_text)
-     VALUES ('$stk_id','MERGE: $stk_name','$dpn_extract_date','$rowcount_original','$stk_type','$journal_text_m')";
+     $sql = "  INSERT INTO smartdb.sm13_stk (stk_id, stk_name,dpn_extract_date,stk_type)
+     VALUES ('$stk_id','MERGE: $stk_name','$dpn_extract_date','$stk_type')";
      // echo "<br><br><br>$sql";
      runSql($sql);
 
@@ -1654,25 +1650,58 @@ echo $date_disp;
 
           $sql_allgood        = "$sql_a UNION $sql_b UNION $sql_c UNION $sql_d UNION $sql_e UNION $sql_f UNION $sql_g ";
           $help_log.= "<br><br><br><b>sql_allgood</b>$sql_allgood";
-          // $sql_allgood_disp   = "$sql_a <br><br> $sql_b <br><br> $sql_c <br><br> $sql_d <br><br> $sql_e <br><br> $sql_f <br><br> $sql_g ";
+
           $sql_needscomparison= $sql_h;
           $help_log.= "<br><br><br><b>sql_needscomparison</b><br>$sql_h";
-          echo $help_log;
-          // echo "<br><br><br>$sql_allgood_disp<br><br> $sql_h ";
-          // echo "<br><br><br>$sql_allgood";
 
-          $sql = "  INSERT INTO smartdb.sm14_ass (create_date, create_user, delete_date, delete_user, stkm_id, storage_id, stk_include, Asset, Subnumber, genesis_cat, first_found_flag, rr_id, fingerprint, res_create_date, res_create_user, res_reason_code, res_reason_code_desc, res_impairment_completed, res_completed, res_comment, AssetDesc1, AssetDesc2, AssetMainNoText, Class, assetType, Inventory, Quantity, SNo, InventNo, accNo, Location, Room, State, latitude, longitude, CurrentNBV, AcqValue, OrigValue, ScrapVal, ValMethod, RevOdep, CapDate, LastInv, DeactDate, PlRetDate, CCC_ParentName, CCC_GrandparentName, GrpCustod, CostCtr, WBSElem, Fund, RspCCtr, CoCd, PlateNo, Vendor, Mfr, UseNo, res_AssetDesc1, res_AssetDesc2, res_AssetMainNoText, res_Class, res_assetType, res_Inventory, res_Quantity, res_SNo, res_InventNo, res_accNo, res_Location, res_Room, res_State, res_latitude, res_longitude, res_CurrentNBV, res_AcqValue, res_OrigValue, res_ScrapVal, res_ValMethod, res_RevOdep, res_CapDate, res_LastInv, res_DeactDate, res_PlRetDate, res_CCC_ParentName, res_CCC_GrandparentName, res_GrpCustod, res_CostCtr, res_WBSElem, res_Fund, res_RspCCtr, res_CoCd, res_PlateNo, res_Vendor, res_Mfr, res_UseNo)
-          SELECT create_date, create_user, delete_date, delete_user, $new_stkm_id, storage_id, 0, Asset, Subnumber, genesis_cat, first_found_flag, rr_id, fingerprint, res_create_date, res_create_user, res_reason_code, res_reason_code_desc, res_impairment_completed, res_completed, res_comment, AssetDesc1, AssetDesc2, AssetMainNoText, Class, assetType, Inventory, Quantity, SNo, InventNo, accNo, Location, Room, State, latitude, longitude, CurrentNBV, AcqValue, OrigValue, ScrapVal, ValMethod, RevOdep, CapDate, LastInv, DeactDate, PlRetDate, CCC_ParentName, CCC_GrandparentName, GrpCustod, CostCtr, WBSElem, Fund, RspCCtr, CoCd, PlateNo, Vendor, Mfr, UseNo, res_AssetDesc1, res_AssetDesc2, res_AssetMainNoText, res_Class, res_assetType, res_Inventory, res_Quantity, res_SNo, res_InventNo, res_accNo, res_Location, res_Room, res_State, res_latitude, res_longitude, res_CurrentNBV, res_AcqValue, res_OrigValue, res_ScrapVal, res_ValMethod, res_RevOdep, res_CapDate, res_LastInv, res_DeactDate, res_PlRetDate, res_CCC_ParentName, res_CCC_GrandparentName, res_GrpCustod, res_CostCtr, res_WBSElem, res_Fund, res_RspCCtr, res_CoCd, res_PlateNo, res_Vendor, res_Mfr, res_UseNo
+          $sql = "  INSERT INTO smartdb.sm14_ass (create_date, create_user, delete_date, delete_user, stkm_id, storage_id, stk_include, Asset, Subnumber, genesis_cat, first_found_flag, rr_id, fingerprint, res_create_date, res_create_user, res_reason_code, res_reason_code_desc, res_comment, AssetDesc1, AssetDesc2, AssetMainNoText, Class, assetType, Inventory, Quantity, SNo, InventNo, accNo, Location, Room, State, latitude, longitude, CurrentNBV, AcqValue, OrigValue, ScrapVal, ValMethod, RevOdep, CapDate, LastInv, DeactDate, PlRetDate, CCC_ParentName, CCC_GrandparentName, GrpCustod, CostCtr, WBSElem, Fund, RspCCtr, CoCd, PlateNo, Vendor, Mfr, UseNo, res_AssetDesc1, res_AssetDesc2, res_AssetMainNoText, res_Class, res_assetType, res_Inventory, res_Quantity, res_SNo, res_InventNo, res_accNo, res_Location, res_Room, res_State, res_latitude, res_longitude, res_CurrentNBV, res_AcqValue, res_OrigValue, res_ScrapVal, res_ValMethod, res_RevOdep, res_CapDate, res_LastInv, res_DeactDate, res_PlRetDate, res_CCC_ParentName, res_CCC_GrandparentName, res_GrpCustod, res_CostCtr, res_WBSElem, res_Fund, res_RspCCtr, res_CoCd, res_PlateNo, res_Vendor, res_Mfr, res_UseNo)
+          SELECT create_date, create_user, delete_date, delete_user, $new_stkm_id, storage_id, 0, Asset, Subnumber, genesis_cat, first_found_flag, rr_id, fingerprint, res_create_date, res_create_user, res_reason_code, res_reason_code_desc, res_comment, AssetDesc1, AssetDesc2, AssetMainNoText, Class, assetType, Inventory, Quantity, SNo, InventNo, accNo, Location, Room, State, latitude, longitude, CurrentNBV, AcqValue, OrigValue, ScrapVal, ValMethod, RevOdep, CapDate, LastInv, DeactDate, PlRetDate, CCC_ParentName, CCC_GrandparentName, GrpCustod, CostCtr, WBSElem, Fund, RspCCtr, CoCd, PlateNo, Vendor, Mfr, UseNo, res_AssetDesc1, res_AssetDesc2, res_AssetMainNoText, res_Class, res_assetType, res_Inventory, res_Quantity, res_SNo, res_InventNo, res_accNo, res_Location, res_Room, res_State, res_latitude, res_longitude, res_CurrentNBV, res_AcqValue, res_OrigValue, res_ScrapVal, res_ValMethod, res_RevOdep, res_CapDate, res_LastInv, res_DeactDate, res_PlRetDate, res_CCC_ParentName, res_CCC_GrandparentName, res_GrpCustod, res_CostCtr, res_WBSElem, res_Fund, res_RspCCtr, res_CoCd, res_PlateNo, res_Vendor, res_Mfr, res_UseNo
           FROM smartdb.sm14_ass
           WHERE ass_id IN (SELECT ass_id FROM ($sql_allgood) AS vt_merge_allgood);";
-          // echo "<br><br><br>$sql";
+          $help_log.= "<br><br><br><b>Insert all good</b><br>$sql";
           runSql($sql);
 
 
           $sql = "  INSERT INTO smartdb.sm20_quarantine (stkm_id, auto_storageID_one, auto_storageID_two)
           SELECT $new_stkm_id, asID1, asID2 FROM ($sql_needscomparison) AS vtCompare;";
-          // echo "<br><br><br>$sql";
+          $help_log.= "<br><br><br><b>Insert needs comparison into quarantine</b><br>$sql";
           runSql($sql);
+
+          
+
+          // Debugger ####################
+          $sql = "SELECT COUNT(*) AS sql_a FROM ($sql_a) AS vtTable ";
+          echo $sql;
+          $result = $con->query($sql);
+          if ($result->num_rows > 0) {
+          while($row = $result->fetch_assoc()) {    
+               $sql_a_res    = $row['sql_a'];  
+               // $sql_b_res    = $row['sql_b'];  
+               // $sql_c_res    = $row['sql_c'];  
+               // $sql_d_res    = $row['sql_d'];  
+               // $sql_e_res    = $row['sql_e'];  
+               // $sql_f_res    = $row['sql_f'];  
+          }}
+          $dt  ="<table>";
+          $dt .="<tr><td>Storage match</td><td>".$sql_a_res."</td></tr>";
+          // $dt .="<tr><td>Storage result - only STK1</td><td>".$sql_b_res."</td></tr>";
+          // $dt .="<tr><td>Storage result - only STK2</td><td>".$sql_c_res."</td></tr>";
+          // $dt .="<tr><td>FF match</td><td>".$sql_d_res."</td></tr>";
+          // $dt .="<tr><td>FF stk1</td><td>".$sql_e_res."</td></tr>";
+          // $dt .="<tr><td>FF stk2</td><td>".$sql_f_res."</td></tr>";
+          $dt .="</table>";
+
+
+          // echo $dt;
+
+
+
+
+
+
+
+
+          // echo $help_log;`
      }
 
 
@@ -1693,7 +1722,7 @@ echo $date_disp;
      // echo "<br><br><br>$sql";
      runSql($sql);
 
-     // header("Location: 20_merge.php?stkm_id=$new_stkm_id");
+     header("Location: 20_merge.php?stkm_id=$new_stkm_id");
 
 }elseif ($act=='save_merge_select') {
      $stkm_id                 = $_GET["stkm_id"];

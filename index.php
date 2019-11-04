@@ -17,6 +17,7 @@
 
 $(function() {
     fnDo("get_system","MakeIndexTable",0)
+    fn_CheckMergeCriteria()
     
     $(document).on('click', '.btnArchive', function(){ 
         let stkm_id = $(this).val();
@@ -25,6 +26,7 @@ $(function() {
             if(data=="success"){
                 $("#row"+stkm_id).hide();
             }
+            fn_CheckMergeCriteria()
         });
     })
 
@@ -42,8 +44,21 @@ $(function() {
             fnDo("get_system","MakeIndexTable",0)
             fnDo("get_system","SetMenu",0)
             fnDo("get_templates","LoadTemplates",0)
+            fn_CheckMergeCriteria()
         });
     })
+
+    function fn_CheckMergeCriteria(){
+        $("#btnMerge").hide();
+        $.get("05_action.php?act=get_check_merge_criteria", function(data, status){
+            // console.log("Result:"+data)
+            if (data==1){
+                $("#btnMerge").show();
+            }else{
+            }
+        });
+    }
+    
 
     $('#area_upload_status').hide();
     $('#fileToUpload').change(function(){
@@ -104,7 +119,9 @@ $(function() {
         </thead>
         <tbody></tbody>
     </table>
-    <br><hr>
+    <a href='05_action.php?act=save_merge_initiate' id='btnMerge' class='btn btn-sm btn-outline-dark float-right'>Merge</a>
+    <br>
+    <hr>
     <form action="05_action.php" method="post" enctype="multipart/form-data" id="form_upload">
         <h5 class="card-title">Upload file</h5>
         <h6 class="card-subtitle mb-2 text-muted">Stocktake and Raw Remainder</h6>
