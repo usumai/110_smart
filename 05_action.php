@@ -5,7 +5,7 @@ if (isset($_POST["act"])) {
 	$act = $_GET["act"];
 }
 // $exportFileVersion=7;
-$this_version_no  = 9;
+$this_version_no  = 10;
 $date_version_published = "2019-11-04 00:00:00";
 // Steps for relesing a new version:
 // 1. Update the version info above with version number one more than current
@@ -1422,14 +1422,14 @@ echo $date_disp;
      header("Location: 11_ass.php?ass_id=".$new_ass_id);
 
 }elseif ($act=='save_merge_initiate') {
-     $debugMode = true;
+     $debugMode = false;
      // Ascertain what type of stocktake it is - GA or IS
      // Get details of existing stocktakes - name, counts
      // Create new stocktake
      // Add all good rows to table
      //Show user rows which need comparison
 
-     $log .= !$debugMode ? $log: "<br><br>Getting details of two stocktakes being merged";
+     $log = !$debugMode ? $log: "<br><br>Getting details of two stocktakes being merged";
      $cherry = 0;
      $sql = "SELECT * FROM smartdb.sm13_stk WHERE  stk_include = 1";
      $result = $con->query($sql);
@@ -1548,8 +1548,7 @@ echo $date_disp;
 
 
 
-          fnCalcStats($stkm_id);
-
+          $nextAddr = "Location: index.php";
 
 
      }elseif($stk_type=="stocktake"){
@@ -1667,15 +1666,31 @@ echo $date_disp;
           $log .= !$debugMode ? $log: "<br><br><br><b>Insert needs comparison into quarantine</b><br>$sql";
           
 
-          if ($debugMode){
+          if (!$debugMode){
                runSql($sql);
+          }else{
+               echo $log;
           }
-          // echo $dt;
 
 
+          $sql = "SELECT COUNT(*) AS qCount FROM smartdb.sm20_quarantine WHERE stkm_id = '$new_stkm_id'";
+          $result = $con->query($sql);
+          if ($result->num_rows > 0) {
+          while($row = $result->fetch_assoc()) {    
+               $qCount    = $row['qCount'];  
+          }}
+     
+          $qCount = (empty($qCount) ? 0 : $qCount);
+          if ($qCount>0){
+               $sql = "  UPDATE smartdb.sm13_stk SET merge_lock=1 WHERE stkm_id = $new_stkm_id;";
+               $nextAddr = "Location: 20_merge.php?stkm_id=$new_stkm_id";
+          }else{
+               $sql = "  UPDATE smartdb.sm13_stk SET merge_lock=NULL WHERE stkm_id = $new_stkm_id;";
+               $nextAddr = "Location: index.php";
+          }
 
-
-
+          
+          fnCalcStats($new_stkm_id);
 
 
 
@@ -1683,23 +1698,13 @@ echo $date_disp;
 
 
      // #########################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################
-     $sql = "SELECT COUNT(*) AS qCount FROM smartdb.sm20_quarantine WHERE stkm_id = '$new_stkm_id'";
-     $result = $con->query($sql);
-     if ($result->num_rows > 0) {
-     while($row = $result->fetch_assoc()) {    
-          $qCount    = $row['qCount'];  
-     }}
 
-     $qCount = (empty($qCount) ? 0 : $qCount);
-     if ($qCount>0){
-          $sql = "  UPDATE smartdb.sm13_stk SET merge_lock=1 WHERE stkm_id = $new_stkm_id;";
-     }else{
-          $sql = "  UPDATE smartdb.sm13_stk SET merge_lock=NULL WHERE stkm_id = $new_stkm_id;";
-     }
      // echo "<br><br><br>$sql";
-     runSql($sql);
 
-     // header("Location: 20_merge.php?stkm_id=$new_stkm_id");
+     if (!$debugMode){
+          runSql($sql);
+          header($nextAddr);
+     }
 
 }elseif ($act=='save_merge_select') {
      $stkm_id                 = $_GET["stkm_id"];
@@ -1735,14 +1740,14 @@ echo $date_disp;
           
      }elseif($stk_type=="stocktake"){
           $sub = "SELECT selected_auto_storageID FROM smartdb.sm20_quarantine WHERE stkm_id = $stkm_id";
-          $sql = "  INSERT INTO smartdb.sm14_ass (create_date, create_user, delete_date, delete_user, stkm_id, storage_id, stk_include, Asset, Subnumber, genesis_cat, first_found_flag, rr_id, fingerprint, res_create_date, res_create_user, res_reason_code, res_reason_code_desc, res_impairment_completed, res_completed, res_comment, AssetDesc1, AssetDesc2, AssetMainNoText, Class, assetType, Inventory, Quantity, SNo, InventNo, accNo, Location, Room, State, latitude, longitude, CurrentNBV, AcqValue, OrigValue, ScrapVal, ValMethod, RevOdep, CapDate, LastInv, DeactDate, PlRetDate, CCC_ParentName, CCC_GrandparentName, GrpCustod, CostCtr, WBSElem, Fund, RspCCtr, CoCd, PlateNo, Vendor, Mfr, UseNo, res_AssetDesc1, res_AssetDesc2, res_AssetMainNoText, res_Class, res_assetType, res_Inventory, res_Quantity, res_SNo, res_InventNo, res_accNo, res_Location, res_Room, res_State, res_latitude, res_longitude, res_CurrentNBV, res_AcqValue, res_OrigValue, res_ScrapVal, res_ValMethod, res_RevOdep, res_CapDate, res_LastInv, res_DeactDate, res_PlRetDate, res_CCC_ParentName, res_CCC_GrandparentName, res_GrpCustod, res_CostCtr, res_WBSElem, res_Fund, res_RspCCtr, res_CoCd, res_PlateNo, res_Vendor, res_Mfr, res_UseNo)
-          SELECT create_date, create_user, delete_date, delete_user, $stkm_id, storage_id, stk_include, Asset, Subnumber, genesis_cat, first_found_flag, rr_id, fingerprint, res_create_date, res_create_user, res_reason_code, res_reason_code_desc, res_impairment_completed, res_completed, res_comment, AssetDesc1, AssetDesc2, AssetMainNoText, Class, assetType, Inventory, Quantity, SNo, InventNo, accNo, Location, Room, State, latitude, longitude, CurrentNBV, AcqValue, OrigValue, ScrapVal, ValMethod, RevOdep, CapDate, LastInv, DeactDate, PlRetDate, CCC_ParentName, CCC_GrandparentName, GrpCustod, CostCtr, WBSElem, Fund, RspCCtr, CoCd, PlateNo, Vendor, Mfr, UseNo, res_AssetDesc1, res_AssetDesc2, res_AssetMainNoText, res_Class, res_assetType, res_Inventory, res_Quantity, res_SNo, res_InventNo, res_accNo, res_Location, res_Room, res_State, res_latitude, res_longitude, res_CurrentNBV, res_AcqValue, res_OrigValue, res_ScrapVal, res_ValMethod, res_RevOdep, res_CapDate, res_LastInv, res_DeactDate, res_PlRetDate, res_CCC_ParentName, res_CCC_GrandparentName, res_GrpCustod, res_CostCtr, res_WBSElem, res_Fund, res_RspCCtr, res_CoCd, res_PlateNo, res_Vendor, res_Mfr, res_UseNo
+          $sql = "  INSERT INTO smartdb.sm14_ass (create_date, create_user, delete_date, delete_user, stkm_id, storage_id, stk_include, Asset, Subnumber, genesis_cat, first_found_flag, rr_id, fingerprint, res_create_date, res_create_user, res_reason_code, res_reason_code_desc, res_comment, AssetDesc1, AssetDesc2, AssetMainNoText, Class, assetType, Inventory, Quantity, SNo, InventNo, accNo, Location, Room, State, latitude, longitude, CurrentNBV, AcqValue, OrigValue, ScrapVal, ValMethod, RevOdep, CapDate, LastInv, DeactDate, PlRetDate, CCC_ParentName, CCC_GrandparentName, GrpCustod, CostCtr, WBSElem, Fund, RspCCtr, CoCd, PlateNo, Vendor, Mfr, UseNo, res_AssetDesc1, res_AssetDesc2, res_AssetMainNoText, res_Class, res_assetType, res_Inventory, res_Quantity, res_SNo, res_InventNo, res_accNo, res_Location, res_Room, res_State, res_latitude, res_longitude, res_CurrentNBV, res_AcqValue, res_OrigValue, res_ScrapVal, res_ValMethod, res_RevOdep, res_CapDate, res_LastInv, res_DeactDate, res_PlRetDate, res_CCC_ParentName, res_CCC_GrandparentName, res_GrpCustod, res_CostCtr, res_WBSElem, res_Fund, res_RspCCtr, res_CoCd, res_PlateNo, res_Vendor, res_Mfr, res_UseNo)
+          SELECT create_date, create_user, delete_date, delete_user, $stkm_id, storage_id, stk_include, Asset, Subnumber, genesis_cat, first_found_flag, rr_id, fingerprint, res_create_date, res_create_user, res_reason_code, res_reason_code_desc, res_comment, AssetDesc1, AssetDesc2, AssetMainNoText, Class, assetType, Inventory, Quantity, SNo, InventNo, accNo, Location, Room, State, latitude, longitude, CurrentNBV, AcqValue, OrigValue, ScrapVal, ValMethod, RevOdep, CapDate, LastInv, DeactDate, PlRetDate, CCC_ParentName, CCC_GrandparentName, GrpCustod, CostCtr, WBSElem, Fund, RspCCtr, CoCd, PlateNo, Vendor, Mfr, UseNo, res_AssetDesc1, res_AssetDesc2, res_AssetMainNoText, res_Class, res_assetType, res_Inventory, res_Quantity, res_SNo, res_InventNo, res_accNo, res_Location, res_Room, res_State, res_latitude, res_longitude, res_CurrentNBV, res_AcqValue, res_OrigValue, res_ScrapVal, res_ValMethod, res_RevOdep, res_CapDate, res_LastInv, res_DeactDate, res_PlRetDate, res_CCC_ParentName, res_CCC_GrandparentName, res_GrpCustod, res_CostCtr, res_WBSElem, res_Fund, res_RspCCtr, res_CoCd, res_PlateNo, res_Vendor, res_Mfr, res_UseNo
           FROM smartdb.sm14_ass
           WHERE ass_id IN ($sub)";
-          fnCalcStats($stkm_id);
      }
      echo "<br><br><br>$sql";
      runSql($sql);
+     fnCalcStats($stkm_id);
 
      $sql = "  UPDATE smartdb.sm13_stk SET merge_lock=NULL WHERE stkm_id = $stkm_id;";
      runSql($sql);
