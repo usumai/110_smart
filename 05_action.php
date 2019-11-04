@@ -400,13 +400,13 @@ if ($act=='sys_pull_master') {
              $arr_asset[] = $r;
      }}
 
-echo "[$stk_name]";
+// echo "[$stk_name]";
      $stk_name_disp = substr($stk_name, 0, 30);
      // $txt_file_link = "SMARTm_$date_disp"."_$stk_id:$stk_name_disp.json";
      $stk_name_disp = str_replace(" ","_",$stk_name_disp);
      $stk_name_disp = str_replace(":","_",$stk_name_disp);
      $txt_file_link = "SMARTm_$stk_name_disp.json";
-     echo "<br>[$txt_file_link]";
+     // echo "<br>[$txt_file_link]";
      // $txt_file_link = "SMARTm.json";
      // $txt_file_link = "$stk_name_disp.json";
      $fp = fopen($txt_file_link, 'w');
