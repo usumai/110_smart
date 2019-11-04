@@ -79,7 +79,7 @@ $(function(){
     })
     .autocomplete( "instance" )._renderItem = function( ul, item ) {
       if (item.Asset == "Raw remainder results"){
-        row = "<div><b>Raw remainder count:</b>"+item.Subnumber+"</div>" 
+        row = "<div><h3>Raw remainder count:</h3>"+item.Subnumber+"</div>" 
       }else{
         row = "<div><b>"+item.Asset+"-"+item.Subnumber+"</b>:"+item.AssetDesc1+"<br>"+item.status_compl+" InventNo["+item.InventNo+"] Serial["+item.SNo+"] Location["+item.Location+""+item.Room+"]</div>"
       }

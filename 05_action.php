@@ -483,7 +483,8 @@ if ($act=='sys_pull_master') {
              $active_profile_id    = $row["active_profile_id"];
      }}
 
-     $sql = "UPDATE smartdb.sm13_stk SET smm_delete_date=NOW(),smm_delete_user='$active_profile_id' WHERE stkm_id = $stkm_id;";
+     $sql = "UPDATE smartdb.sm13_stk SET smm_delete_date=NOW(),smm_delete_user='$active_profile_id' WHERE stkm_id = $stkm_id; ";
+     $sql .= "UPDATE smartdb.sm14_ass SET stk_include=NULL WHERE stkm_id = $stkm_id; ";
      // echo $sql_save;
      echo runSql($sql);
 
@@ -976,7 +977,7 @@ if ($act=='sys_pull_master') {
      $ar = array();
 
 
-     $limitsql = "(SELECT * FROM smartdb.sm14_ass WHERE stkm_id IN (SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include = 1 )) AS vtIncludedAssets";
+     $limitsql = "(SELECT * FROM smartdb.sm14_ass WHERE stk_include=1 AND stkm_id IN (SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include = 1 )) AS vtIncludedAssets";
 
 
      $sql = "  SELECT ass_id, Asset, Subnumber, res_AssetDesc1, res_AssetDesc2, res_InventNo, res_SNo, res_Location, res_Room, res_reason_code

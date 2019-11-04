@@ -118,7 +118,7 @@ $(document).ready(function() {
             while($row = $result->fetch_assoc()) {
                 $ass_id             = $row["ass_id"];
                 $Asset              = $row["Asset"];
-                $Subnumber      = $row["Subnumber"];
+                $Subnumber          = $row["Subnumber"];
                 $res_Class          = $row["res_Class"];
                 $res_Location       = $row["res_Location"];
                 $res_Room           = $row["res_Room"];
