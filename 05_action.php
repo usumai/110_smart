@@ -971,13 +971,7 @@ echo $date_disp;
      $limitsql = "(SELECT * FROM smartdb.sm14_ass WHERE stkm_id IN (SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include = 1 )) AS vtIncludedAssets";
 
 
-     $sql = "  SELECT *, 
-               CASE WHEN res_AssetDesc1 IS NULL THEN AssetDesc1 ELSE res_AssetDesc1 END AS best_AssetDesc1,
-               CASE WHEN res_AssetDesc2 IS NULL THEN AssetDesc2 ELSE res_AssetDesc2 END AS best_AssetDesc2,
-               CASE WHEN res_InventNo IS NULL THEN InventNo ELSE res_InventNo END AS best_InventNo,
-               CASE WHEN res_SNo IS NULL THEN SNo ELSE res_SNo END AS best_SNo,
-               CASE WHEN res_Location IS NULL THEN Location ELSE res_Location END AS best_Location,
-               CASE WHEN res_Room IS NULL THEN Room ELSE res_Room END AS best_Room
+     $sql = "  SELECT ass_id, Asset, Subnumber, res_AssetDesc1, res_AssetDesc2, res_InventNo, res_SNo, res_Location, res_Room, res_reason_code
 
                FROM $limitsql
 
@@ -1076,18 +1070,17 @@ echo $date_disp;
      if ($result->num_rows > 0) {
           while($row = $result->fetch_assoc()) {
                $arr = array();
-               $arr["label"]       = $row["Asset"].'-'.$row["Subnumber"].':'.$row["AssetDesc1"];
+               $arr["label"]            = $row["Asset"].'-'.$row["Subnumber"].':'.$row["res_AssetDesc1"];
                $arr["Asset"]            = $row["Asset"];
                $arr["Subnumber"]        = $row["Subnumber"];
-               $arr["AssetDesc1"]       = $row["best_AssetDesc1"];
-               $arr["AssetDesc2"]       = $row["best_AssetDesc2"];
-               $arr["InventNo"]         = $row["best_InventNo"];
-               $arr["SNo"]              = $row["best_SNo"];
-               $arr["Location"]         = $row["best_Location"];
-               $arr["Room"]             = $row["best_Room"];
-               // $arr["res_completed"]    = $row["res_completed"];
+               $arr["AssetDesc1"]       = $row["res_AssetDesc1"];
+               $arr["AssetDesc2"]       = $row["res_AssetDesc2"];
+               $arr["InventNo"]         = $row["res_InventNo"];
+               $arr["SNo"]              = $row["res_SNo"];
+               $arr["Location"]         = $row["res_Location"];
+               $arr["Room"]             = $row["res_Room"];
 
-               if ($row["res_completed"]==1) {
+               if ($row["res_reason_code"]) {
                     $arr["status_compl"] = "<span class='octicon octicon-check text-success'></span>";
                }else{
                     $arr["status_compl"] = "<span class='octicon octicon-x text-danger' ></span>";
