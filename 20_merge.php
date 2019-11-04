@@ -32,7 +32,6 @@ if ($result->num_rows > 0) {
           $stk_id             = $row["stk_id"];
           $stk_name           = $row["stk_name"];
           $dpn_extract_date   = $row["dpn_extract_date"];
-          $rowcount_original  = $row["rowcount_original"];
           $stk_type           = $row["stk_type"];
 }}
 
@@ -175,7 +174,6 @@ if ($stk_type=="impairment"){
             $Asset              = $row['Asset'];  
             $Subnumber          = $row['Subnumber'];  
             $Class              = $row['Class'];  
-            $classDesc          = $row['classDesc'];
             $AssetDesc1         = $row['AssetDesc1']; 
             $AssetDesc2         = $row['AssetDesc2']; 
             $assetType          = $row['assetType'];   
@@ -212,7 +210,6 @@ if ($stk_type=="impairment"){
         $rws .= "<tr>";
         $rws .= "<td>$Asset - $Subnumber</td>";
         $rws .= "<td>$Class</td>";
-        $rws .= "<td>$classDesc</td>";
         $rws .= "<td>$AssetDesc1</td>";
         $rws .= "<td>$AssetDesc2</td>";
         $rws .= "<td>$assetType</td>";

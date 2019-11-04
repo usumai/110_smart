@@ -1422,12 +1422,14 @@ echo $date_disp;
      header("Location: 11_ass.php?ass_id=".$new_ass_id);
 
 }elseif ($act=='save_merge_initiate') {
+     $debugMode = true;
      // Ascertain what type of stocktake it is - GA or IS
      // Get details of existing stocktakes - name, counts
      // Create new stocktake
      // Add all good rows to table
      //Show user rows which need comparison
 
+     $log .= !$debugMode ? $log: "<br><br>Getting details of two stocktakes being merged";
      $cherry = 0;
      $sql = "SELECT * FROM smartdb.sm13_stk WHERE  stk_include = 1";
      $result = $con->query($sql);
@@ -1445,8 +1447,9 @@ echo $date_disp;
                $stk_type           = $row["stk_type"];
      }}
 
-     $sql = "  INSERT INTO smartdb.sm13_stk (stk_id, stk_name,dpn_extract_date,stk_type)
-     VALUES ('$stk_id','MERGE: $stk_name','$dpn_extract_date','$stk_type')";
+     $log .= !$debugMode ? $log: "<br><br>Creating new stocktake record";
+     $sql = "  INSERT INTO smartdb.sm13_stk (stk_id, stk_name,dpn_extract_date,stk_type, merge_lock)
+     VALUES ('$stk_id','MERGE: $stk_name','$dpn_extract_date','$stk_type', 1)";
      // echo "<br><br><br>$sql";
      runSql($sql);
 
@@ -1542,17 +1545,28 @@ echo $date_disp;
           SELECT $new_stkm_id, asID1, asID2 FROM ($sql_needscomparison) AS vtCompare;";
           // echo "<br><br><br>$sql";
           runSql($sql);
+
+
+
+          fnCalcStats($stkm_id);
+
+
+
      }elseif($stk_type=="stocktake"){
+          $log .= !$debugMode ? $log: "<br><br>This is a stocktake merge action";
           $sql1 = "(SELECT ass_id, storage_id, fingerprint FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id_one) AS vtsql1";
           $sql2 = "(SELECT ass_id, storage_id, fingerprint FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id_two) AS vtsql2";
           
+          
+          $log .= !$debugMode ? $log: "<br><br>The following are category sqls for types of merge candidates";
           $sql_a = "  SELECT vtsql1.storage_id AS stID1, vtsql1.fingerprint AS fp1, 
                          vtsql2.storage_id AS stID2, vtsql2.fingerprint AS fp2, 
                       'Storage match', vtsql1.ass_id
                       FROM $sql1, $sql2 
                       WHERE vtsql1.storage_id = vtsql2.storage_id
                       AND  vtsql1.fingerprint = vtsql2.fingerprint";
-          $help_log = "<br><br><br><b>Storage match</b><br>$sql_a";
+          $log .= !$debugMode ? $log: "<br><br><br><b>Storage match</b><br>$sql_a";
+
           $sql_b = "  SELECT vtsql1.storage_id AS stID1, vtsql1.fingerprint AS fp1, 
                          vtsql2.storage_id AS stID2, vtsql2.fingerprint AS fp2,  
                       'Storage result - only STK1', vtsql1.ass_id
@@ -1560,7 +1574,7 @@ echo $date_disp;
                       WHERE vtsql1.storage_id = vtsql2.storage_id
                       AND vtsql1.fingerprint IS NOT NULL
                       AND vtsql2.fingerprint IS NULL";
-          $help_log.= "<br><br><br><b>Storage result - only STK1</b><br>$sql_b";
+          $log .= !$debugMode ? $log: "<br><br><br><b>Storage result - only STK1</b><br>$sql_b";
           
           $sql_c = "  SELECT vtsql1.storage_id AS stID1, vtsql1.fingerprint AS fp1, 
                          vtsql2.storage_id AS stID2, vtsql2.fingerprint AS fp2,   
@@ -1569,7 +1583,7 @@ echo $date_disp;
                       WHERE vtsql1.storage_id = vtsql2.storage_id
                       AND vtsql1.fingerprint IS NULL
                       AND vtsql2.fingerprint IS NOT NULL";
-          $help_log.= "<br><br><br><b>Storage result - only STK2</b><br>$sql_c";
+          $log .= !$debugMode ? $log: "<br><br><br><b>Storage result - only STK2</b><br>$sql_c";
           
           $sql_d = "  SELECT vtsql1.storage_id AS stID1, vtsql1.fingerprint AS fp1, 
                          vtsql2.storage_id AS stID2, vtsql2.fingerprint AS fp2,  
@@ -1578,16 +1592,8 @@ echo $date_disp;
                          (SELECT ass_id, storage_id, fingerprint FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id_one AND storage_id IS NULL) AS vtsql1,
                          (SELECT ass_id, storage_id, fingerprint FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id_two AND storage_id IS NULL) AS vtsql2
                       WHERE vtsql1.fingerprint = vtsql2.fingerprint";
-          $help_log.= "<br><br><br><b>FF match</b><br>$sql_d";
-          
-          // $sql_e = "  SELECT vtsql1.storage_id AS stID1, vtsql1.fingerprint AS fp1, 
-          //                vtsql2.storage_id AS stID2, vtsql2.fingerprint AS fp2,  
-          //             'FF stk1', vtsql1.ass_id
-          //             FROM $sql1, $sql2 
-          //             WHERE vtsql1.storage_id IS NULL
-          //             AND vtsql2.storage_id IS NULL
-          //             AND vtsql1.fingerprint IS NOT NULL
-          //             AND vtsql2.fingerprint IS NULL";
+          $log .= !$debugMode ? $log: "<br><br><br><b>FF match</b><br>$sql_d";
+
           $sql_e = "     SELECT NULL AS stID1, fingerprint AS fp1, NULL AS stID2, NULL AS fp2,
           'FF stk1', ass_id
           FROM smartdb.sm14_ass 
@@ -1602,16 +1608,8 @@ echo $date_disp;
               (SELECT ass_id, storage_id, fingerprint FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id_two AND storage_id IS NULL) AS vtsql2
               WHERE vtsql1.fingerprint = vtsql2.fingerprint
           )";          
-          $help_log.= "<br><br><br><b>FF stk1</b><br>$sql_e";
+          $log .= !$debugMode ? $log: "<br><br><br><b>FF stk1</b><br>$sql_e";
           
-          // $sql_f = "  SELECT vtsql1.storage_id AS stID1, vtsql1.fingerprint AS fp1, 
-          //                vtsql2.storage_id AS stID2, vtsql2.fingerprint AS fp2,  
-          //             'FF stk2', vtsql2.ass_id
-          //             FROM $sql1, $sql2 
-          //             WHERE vtsql1.storage_id IS NULL
-          //             AND vtsql2.storage_id IS NULL
-          //             AND vtsql1.fingerprint IS NULL
-          //             AND vtsql2.fingerprint IS NOT NULL";
           $sql_f = "     SELECT NULL AS stID1, NULL AS fp1, NULL AS stID2, fingerprint AS fp2,
           'FF stk2', ass_id
           FROM smartdb.sm14_ass 
@@ -1626,7 +1624,7 @@ echo $date_disp;
               (SELECT ass_id, storage_id, fingerprint FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id_two AND storage_id IS NULL) AS vtsql2
                WHERE vtsql1.fingerprint = vtsql2.fingerprint
           )";
-          $help_log.= "<br><br><br><b>FF stk2</b><br>$sql_f";
+          $log .= !$debugMode ? $log: "<br><br><br><b>FF stk2</b><br>$sql_f";
           
           $sql_g = "  SELECT vtsql1.storage_id AS stID1, vtsql1.fingerprint AS fp1, 
                          vtsql2.storage_id AS stID2, vtsql2.fingerprint AS fp2,  
@@ -1635,7 +1633,7 @@ echo $date_disp;
                       WHERE vtsql1.storage_id = vtsql2.storage_id
                       AND vtsql1.fingerprint IS NULL
                       AND vtsql2.fingerprint IS NULL";
-          $help_log.= "<br><br><br><b>No result</b><br>$sql_g";
+          $log .= !$debugMode ? $log: "<br><br><br><b>No result</b><br>$sql_g";
           
           $sql_h = "  SELECT vtsql1.storage_id AS stID1, vtsql1.fingerprint AS fp1, 
                          vtsql2.storage_id AS stID2, vtsql2.fingerprint AS fp2,   
@@ -1645,53 +1643,33 @@ echo $date_disp;
                       AND vtsql1.fingerprint IS NOT NULL
                       AND vtsql2.fingerprint IS NOT NULL
                       AND vtsql1.fingerprint <> vtsql2.fingerprint";
-          $help_log.= "<br><br><br><b>Needs comparison</b><br>$sql_h";
+          $log .= !$debugMode ? $log: "<br><br><br><b>Needs comparison</b><br>$sql_h";
 
 
           $sql_allgood        = "$sql_a UNION $sql_b UNION $sql_c UNION $sql_d UNION $sql_e UNION $sql_f UNION $sql_g ";
-          $help_log.= "<br><br><br><b>sql_allgood</b>$sql_allgood";
+          $log .= !$debugMode ? $log: "<br><br><br><b>sql_allgood</b>$sql_allgood";
 
           $sql_needscomparison= $sql_h;
-          $help_log.= "<br><br><br><b>sql_needscomparison</b><br>$sql_h";
+          $log .= !$debugMode ? $log: "<br><br><br><b>sql_needscomparison</b><br>$sql_h";
 
           $sql = "  INSERT INTO smartdb.sm14_ass (create_date, create_user, delete_date, delete_user, stkm_id, storage_id, stk_include, Asset, Subnumber, genesis_cat, first_found_flag, rr_id, fingerprint, res_create_date, res_create_user, res_reason_code, res_reason_code_desc, res_comment, AssetDesc1, AssetDesc2, AssetMainNoText, Class, assetType, Inventory, Quantity, SNo, InventNo, accNo, Location, Room, State, latitude, longitude, CurrentNBV, AcqValue, OrigValue, ScrapVal, ValMethod, RevOdep, CapDate, LastInv, DeactDate, PlRetDate, CCC_ParentName, CCC_GrandparentName, GrpCustod, CostCtr, WBSElem, Fund, RspCCtr, CoCd, PlateNo, Vendor, Mfr, UseNo, res_AssetDesc1, res_AssetDesc2, res_AssetMainNoText, res_Class, res_assetType, res_Inventory, res_Quantity, res_SNo, res_InventNo, res_accNo, res_Location, res_Room, res_State, res_latitude, res_longitude, res_CurrentNBV, res_AcqValue, res_OrigValue, res_ScrapVal, res_ValMethod, res_RevOdep, res_CapDate, res_LastInv, res_DeactDate, res_PlRetDate, res_CCC_ParentName, res_CCC_GrandparentName, res_GrpCustod, res_CostCtr, res_WBSElem, res_Fund, res_RspCCtr, res_CoCd, res_PlateNo, res_Vendor, res_Mfr, res_UseNo)
           SELECT create_date, create_user, delete_date, delete_user, $new_stkm_id, storage_id, 0, Asset, Subnumber, genesis_cat, first_found_flag, rr_id, fingerprint, res_create_date, res_create_user, res_reason_code, res_reason_code_desc, res_comment, AssetDesc1, AssetDesc2, AssetMainNoText, Class, assetType, Inventory, Quantity, SNo, InventNo, accNo, Location, Room, State, latitude, longitude, CurrentNBV, AcqValue, OrigValue, ScrapVal, ValMethod, RevOdep, CapDate, LastInv, DeactDate, PlRetDate, CCC_ParentName, CCC_GrandparentName, GrpCustod, CostCtr, WBSElem, Fund, RspCCtr, CoCd, PlateNo, Vendor, Mfr, UseNo, res_AssetDesc1, res_AssetDesc2, res_AssetMainNoText, res_Class, res_assetType, res_Inventory, res_Quantity, res_SNo, res_InventNo, res_accNo, res_Location, res_Room, res_State, res_latitude, res_longitude, res_CurrentNBV, res_AcqValue, res_OrigValue, res_ScrapVal, res_ValMethod, res_RevOdep, res_CapDate, res_LastInv, res_DeactDate, res_PlRetDate, res_CCC_ParentName, res_CCC_GrandparentName, res_GrpCustod, res_CostCtr, res_WBSElem, res_Fund, res_RspCCtr, res_CoCd, res_PlateNo, res_Vendor, res_Mfr, res_UseNo
           FROM smartdb.sm14_ass
           WHERE ass_id IN (SELECT ass_id FROM ($sql_allgood) AS vt_merge_allgood);";
-          $help_log.= "<br><br><br><b>Insert all good</b><br>$sql";
-          runSql($sql);
+          $log .= !$debugMode ? $log: "<br><br><br><b>Insert all good</b><br>$sql";
 
+          if (!$debugMode){
+               runSql($sql);
+          }
 
           $sql = "  INSERT INTO smartdb.sm20_quarantine (stkm_id, auto_storageID_one, auto_storageID_two)
           SELECT $new_stkm_id, asID1, asID2 FROM ($sql_needscomparison) AS vtCompare;";
-          $help_log.= "<br><br><br><b>Insert needs comparison into quarantine</b><br>$sql";
-          runSql($sql);
-
+          $log .= !$debugMode ? $log: "<br><br><br><b>Insert needs comparison into quarantine</b><br>$sql";
           
 
-          // Debugger ####################
-          $sql = "SELECT COUNT(*) AS sql_a FROM ($sql_a) AS vtTable ";
-          echo $sql;
-          $result = $con->query($sql);
-          if ($result->num_rows > 0) {
-          while($row = $result->fetch_assoc()) {    
-               $sql_a_res    = $row['sql_a'];  
-               // $sql_b_res    = $row['sql_b'];  
-               // $sql_c_res    = $row['sql_c'];  
-               // $sql_d_res    = $row['sql_d'];  
-               // $sql_e_res    = $row['sql_e'];  
-               // $sql_f_res    = $row['sql_f'];  
-          }}
-          $dt  ="<table>";
-          $dt .="<tr><td>Storage match</td><td>".$sql_a_res."</td></tr>";
-          // $dt .="<tr><td>Storage result - only STK1</td><td>".$sql_b_res."</td></tr>";
-          // $dt .="<tr><td>Storage result - only STK2</td><td>".$sql_c_res."</td></tr>";
-          // $dt .="<tr><td>FF match</td><td>".$sql_d_res."</td></tr>";
-          // $dt .="<tr><td>FF stk1</td><td>".$sql_e_res."</td></tr>";
-          // $dt .="<tr><td>FF stk2</td><td>".$sql_f_res."</td></tr>";
-          $dt .="</table>";
-
-
+          if ($debugMode){
+               runSql($sql);
+          }
           // echo $dt;
 
 
@@ -1701,7 +1679,6 @@ echo $date_disp;
 
 
 
-          // echo $help_log;`
      }
 
 
@@ -1722,7 +1699,7 @@ echo $date_disp;
      // echo "<br><br><br>$sql";
      runSql($sql);
 
-     header("Location: 20_merge.php?stkm_id=$new_stkm_id");
+     // header("Location: 20_merge.php?stkm_id=$new_stkm_id");
 
 }elseif ($act=='save_merge_select') {
      $stkm_id                 = $_GET["stkm_id"];
@@ -1762,6 +1739,7 @@ echo $date_disp;
           SELECT create_date, create_user, delete_date, delete_user, $stkm_id, storage_id, stk_include, Asset, Subnumber, genesis_cat, first_found_flag, rr_id, fingerprint, res_create_date, res_create_user, res_reason_code, res_reason_code_desc, res_impairment_completed, res_completed, res_comment, AssetDesc1, AssetDesc2, AssetMainNoText, Class, assetType, Inventory, Quantity, SNo, InventNo, accNo, Location, Room, State, latitude, longitude, CurrentNBV, AcqValue, OrigValue, ScrapVal, ValMethod, RevOdep, CapDate, LastInv, DeactDate, PlRetDate, CCC_ParentName, CCC_GrandparentName, GrpCustod, CostCtr, WBSElem, Fund, RspCCtr, CoCd, PlateNo, Vendor, Mfr, UseNo, res_AssetDesc1, res_AssetDesc2, res_AssetMainNoText, res_Class, res_assetType, res_Inventory, res_Quantity, res_SNo, res_InventNo, res_accNo, res_Location, res_Room, res_State, res_latitude, res_longitude, res_CurrentNBV, res_AcqValue, res_OrigValue, res_ScrapVal, res_ValMethod, res_RevOdep, res_CapDate, res_LastInv, res_DeactDate, res_PlRetDate, res_CCC_ParentName, res_CCC_GrandparentName, res_GrpCustod, res_CostCtr, res_WBSElem, res_Fund, res_RspCCtr, res_CoCd, res_PlateNo, res_Vendor, res_Mfr, res_UseNo
           FROM smartdb.sm14_ass
           WHERE ass_id IN ($sub)";
+          fnCalcStats($stkm_id);
      }
      echo "<br><br><br>$sql";
      runSql($sql);
@@ -2208,6 +2186,7 @@ function fnInitiateDatabase(){
 
      header("Location: index.php");
 }
+
 
 
 
