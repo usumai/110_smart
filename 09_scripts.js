@@ -131,6 +131,7 @@ function fnRB_stocktake(stk_arr, sys){
     console.log(stk_arr)
     btnDeconflictMerge = "<a href='20_merge.php?stkm_id="+stk_arr['stkm_id']+"' class='btn btn-sm btn-outline-dark'>Continue merge</a>";
     btnToggle = (stk_arr['merge_lock']==1) ? btnDeconflictMerge : btnToggle; 
+    btnExport = (stk_arr['merge_lock']==1) ? "" : btnExport; 
 
     let row = "<tr id='row"+stk_arr['stkm_id']+"'>"
     row += "<td>"+btnToggle+"</td>"
