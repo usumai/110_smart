@@ -342,7 +342,8 @@ if ($act=='sys_pull_master') {
 }elseif ($act=='get_export_stk'){
      $stkm_id = $_GET["stkm_id"];
 
-
+     error_reporting(-1);
+     ini_set('display_errors', 'On');
 
      $mydate=getdate(date("U"));
      $month_disp = substr("00".$mydate['mon'], -2);
@@ -352,8 +353,9 @@ if ($act=='sys_pull_master') {
      $seconds_disp  = substr("00".$mydate['seconds'], -2);
      $date_disp = $mydate['year'].$month_disp.$day_disp;
      $date_disp = $mydate['year'].$month_disp.$day_disp."_".$hours_disp.$minutes_disp.$seconds_disp;
+     $date_disp = $mydate['year'].$month_disp.$day_disp.$hours_disp.$minutes_disp;
 
-echo $date_disp;
+// echo $date_disp;
 
 
 
@@ -366,7 +368,7 @@ echo $date_disp;
              $dpn_extract_date     = $row["dpn_extract_date"];
              $dpn_extract_user     = $row["dpn_extract_user"];
              $stk_type             = $row["stk_type"];
-             $journal_text         = $row["journal_text"];
+          //    $journal_text         = $row["journal_text"];
              $rc_orig              = $row["rc_orig"];
              $rc_orig_complete     = $row["rc_orig_complete"];
              $rc_extras            = $row["rc_extras"];
@@ -398,9 +400,14 @@ echo $date_disp;
              $arr_asset[] = $r;
      }}
 
-
+echo "[$stk_name]";
      $stk_name_disp = substr($stk_name, 0, 30);
-     $txt_file_link = "SMARTm_".$date_disp."_$stk_name_disp.json";
+     // $txt_file_link = "SMARTm_$date_disp"."_$stk_id:$stk_name_disp.json";
+     $stk_name_disp = str_replace(" ","_",$stk_name_disp);
+     $stk_name_disp = str_replace(":","_",$stk_name_disp);
+     $txt_file_link = "SMARTm_$stk_name_disp.json";
+     echo "<br>[$txt_file_link]";
+     // $txt_file_link = "SMARTm.json";
      // $txt_file_link = "$stk_name_disp.json";
      $fp = fopen($txt_file_link, 'w');
 
@@ -422,7 +429,7 @@ echo $date_disp;
      $response['import']['dpn_extract_user']      = $dpn_extract_user;
      $response['import']['smm_extract_user']      = $smm_extract_user;
      $response['import']['smm_extract_date']      = $smm_extract_date;
-     $response['import']['journal_text']          = $journal_text;
+     // $response['import']['journal_text']          = $journal_text;
      $response['import']['rc_orig']               = $rc_orig;
      $response['import']['rc_orig_complete']      = $rc_orig_complete;
      $response['import']['rc_extras']             = $rc_extras;
@@ -433,6 +440,7 @@ echo $date_disp;
      fwrite($fp, json_encode($response));
      fclose($fp);
      if (file_exists($txt_file_link)) {
+          echo "Opening file";
          header('Content-Description: File Transfer');
          header('Content-Type: application/octet-stream');
          header('Content-Disposition: attachment; filename='.basename($txt_file_link));
@@ -1440,9 +1448,20 @@ echo $date_disp;
                $stk_type           = $row["stk_type"];
      }}
 
+
+
+     echo "Strpos".strpos($stk_name, "MERGE");
+     if(strpos($stk_name, "MERGE")===false){
+          $stk_name_disp = "MERGE_$stk_name";
+     }else{
+          $stk_name_disp = $stk_name;
+     }
+
+
+
      $log .= !$debugMode ? $log: "<br><br>Creating new stocktake record";
      $sql = "  INSERT INTO smartdb.sm13_stk (stk_id, stk_name,dpn_extract_date,stk_type, merge_lock)
-     VALUES ('$stk_id','MERGE: $stk_name','$dpn_extract_date','$stk_type', 1)";
+     VALUES ('$stk_id','$stk_name_disp','$dpn_extract_date','$stk_type', 1)";
      // echo "<br><br><br>$sql";
      runSql($sql);
 
