@@ -51,7 +51,7 @@ $(function() {
     function fn_CheckMergeCriteria(){
         $("#btnMerge").hide();
         $.get("05_action.php?act=get_check_merge_criteria", function(data, status){
-            // console.log("Result:"+data)
+            console.log("Result:"+data)
             if (data==1){
                 $("#btnMerge").show();
             }else{

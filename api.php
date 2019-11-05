@@ -180,7 +180,7 @@ if ($act=='get_system'){
      $fingerprint        = time();
      $sqlUpdateFingerprint='';
      if ($fieldName=="res_reason_code"){ 
-          $sqlUpdateFingerprint = ", fingerprint=$fingerprint";
+          $sqlUpdateFingerprint = ", fingerprint=$fingerprint, res_create_date=NOW()";
      }
      $sql = "UPDATE smartdb.sm14_ass SET $fieldName='$fieldValue' $sqlUpdateFingerprint WHERE ass_id = $ass_id;";
      // echo $sql;

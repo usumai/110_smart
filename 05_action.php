@@ -108,7 +108,7 @@ if ($act=='sys_pull_master') {
      header("Location: ".$_SERVER['HTTP_REFERER']);
 
 }elseif ($act=='get_check_merge_criteria') {
-     $sql = "SELECT COUNT(DISTINCT stk_id) as CountDistinctStk, COUNT(*) AS CountActiveStks FROM smartdb.sm13_stk WHERE stk_include = 1";
+     $sql = "SELECT COUNT(DISTINCT stk_id) as CountDistinctStk, COUNT(*) AS CountActiveStks FROM smartdb.sm13_stk WHERE stk_include = 1 AND smm_delete_date IS NULL";
      $result = $con->query($sql);
      if ($result->num_rows > 0) {
           while($row = $result->fetch_assoc()) {
@@ -1433,7 +1433,7 @@ if ($act=='sys_pull_master') {
 
      $log = !$debugMode ? $log: "<br><br>Getting details of two stocktakes being merged";
      $cherry = 0;
-     $sql = "SELECT * FROM smartdb.sm13_stk WHERE  stk_include = 1";
+     $sql = "SELECT * FROM smartdb.sm13_stk WHERE  stk_include = 1 and smm_delete_date IS NULL";
      $result = $con->query($sql);
      if ($result->num_rows > 0) {
          while($row = $result->fetch_assoc()) {

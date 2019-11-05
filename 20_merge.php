@@ -207,14 +207,18 @@ if ($stk_type=="impairment"){
         $fOne = fnGetReasonCodeName($res_reason_codeA);
         $fTwo = fnGetReasonCodeName($res_reason_codeB);
 
+
+        $btnLink1 = "<a href='11_ass.php?ass_id=".$auto_storageID_one."' class='btn btn-outline-dark'>Link</a>";
+        $btnLink2 = "<a href='11_ass.php?ass_id=".$auto_storageID_two."' class='btn btn-outline-dark'>Link</a>";
+
         $rws .= "<tr>";
         $rws .= "<td>$Asset - $Subnumber</td>";
         $rws .= "<td>$Class</td>";
         $rws .= "<td>$AssetDesc1</td>";
         $rws .= "<td>$AssetDesc2</td>";
         $rws .= "<td>$assetType</td>";
-        $rws .= "<td>$res_create_dateA<br>$res_reason_codeA: $fOne<br>$res_comment1A<br>$btnTakeOne</td>";
-        $rws .= "<td>$res_create_dateB<br>$res_reason_codeB: $fTwo<br>$res_comment1B<br>$btnTakeTwo</td>";
+        $rws .= "<td>$res_create_dateA<br>$res_reason_codeA: $fOne<br>$res_comment1A<br>$btnTakeOne<br>$btnLink1</td>";
+        $rws .= "<td>$res_create_dateB<br>$res_reason_codeB: $fTwo<br>$res_comment1B<br>$btnTakeTwo<br>$btnLink2</td>";
         $rws .= "</tr>";
 
 
@@ -243,7 +247,7 @@ function fnGetReasonCodeName($res_reason_code){
         <?=$btnFinish?>
     </div>
         <table class='table' id='mainTable'>
-            <tr>
+            <!-- <tr>
                 <th>District<br>Warehouse<br>SCA</th>
                 <th>Stock code</th>
                 <th>Item Name</th>
@@ -252,6 +256,15 @@ function fnGetReasonCodeName($res_reason_code){
                 <th>TrackingRef</th>
                 <th>Result 1<br>Create Date<br>FindingID<br>Comment</th>
                 <th>Result 2<br>Create Date<br>FindingID<br>Comment</th>
+            </tr> -->
+            <tr>
+                <th>Asset</th>
+                <th>Class</th>
+                <th>Desc1</th>
+                <th>Desc2</th>
+                <th>AssetType</th>
+                <th>Result 1</th>
+                <th>Result 2</th>
             </tr>
             <?=$rws?>
         </table>
