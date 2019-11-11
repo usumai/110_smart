@@ -18,8 +18,7 @@ if ($result->num_rows > 0) {
 
 <script type="text/javascript">
 let ans = '<?=$finalResultPath?>'
-if(ans==''){
-    ans = {
+ansraw = {
         1 : "",
         2 : "",
         3 : "",
@@ -29,10 +28,17 @@ if(ans==''){
         7 : "",
         8 : "",
         9 : "",
+        10: "",
     }
+if(ans==''){
+    ans = JSON.parse(JSON.stringify(ansraw));//Creates a copy of a basic object
 }else{
     ans = JSON.parse(ans)
 }
+// console.log(typeof ans)
+// ans_backup = JSON.parse(JSON.stringify(ans));
+// console.log(typeof ans_backup)
+// console.log(ans== ans)
 
 let qns = {
     1:{
@@ -51,7 +57,7 @@ let qns = {
         noPath: "FF",
     },
     4:{
-        name:   "Check dues in/out status?",
+        name:   "Check dues in/out status. Check if the item was reciepted 72 hours pre-NAIS stocktake.",
         yesPath:"nstr",
         noPath: "5",
     },
@@ -63,7 +69,7 @@ let qns = {
     6:{
         name:   "Does the item belong in this WHS?",
         yesPath:"7",
-        noPath: "nstr",
+        noPath: "10",
     },
     7:{
         name:   "Verify inventory category. Does it fall under an exclusion list?",
@@ -71,13 +77,18 @@ let qns = {
         noPath: "8",
     },
     8:{
-        name:   "Are there other MILIS bins in the warehouse that contain this item/stockcode?",
+        name:   "Are there/have there been any other MILIS bins in the warehouse that contain/have contained this item/stockcode? Conduct district search",
         yesPath:"9",
-        noPath: "nstr",
+        noPath: "FF",
     },
     9:{
         name:   "Is the physical SOH different to 1RB?",
         yesPath:"LE",
+        noPath: "FF",
+    },
+    10:{
+        name:   "Has this item ever been held in this warehouse? Conduct district search of stockcode.",
+        yesPath:"7",
         noPath: "FF",
     },
 }
@@ -110,12 +121,10 @@ $(document).ready(function() {
     function setPage(){
         path='';
         $('.question').toggle(false);
-
         isFinished = false
         nextStep = 1
         do {
             nextStep = assessQuestion(nextStep)
-            
             if (nextStep=='nstr'||nextStep=='LE'||nextStep=='FF'||nextStep=='waiting'){
                 isFinished = true
             }
@@ -123,15 +132,12 @@ $(document).ready(function() {
         while ( isFinished == false);
         
         if (nextStep!='waiting'){
-            // path+="<br><br>Final result: "+nextStep
             finalResult         = nextStep
             finalResult_disp    = nextStep
             if (finalResult_disp=='nstr'){
                 finalResult_disp = "No further investigation"
             }
             path+="<li class='list-group-item'><b class='display-4'>"+finalResult_disp+"</b><br>Final result</li><br>"
-
-
             path+="<button type='button' id='btnSave' class='btn btn-outline-dark'>Save</button>"
         }
         $("#workingChain").html(path);
@@ -164,19 +170,28 @@ $(document).ready(function() {
         });
     })
 
-    $('body').on('click', '.btnRepeal', function() {
-        let qno = $(this).val();
-        qno=Number(qno)
-        let deleteRest = false
-        for (let key in ans){
-            key=Number(key)
-            if(key==qno){
-                deleteRest = true
-            }
-            if(deleteRest){// console.log('deleting answer:'+key+'-'+ans[key])
-                ans[key]=''
-            }
+    function fnGetNextStep(qno){
+        if (ans[qno]=="Yes"){
+            nextStep = qns[qno]['yesPath']
+        }else{
+            nextStep = qns[qno]['noPath']
         }
+        return nextStep
+    }
+
+    $('body').on('click', '.btnRepeal', function() {
+        let repealedQno = $(this).val();
+        repealedQno=Number(repealedQno)
+        ans_backup = JSON.parse(JSON.stringify(ansraw));//Create a copy of the basic empty ans array
+        caughtUp    = false
+        nextQno     = 1 //Start at the first question
+        do {//Loop through logic path until caughtup to repealed question
+            ans_backup[nextQno] = ans[nextQno] //Rebuild ans_backup
+            nextQno = fnGetNextStep(nextQno)
+            caughtUp = repealedQno==nextQno
+        }
+        while (!caughtUp);
+        ans = JSON.parse(JSON.stringify(ans_backup)); //Replace the page ans with the newly cleaed one
         setPage()
     })
 
