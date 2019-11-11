@@ -48,6 +48,7 @@ if ($result->num_rows > 0) {
         $extraITEM_NAME     = $row['ITEM_NAME'];
         $extraSOH           = $row['SOH'];
         $finalResult        = $row['finalResult'];
+        // $res_comment        = $row['res_comment'];
 
         if(empty($finalResult)){
             $extraStatus = "<a href='18_b2r_extra.php?auto_storageID=$auto_storageID&BIN_CODE=$BIN_CODE&stkm_id=".$stkm_id."' class='list-group-item list-group-item-danger btnInvestigate' style='padding:5px;text-decoration:none'>Investigate</a>";
@@ -58,9 +59,9 @@ if ($result->num_rows > 0) {
             }
             $extraStatus = "<a href='18_b2r_extra.php?auto_storageID=$auto_storageID&BIN_CODE=$BIN_CODE&stkm_id=".$stkm_id."' class='list-group-item list-group-item-success btnInvestigate' style='padding:5px;text-decoration:none'>$finalResultDisp</a>";
         }
-        $btnEditExra = "<button type='button' class='btn btn-link btnEditExtra' data-toggle='modal' data-target='#modal_add_extra' data-asi='$auto_storageID' data-sc='$extraSTOCK_CODE' data-in='$extraITEM_NAME' data-soh='$extraSOH'>$extraITEM_NAME</button>";
-
-        $binExtra .= "<tr><td>$extraSTOCK_CODE</td><td>$btnEditExra</td><td></td><td align='right'>$extraStatus</td></tr>";
+        // $btnEditExra = "<button type='button' class='btn btn-link btnEditExtra' data-toggle='modal' data-target='#modal_add_extra' data-asi='$auto_storageID' data-sc='$extraSTOCK_CODE' data-in='$extraITEM_NAME' data-soh='$extraSOH'>$extraITEM_NAME</button>";
+        $btnEditExra = "<a href='18_b2r_edit.php?auto_storageID=$auto_storageID&BIN_CODE=$BIN_CODE&stkm_id=".$stkm_id."' class='btn btn-outline-dark'>Edit</a>";
+        $binExtra .= "<tr><td>$extraSTOCK_CODE</td><td>$extraITEM_NAME</td><td>$btnEditExra</td><td align='right'>$extraStatus</td></tr>";
 
         $arrSample['extras'][] = $row;
 }}
@@ -110,11 +111,15 @@ $(document).ready(function() {
 					maxlength: 9
 				},
 				extraName: {
-					maxlength: 255
+					maxlength: 255,
+                    required: true
 				},
 				extraSOH: {
                     digits: true,
                     maxlength: 20
+				},
+				extraComment: {
+					maxlength: 2000
 				}
 			},
 			messages: {
@@ -138,12 +143,13 @@ $(document).ready(function() {
         let extraSTOCK_CODE = $(this).data("sc");
         let extraITEM_NAME  = $(this).data("in");
         let extraSOH        = $(this).data("soh");
+        let extraComments   = $(this).data("com");
         // console.log("auto_storageID: "+auto_storageID+"\nextraSTOCK_CODE: "+extraSTOCK_CODE+"\nextraITEM_NAME: "+extraITEM_NAME+"\nextraSOH: "+extraSOH)
         $("#extraStockcode").val(extraSTOCK_CODE);
         $("#extraName").val(extraITEM_NAME);
         $("#extraSOH").val(extraSOH);
         $("#auto_storageID").val(auto_storageID);
-        $('#areaDeleteExtra').html("<a href='05_action.php?act=save_delete_extra&auto_storageID="+auto_storageID+"&stkm_id="+stkm_id+"&BIN_CODE="+BIN_CODE+"' class='btn btn-danger float-left'>Delete</a>");
+        $("#extraComments").val(extraComments);
         // $('#areaDeleteExtra').html("Test");
         console.log("test")
     });
@@ -268,16 +274,16 @@ $(document).ready(function() {
                 <input type="text" name="extraStockcode" id="extraStockcode" class="form-control addSCFormInputs">
                 <br>Stockcode description
                 <input type="text" name="extraName" id="extraName" class="form-control addSCFormInputs">
-                <br>SOH
-                <input type="text" name="extraSOH" id="extraSOH" class="form-control addSCFormInputs">
-
+                <!-- <br>SOH
+                <input type="text" name="extraSOH" id="extraSOH" class="form-control addSCFormInputs"> -->
+                <br>Comments
+                <textarea name="extraComments" id="extraComments" class="form-control addSCFormInputs" rows='5'></textarea>
                 <input type="hidden" name="BIN_CODE" value="<?=$BIN_CODE?>">
                 <input type="hidden" name="stkm_id" value="<?=$stkm_id?>">
                 <input type="hidden" name="DSTRCT_CODE" value="<?=$DSTRCT_CODE?>">
                 <input type="hidden" name="WHOUSE_ID" value="<?=$WHOUSE_ID?>">
                 <input type="hidden" name="auto_storageID" id="auto_storageID">
                 <input type="hidden" name="act" value="save_b2r_add_extra">
-                
             </p>
             </div>
             <div class="modal-footer">

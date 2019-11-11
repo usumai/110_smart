@@ -1292,11 +1292,13 @@ if ($act=='sys_pull_master') {
      $extraName          = $_POST["extraName"];
      $extraSOH           = $_POST["extraSOH"];
      $stkm_id            = $_POST["stkm_id"];
-     $DSTRCT_CODE        = $_POST["DSTRCT_CODE"];
-     $WHOUSE_ID          = $_POST["WHOUSE_ID"];
-     $res_update_user='';
+     $extraComments      = $_POST["extraComments"];
 
+     $res_update_user='';
+     echo "<br>auto_storageID: $auto_storageID<br>";
      if($auto_storageID==0){
+          $DSTRCT_CODE        = $_POST["DSTRCT_CODE"];
+          $WHOUSE_ID          = $_POST["WHOUSE_ID"];
           $sql = "  INSERT INTO smartdb.sm18_impairment (
                res_create_date,
                res_update_user,
@@ -1309,7 +1311,8 @@ if ($act=='sys_pull_master') {
                SOH,
                isChild,
                isType,
-               fingerprint)
+               fingerprint,
+               res_comment)
           VALUES (
                NOW(),
                '$res_update_user',
@@ -1322,13 +1325,15 @@ if ($act=='sys_pull_master') {
                '$extraSOH',
                1,
                'b2r',
-               '$fingerprint'
+               '$fingerprint',
+               '$extraComments'
                )";         
      }else{
           $sql = "UPDATE smartdb.sm18_impairment SET
           STOCK_CODE = '$extraStockcode',
           ITEM_NAME = '$extraName',
-          SOH = '$extraSOH'
+          SOH = '$extraSOH',
+          res_comment = '$extraComments'
           WHERE auto_storageID=$auto_storageID"; 
      }
      echo $sql;
