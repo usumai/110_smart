@@ -275,17 +275,15 @@ if ($act=='sys_pull_master') {
           // $sql_save_history = "INSERT INTO ".$dbname.".smart_l10_history (create_date, create_user, history_type, history_desc, history_link) VALUES ( NOW(),'".$current_user."','Raw remainder file upload','User uploaded raw remainder V2 file','108_rr.php');";
 
      }elseif ($arr['type']=="impairment") {
-          $stk_id                  = $arr['isID'];
-          $stk_name                = $arr['isName'];
+          $stk_id                  = $arr['stk_id'];
+          $stk_name                = $arr['stk_name'];
           $dpn_extract_date        = $arr['dpn_extract_date'];
           $dpn_extract_user        = $arr['dpn_extract_user'];
           $smm_extract_date        = $arr['smm_extract_date'];
           $smm_extract_user        = $arr['smm_extract_user'];
-          $journal_text            = $arr['journal_text'];
-          $rowcount_original       = $arr['rowcount_original'];
-          $rowcount_firstfound     = $arr['rowcount_firstfound'];
-          $rowcount_other          = $arr['rowcount_other'];
-          $rowcount_completed      = $arr['rowcount_completed'];
+          $rc_orig                 = $arr['rc_orig'];
+          $rc_orig_complete        = $arr['rc_orig_complete'];
+          $rc_extras               = $arr['rc_extras'];
 
 
           if(empty($smm_extract_date)){
@@ -294,7 +292,7 @@ if ($act=='sys_pull_master') {
                $smm_extract_date="'".$smm_extract_date."'";
           }
 
-          $sql_save = "INSERT INTO smartdb.sm13_stk (stk_id,stk_name,dpn_extract_date,dpn_extract_user,smm_extract_date,smm_extract_user,rowcount_original,rowcount_firstfound, rowcount_other, rowcount_completed, stk_type, journal_text) VALUES ('".$stk_id."','".$stk_name."','".$dpn_extract_date."','".$dpn_extract_user."',".$smm_extract_date.",'".$smm_extract_user."','".$rowcount_original."','".$rowcount_firstfound."','".$rowcount_other."','".$rowcount_completed."','impairment','".$journal_text."'); ";
+          $sql_save = "INSERT INTO smartdb.sm13_stk (stk_id,stk_name,dpn_extract_date,dpn_extract_user,smm_extract_date,smm_extract_user,rc_orig,rc_orig_complete, rc_extras, stk_type) VALUES ('".$stk_id."','".$stk_name."','".$dpn_extract_date."','".$dpn_extract_user."',".$smm_extract_date.",'".$smm_extract_user."','".$rc_orig."','".$rc_orig_complete."','".$rc_extras."','impairment'); ";
           if (true) { echo "<br>sql_save: ".$sql_save; }
           mysqli_multi_query($con,$sql_save);
 
@@ -1209,7 +1207,6 @@ if ($act=='sys_pull_master') {
      res_create_date=NULL,
      res_update_user=NULL,
      findingID=NULL,  
-     res_comment=NULL,  
      res_evidence_desc=NULL,
      res_unserv_date=NULL,
      fingerprint=NULL
@@ -1278,8 +1275,18 @@ if ($act=='sys_pull_master') {
      header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
 
 
+}elseif ($act=='save_delete_extra') {
+     $auto_storageID     = $_GET["auto_storageID"];
+     $BIN_CODE           = $_GET["BIN_CODE"];
+     $stkm_id            = $_GET["stkm_id"];
+     $sql = "UPDATE smartdb.sm18_impairment SET delete_date=NOW() WHERE auto_storageID=$auto_storageID"; 
+     // echo $sql;
+     runSql($sql);
+     checkExtrasFinished($BIN_CODE);
+     header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
 
 }elseif ($act=='save_b2r_add_extra') {
+     $auto_storageID     = $_POST["auto_storageID"];
      $BIN_CODE           = $_POST["BIN_CODE"];
      $extraStockcode     = $_POST["extraStockcode"];
      $extraName          = $_POST["extraName"];
@@ -1288,34 +1295,43 @@ if ($act=='sys_pull_master') {
      $DSTRCT_CODE        = $_POST["DSTRCT_CODE"];
      $WHOUSE_ID          = $_POST["WHOUSE_ID"];
      $res_update_user='';
-     $sql = "  INSERT INTO smartdb.sm18_impairment (
-          res_create_date,
-          res_update_user,
-          stkm_id,
-          BIN_CODE, 
-          DSTRCT_CODE, 
-          WHOUSE_ID, 
-          STOCK_CODE, 
-          ITEM_NAME, 
-          SOH,
-          isChild,
-          isType,
-          fingerprint)
-     VALUES (
-          NOW(),
-          '$res_update_user',
-          '$stkm_id',
-          '$BIN_CODE',
-          '$DSTRCT_CODE',
-          '$WHOUSE_ID',
-          '$extraStockcode',
-          '$extraName',
-          '$extraSOH',
-          1,
-          'b2r',
-          '$fingerprint'
-          )";
 
+     if($auto_storageID==0){
+          $sql = "  INSERT INTO smartdb.sm18_impairment (
+               res_create_date,
+               res_update_user,
+               stkm_id,
+               BIN_CODE, 
+               DSTRCT_CODE, 
+               WHOUSE_ID, 
+               STOCK_CODE, 
+               ITEM_NAME, 
+               SOH,
+               isChild,
+               isType,
+               fingerprint)
+          VALUES (
+               NOW(),
+               '$res_update_user',
+               '$stkm_id',
+               '$BIN_CODE',
+               '$DSTRCT_CODE',
+               '$WHOUSE_ID',
+               '$extraStockcode',
+               '$extraName',
+               '$extraSOH',
+               1,
+               'b2r',
+               '$fingerprint'
+               )";         
+     }else{
+          $sql = "UPDATE smartdb.sm18_impairment SET
+          STOCK_CODE = '$extraStockcode',
+          ITEM_NAME = '$extraName',
+          SOH = '$extraSOH'
+          WHERE auto_storageID=$auto_storageID"; 
+     }
+     echo $sql;
      runSql($sql);
      checkExtrasFinished($BIN_CODE);
      header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
@@ -1352,6 +1368,31 @@ if ($act=='sys_pull_master') {
 
      header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
 
+
+
+}elseif ($act=='save_is_toggle_check') {
+     $toggle        = $_GET["toggle"];
+     $STOCK_CODE    = $_GET["STOCK_CODE"];
+     $BIN_CODE      = $_GET["BIN_CODE"];
+     $stkm_id       = $_GET["stkm_id"];
+
+     $sql = "UPDATE smartdb.sm18_impairment SET checkFlag=$toggle WHERE STOCK_CODE='$STOCK_CODE' AND BIN_CODE='$BIN_CODE'";
+     echo runSql($sql);
+
+
+     header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
+
+
+
+
+
+
+
+
+
+
+
+     
 }elseif ($act=='save_toggle_imp_backup') {
      $stkm_id       = $_GET["stkm_id"];
      $targetID      = $_GET["targetID"];
@@ -1814,7 +1855,7 @@ function checkExtrasFinished($BIN_CODE){
      global $con;
 
      $fingerprint        = time();
-     $sql = "SELECT COUNT(*) AS extraCount, SUM(CASE WHEN finalResult IS NULL THEN 0 ELSE 1 END) AS extraComplete FROM smartdb.sm18_impairment WHERE BIN_CODE = '$BIN_CODE' AND isChild=1 AND isType='b2r'";
+     $sql = "SELECT COUNT(*) AS extraCount, SUM(CASE WHEN finalResult IS NULL THEN 0 ELSE 1 END) AS extraComplete FROM smartdb.sm18_impairment WHERE BIN_CODE = '$BIN_CODE' AND isChild=1 AND isType='b2r' AND delete_date IS NULL";
      $result = $con->query($sql);
      if ($result->num_rows > 0) {
      while($row = $result->fetch_assoc()) {    
@@ -2141,6 +2182,7 @@ function fnInitiateDatabase(){
      `finalResult` VARCHAR(255) NULL,
      `finalResultPath` VARCHAR(255) NULL,
      `fingerprint` varchar(255) DEFAULT NULL,
+     `checkFlag` int(11) NULL,
      
      PRIMARY KEY (`auto_storageID`));";
      echo "<br><br>".$sql_save;

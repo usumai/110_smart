@@ -86,13 +86,13 @@ function fnSetMenu(sys){
     menuAdd = ""
     $("#menuSearch").hide();
     if(system_stk_type=="stocktake"){
-        $(".initiateBTN").html("<a href='10_stk.php' class='nav-link text-success' >Stocktake</a>");
+        $(".initiateBTN").html("<a href='10_stk.php' class='nav-link text-success' >Summary</a>");
         $("#menuSearch").show();
         $("#tags").focus();
         helpContents += btnImages+btnCreateTemplate
         menuAdd = "<a class='nav-link dropdown-toggle' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='menuFF'>First found</a><div class='dropdown-menu' aria-labelledby='dropdown01' id='dropdown_adds'>"+btnFF+"<div class='dropdown-divider'></div><h6 class='dropdown-header'>Templates <a href='21_templates.php' class='float-right'>Edit</a></h6><div id='areaTemplates'></div></div>"
     }else if(system_stk_type=="impairment"){
-        $(".initiateBTN").html("<a href='15_impairment.php' class='nav-link text-success' >Impairment</a>");
+        $(".initiateBTN").html("<a href='15_impairment.php' class='nav-link text-success' >Summary</a>");
         helpContents += btnBackups
     }else{
         $(".initiateBTN").html("");
