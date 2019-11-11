@@ -146,7 +146,7 @@ $(document).ready(function() {
         $('.dispStrack').toggle(dispStrack);
         $('.complete').toggle(complete);
         
-        $('#res_comment').prop('disabled', true);
+        // $('#res_comment').prop('disabled', true);
         if(arS[0]['findingID']){
             let fID = arS[0]['findingID']
             $('#res_comment').prop('disabled', false);
@@ -218,6 +218,7 @@ $(document).ready(function() {
                 
             }
         }else{
+            $('#res_comment').prop('disabled', true);
             $('#areaDate').toggle(false);
             $('#areaSplit').toggle(false);
             $("#resultSelection").html('&nbsp;');

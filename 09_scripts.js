@@ -121,12 +121,11 @@ function fnCheckUpdates(data){
 
 function fnRB_stocktake(stk_arr, sys){
     let system_stk_type = sys["system_stk_type"]
-    let btnToggle = fnMakeToggleButton(stk_arr, system_stk_type);
-
-    let rc_orig = stk_arr['rc_orig'] ? stk_arr['rc_orig'] : 0;
-    let rc_orig_complete = stk_arr['rc_orig_complete'] ? stk_arr['rc_orig_complete'] : 0;
-    let rc_extras = stk_arr['rc_extras'] ? stk_arr['rc_extras'] : 0;
-    let rc_perc = rc_orig ? Math.round((rc_orig_complete/rc_orig)*100,2) : 0
+    let btnToggle       = fnMakeToggleButton(stk_arr, system_stk_type);
+    let rc_orig         = stk_arr['rc_orig'] ? stk_arr['rc_orig'] : 0;
+    let rc_orig_complete= stk_arr['rc_orig_complete'] ? stk_arr['rc_orig_complete'] : 0;
+    let rc_extras       = stk_arr['rc_extras'] ? stk_arr['rc_extras'] : 0;
+    let rc_perc         = rc_orig ? Math.round((rc_orig_complete/rc_orig)*100,2) : 0
 
     console.log(stk_arr)
     btnDeconflictMerge = "<a href='20_merge.php?stkm_id="+stk_arr['stkm_id']+"' class='btn btn-sm btn-outline-dark'>Continue merge</a>";
@@ -168,6 +167,7 @@ function fnRB_impairment(stk_arr, sys){
     row += "<td align='right'>"+btnExport+"</td>"
     row += "<td align='right'>"+btnToggle+"</td>"
     row += "</tr>"
+    
     return row
 }
 function fnRB_template(stk_arr, sys){
