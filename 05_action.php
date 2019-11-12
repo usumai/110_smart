@@ -322,16 +322,15 @@ if ($act=='sys_pull_master') {
           
 
           }
-
-
-
-
-
-
-
-
-
+          fnCalcImpairmentStats();
      }
+
+
+
+
+
+
+
 
 
 
@@ -1127,11 +1126,7 @@ if ($act=='sys_pull_master') {
           }
           return $fieldVal;
      }
-
-
-
      // print_r($_POST);
-
      //Delete children
      $sql = "DELETE FROM smartdb.sm18_impairment WHERE res_parent_storageID='$storageID' ";
      runSql($sql);
@@ -1150,32 +1145,14 @@ if ($act=='sys_pull_master') {
                     $splityDate = 'null';
                }
                $sql = "  INSERT INTO smartdb.sm18_impairment (
-                              res_create_date,
-                              res_update_user,
-                              findingID, 
-                              res_unserv_date, 
-                              res_parent_storageID, 
-                              SOH,
-                              fingerprint)
+                              res_create_date, res_update_user, findingID, res_unserv_date, 
+                              res_parent_storageID, SOH, fingerprint)
                          VALUES (
-                              NOW(),
-                              '$res_update_user',
-                              '$splityResult',
-                              $splityDate,
-                              '$storageID',
-                              '$fingerprint',
-                              ''
-                              )";
-
+                              NOW(),'$res_update_user','$splityResult',$splityDate,
+                              '$storageID','$fingerprint','')";
                runSql($sql);
           }
-
-          
-
      }
-
-
-
 
      if(!empty($_POST['res_unserv_date'])){
           $res_unserv_date = clnr($_POST['res_unserv_date']);    
@@ -1196,8 +1173,15 @@ if ($act=='sys_pull_master') {
      runSql($sql);
 
 
+     fnCalcImpairmentStats();
 
-     header("Location: 16_imp.php?auto_storageID=".$auto_storageID);
+     // header("Location: 16_imp.php?auto_storageID=".$auto_storageID);
+
+
+
+
+
+
 
 }elseif ($act=='save_clear_msi_bin') {
      $auto_storageID     = $_GET["auto_storageID"];
@@ -1234,6 +1218,7 @@ if ($act=='sys_pull_master') {
      WHERE BIN_CODE='$BIN_CODE' AND isType='b2r' ";
      runSql($sql);
 
+     fnCalcImpairmentStats();
      header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
 
 
@@ -1249,6 +1234,7 @@ if ($act=='sys_pull_master') {
      WHERE BIN_CODE='$BIN_CODE'  AND isType='b2r' ";
      runSql($sql);
 
+     fnCalcImpairmentStats();
      header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
 
      
@@ -1272,6 +1258,7 @@ if ($act=='sys_pull_master') {
      $sql = "DELETE FROM smartdb.sm18_impairment WHERE BIN_CODE='$BIN_CODE' AND isChild=1 AND isType='b2r'";
      runSql($sql);
 
+     fnCalcImpairmentStats();
      header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
 
 
@@ -1815,7 +1802,8 @@ if ($act=='sys_pull_master') {
      header("Location: index.php");
 
 
-
+}elseif ($act=='testarea') {
+     fnCalcImpairmentStats();
 
 }
 // echo $log;
@@ -1878,6 +1866,8 @@ function checkExtrasFinished($BIN_CODE){
           WHERE BIN_CODE='$BIN_CODE' ";
      }
      runSql($sql);
+     
+     fnCalcImpairmentStats();
 }
 
 
@@ -2253,6 +2243,48 @@ function fnInitiateDatabase(){
 }
 
 
+function fnCalcImpairmentStats(){
+     global $con;
+
+
+     
+     $sql = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include = 1";
+     $result = $con->query($sql);
+     if ($result->num_rows > 0) {
+         while($row = $result->fetch_assoc()) {
+               $stkm_id            = $row["stkm_id"];
+               $rc_orig            = 0;
+               $rc_orig_complete   = 0;
+
+               $sql1 = "SELECT COUNT(*) as rc_orig, SUM(CASE WHEN findingID = 14 THEN 1 WHEN findingID = 16 THEN 1 ELSE 0 END) as rc_orig_complete FROM (SELECT stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, findingID FROM smartdb.sm18_impairment WHERE isType='b2r' AND stkm_id=$stkm_id GROUP BY stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, findingID) AS vtOne";
+               $sql2 = "SELECT SUM(CASE WHEN storageID IS NOT NULL THEN 1 ELSE 0 END) AS rc_orig, SUM(CASE WHEN storageID IS NOT NULL AND res_create_date IS NOT NULL THEN 1 ELSE 0 END) AS rc_orig_complete FROM smartdb.sm18_impairment WHERE delete_date IS NULL AND isType='imp' AND stkm_id= $stkm_id GROUP BY stkm_id";
+               $sql3 = "$sql1 UNION $sql2";
+               $sql4 = "SELECT SUM(rc_orig) AS rc_orig, SUM(rc_orig_complete) AS rc_orig_complete FROM ($sql3) AS vt";
+
+               $result2 = $con->query($sql4);
+               if ($result2->num_rows > 0) {
+               while($row2 = $result2->fetch_assoc()) {
+                    $rc_orig            = $row2["rc_orig"];
+                    $rc_orig_complete   = $row2["rc_orig_complete"];
+               }}
+
+               $sql5 = " UPDATE smartdb.sm13_stk SET 
+                         rc_orig = '$rc_orig', 
+                         rc_orig_complete = '$rc_orig_complete' 
+                         WHERE stkm_id =$stkm_id
+                         ";
+               mysqli_multi_query($con,$sql5);
+               
+               // echo "<br><br><b>sql1:</b><br>$sql1";
+               // echo "<br><br><b>sql2:</b><br>$sql2";
+               // echo "<br><br><b>sql3:</b><br>$sql3";
+               // echo "<br><br><b>sql4:</b><br>$sql4";
+               // echo "<br><br><b>sql5:</b><br>$sql5";
+
+     }}
+
+
+}
 
 
 

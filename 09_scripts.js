@@ -152,16 +152,21 @@ function fnRB_stocktake(stk_arr, sys){
 function fnRB_impairment(stk_arr, sys){
     let system_stk_type = sys["system_stk_type"]
     let btnToggle = fnMakeToggleButton(stk_arr, system_stk_type);
+    let rc_orig         = stk_arr['rc_orig'] ? stk_arr['rc_orig'] : 0;
+    let rc_orig_complete= stk_arr['rc_orig_complete'] ? stk_arr['rc_orig_complete'] : 0;
+    let rc_extras       = stk_arr['rc_extras'] ? stk_arr['rc_extras'] : 0;
+    let rc_perc         = rc_orig ? Math.round((rc_orig_complete/rc_orig)*100,2) : 0
+
     let row = "<tr id='row"+stk_arr['stkm_id']+"'>"
     row += "<td>"+btnToggle+"</td>"
     row += "<td>"+stk_arr['stkm_id']+"</td>"
     row += "<td>"+stk_arr['stk_type']+"</td>"
     row += "<td>"+stk_arr['stk_id']+"</td>"
     row += "<td>"+stk_arr['stk_name']+"</td>"
-    row += "<td align='right'>"+stk_arr['rc_orig']+"</td>"
-    row += "<td></td>"
-    row += "<td></td>"
-    row += "<td></td>"
+    row += "<td align='right'>"+rc_orig+"</td>"
+    row += "<td align='right'>"+rc_orig_complete+"</td>"
+    row += "<td align='right'>"+rc_extras+"</td>"
+    row += "<td align='right'>"+rc_perc+"%</td>"
     row += "<td align='right'>"+btnArchive+"</td>"
     row += "<td align='right'>"+btnExcel+"</td>"
     row += "<td align='right'>"+btnExport+"</td>"

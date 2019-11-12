@@ -23,44 +23,16 @@ function fnPerc($tot,$sub){
 }
 
 
-$sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_delete_date IS NULL";
-
-$sql = "SELECT COUNT(*) as imp_count_total, SUM(CASE WHEN res_create_date IS NOT NULL AND delete_date IS NULL AND findingID<>13 THEN 1 ELSE 0 END) AS imp_count_complete FROM smartdb.sm18_impairment  
-WHERE isType='imp' AND isBackup IS NULL AND stkm_id IN ($sqlInclude)";
+$sql = "SELECT SUM(rc_orig) AS rc_orig, SUM(rc_orig_complete) AS rc_orig_complete FROM smartdb.sm13_stk  
+WHERE stk_include=1";
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
-        $imp_count_total    = $row["imp_count_total"];
-        $imp_count_complete = $row["imp_count_complete"];
+        $rc_orig            = $row["rc_orig"];
+        $rc_orig_complete   = $row["rc_orig_complete"];
 }}
-$imp_count_total    = fnClNum($imp_count_total);
-$imp_count_complete = fnClNum($imp_count_complete);
 
-
-$sql = "SELECT  COUNT(DISTINCT BIN_CODE) AS b2r_count_total FROM smartdb.sm18_impairment 
-WHERE isType='b2r' AND isBackup IS NULL AND stkm_id IN ($sqlInclude) ";
-$result = $con->query($sql);
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        $b2r_count_total    = $row["b2r_count_total"];
-}}
-$sql = "SELECT  COUNT(DISTINCT BIN_CODE) AS b2r_count_complete
-        FROM smartdb.sm18_impairment 
-        WHERE isType='b2r' 
-        AND isBackup IS NULL 
-        AND stkm_id IN ($sqlInclude)
-        AND findingID IS NOT NULL";
-$result = $con->query($sql);
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        $b2r_count_complete = $row["b2r_count_complete"];
-}}
-$b2r_count_total    = fnClNum($b2r_count_total);
-$b2r_count_complete = fnClNum($b2r_count_complete);
-
-$count_total    = $imp_count_total      + $b2r_count_total;
-$count_complete = $imp_count_complete   + $b2r_count_complete;
-$perc_complete  = fnPerc($count_total,$count_complete)
+$perc_complete  = fnPerc($rc_orig,$rc_orig_complete)
 
 ?>
 
@@ -133,7 +105,7 @@ $(document).ready(function() {
     <br><br>
     <div class="row">
         <div class="col">
-            <h2><?=$count_complete?>/<?=$count_total?> total (<?=$perc_complete?>%)&nbsp;
+            <h2><?=$rc_orig_complete?>/<?=$rc_orig?> total (<?=$perc_complete?>%)&nbsp;
             <button class="btn btn-primary btn_search_term" data-search_term="FIN~">Add completed filter</button>&nbsp;
             <button class="btn btn-primary btn_search_term" data-search_term="NYC~">Add incomplete filter</button>&nbsp;
             <button class="btn btn-warning btn_search_term_clear">Clear search terms</button></h2>
@@ -192,7 +164,7 @@ if ($result->num_rows > 0) {
 
 
 $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_delete_date IS NULL";
-$sql = "SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND isBackup IS NULL AND isType='imp'";
+$sql = "SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND isBackup IS NULL AND isType='imp' AND delete_date IS NULL ";
 // $sql .= " LIMIT 500; ";   
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
@@ -243,8 +215,7 @@ if ($result->num_rows > 0) {
 
 
 $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_delete_date IS NULL";
-$sql = "SELECT  stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, findingID, SUM(SOH) AS sumSOH  FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND isBackup IS NULL AND isType='b2r' GROUP BY stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, findingID 
-";
+$sql = "SELECT  stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, findingID, COUNT(DISTINCT STOCK_CODE) AS countSCs  FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND isBackup IS NULL AND isType='b2r' AND delete_date IS NULL GROUP BY stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, findingID ";
 // $sql .= " LIMIT 500; ";   
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
@@ -255,7 +226,7 @@ if ($result->num_rows > 0) {
         $SUPPLY_CUST_ID     = $row['SUPPLY_CUST_ID'];
         $BIN_CODE           = $row['BIN_CODE'];
         $findingID          = $row['findingID'];
-        $sumSOH             = $row['sumSOH'];
+        $countSCs           = $row['countSCs'];
 
         $flag_status = "<h4><span class='badge badge-secondary'>NYC~</span></h4>";
         if(!empty($findingID)){
@@ -271,7 +242,7 @@ if ($result->num_rows > 0) {
 
 
 
-        echo "<tr><td>".$btnAction."</td><td>".$DSTRCT_CODE."</td><td>".$WHOUSE_ID."</td><td>".$SUPPLY_CUST_ID."</td><td>".$BIN_CODE."</td><td></td><td></td><td></td><td>".$sumSOH."</td><td></td><td></td><td>".$flag_type."</td><td>".$flag_status."</td><td class='text-right'>".$btnAction."</td></tr>";
+        echo "<tr><td>".$btnAction."</td><td>".$DSTRCT_CODE."</td><td>".$WHOUSE_ID."</td><td>".$SUPPLY_CUST_ID."</td><td>".$BIN_CODE."</td><td></td><td></td><td></td><td>".$countSCs."</td><td></td><td></td><td>".$flag_type."</td><td>".$flag_status."</td><td class='text-right'>".$btnAction."</td></tr>";
 
 }}
 
