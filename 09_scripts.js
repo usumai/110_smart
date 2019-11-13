@@ -160,7 +160,7 @@ function fnRB_impairment(stk_arr, sys){
     let row = "<tr id='row"+stk_arr['stkm_id']+"'>"
     row += "<td>"+btnToggle+"</td>"
     row += "<td>"+stk_arr['stkm_id']+"</td>"
-    row += "<td>"+stk_arr['stk_type']+"</td>"
+    row += "<td>Impairment/B2R</td>"
     row += "<td>"+stk_arr['stk_id']+"</td>"
     row += "<td>"+stk_arr['stk_name']+"</td>"
     row += "<td align='right'>"+rc_orig+"</td>"

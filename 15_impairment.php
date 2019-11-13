@@ -32,7 +32,22 @@ if ($result->num_rows > 0) {
         $rc_orig_complete   = $row["rc_orig_complete"];
 }}
 
-$perc_complete  = fnPerc($rc_orig,$rc_orig_complete)
+$perc_complete  = fnPerc($rc_orig,$rc_orig_complete);
+
+
+$fltrBtns='';
+$sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_delete_date IS NULL";
+$sql = "SELECT DSTRCT_CODE, WHOUSE_ID FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND isBackup IS NULL AND isType='imp' AND delete_date IS NULL GROUP BY DSTRCT_CODE, WHOUSE_ID  ";
+// $sql .= " LIMIT 500; ";   
+// echo $sql;
+$result = $con->query($sql);
+if ($result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {    
+        $DSTRCT_CODE        = $row['DSTRCT_CODE'];
+        $WHOUSE_ID          = $row['WHOUSE_ID'];
+        $fltrBtns.="<button class='btn btn-info btn_search_term' data-search_term='$DSTRCT_CODE~$WHOUSE_ID'>$DSTRCT_CODE~$WHOUSE_ID</button>&nbsp;";
+    }}
+
 
 ?>
 
@@ -106,19 +121,19 @@ $(document).ready(function() {
     <div class="row">
         <div class="col">
             <h2><?=$rc_orig_complete?>/<?=$rc_orig?> total (<?=$perc_complete?>%)&nbsp;
-            <button class="btn btn-primary btn_search_term" data-search_term="FIN~">Add completed filter</button>&nbsp;
-            <button class="btn btn-primary btn_search_term" data-search_term="NYC~">Add incomplete filter</button>&nbsp;
-            <button class="btn btn-warning btn_search_term_clear">Clear search terms</button></h2>
+            <button class="btn btn-primary btn_search_term" data-search_term="FIN~">Completed</button>&nbsp;
+            <button class="btn btn-primary btn_search_term" data-search_term="NYC~">Incomplete</button>&nbsp;
+            <button class="btn btn-primary btn_search_term" data-search_term="~TBA">Pending</button>&nbsp;
+            <button class="btn btn-warning btn_search_term_clear">Clear search terms</button>
+            <?=$fltrBtns?></h2>
         </div>
     </div>
 
-    <span id="area_rr_count">Enter a search term greater than four characters to search the Raw Remainder dataset.</span>
     <table id="table_assets" class="table table-sm" width="100%">
         <thead>
             <tr>
                 <th>Action</th>
-                <th>DIST</th>
-                <th>WHSE</th>
+                <th>DIST~WHSE</th>
                 <th>SCA</th>
                 <th>BIN_CODE</th>
                 <th>Stockcde</th>
@@ -205,11 +220,9 @@ if ($result->num_rows > 0) {
 
 
 
-        echo "<tr><td>".$btnAction."</td><td>".$DSTRCT_CODE."</td><td>".$WHOUSE_ID."</td><td>".$SUPPLY_CUST_ID."</td><td>".$BIN_CODE."</td><td>".$STOCK_CODE."</td><td>".$ITEM_NAME."</td><td>".substr($INVENT_CAT,0,2)."</td><td>".$SOH."</td><td>".$TRACKING_IND."</td><td>".$TRACKING_REFERENCE."</td><td>".$flag_type."</td><td>".$flag_status."</td><td class='text-right'>".$btnAction."</td></tr>";
+        echo "<tr><td>".$btnAction."</td><td>".$DSTRCT_CODE."~".$WHOUSE_ID."</td><td>".$SUPPLY_CUST_ID."</td><td>".$BIN_CODE."</td><td>".$STOCK_CODE."</td><td>".$ITEM_NAME."</td><td>".substr($INVENT_CAT,0,2)."</td><td>".$SOH."</td><td>".$TRACKING_IND."</td><td>".$TRACKING_REFERENCE."</td><td>".$flag_type."</td><td>".$flag_status."</td><td class='text-right'>".$btnAction."</td></tr>";
 
 }}
-
-
 
 
 
@@ -242,7 +255,7 @@ if ($result->num_rows > 0) {
 
 
 
-        echo "<tr><td>".$btnAction."</td><td>".$DSTRCT_CODE."</td><td>".$WHOUSE_ID."</td><td>".$SUPPLY_CUST_ID."</td><td>".$BIN_CODE."</td><td></td><td></td><td></td><td>".$countSCs."</td><td></td><td></td><td>".$flag_type."</td><td>".$flag_status."</td><td class='text-right'>".$btnAction."</td></tr>";
+        echo "<tr><td>".$btnAction."</td><td>".$DSTRCT_CODE."~".$WHOUSE_ID."</td><td>".$SUPPLY_CUST_ID."</td><td>".$BIN_CODE."</td><td></td><td></td><td></td><td>".$countSCs."</td><td></td><td></td><td>".$flag_type."</td><td>".$flag_status."</td><td class='text-right'>".$btnAction."</td></tr>";
 
 }}
 
