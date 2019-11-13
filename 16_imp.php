@@ -157,7 +157,7 @@ $(document).ready(function() {
             // Publish display elements
             $('#areaDate').toggle(arS['rl'][fID-1]['reqDate']==1);
             $('#areaSplit').toggle(arS['rl'][fID-1]['reqSplit']==1);
-            $("#resultSelection").html("<b>"+arS['rl'][fID-1]['findingName']+"</b>");
+            $("#resultSelection").html("<b>"+arS['rl'][fID-1]['findingName']+"</b><br>"+arS['rl'][fID-1]['resHelp']);
             $("#resultSelection").addClass('list-group-item-'+arS['rl'][fID-1]['color']);
 
             //Disprove submission validation

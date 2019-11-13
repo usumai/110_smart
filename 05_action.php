@@ -2208,31 +2208,34 @@ function fnInitiateDatabase(){
           `reqDate` INT(11),
           `reqSplit` INT(11),
           `reqComment` INT(11),
-          `resAbbr` VARCHAR(30),          
+          `resAbbr` VARCHAR(30),
+          `resHelp` VARCHAR(1000),          
           PRIMARY KEY (`findingID`));";
           echo "<br><br>".$sql_save;
           mysqli_multi_query($con,$sql_save);
 
 
-     $sql_save = "INSERT INTO $dbname.sm19_result_cats (findingID, findingName, isType, color, reqDate, reqSplit, reqComment, resAbbr) VALUES 
-     (1, 'Serial tracked - Item sighted - Serviceable','imp','success',0,0,0,'SER'),
-     (2, 'Serial tracked - Item sighted - Unserviceable - with date','imp','success',1,0,1,'USWD'),
-     (3, 'Serial tracked - Item sighted - Unserviceable - no date','imp','success',0,0,1,'USND'),
-     (4, 'Serial tracked - Item not sighted - Serviceable','imp','warning',0,0,0,'SER'),
-     (5, 'Serial tracked - Item not sighted - Unserviceable - with date','imp','warning',1,0,1,'USWD'),
-     (6, 'Serial tracked - Item not sighted - Unserviceable - no date','imp','warning',0,0,1,'USND'),
-     (7, 'Serial tracked - Item not found, no evidence provided','imp','danger',0,0,0,'NIC'),
-     (8, 'Quantity tracked - Sighted or found evidence of all items - All serviceable','imp','success',0,0,0,'SER'),
-     (9, 'Quantity tracked - Sighted or found evidence of all items - None serviceable - with date','imp','success',1,0,0,'USWD'),
-     (10, 'Quantity tracked - Sighted or found evidence of all items - None serviceable - no date','imp','success',0,0,0,'USND'),
-     (11, 'Quantity tracked - Split category - One, some or all of the following:<br>+ Not all items were found<br>+ Items were in different categories<br>+ Found more than original quantity','imp','warning',0,1,1,'SPLT'),
-     (12, 'Quantity tracked - No items found, no evidence provided','imp','danger',0,0,1,'NIC'),
-     (13, 'In progress - Come back to it later','imp','info',0,0,0,'TBA'),
+     $sql_save = "INSERT INTO $dbname.sm19_result_cats (findingID, findingName, isType, color, reqDate, reqSplit, reqComment, resAbbr, resHelp) VALUES 
+     (1, 'Serial tracked - Item sighted - Serviceable','imp','success',0,0,0,'SER','Also includes items currently in use.'),
+     (2, 'Serial tracked - Item sighted - Unserviceable - with date','imp','success',1,0,1,'USWD','Comments and Date mandatory with this option. Date must be cross-checked with MILIS, the date refers to the date the item inventory category first changed to unserviceable.'),
+     (3, 'Serial tracked - Item sighted - Unserviceable - no date','imp','success',0,0,1,'USND','Comments mandatory with this option. Only select this option if a date cannot be verified within MILIS. Ensure evidence has been provided to support this option.'),
+     (4, 'Serial tracked - Item not sighted - Serviceable','imp','warning',0,0,0,'SER','Also includes items currently in use.'),
+     (5, 'Serial tracked - Item not sighted - Unserviceable - with date','imp','warning',1,0,1,'USWD','Comments and Date mandatory with this option. Date must be cross-checked with MILIS, the date refers to the date the item inventory category first changed to unserviceable.'),
+     (6, 'Serial tracked - Item not sighted - Unserviceable - no date','imp','warning',0,0,1,'USND','Comments mandatory with this option. Only select this option if a date cannot be verified within MILIS. Ensure evidence has been provided to support this option.'),
+     (7, 'Serial tracked - Item not found, no evidence provided','imp','danger',0,0,1,'NIC','Comments mandatory with this option. Ensure communication to EDLA and DLAP and site Point of Contact is aware of evidential requirements.'),
+     (8, 'Quantity tracked - Sighted or found evidence of all items - All serviceable','imp','success',0,0,0,'SER','Also includes items currently in use.'),
+     (9, 'Quantity tracked - Sighted or found evidence of all items - None serviceable - with date','imp','success',1,0,0,'USWD','Comments and Date mandatory with this option. Date must be cross-checked with MILIS, the date refers to the date the item inventory category first changed to unserviceable.'),
+     (10, 'Quantity tracked - Sighted or found evidence of all items - None serviceable - no date','imp','success',0,0,0,'USND','Comments mandatory with this option. Only select this option if a date cannot be verified within MILIS. Ensure evidence has been provided to support this option.'),
+
+     (11, 'Quantity tracked - Split category - One, some or all of the following:<br>+ Not all items were found<br>+ Items were in different categories<br>+ Found more than original quantity','imp','warning',0,1,1,'SPLT',''),
+
+     (12, 'Quantity tracked - No items found, no evidence provided','imp','danger',0,0,1,'NIC','Comments mandatory with this option. Ensure communication to EDLA and DLAP and site Point of Contact is aware of evidential requirements.'),
+     (13, 'In progress - Come back to it later','imp','info',0,0,0,'TBA','Parked and complete when more information is available.'),
 
 
-     (14, 'No additional stockcodes were found','b2r','success',0,0,0,'NSTR'),
-     (15, 'You have found some additional stockcodes but have not investigated them','b2r','info',0,0,0,'TBA'),
-     (16, 'You have found some additional stockcodes and have investigated them all','b2r','warning',0,0,0,'INV')
+     (14, 'No additional stockcodes were found','b2r','success',0,0,0,'NSTR',''),
+     (15, 'You have found some additional stockcodes but have not investigated them','b2r','info',0,0,0,'TBA',''),
+     (16, 'You have found some additional stockcodes and have investigated them all','b2r','warning',0,0,0,'INV','')
      ; "; 
      // echo "<br><br>".$sql_save;
      mysqli_multi_query($con,$sql_save);
