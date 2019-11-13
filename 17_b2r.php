@@ -225,7 +225,13 @@ $(document).ready(function() {
             <tr><td><b>Warehouse</b></td><td colspan='2' ><?=$WHOUSE_ID?></td><td></td></tr>
             <tr><td><b>SCA</b></td><td colspan='2' ><?=$SUPPLY_CUST_ID?></td><td></td></tr>
             <tr><td><b>Bin</b></td><td colspan='2' ><?=$BIN_CODE?></td><td></td></tr>
-            <tr><td colspan='4'><b>Bin contents</b></td></tr>
+            <tr>
+                <td colspan='4'>
+                    <b>Bin contents</b>
+                    <small>(Not all items listed must be sighted, but all additional stockcodes found must be registered.)</small>
+                    <!-- <button type="button" class="btn btn-primary btn-sm helpBtn float-right" data-toggle="modal" data-target="#helpModal" data-helpwords="This is the first help modal">?</button> -->
+                </td>
+            </tr>
             <tr>
                 <td><b>Stockcode</b></td>
                 <td><b>Name</b></td>
@@ -269,14 +275,15 @@ $(document).ready(function() {
             <p class="lead">
                 So you've found a stockcode in a bin, which is additional to the list you expected. Lets get some details:
                 <br>
-                <br>
-                NSN/Stockcode
+                <br>NSN/Stockcode
+                <br><small>(Where the NSN/stockcode is not available, enter in other identifying ID. Comments mandatory if this option used. Ensure MILIS and other systems are checked.)</small>
                 <input type="text" name="extraStockcode" id="extraStockcode" class="form-control addSCFormInputs">
                 <br>Stockcode description
                 <input type="text" name="extraName" id="extraName" class="form-control addSCFormInputs">
                 <!-- <br>SOH
                 <input type="text" name="extraSOH" id="extraSOH" class="form-control addSCFormInputs"> -->
                 <br>Comments
+                <br><small>(Comments mandatory if NSN/stockcode cannot be identified. Include in comments other identifying information such as contractor part number, serial number. Ensure MILIS and other systems are checked.)</small>
                 <textarea name="extraComments" id="extraComments" class="form-control addSCFormInputs" rows='5'></textarea>
                 <input type="hidden" name="BIN_CODE" value="<?=$BIN_CODE?>">
                 <input type="hidden" name="stkm_id" value="<?=$stkm_id?>">
