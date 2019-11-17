@@ -115,7 +115,8 @@ $(document).ready(function() {
     $('#menuright').html(menuright);
 
     //Create the splity option menu
-    let rls = [1,2,3,4,5,6,7];
+    // let rls = [1,2,3,4,5,6,7];
+    let rls = [17,18,19,20,21,22,23];
     let splityOptions = "";
     for (let key in rls) {
         splityOptions += "<option "
