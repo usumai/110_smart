@@ -375,20 +375,16 @@ if ($act=='sys_pull_master') {
 
 
      
-     $sql = "SELECT COUNT(*) AS rc_totalSent FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id AND flagTemplate IS NULL ";
-     $result = $con->query($sql);
-     if ($result->num_rows > 0) {
-         while($row = $result->fetch_assoc()) {
-             $rc_totalSent         = $row["rc_totalSent"];
-     }}
 
 
 
 
      if ($stk_type=='stocktake'){
-          $sql = "SELECT *  FROM smartdb.sm14_ass WHERE stkm_id = $stkm_id AND delete_date IS NULL AND flagTemplate IS NULL;";
+          $sql = "SELECT *  FROM smartdb.sm14_ass WHERE stkm_id = $stkm_id AND delete_date IS NULL AND flagTemplate IS NULL";
+
      }else{
-          $sql = "SELECT *  FROM smartdb.sm18_impairment WHERE stkm_id = $stkm_id AND delete_date IS NULL ;";
+          $sql = "SELECT *  FROM smartdb.sm18_impairment WHERE stkm_id = $stkm_id AND delete_date IS NULL ";
+
      }
      $arr_asset = array();
      $result = $con->query($sql);
@@ -396,6 +392,18 @@ if ($act=='sys_pull_master') {
          while($r = $result->fetch_assoc()) {
              $arr_asset[] = $r;
      }}
+
+     $sql_count = "SELECT COUNT(*) AS rc_totalSent FROM ($sql) as vtMainSummary";
+     $result = $con->query($sql_count);
+     if ($result->num_rows > 0) {
+         while($row = $result->fetch_assoc()) {
+             $rc_totalSent         = $row["rc_totalSent"];
+     }}
+     //echo "rc_totalSent[$rc_totalSent]";
+
+
+
+
 
 // echo "[$stk_name]";
      $stk_name_disp = substr($stk_name, 0, 30);
