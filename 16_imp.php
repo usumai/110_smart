@@ -249,13 +249,14 @@ $(document).ready(function() {
         setPage()
     });
 
-    $(".datepicker").datepicker({ dateFormat: 'yy-mm-dd' });
+    $(".datepicker").datepicker({ 
+        dateFormat: 'yy-mm-dd' ,
+		changeMonth: true,
+		changeYear: true 
+        });
     $(".datepicker").change(function(){
         setPage()
     })
-
-
-
 
 
 
@@ -337,7 +338,7 @@ $(document).ready(function() {
 //         if(resultOptions[resultSelection]['reqComment']&& res_comment.length<=5){
 //             $('#btnSubmit').hide();
 //         }
-
+//
 //     }
 
 
