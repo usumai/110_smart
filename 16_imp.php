@@ -44,6 +44,7 @@ if ($result->num_rows > 0) {
         $res_comment        = $row['res_comment'];
         $res_unserv_date    = $row['res_unserv_date'];
         $LAST_MOD_DATE      = $row['LAST_MOD_DATE'];
+        $stkm_id            = $row['stkm_id'];
 
         $arrSample[] = $row;
 }}
@@ -468,6 +469,7 @@ $(document).ready(function() {
 
                     <input type='hidden' name='act' value='save_msi_bin_stk'>
                     <input type='hidden' name='findingID' id='findingID' value='<?=$findingID?>'>
+                    <input type='hidden' name='stkm_id' id='stkm_id' value='<?=$stkm_id?>'>
                     <input type='hidden' name='auto_storageID' value='<?=$auto_storageID?>'>
                     <input type='hidden' name='storageID' id='storageID' value='<?=$storageID?>'>
                     <input type='submit' id='btnSubmit' value='Save' class='btn btn-outline-dark float-right complete' >

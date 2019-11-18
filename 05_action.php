@@ -1139,7 +1139,9 @@ if ($act=='sys_pull_master') {
      $findingID          = $_POST["findingID"];
      $auto_storageID     = $_POST["auto_storageID"];
      $storageID          = $_POST["storageID"];
+     $stkm_id            = $_POST["stkm_id"];
      $res_update_user    = "";
+     $findingID          = $_POST["findingID"];
      function clnr($fieldVal){
           // echo "<br>".$fieldVal;
           if(empty($fieldVal)&&$fieldVal==''){
@@ -1170,11 +1172,12 @@ if ($act=='sys_pull_master') {
                }
                $sql = "  INSERT INTO smartdb.sm18_impairment (
                               res_create_date, res_update_user, findingID, res_unserv_date, 
-                              res_parent_storageID, SOH, fingerprint)
+                              res_parent_storageID, SOH, fingerprint, isType, stkm_id)
                          VALUES (
                               NOW(),'$res_update_user','$splityResult',$splityDate,
-                              '$storageID','$fingerprint','')";
+                              '$storageID','$splityCount','$fingerprint','imp', '$stkm_id')";
                runSql($sql);
+               echo "<br>$sql";
           }
      }
 
@@ -1301,10 +1304,11 @@ if ($act=='sys_pull_master') {
      $BIN_CODE           = $_POST["BIN_CODE"];
      $extraStockcode     = $_POST["extraStockcode"];
      $extraName          = $_POST["extraName"];
-     $extraSOH           = $_POST["extraSOH"];
+     // $extraSOH           = $_POST["extraSOH"];
      $stkm_id            = $_POST["stkm_id"];
      $extraComments      = $_POST["extraComments"];
 
+     $fingerprint        = time();
      $res_update_user='';
      echo "<br>auto_storageID: $auto_storageID<br>";
      if($auto_storageID==0){
@@ -1319,7 +1323,6 @@ if ($act=='sys_pull_master') {
                WHOUSE_ID, 
                STOCK_CODE, 
                ITEM_NAME, 
-               SOH,
                isChild,
                isType,
                fingerprint,
@@ -1333,7 +1336,6 @@ if ($act=='sys_pull_master') {
                '$WHOUSE_ID',
                '$extraStockcode',
                '$extraName',
-               '$extraSOH',
                1,
                'b2r',
                '$fingerprint',
@@ -1343,14 +1345,13 @@ if ($act=='sys_pull_master') {
           $sql = "UPDATE smartdb.sm18_impairment SET
           STOCK_CODE = '$extraStockcode',
           ITEM_NAME = '$extraName',
-          SOH = '$extraSOH',
           res_comment = '$extraComments'
           WHERE auto_storageID=$auto_storageID"; 
      }
      echo $sql;
      runSql($sql);
      checkExtrasFinished($BIN_CODE);
-     header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
+     // header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
 
 
 }elseif ($act=='save_b2r_extra') {
@@ -2294,30 +2295,42 @@ function fnCalcImpairmentStats(){
                $rc_orig            = 0;
                $rc_orig_complete   = 0;
 
-               $sql1 = "SELECT COUNT(*) as rc_orig, SUM(CASE WHEN findingID = 14 THEN 1 WHEN findingID = 16 THEN 1 ELSE 0 END) as rc_orig_complete FROM (SELECT stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, findingID FROM smartdb.sm18_impairment WHERE isType='b2r' AND stkm_id=$stkm_id GROUP BY stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, findingID) AS vtOne";
-               $sql2 = "SELECT SUM(CASE WHEN storageID IS NOT NULL THEN 1 ELSE 0 END) AS rc_orig, SUM(CASE WHEN storageID IS NOT NULL AND res_create_date IS NOT NULL THEN 1 ELSE 0 END) AS rc_orig_complete FROM smartdb.sm18_impairment WHERE delete_date IS NULL AND isType='imp' AND stkm_id= $stkm_id GROUP BY stkm_id";
-               $sql3 = "$sql1 UNION $sql2";
-               $sql4 = "SELECT SUM(rc_orig) AS rc_orig, SUM(rc_orig_complete) AS rc_orig_complete FROM ($sql3) AS vt";
+               $sql_count_b2r_extras = "SELECT COUNT(*) AS rc_extras FROM smartdb.sm18_impairment 
+               WHERE isType='b2r' AND stkm_id=$stkm_id AND isChild IS NOT NULL AND delete_date IS NULL";
+               $sql1 = "SELECT 
+                         COUNT(*) as rc_orig, 
+                         SUM(CASE WHEN findingID = 14 THEN 1 WHEN findingID = 16 THEN 1 ELSE 0 END) as rc_orig_complete,
+                         ($sql_count_b2r_extras) AS rc_extras
+                         FROM (SELECT stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, isChild, findingID FROM smartdb.sm18_impairment WHERE isType='b2r' AND stkm_id=$stkm_id GROUP BY stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, isChild, findingID) AS vtOne";
+               $sql2 = "SELECT 
+                         SUM(CASE WHEN storageID IS NOT NULL THEN 1 ELSE 0 END) AS rc_orig, 
+                         SUM(CASE WHEN storageID IS NOT NULL AND res_create_date IS NOT NULL THEN 1 ELSE 0 END) AS rc_orig_complete, 
+                         SUM(CASE WHEN res_parent_storageID IS NOT NULL THEN 1 ELSE 0 END) AS rc_extras
+                         FROM smartdb.sm18_impairment 
+                         WHERE delete_date IS NULL 
+                         AND isType='imp' 
+                         AND stkm_id= $stkm_id 
+                         GROUP BY stkm_id";
 
+
+               $sql3 = "$sql1 UNION $sql2";
+               $sql4 = "SELECT SUM(rc_orig) AS rc_orig, SUM(rc_orig_complete) AS rc_orig_complete, SUM(rc_extras) AS rc_extras FROM ($sql3) AS vt";
+               echo "<br><br>$sql1";
                $result2 = $con->query($sql4);
                if ($result2->num_rows > 0) {
                while($row2 = $result2->fetch_assoc()) {
                     $rc_orig            = $row2["rc_orig"];
                     $rc_orig_complete   = $row2["rc_orig_complete"];
+                    $rc_extras          = $row2["rc_extras"];
                }}
 
                $sql5 = " UPDATE smartdb.sm13_stk SET 
                          rc_orig = '$rc_orig', 
-                         rc_orig_complete = '$rc_orig_complete' 
+                         rc_orig_complete = '$rc_orig_complete', 
+                         rc_extras = '$rc_extras' 
                          WHERE stkm_id =$stkm_id
                          ";
                mysqli_multi_query($con,$sql5);
-               
-               // echo "<br><br><b>sql1:</b><br>$sql1";
-               // echo "<br><br><b>sql2:</b><br>$sql2";
-               // echo "<br><br><b>sql3:</b><br>$sql3";
-               // echo "<br><br><b>sql4:</b><br>$sql4";
-               // echo "<br><br><b>sql5:</b><br>$sql5";
 
      }}
 
