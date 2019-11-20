@@ -1351,7 +1351,7 @@ if ($act=='sys_pull_master') {
      echo $sql;
      runSql($sql);
      checkExtrasFinished($BIN_CODE);
-     // header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
+     header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
 
 
 }elseif ($act=='save_b2r_extra') {
@@ -2315,7 +2315,7 @@ function fnCalcImpairmentStats(){
 
                $sql3 = "$sql1 UNION $sql2";
                $sql4 = "SELECT SUM(rc_orig) AS rc_orig, SUM(rc_orig_complete) AS rc_orig_complete, SUM(rc_extras) AS rc_extras FROM ($sql3) AS vt";
-               echo "<br><br>$sql1";
+               // echo "<br><br>$sql1";
                $result2 = $con->query($sql4);
                if ($result2->num_rows > 0) {
                while($row2 = $result2->fetch_assoc()) {
