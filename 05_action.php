@@ -171,7 +171,7 @@ if ($act=='sys_pull_master') {
           $smm_extract_user        = cleanvalue($arr['smm_extract_user']);
           // $smm_extract_date        = NULL;
           // $smm_extract_user        = NULL;
-          $journal_text            = $arr['journal_text'];
+          // $journal_text            = $arr['journal_text'];
 
           $rc_orig                 = $arr['rc_orig'];
           $rc_orig_complete        = $arr['rc_orig_complete'];
@@ -180,12 +180,12 @@ if ($act=='sys_pull_master') {
           $assets                  = $arr['results'];
 
           if ($dev) {
-               echo "<br>stk_id:".$stk_id ."<br>stk_name:".$stk_name ."<br>dpn_extract_date:".$dpn_extract_date ."<br>dpn_extract_user:".$dpn_extract_user ."<br>smm_extract_date:".$smm_extract_date ."<br>smm_extract_user:".$smm_extract_user ."<br>journal_text:".$journal_text."<br>rc_orig:".$rc_orig ."<br>rc_orig_complete:".$rc_orig_complete."<br>rc_extras:".$rc_extras;
+               echo "<br>stk_id:".$stk_id ."<br>stk_name:".$stk_name ."<br>dpn_extract_date:".$dpn_extract_date ."<br>dpn_extract_user:".$dpn_extract_user ."<br>smm_extract_date:".$smm_extract_date ."<br>smm_extract_user:".$smm_extract_user ."<br>rc_orig:".$rc_orig ."<br>rc_orig_complete:".$rc_orig_complete."<br>rc_extras:".$rc_extras;
                     // print_r($assets) ;
           }
 
           // $sql_save = "INSERT INTO smartdb.sm13_stk (stk_id,stk_name,dpn_extract_date,dpn_extract_user,smm_extract_date,smm_extract_user,rowcount_original,stk_type, journal_text) VALUES ('".$stk_id."','".$stk_name."',".$dpn_extract_date.",".$dpn_extract_user.",".$smm_extract_date.",".$smm_extract_user.",'".$rowcount_original."','stocktake','".$journal_text."'); ";
-          $sql_save = "INSERT INTO smartdb.sm13_stk (stk_id,stk_name,rc_orig,stk_type, journal_text) VALUES ('".$stk_id."','".$stk_name."','".$rc_orig."','stocktake','".$journal_text."'); ";
+          $sql_save = "INSERT INTO smartdb.sm13_stk (stk_id,stk_name,rc_orig,stk_type) VALUES ('".$stk_id."','".$stk_name."','".$rc_orig."','stocktake'); ";
 
 // echo "<br>sql_save: ".$sql_save;
           if ($dev) { echo "<br>sql_save: ".$sql_save; }
@@ -218,7 +218,7 @@ if ($act=='sys_pull_master') {
                     $ass[$fieldname] = cleanvalue($ass[$fieldname]);
                }
                $sql_save=" INSERT INTO smartdb.sm14_ass ($tags) VALUES(".$ass['create_date'].",".$ass['create_user'].",".$ass['delete_date'].",".$ass['delete_user'].",".$stkm_id_new.",".$ass['storage_id'].",".$ass['stk_include'].",".$ass['Asset'].",".$ass['Subnumber'].",".$ass['genesis_cat'].",".$ass['first_found_flag'].",".$ass['rr_id'].",".$ass['fingerprint'].",".$ass['res_create_date'].",".$ass['res_create_user'].",".$ass['res_reason_code'].",".$ass['res_reason_code_desc'].",".$ass['res_completed'].",".$ass['res_comment'].",".$ass['AssetDesc1'].",".$ass['AssetDesc2'].",".$ass['AssetMainNoText'].",".$ass['Class'].",".$ass['assetType'].",".$ass['Inventory'].",".$ass['Quantity'].",".$ass['SNo'].",".$ass['InventNo'].",".$ass['accNo'].",".$ass['Location'].",".$ass['Room'].",".$ass['State'].",".$ass['latitude'].",".$ass['longitude'].",".$ass['CurrentNBV'].",".$ass['AcqValue'].",".$ass['OrigValue'].",".$ass['ScrapVal'].",".$ass['ValMethod'].",".$ass['RevOdep'].",".$ass['CapDate'].",".$ass['LastInv'].",".$ass['DeactDate'].",".$ass['PlRetDate'].",".$ass['CCC_ParentName'].",".$ass['CCC_GrandparentName'].",".$ass['GrpCustod'].",".$ass['CostCtr'].",".$ass['WBSElem'].",".$ass['Fund'].",".$ass['RspCCtr'].",".$ass['CoCd'].",".$ass['PlateNo'].",".$ass['Vendor'].",".$ass['Mfr'].",".$ass['UseNo'].",".$ass['res_AssetDesc1'].",".$ass['res_AssetDesc2'].",".$ass['res_AssetMainNoText'].",".$ass['res_Class'].",".$ass['res_assetType'].",".$ass['res_Inventory'].",".$ass['res_Quantity'].",".$ass['res_SNo'].",".$ass['res_InventNo'].",".$ass['res_accNo'].",".$ass['res_Location'].",".$ass['res_Room'].",".$ass['res_State'].",".$ass['res_latitude'].",".$ass['res_longitude'].",".$ass['res_CurrentNBV'].",".$ass['res_AcqValue'].",".$ass['res_OrigValue'].",".$ass['res_ScrapVal'].",".$ass['res_ValMethod'].",".$ass['res_RevOdep'].",".$ass['res_CapDate'].",".$ass['res_LastInv'].",".$ass['res_DeactDate'].",".$ass['res_PlRetDate'].",".$ass['res_CCC_ParentName'].",".$ass['res_CCC_GrandparentName'].",".$ass['res_GrpCustod'].",".$ass['res_CostCtr'].",".$ass['res_WBSElem'].",".$ass['res_Fund'].",".$ass['res_RspCCtr'].",".$ass['res_CoCd'].",".$ass['res_PlateNo'].",".$ass['res_Vendor'].",".$ass['res_Mfr'].",".$ass['res_UseNo'].",".$ass['flagTemplate']."); ";
-               //  echo "<br><br>".$sql_save;
+               echo "<br><br>".$sql_save;
                mysqli_multi_query($con,$sql_save);
           }
 
@@ -334,7 +334,7 @@ if ($act=='sys_pull_master') {
 
 
 
-     header("Location: index.php");
+     // header("Location: index.php");
 
 }elseif ($act=='get_export_stk'){
      $stkm_id = $_GET["stkm_id"];
@@ -1179,6 +1179,24 @@ if ($act=='sys_pull_master') {
                runSql($sql);
                echo "<br>$sql";
           }
+
+     $sql = "  UPDATE smartdb.sm18_impairment AS tblEdit, smartdb.sm18_impairment AS tblSource SET 	
+               tblEdit.DSTRCT_CODE = tblSource.DSTRCT_CODE,
+               tblEdit.WHOUSE_ID = tblSource.WHOUSE_ID,
+               tblEdit.SUPPLY_CUST_ID = tblSource.SUPPLY_CUST_ID,
+               tblEdit.SC_ACCOUNT_TYPE = tblSource.SC_ACCOUNT_TYPE,
+               tblEdit.STOCK_CODE = tblSource.STOCK_CODE,
+               tblEdit.ITEM_NAME = tblSource.ITEM_NAME,
+               tblEdit.STK_DESC = tblSource.STK_DESC,
+               tblEdit.BIN_CODE = tblSource.BIN_CODE,
+               tblEdit.INVENT_CAT = tblSource.INVENT_CAT,
+               tblEdit.TRACKING_IND = tblSource.TRACKING_IND,
+               tblEdit.TRACKING_REFERENCE = tblSource.TRACKING_REFERENCE,
+               tblEdit.LAST_MOD_DATE = tblSource.LAST_MOD_DATE
+               WHERE 	tblEdit.res_parent_storageID = tblSource.storageID
+               AND tblEdit.storageID IS NULL
+               AND tblSource.auto_storageID=$auto_storageID ";
+     runSql($sql);
      }
 
      if(!empty($_POST['res_unserv_date'])){
