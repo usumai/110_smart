@@ -1197,6 +1197,9 @@ if ($act=='sys_pull_master') {
                AND tblEdit.storageID IS NULL
                AND tblSource.auto_storageID=$auto_storageID ";
      runSql($sql);
+
+
+     
      }
 
      if(!empty($_POST['res_unserv_date'])){
@@ -1902,11 +1905,13 @@ function checkExtrasFinished($BIN_CODE){
           $sql = "UPDATE smartdb.sm18_impairment SET 
           findingID=16,
           fingerprint='$fingerprint'
-          WHERE BIN_CODE='$BIN_CODE' ";
+          WHERE BIN_CODE='$BIN_CODE' 
+          AND isType='b2r' ";
      }else{
           $sql = "UPDATE smartdb.sm18_impairment SET 
           findingID=15
-          WHERE BIN_CODE='$BIN_CODE' ";
+          WHERE BIN_CODE='$BIN_CODE' 
+          AND isType='b2r' ";
      }
      runSql($sql);
      
