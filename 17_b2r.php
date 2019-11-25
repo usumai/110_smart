@@ -32,7 +32,7 @@ if ($result->num_rows > 0) {
             $btn_status = "<a href='05_action.php?act=save_is_toggle_check&toggle=1&STOCK_CODE=$STOCK_CODE&BIN_CODE=$BIN_CODE&stkm_id=$stkm_id' class='btn btn-outline-dark'>Original</a>";
         }
         // $binC .= "<tr><td>$STOCK_CODE</td><td>$ITEM_NAME</td><td align='right'>$sumSOH</td><td>Original</td></tr>";
-        $binC .= "<tr><td>$STOCK_CODE</td><td>$ITEM_NAME</td><td></td><td align='right'>$btn_status</td></tr>";
+        $binC .= "<tr><td>$STOCK_CODE</td><td>$ITEM_NAME</td><td></td><td></td><td align='right'>$btn_status</td></tr>";
 
         $arrSample[] = $row;
 }}
@@ -61,7 +61,7 @@ if ($result->num_rows > 0) {
         }
         // $btnEditExra = "<button type='button' class='btn btn-link btnEditExtra' data-toggle='modal' data-target='#modal_add_extra' data-asi='$auto_storageID' data-sc='$extraSTOCK_CODE' data-in='$extraITEM_NAME' data-soh='$extraSOH'>$extraITEM_NAME</button>";
         $btnEditExra = "<a href='18_b2r_edit.php?auto_storageID=$auto_storageID&BIN_CODE=$BIN_CODE&stkm_id=".$stkm_id."' class='btn btn-outline-dark'>Edit</a>";
-        $binExtra .= "<tr><td>$extraSTOCK_CODE</td><td>$extraITEM_NAME</td><td>$btnEditExra</td><td align='right'>$extraStatus</td></tr>";
+        $binExtra .= "<tr><td>$extraSTOCK_CODE</td><td>$extraITEM_NAME</td><td>$extraSOH</td><td>$btnEditExra</td><td align='right'>$extraStatus</td></tr>";
 
         $arrSample['extras'][] = $row;
 }}
@@ -235,13 +235,20 @@ $(document).ready(function() {
             <tr>
                 <td><b>Stockcode</b></td>
                 <td><b>Name</b></td>
-                <!-- <td align='right'><b>SOH</b></td> -->
+                <td align='right'><b></b></td>
                 <td></td>
                 <td align='right'><b>Status</b></td>
             </tr>
             <?=$binC?>
 
             <tr><td colspan='4' class='text-center'><b><br>Extras</b></td></tr>
+            <tr>
+                <td><b>Stockcode</b></td>
+                <td><b>Name</b></td>
+                <td><b>SOH</b></td>
+                <td></td>
+                <td align='right'><b>Status</b></td>
+            </tr>
             <?=$binExtra?>
 
             <!-- <tr><td colspan='3' class='hideInitialMenu'><b>Comments</b><textarea class='form-control' rows='5' name='res_comment' id='res_comment'><?=$res_comment?></textarea></td></tr> -->
@@ -280,6 +287,8 @@ $(document).ready(function() {
                 <input type="text" name="extraStockcode" id="extraStockcode" class="form-control addSCFormInputs">
                 <br>Stockcode description
                 <input type="text" name="extraName" id="extraName" class="form-control addSCFormInputs">
+                <br>SOH
+                <input type="text" name="extraSOH" id="extraSOH" class="form-control addSCFormInputs">
                 <!-- <br>SOH
                 <input type="text" name="extraSOH" id="extraSOH" class="form-control addSCFormInputs"> -->
                 <br>Comments

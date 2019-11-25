@@ -1325,7 +1325,7 @@ if ($act=='sys_pull_master') {
      $BIN_CODE           = $_POST["BIN_CODE"];
      $extraStockcode     = $_POST["extraStockcode"];
      $extraName          = $_POST["extraName"];
-     // $extraSOH           = $_POST["extraSOH"];
+     $extraSOH           = $_POST["extraSOH"];
      $stkm_id            = $_POST["stkm_id"];
      $extraComments      = $_POST["extraComments"];
 
@@ -1344,6 +1344,7 @@ if ($act=='sys_pull_master') {
                WHOUSE_ID, 
                STOCK_CODE, 
                ITEM_NAME, 
+               SOH, 
                isChild,
                isType,
                fingerprint,
@@ -1357,6 +1358,7 @@ if ($act=='sys_pull_master') {
                '$WHOUSE_ID',
                '$extraStockcode',
                '$extraName',
+               '$extraSOH',
                1,
                'b2r',
                '$fingerprint',
@@ -1366,6 +1368,7 @@ if ($act=='sys_pull_master') {
           $sql = "UPDATE smartdb.sm18_impairment SET
           STOCK_CODE = '$extraStockcode',
           ITEM_NAME = '$extraName',
+          SOH = '$extraSOH',
           res_comment = '$extraComments'
           WHERE auto_storageID=$auto_storageID"; 
      }
