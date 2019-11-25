@@ -2126,6 +2126,9 @@ function fnInitiateDatabase(){
 
      $sql_save = "INSERT INTO $dbname.sm15_rc (res_reason_code, rc_desc, rc_long_desc, rc_examples, rc_action, rc_section) VALUES  
      ('ND10','No financial discrepancies','Asset Found - No Action required','Asset found with all details correct.','ND','ND'),
+     ('ND11','No financial discrepancies','Asset Found - Counted by custodian','Asset counted by custodian, unseen by GA staff. This covers all virtual stocktakes and Assets counted by the custodian when site and room access has been restricted. This includes assets that are away from the site and have been confirmed by the custodian (e.g. Drones, Cameras) Assets managed by custodian in house asset lists.','ND','ERR'),
+     ('RE20','Asset register Error','General non-financial related errors.','Simple record updates such as, location data changes (Within the current site and CCC), barcode updates, transcription, spelling errors, description i.e. asset description not in UPPER CASE.','ND','ERR'),
+     
      ('NC10','Not In Count','Assets excluded from count.','Asset where the site is inaccessible, i.e. remote locality or project construction areas.','NIC','ERR'),
      ('AF10','Asset Found - Ownership','Asset ownership error. The asset management system to be updated to reflect correct owners.','Asset found with incorrect Cost Centre Code.','SAV','ERR'),
      ('AF15','Asset Found - Incorrect Register','Asset found - asset accounted for in the incorrect asset register/system.','An asset found that should be accounted for in MILIS and not ROMAN.','SAV','ERR'),
@@ -2143,7 +2146,6 @@ function fnInitiateDatabase(){
      ('RE10','Asset Duplication - Different Register','Errors found for the same asset record in separate registers/ systems/company codes where the error is a direct result of register actions by DFG Register Authority.','Duplication: assets recorded and financially accounted for in multiple register/ systems (ROMAN and MILIS), or in multiple Company Codes, (1000 and 4100).','SAV','ERR'),
      ('RE15','Asset Duplication - Same Register','Errors found for the same asset record in same asset register/ system, where the error is a direct result of register actions by the Register Authority','Duplication: assets recorded twice for the same physical asset. Assets created as a result of revaluation adjustments.','SAV','ERR'),
      ('FF99','DFG excluded adjustments, as approved by DFG.','Assets First Found which are project related, to be removed from the count as approved by DFG.','Pending ROMAN adjustments relating to a Project Rollout. The rollout of these assets will be conducted IAW Project Rollout processes.','NIC','ERR'),
-     ('RE20','Asset register Error','General non-financial related errors.','Simple record updates such as, location data, barcode updates, transcription, spelling errors, description i.e. asset description not in UPPER CASE.','ND','ERR'),
      ('RE25','Asset Split','Errors relating to assets that may form part of Merge/Split process.','A Split error is where a single asset record may have been initially created, however the assets characteristics distinctly display two separate physical assets','SAV','ERR'),
      ('RE30','Asset Merge','Errors relating to assets that may form part of Merge/Split process.','A Merge error is where two asset records may have been initially created, when it should have been a single asset record;','SAV','ERR'); "; 
      // echo "<br><br>".$sql_save;
