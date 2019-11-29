@@ -2125,7 +2125,7 @@ function fnInitiateDatabase(){
      mysqli_multi_query($con,$sql_save);
 
      $sql_save = "INSERT INTO $dbname.sm15_rc (res_reason_code, rc_desc, rc_long_desc, rc_examples, rc_action, rc_section) VALUES  
-     ('ND10','No financial discrepancies','Asset Found - GA counted','Asset found with all details correct.','ND','ND'),
+     ('ND10','Asset Found - GA counted','No financial discrepancies - No action required','Asset found with all details correct.','ND','ND'),
 
      ('FF98','Asset incorrectly added as First Found (FF)','Assets added to this stocktake then removed. Found to be in error during to reconciliation process.','Assets added to this stocktake then removed, whilst under reconciliation this asset was found to be, (i) already in ROMAN under another asset number, (ii) assets not in our count schedule e.g. class 6000 - low value.  Or ASD Asset added to E&IG count etc.','NIC','RFC'),
      ('FF99','DFG excluded adjustments, as approved by DFG.','Assets First Found which are project related, to be removed from the count as approved by DFG.','Pending ROMAN adjustments relating to a Project Rollout. The rollout of these assets will be conducted IAW Project Rollout processes.','NIC','RFC'),
@@ -2139,12 +2139,12 @@ function fnInitiateDatabase(){
      ('FF20','Asset First Found - Externally Acquired','Asset first found - asset received from organisation external to Defence.','Asset acquired from another government department without documentation. Asset could have been `Gifted to Defence`.','SAV','FF'),
      ('FF25','Asset First Found - Unexplained','Asset first found - Unexplained.','Asset purchase with no history, no explanation as to its existence. Not communicated to DFG, and not added to the FAR','SAV','FF'),
 
-     ('ND11','No financial discrepancies','Asset Found - Counted by custodian','Asset counted by custodian, unseen by GA staff. This covers all virtual stocktakes and Assets counted by the custodian when site and room access has been restricted. This includes assets that are away from the site and have been confirmed by the custodian (e.g. Drones, Cameras) Assets managed by custodian in house asset lists.','ND','ERR'),
+     ('ND11','Asset Found - Counted by custodian','No financial discrepancies - Counted by custodian','Asset counted by custodian, unseen by GA staff. This covers all virtual stocktakes and Assets counted by the custodian when site and room access has been restricted. This includes assets that are away from the site and have been confirmed by the custodian (e.g. Drones, Cameras) Assets managed by custodian in house asset lists.','ND','ERR'),
      ('RE20','Asset Found - Register Error','General non-financial related errors.','Simple record updates such as, location data changes within the current Site and CCC, barcode updates, transcription, spelling errors, description i.e. asset description not in UPPER CASE.','ND','ERR'),
-     ('AF10','Asset Found - Custodian counted','Asset ownership error. The asset management system to be updated to reflect correct owners.','Asset found with incorrect Cost Centre Code.','SAV','ERR'),
+     ('AF10','Asset Found - Ownership','Asset ownership error. The asset management system to be updated to reflect correct owners.','Asset found with incorrect Cost Centre Code.','SAV','ERR'),
      ('AF15','Asset Found - Incorrect Register','Asset found - asset accounted for in the incorrect asset register/system.','An asset found that should be accounted for in MILIS and not ROMAN.','SAV','ERR'),
      ('AF20','Asset Found - Asset Transferred onto Site','Asset found, however the asset register indicated the asset resided on another base/site. Asset added from Raw Remainder.','Demountable moved between Defence properties without asset transfer documentation sent to DFG.  (Asset found in Raw Remainder and the Transfer was not completed in ROMAN). The GA stocktaking team to ensure the transfer is completed in ROMAN.','SAV','ERR'),
-     ('PE15','Prior Stocktake Error','Stocktake Adjustment error in the asset register/ system, where the error has occurred as a direct result of a previous or current stocktake adjustment.','Reversal of a `write-off` action from a previous stocktake. Asset was disposed in error on previous stocktake.','SAV','ERR'),
+     ('PE15','Prior Stocktake Error - Write on','Stocktake Adjustment error in the asset register/ system, where the error has occurred as a direct result of a previous or current stocktake adjustment.','Reversal of a `write-off` action from a previous stocktake. Asset was disposed in error on previous stocktake.','SAV','ERR'),
      ('RE25','Asset Split','Errors relating to assets that may form part of Merge/Split process.','A Split error is where a single asset record may have been initially created, however the assets characteristics distinctly display two separate physical assets','SAV','ERR'),
 
 
