@@ -392,6 +392,10 @@ $( function() {
             $(".btnCancel").show();
             $("#areaRCs").show();
             $(".rc_sectionERR").show();
+        }else if(tempData["tempReasonCat"]=="rfc"){//Select an error reason code
+            $(".btnCancel").show();
+            $("#areaRCs").show();
+            $(".rc_sectionRFC").show();
         }else{//his asset has not been assessed
             $(".txy").prop('disabled', true);
             $("#ta_comment").prop('disabled', false);
@@ -444,7 +448,8 @@ $( function() {
                     <button type='button' value='ND10'   class='rcCat nav-link btn hdz' style='background-color:#78e090!important;display:none'>Sighted<br>Edit</button><br>
                     <button type='button' value='ND10' data-noedit="1"  class='rcCat nav-link btn hdz' style='background-color:#78e090!important;display:none'>Sighted<br>No Edit</button><br>
                     <button type='button' value='notfound'  class='rcCat nav-link btn btn-warning hdz'>Not<br>found</button><br>
-                    <button type='button' value='error'     class='rcCat nav-link btn btn-primary hdz'>Asset<br>Error</button><br>
+                    <button type='button' value='error'     class='rcCat nav-link btn btn-primary hdz'>Found<br>error</button><br>
+                    <button type='button' value='rfc'       class='rcCat nav-link btn btn-info hdz'>Remove<br>from count</button><br>
                     <div class='dropdown btnClear hdz'>
                         <button class='nav-link btn btn-outline-dark dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Clear</button>
                         <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
@@ -601,7 +606,8 @@ $( function() {
                     <button type='button' value='ND10'   class='rcCat nav-link btn hdz' style='background-color:#78e090!important;display:none'>Sighted<br>Edit</button><br>
                     <button type='button' value='ND10' data-noedit="1"  class='rcCat nav-link btn hdz' style='background-color:#78e090!important;display:none'>Sighted<br>No Edit</button><br>
                     <button type='button' value='notfound'  class='rcCat nav-link btn btn-warning hdz'>Not<br>found</button><br>
-                    <button type='button' value='error'     class='rcCat nav-link btn btn-primary hdz'>Asset<br>Error</button><br>
+                    <button type='button' value='error'     class='rcCat nav-link btn btn-primary hdz'>Found<br>error</button><br>
+                    <button type='button' value='rfc'       class='rcCat nav-link btn btn-info hdz'>Remove<br>from count</button><br>
                     <div class='dropdown btnClear hdz'>
                         <button class='nav-link btn btn-outline-dark dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Clear</button>
                         <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
