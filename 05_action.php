@@ -80,6 +80,8 @@ if ($act=='sys_pull_master') {
      mysqli_multi_query($con,$sql_save); 
      fnInitiateDatabase();
 
+
+     
 }elseif ($act=='sys_reset_data_minus_rr') {
      //Delete all tables except for RR
 
@@ -1849,6 +1851,71 @@ if ($act=='sys_pull_master') {
 
 
      header("Location: index.php");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}elseif ($act=='save_edit_user_profile') {
+     $edit_profile_id         = $_POST["edit_profile_id"];
+     $profile_name            = $_POST["profile_name"];
+     $profile_phone_number    = $_POST["profile_phone_number"];
+
+     echo "<br>edit_profile_id: ".$edit_profile_id;
+     echo "<br>profile_name: ".$profile_name;
+     echo "<br>profile_phone_number: ".$profile_phone_number;
+
+     if ($edit_profile_id==0){
+          $sql = "  INSERT INTO smartdb.sm11_pro 
+                    (create_date, profile_name, profile_phone_number)
+                    VALUE (NOW(), '$profile_name', '$profile_phone_number') ";
+          $epi_sql= "(SELECT max(profile_id) AS new_profile_id FROM smartdb.sm11_pro)";
+     }else{
+          $sql = "  UPDATE smartdb.sm11_pro SET 
+                    update_date=NOW(),
+                    profile_name='$profile_name',
+                    profile_phone_number='$profile_phone_number'
+                    WHERE profile_id='$edit_profile_id' ";
+          $epi_sql= "'$edit_profile_id'";
+     }
+     echo $sql;
+     runSql($sql);
+
+     $sql = "UPDATE smartdb.sm10_set SET active_profile_id=$epi_sql ";
+     runSql($sql);
+
+
+
+
+}elseif ($act=='save_delete_user_profile') {
+     $edit_profile_id = $_POST["edit_profile_id"];
+     $sql = "  UPDATE smartdb.sm11_pro SET delete_date=NOW() WHERE profile_id='$edit_profile_id' ";
+     runSql($sql);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }elseif ($act=='testarea') {

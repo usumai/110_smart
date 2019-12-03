@@ -35,15 +35,78 @@ if ($result->num_rows > 0) {
 
 <script>
 $(function(){
-	fnDo("get_system","SetMenu",0)
+	let edit_profile_id;
+	fnDo("get_system","SetMenu",1)
 	fnDo("get_templates","LoadTemplates",0)
 
-    $(document).on('click', '.btnInitTemplate', function(){ 
+  	$(document).on('click', '.btnInitTemplate', function(){ 
 		let ass_id = $(this).val();
 		$("#ass_id").val(ass_id);
 		// console.log(ass_id)
 	})
+
+
 	
+  	$(document).on('click', '.btnUser', function(){ 
+		// let profile_id        	= $('#profile_id').val();
+		profile_id			= $(this).data("profile_id");
+		profile_name		= $(this).data("profile_name");
+		profile_phone_number= $(this).data("profile_phone_number");
+		if(profile_id==0){
+			$("#btnDeleteUser").hide();
+		}else{
+			$("#btnDeleteUser").show();
+		}
+		edit_profile_id = profile_id;
+		$("#profile_name").val(profile_name);
+		$("#profile_phone_number").val(profile_phone_number);
+	})	
+
+
+	$(document).on('click', '#btnDeleteUser', function(){ 
+		$.post( {
+			url: "05_action.php",
+			data: {
+				act: "save_delete_user_profile",
+				edit_profile_id
+			},
+			success: function( data ) {
+				console.log(data)
+				// Refresh menu
+				fnDo("get_system","SetMenu",1)
+				// Dismiss modal
+				$('#modal_add_user').modal('toggle')
+			}
+		});
+	})
+
+	
+  	$(document).on('click', '#btnSaveUser', function(){ 
+		let profile_name        = $('#profile_name').val();
+		let profile_phone_number= $('#profile_phone_number').val();
+
+		// Save details
+		$.post( {
+			url: "05_action.php",
+			data: {
+				act: "save_edit_user_profile",
+				edit_profile_id,
+				profile_name,
+				profile_phone_number,
+			},
+			success: function( data ) {
+				console.log(data)
+				// Refresh menu
+				fnDo("get_system","SetMenu",1)
+				// Dismiss modal
+				$('#modal_add_user').modal('toggle')
+			}
+		});
+		// Set active_profile_id as new user
+
+	})	
+
+  
     $(document).on('click', '#btnCheckForUpdates', function(e){ 
 		e.stopPropagation();
 		if ($('.dropdown').find('#dropdownHelp').is(":hidden")){
@@ -230,4 +293,35 @@ $(function(){
   </div>
 </div>
 
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="modal_add_user" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Create a new user</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">  
+        <p class="lead">
+          User name:
+          <input type='text' class='form-control' id='profile_name' name='profile_name'>
+          User contact number:
+          <input type='text' class='form-control' id='profile_phone_number' name='profile_phone_number'>
+          <br><button type="button" class="btn btn-danger" id='btnDeleteUser'>Delete</button>
+        </p>  
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id='btnSaveUser'>Save</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        
+      </div>
+    </div>
+  </div>
+</div>
 

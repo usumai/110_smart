@@ -11,7 +11,7 @@ $dbname = "smartdb";
 
 
 if ($act=='get_system'){
-    $stks = $sett = [];
+    $stks = $sett = $pro = [];
 
     $sql = "SELECT * FROM smartdb.sm13_stk WHERE smm_delete_date IS NULL;";
     $result = $con->query($sql);
@@ -25,6 +25,13 @@ if ($act=='get_system'){
     if ($result->num_rows > 0) {
         while($row = $result->fetch_assoc()) {
             $sett[] = $row;
+    }}
+    
+    $sql = "SELECT * FROM smartdb.sm11_pro WHERE delete_date IS NULL;";
+    $result = $con->query($sql);
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            $pro[] = $row;
     }}
 
     $sql = "SELECT stk_type FROM smartdb.sm13_stk WHERE smm_delete_date IS NULL AND stk_include =1;";
@@ -41,6 +48,7 @@ if ($act=='get_system'){
     $sys  = [];
     $sys["stks"]            = $stks;
     $sys["sett"]            = $sett;
+    $sys["pro"]             = $pro;
     $sys["system_stk_type"] = $system_stk_type;
     $sys = json_encode($sys);
     echo $sys;

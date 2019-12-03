@@ -98,7 +98,37 @@ function fnSetMenu(sys){
         $(".initiateBTN").html("");
     }
 
-    menuHelp    = "<a class='nav-link dropdown-toggle "+styleUpdateAvailable+"' href='#'data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='headingHelp'>Help</a><div class='dropdown-menu' aria-labelledby='dropdown01' id='dropdownHelp' >"+helpContents+menuRR+menuUpdate+"</div>"
+
+
+
+    console.log("Menu set:")
+    console.log(typeof sys["pro"])
+    console.log(sys["pro"])
+    users               = sys["pro"];
+    active_profile_id   = sys["sett"][0]["active_profile_id"];
+    btnUser = "";
+    if (Object.entries(users).length === 0){
+        console.log("No users exist")
+    }else{
+        // users       = ["Lucas","Sam","Max"];
+        activeUser  = 1;
+        for (let user in users){
+            profile_id              = users[user]["profile_id"]
+            profile_name            = users[user]["profile_name"]
+            profile_phone_number    = users[user]["profile_phone_number"]
+            // console.log("active_profile_id:"+active_profile_id)
+            // console.log("profile_id:"+profile_id)
+            if (active_profile_id==profile_id){
+                btnUser  += "<button type='button' class='dropdown-item btn text-success btnUser' data-toggle='modal' data-target='#modal_add_user' data-profile_id='"+profile_id+"' data-profile_name='"+profile_name+"' data-profile_phone_number='"+profile_phone_number+"'>"+profile_name+"</button>";
+            }else{
+                btnUser  += "<button type='button' class='dropdown-item btn btnUser' data-toggle='modal' data-target='#modal_add_user' data-profile_id='"+profile_id+"' data-profile_name='"+profile_name+"' data-profile_phone_number='"+profile_phone_number+"'>"+profile_name+"</button>";
+            }
+        }
+    }
+    btnAddUser  = "<button type='button' class='btn btnUser' data-toggle='modal' data-target='#modal_add_user' data-profile_id='0'>+ Add new user</button>"
+    menuUser    = "<div class='dropdown-divider'></div><h6 class='dropdown-header'>User management</span></h6>"+btnUser+btnAddUser
+
+    menuHelp    = "<a class='nav-link dropdown-toggle "+styleUpdateAvailable+"' href='#'data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='headingHelp'>Help</a><div class='dropdown-menu' aria-labelledby='dropdown01' id='dropdownHelp' >"+helpContents+menuRR+menuUpdate+menuUser+"</div>"
     $("#menuHelp").html(menuHelp);
     $("#menuAdd").html(menuAdd);
 }
