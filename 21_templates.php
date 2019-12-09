@@ -49,7 +49,7 @@ $( function() {
         
         $("#tplrow_"+ass_id+"").css("background-color","grey")
         console.log(ass_id)
-        $.post("api.php",{
+        $.post("05_action.php",{
             act: "save_RemoveTemplate",
             ass_id:  ass_id
         },

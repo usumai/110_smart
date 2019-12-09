@@ -36,7 +36,7 @@ if ($result->num_rows > 0) {
 <script>
 $(function(){
 	let edit_profile_id;
-	fnDo("get_system","SetMenu",1)
+	fnDo("get_system","SetMenu",0)
 	fnDo("get_templates","LoadTemplates",0)
 
   	$(document).on('click', '.btnInitTemplate', function(){ 
@@ -71,7 +71,7 @@ $(function(){
 				edit_profile_id
 			},
 			success: function( data ) {
-				console.log(data)
+				// console.log(data)
 				// Refresh menu
 				fnDo("get_system","SetMenu",1)
 				// Dismiss modal
@@ -95,7 +95,7 @@ $(function(){
 				profile_phone_number,
 			},
 			success: function( data ) {
-				console.log(data)
+				// console.log(data)
 				// Refresh menu
 				fnDo("get_system","SetMenu",1)
 				// Dismiss modal

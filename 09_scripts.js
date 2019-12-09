@@ -5,7 +5,7 @@
 
 // function fnMakeIndexTable(){
 //     $("#tbl_stk tbody").html("");
-//     $.get("api.php?act=get_system", function(sys, status){
+//     $.get("05_action.php?act=get_system", function(sys, status){
 //         sys = JSON.parse(sys);
 //         fnRowMaker(sys)
 //         fnSetMenu(sys)
@@ -15,7 +15,7 @@
 
 function fnDo(api, nextFn, sL){
     fns(sL,"Calling API:"+api)
-    $.get("api.php?act="+api, function(data, status){
+    $.get("05_action.php?act="+api, function(data, status){
         
         fns(sL,"Data returned:")
         fns(sL,data)
@@ -101,9 +101,9 @@ function fnSetMenu(sys){
 
 
 
-    console.log("Menu set:")
-    console.log(typeof sys["pro"])
-    console.log(sys["pro"])
+    // console.log("Menu set:")
+    // console.log(typeof sys["pro"])
+    // console.log(sys["pro"])
     users               = sys["pro"];
     active_profile_id   = sys["sett"][0]["active_profile_id"];
     btnUser = "";

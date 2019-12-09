@@ -105,6 +105,7 @@ $(document).ready(function() {
                 <th>Description<br>&nbsp;</th>
                 <th class="text-center">InventNo<br>SerialNo</th>
                 <th class="text-right">$NBV<br>&nbsp;</th>
+                <th class="text-right">Custodian<br>&nbsp;</th>
                 <th class="text-center">Status<br>&nbsp;</th>
                 <th>Timestamp<br>&nbsp;</th>
                 <th>Action<br>&nbsp;</th>
@@ -112,7 +113,7 @@ $(document).ready(function() {
         </thead>
         <tbody>
         <?php
-        $sql = "    SELECT ass_id, res_create_date, Asset, Subnumber, res_Class, res_Location, res_Room, res_AssetDesc1, res_AssetDesc2, res_InventNo, res_SNo, res_CurrentNBV, res_reason_code FROM smartdb.sm14_ass WHERE stk_include=1 AND delete_date IS NULL AND flagTemplate IS NULL";
+        $sql = "    SELECT ass_id, res_create_date, Asset, Subnumber, res_Class, res_Location, res_Room, res_AssetDesc1, res_AssetDesc2, res_InventNo, res_SNo, res_CurrentNBV, res_reason_code, res_PlateNo FROM smartdb.sm14_ass WHERE stk_include=1 AND delete_date IS NULL AND flagTemplate IS NULL";
         // $sql .= " LIMIT 500; ";   
         $result = $con->query($sql);
         if ($result->num_rows > 0) {
@@ -130,6 +131,7 @@ $(document).ready(function() {
                 $res_SNo            = $row["res_SNo"];
                 $res_CurrentNBV     = $row["res_CurrentNBV"];
                 $res_reason_code    = $row["res_reason_code"];
+                $res_PlateNo        = $row["res_PlateNo"];
 
                 if (!empty($res_CurrentNBV)) {
                     $disp_CurrentNBV = "$".number_format($res_CurrentNBV,2);
@@ -142,7 +144,7 @@ $(document).ready(function() {
                     $flag_status = "<span class='text-success'>FIN~<br>$res_reason_code</span>";
                 }
                 $btn_action = "<a href='11_ass.php?ass_id=".$ass_id."' class='btn btn-primary'><span class='octicon octicon-zap' style='font-size:30px'></span></a>";
-                echo "<tr><td>".$btn_action."</td><td class='text-center'>".$Asset."<br><small>c".$res_Class."</small></td><td class='text-center'>".$res_Location."<br><small>".$res_Room."</small></td><td>".$res_AssetDesc1."<br><small>".$res_AssetDesc2."</small></td><td nowrap class='text-center'>".$res_InventNo."<br><small>".$res_SNo."</small></td><td class='text-right'>".$disp_CurrentNBV."</td><td class='text-center'>$flag_status</td><td>$res_create_date</td><td class='text-right'>".$btn_action."</td></tr>";
+                echo "<tr><td>".$btn_action."</td><td class='text-center'>".$Asset."<br><small>c".$res_Class."</small></td><td class='text-center'>".$res_Location."<br><small>".$res_Room."</small></td><td>".$res_AssetDesc1."<br><small>".$res_AssetDesc2."</small></td><td nowrap class='text-center'>".$res_InventNo."<br><small>".$res_SNo."</small></td><td class='text-right'>".$disp_CurrentNBV."</td><td class='text-right'>".$res_PlateNo."</td><td class='text-center'>$flag_status</td><td>$res_create_date</td><td class='text-right'>".$btn_action."</td></tr>";
         }}
         ?>
 

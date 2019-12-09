@@ -138,7 +138,7 @@ $( function() {
 
     function fnGetImgGallery() {
         let ImgGallery = "Images TBA"
-        $.post("api.php",{
+        $.post("05_action.php",{
             act:    "get_ImgGallery",
             ass_id: data["asset"]["ass_id"]
         },
@@ -218,7 +218,7 @@ $( function() {
         }else{
             thisElement.css("background-color",colAmber)
             fieldName = fieldName=="res_comment" ? fieldName : "res_"+fieldName;
-            $.post("api.php",{
+            $.post("05_action.php",{
                 act: "save_AssetFieldValue",
                 ass_id:     data["asset"]["ass_id"],
                 fieldName:  fieldName,
@@ -260,7 +260,7 @@ $( function() {
 
     $(document).on('click', '.btn_delete_photo', function(){
         let filename = $(this).val();
-        $.post("api.php",{
+        $.post("05_action.php",{
             act: "save_delete_photo",
             filename:  filename
         },
@@ -292,7 +292,7 @@ $( function() {
 
     $("#btnTemplate").click(function(){
         $(this).hide();
-        $.post("api.php",{
+        $.post("05_action.php",{
             act:    "save_CreateTemplateAsset",
             ass_id: data["asset"]["ass_id"]
 
@@ -308,7 +308,7 @@ $( function() {
     $(".btnClearSure").click(function(){
         data["asset"]["res_reason_code"]= null
         tempData["tempReasonCat"]       = null
-        $.post("api.php",{
+        $.post("05_action.php",{
             act:    "save_ResetAssetResults",
             ass_id: data["asset"]["ass_id"]
         },
@@ -327,7 +327,7 @@ $( function() {
     });
 
     function fnSaveReasonCode(new_reason_code, noedit){
-        $.post("api.php",{
+        $.post("05_action.php",{
             act:        "save_AssetFieldValue",
             ass_id:     data["asset"]["ass_id"],
             fieldName:  "res_reason_code",
@@ -574,6 +574,9 @@ $( function() {
                         </div>
 						<div class="form-group"><label>RevOdep</label>
                             <input type="text" class="form-control txy" data-name="RevOdep" data-vld="string">
+                        </div>
+						<div class="form-group"><label>TypeName</label><!-- We are hiding TypeName in PlateNo -->
+                            <input type="text" class="form-control txy" data-name="PlateNo" data-vld="string">
                         </div>
                         <br><button type='button' id='btnTemplate' class='btn btn-outline-dark' data-toggle='modal' data-target='#modal_copy'>Add to template</button>
 					</div>
