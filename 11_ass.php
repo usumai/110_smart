@@ -465,7 +465,19 @@ $( function() {
                     </div>
 
                     <a href='13_camera.php?ass_id=<?=$ass_id?>' class='btn btn-secondary text-center btnCamera'><span class='octicon octicon-device-camera' style='font-size:30px'></span></a>
-
+                    <br><br><br><br><button type='button' class='btn btn-info btn-xs btnHelp' data-toggle='modal' data-target='#modal_help' value='<strong>Asset photograph guidelines</strong><br><br>The essential difference is that photos are NOT mandatory for all assets as it explains below. 
+                    <ul>
+                        <li>
+                            1. Photographs are mandatory for all: 
+                            <ul>
+                                <li>a. LBI recorded as “FIRST FOUND” assets during a stocktake, subject to the >$5K threshold limit; </li>
+                                <li>b. OP&E recorded as “FIRST FOUND” assets during a stocktake, subject to the >$50K threshold limit; </li>
+                                <li>c. Existing assets that have been significantly refurbished to the extent where its original useful life may have been extended, and as a result, requiring possible revaluation. </li>
+                            </ul>
+                        </li>
+                        <li>2. All existing assets that are in their original purchase state/condition and a current photo exists on file, a new photograph is NOT required.</li>
+                    </ul>
+                    Execution Supp 3.20 PREAMBLE: “Photographs shall be taken IAW ESCM JLCS – V04S10C09F, (Photographic Evidence requirements). Photos are to be taken utilising SMARTm Application wherever possible.”'>?</button>
                 </span>
             </nav>
 <!-- $btn_deleteff $btn_camera -->
@@ -626,6 +638,7 @@ $( function() {
                     </div>
 
                     <a href='13_camera.php?ass_id=<?=$ass_id?>' class='btn btn-secondary text-center btnCamera float-right'><span class='octicon octicon-device-camera' style='font-size:30px'></span></a>
+                    
                 </span>
             </nav>
 		</div>
