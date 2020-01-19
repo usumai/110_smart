@@ -11,9 +11,9 @@ $password = "";
 
 
 // max_execution_time=3000000
-// memory_limit=128000M
-// post_max_size=100000M
-// upload_max_filesize=200000M
+// memory_limit=3000000M
+// post_max_size=3000000M
+// upload_max_filesize=3000000M
 
 
 $servername = "";
