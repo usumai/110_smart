@@ -164,7 +164,7 @@ function fnInitiateDatabase(){
               PRIMARY KEY (`ass_id`),
               UNIQUE KEY `ass_id_UNIQUE` (`ass_id`)
               ) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
-    echo "<br><br>".$sql_save;
+//     echo "<br><br>".$sql_save;
     mysqli_multi_query($con,$sql_save); 
 
 
@@ -178,7 +178,7 @@ function fnInitiateDatabase(){
                    `rc_section` VARCHAR(255) NULL,
                    PRIMARY KEY (`reason_code_id`),
                    UNIQUE INDEX `reason_code_id_UNIQUE` (`reason_code_id` ASC));";
-    echo "<br><br>".$sql_save;
+//     echo "<br><br>".$sql_save;
     mysqli_multi_query($con,$sql_save);
 
     $sql_save = "INSERT INTO $dbname.sm15_rc (res_reason_code, rc_desc, rc_long_desc, rc_examples, rc_action, rc_section) VALUES  
@@ -218,12 +218,13 @@ function fnInitiateDatabase(){
     mysqli_multi_query($con,$sql_save);
 
     $sql_save = "CREATE TABLE $dbname.sm16_file (`file_id` INT NOT NULL AUTO_INCREMENT,`file_type` VARCHAR(255) NULL,`file_ref` VARCHAR(255) NULL,`file_desc` VARCHAR(255) NULL,PRIMARY KEY (`file_id`),UNIQUE INDEX `file_id_UNIQUE` (`file_id` ASC));";
-    echo "<br><br>".$sql_save;
+//     echo "<br><br>".$sql_save;
     mysqli_multi_query($con,$sql_save);
 
     $sql_save = "CREATE TABLE $dbname.sm17_history (`history_id` INT(11) NOT NULL AUTO_INCREMENT,`create_date` DATETIME NULL,`create_user` VARCHAR(255) NULL,`history_link` VARCHAR(255) NULL,`history_type` VARCHAR(255) NULL,`history_desc` VARCHAR(255) NULL, PRIMARY KEY (`history_id`));";
-    echo "<br><br>".$sql_save;
+//     echo "<br><br>".$sql_save;
     mysqli_multi_query($con,$sql_save);
+    
     $sql_save = "INSERT INTO ".$dbname.".sm17_history (create_date, create_user, history_type, history_desc) VALUES ( NOW(),'System Robot','System Initialisation','The system initiated a new deployment');";
     mysqli_multi_query($con,$sql_save);
 
@@ -279,7 +280,7 @@ function fnInitiateDatabase(){
     `checkFlag` int(11) NULL,
     
     PRIMARY KEY (`auto_storageID`));";
-    echo "<br><br>".$sql_save;
+//     echo "<br><br>".$sql_save;
     mysqli_multi_query($con,$sql_save);
 
 
@@ -294,7 +295,7 @@ function fnInitiateDatabase(){
          `resAbbr` VARCHAR(30),
          `resHelp` VARCHAR(1000),          
          PRIMARY KEY (`findingID`));";
-         echo "<br><br>".$sql_save;
+     //     echo "<br><br>".$sql_save;
          mysqli_multi_query($con,$sql_save);
 
 
@@ -343,7 +344,7 @@ function fnInitiateDatabase(){
          `complete_date` datetime NULL,
          `selected_auto_storageID` INT(11),
          PRIMARY KEY (`q_id`));";
-    echo "<br><br>".$sql_save;
+//     echo "<br><br>".$sql_save;
     mysqli_multi_query($con,$sql_save);
 
 
