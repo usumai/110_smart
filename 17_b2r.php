@@ -8,7 +8,7 @@ $BIN_CODE = $_GET["BIN_CODE"];
 $stkm_id = $_GET["stkm_id"];
 $binC='';
 $arrSample = array();
-$sql = "SELECT STOCK_CODE, ITEM_NAME, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, res_comment, findingID, SUM(SOH) AS sumSOH, SUM(CASE WHEN checkFlag = 1 THEN 1 ELSE 0 END) AS checkFlag FROM smartdb.sm18_impairment WHERE BIN_CODE = '$BIN_CODE'  AND isChild IS NULL AND isType ='b2r' AND stkm_id = $stkm_id
+$sql = "SELECT storageID, STOCK_CODE, ITEM_NAME, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, res_comment, findingID, SUM(SOH) AS sumSOH, SUM(CASE WHEN checkFlag = 1 THEN 1 ELSE 0 END) AS checkFlag FROM smartdb.sm18_impairment WHERE BIN_CODE = '$BIN_CODE'  AND isChild IS NULL AND isType ='b2r' AND stkm_id = $stkm_id 
 GROUP BY STOCK_CODE, ITEM_NAME, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, res_comment, findingID
 ";
 // $sql .= " LIMIT 500; ";   
@@ -16,6 +16,7 @@ GROUP BY STOCK_CODE, ITEM_NAME, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, res_comm
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {    
+        $storageID          = $row['storageID'];
         $STOCK_CODE         = $row['STOCK_CODE'];
         $ITEM_NAME          = $row['ITEM_NAME'];
         $DSTRCT_CODE        = $row['DSTRCT_CODE'];
@@ -31,14 +32,20 @@ if ($result->num_rows > 0) {
         }else{
             $btn_status = "<a href='05_action.php?act=save_is_toggle_check&toggle=1&STOCK_CODE=$STOCK_CODE&BIN_CODE=$BIN_CODE&stkm_id=$stkm_id' class='btn btn-outline-dark'>Original</a>";
         }
+
+        if($storageID){
+            $binC .= "<tr><td colspan='5'>No stockcodes recorded</td></tr>";
+
+        }else{
+            $binC .= "<tr><td>$STOCK_CODE</td><td>$ITEM_NAME</td><td></td><td></td><td align='right'>$btn_status</td></tr>";
+        }
         // $binC .= "<tr><td>$STOCK_CODE</td><td>$ITEM_NAME</td><td align='right'>$sumSOH</td><td>Original</td></tr>";
-        $binC .= "<tr><td>$STOCK_CODE</td><td>$ITEM_NAME</td><td></td><td></td><td align='right'>$btn_status</td></tr>";
 
         $arrSample[] = $row;
 }}
 
 $binExtra = '';
-$sql = "SELECT auto_storageID, STOCK_CODE, ITEM_NAME, SOH, finalResult FROM smartdb.sm18_impairment WHERE BIN_CODE = '$BIN_CODE' AND isChild=1 AND stkm_id = $stkm_id AND delete_date IS NULL";
+$sql = "SELECT auto_storageID, STOCK_CODE, ITEM_NAME, SOH, finalResult FROM smartdb.sm18_impairment WHERE BIN_CODE = '$BIN_CODE' AND isChild=1 AND stkm_id = $stkm_id AND delete_date IS NULL ";
 // $sql .= " LIMIT 500; ";   
 $result = $con->query($sql);
 if ($result->num_rows > 0) {

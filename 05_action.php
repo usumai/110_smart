@@ -1560,7 +1560,7 @@ if ($act=='sys_pull_master') {
      }
      echo $sql;
      echo runSql($sql);
-
+     fnCalcImpairmentStats();
      header("Location: 19_toggle.php");
 
 

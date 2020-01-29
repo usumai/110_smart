@@ -226,9 +226,10 @@ if ($result->num_rows > 0) {
 
 
 
-
+// B2R items which have a storageID of 1 are those which are teh skeleton rows, without them, if a bin location is listed as a target, but does not have stock, the bin will not be sent from the DPN.
 $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_delete_date IS NULL";
-$sql = "SELECT  stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, findingID, COUNT(DISTINCT STOCK_CODE) AS countSCs  FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND isBackup IS NULL AND isType='b2r' AND delete_date IS NULL GROUP BY stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, findingID ";
+$sql = "SELECT  stkm_id, DSTRCT_CODE, WHOUSE_ID, BIN_CODE, findingID, COUNT(DISTINCT STOCK_CODE) AS countSCs  FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND isBackup IS NULL AND isType='b2r' AND delete_date IS NULL AND storageID=1 GROUP BY stkm_id, DSTRCT_CODE, WHOUSE_ID, BIN_CODE, findingID ";
+// echo $sql;
 // $sql .= " LIMIT 500; ";   
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
@@ -236,7 +237,7 @@ if ($result->num_rows > 0) {
         $stkm_id            = $row['stkm_id'];  
         $DSTRCT_CODE        = $row['DSTRCT_CODE'];
         $WHOUSE_ID          = $row['WHOUSE_ID'];
-        $SUPPLY_CUST_ID     = $row['SUPPLY_CUST_ID'];
+        // $SUPPLY_CUST_ID     = $row['SUPPLY_CUST_ID'];
         $BIN_CODE           = $row['BIN_CODE'];
         $findingID          = $row['findingID'];
         $countSCs           = $row['countSCs'];
@@ -255,7 +256,7 @@ if ($result->num_rows > 0) {
 
 
 
-        echo "<tr><td>".$btnAction."</td><td>".$DSTRCT_CODE."~".$WHOUSE_ID."</td><td>".$SUPPLY_CUST_ID."</td><td>".$BIN_CODE."</td><td></td><td></td><td></td><td>".$countSCs."</td><td></td><td></td><td>".$flag_type."</td><td>".$flag_status."</td><td class='text-right'>".$btnAction."</td></tr>";
+        echo "<tr><td>".$btnAction."</td><td>".$DSTRCT_CODE."~".$WHOUSE_ID."</td><td></td><td>".$BIN_CODE."</td><td></td><td></td><td></td><td>".$countSCs."</td><td></td><td></td><td>".$flag_type."</td><td>".$flag_status."</td><td class='text-right'>".$btnAction."</td></tr>";
 
 }}
 
