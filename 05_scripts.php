@@ -343,7 +343,7 @@ function fnCalcImpairmentStats(){
 
 
     
-    $sql = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include = 1";
+    $sql = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include = 1 AND smm_delete_date IS NULL";
     $result = $con->query($sql);
     if ($result->num_rows > 0) {
         while($row = $result->fetch_assoc()) {
@@ -357,7 +357,7 @@ function fnCalcImpairmentStats(){
                         COUNT(*) as rc_orig, 
                         SUM(CASE WHEN findingID = 14 THEN 1 WHEN findingID = 16 THEN 1 ELSE 0 END) as rc_orig_complete,
                         ($sql_count_b2r_extras) AS rc_extras
-                        FROM (SELECT stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, isChild, findingID FROM smartdb.sm18_impairment WHERE isType='b2r' AND stkm_id=$stkm_id GROUP BY stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, isChild, findingID) AS vtOne";
+                        FROM (SELECT stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, isChild, findingID FROM smartdb.sm18_impairment WHERE isType='b2r' AND delete_date IS NULL AND sampleFlag=1  AND isBackup IS NULL AND stkm_id=$stkm_id GROUP BY stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, isChild, findingID) AS vtOne";
               $sql2 = "SELECT 
                         SUM(CASE WHEN storageID IS NOT NULL THEN 1 ELSE 0 END) AS rc_orig, 
                         SUM(CASE WHEN storageID IS NOT NULL AND res_create_date IS NOT NULL THEN 1 ELSE 0 END) AS rc_orig_complete, 
@@ -365,13 +365,16 @@ function fnCalcImpairmentStats(){
                         FROM smartdb.sm18_impairment 
                         WHERE delete_date IS NULL 
                         AND isType='imp' 
+                        AND sampleFlag=1 
+                        AND isBackup IS NULL
                         AND stkm_id= $stkm_id 
                         GROUP BY stkm_id";
 
 
               $sql3 = "$sql1 UNION $sql2";
+              echo $sql3;
               $sql4 = "SELECT SUM(rc_orig) AS rc_orig, SUM(rc_orig_complete) AS rc_orig_complete, SUM(rc_extras) AS rc_extras FROM ($sql3) AS vt";
-              // echo "<br><br>$sql1";
+              echo "<br><br>$sql4";
               $result2 = $con->query($sql4);
               if ($result2->num_rows > 0) {
               while($row2 = $result2->fetch_assoc()) {

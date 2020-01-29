@@ -24,7 +24,7 @@ function fnPerc($tot,$sub){
 
 
 $sql = "SELECT SUM(rc_orig) AS rc_orig, SUM(rc_orig_complete) AS rc_orig_complete FROM smartdb.sm13_stk  
-WHERE stk_include=1";
+WHERE stk_include=1 AND smm_delete_date IS NULL";
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
@@ -179,7 +179,7 @@ if ($result->num_rows > 0) {
 
 
 $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_delete_date IS NULL";
-$sql = "SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND isBackup IS NULL AND isType='imp' AND delete_date IS NULL ";
+$sql = "SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND sampleFlag = 1 AND isBackup IS NULL AND isType='imp' AND delete_date IS NULL ";
 // $sql .= " LIMIT 500; ";   
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
