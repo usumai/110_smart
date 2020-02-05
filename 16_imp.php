@@ -105,6 +105,8 @@ let arS = '<?=$arrSample?>'
 let fID = arS[0]['findingID'];
 let rl  = arS['rl'];
 // console.log(rl)
+console.log("testing")
+console.log(arS)
 
 //Declare other global variables
 let dispQtrack,dispStrack,complete;
@@ -134,7 +136,7 @@ $(document).ready(function() {
     setPage()
 
     function setPage(){  
-        // console.log(arS[0]['findingID'])
+        console.log(arS)
         if (arS[0]['findingID']){
             complete        = true;
         }else{
@@ -143,7 +145,9 @@ $(document).ready(function() {
 
         // determine if the menu should be shown at all
         dispQtrack = complete ? false : arS[0]['TRACKING_IND']=="Q"
-        dispStrack = complete ? false : arS[0]['TRACKING_IND']=="S"
+        dispStrack = complete ? false : arS[0]['TRACKING_IND']=="S"||arS[0]['TRACKING_IND']=="E"
+        console.log("dispQtrack:"+dispQtrack)
+        console.log("dispStrack:"+dispStrack)
         $('.dispQtrack').toggle(dispQtrack);
         $('.dispStrack').toggle(dispStrack);
         $('.complete').toggle(complete);
