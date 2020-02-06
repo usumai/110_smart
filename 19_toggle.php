@@ -8,7 +8,7 @@ $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_
 
 
 $rws = '';
-$sql = "SELECT isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, STOCK_CODE, ITEM_NAME, isBackup, COUNT(*) AS targetItemCount FROM smartdb.sm18_impairment WHERE stkm_id IN ($sqlInclude) AND isType='imp' GROUP BY isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, STOCK_CODE, ITEM_NAME, isBackup"; 
+$sql = "SELECT isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, STOCK_CODE, ITEM_NAME, isBackup, COUNT(*) AS targetItemCount FROM smartdb.sm18_impairment WHERE stkm_id IN ($sqlInclude) AND isType='imp' AND delete_date IS NULL GROUP BY isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, STOCK_CODE, ITEM_NAME, isBackup"; 
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {   
@@ -34,7 +34,7 @@ if ($result->num_rows > 0) {
 }}
 
 
-$sql = "SELECT isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, isBackup, COUNT(*) AS targetItemCount FROM smartdb.sm18_impairment WHERE stkm_id=1 AND isType='b2r' GROUP BY isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, isBackup";   
+$sql = "SELECT isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, isBackup, COUNT(*) AS targetItemCount FROM smartdb.sm18_impairment WHERE stkm_id IN ($sqlInclude) AND isType='b2r' GROUP BY isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, isBackup";   
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {    
