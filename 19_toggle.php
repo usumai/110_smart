@@ -58,6 +58,41 @@ if ($result->num_rows > 0) {
         $rws.="<tr><td>$btnType</td><td>$targetID</td><td>$DSTRCT_CODE</td><td>$WHOUSE_ID</td><td>$SUPPLY_CUST_ID</td><td>$BIN_CODE</td><td></td><td></td><td>$targetItemCount</td><td>$btnBackup</td></tr>";
 }}
 
+
+$sqlStats = "SELECT 
+SUM(CASE WHEN isType='imp' AND isBackup<>1 AND res_create_date THEN 1 ELSE 0 END)   AS impPrimeComplete, 
+SUM(CASE WHEN isType='imp' AND isBackup<>1 THEN 1 ELSE 0 END)	                    AS impPrimeTotal,
+SUM(CASE WHEN isType='imp' AND isBackup=1 AND res_create_date THEN 1 ELSE 0 END)    AS impBackupComplete,
+SUM(CASE WHEN isType='imp' AND isBackup=1 THEN 1 ELSE 0 END) 	                    AS impBackupTotal,
+SUM(CASE WHEN isType='b2r' AND isBackup<>1 AND res_create_date THEN 1 ELSE 0 END)   AS b2rPrimeComplete,
+SUM(CASE WHEN isType='b2r' AND isBackup<>1 THEN 1 ELSE 0 END)	                    AS b2rPrimeTotal,
+SUM(CASE WHEN isType='b2r' AND isBackup=1 AND res_create_date THEN 1 ELSE 0 END)    AS b2rBackupComplete,
+SUM(CASE WHEN isType='b2r' AND isBackup=1 THEN 1 ELSE 0 END) 	                    AS b2rBackupTotal
+
+FROM smartdb.sm18_impairment
+WHERE stkm_id=1";
+// $sql .= " LIMIT 500; ";   
+// echo $sql;
+$result = $con->query($sqlStats);
+if ($result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {    
+        $impPrimeComplete        = $row['impPrimeComplete'];
+        $impPrimeTotal        = $row['impPrimeTotal'];
+        $impBackupComplete        = $row['impBackupComplete'];
+        $impBackupTotal        = $row['impBackupTotal'];
+        $b2rPrimeComplete        = $row['b2rPrimeComplete'];
+        $b2rPrimeTotal        = $row['b2rPrimeTotal'];
+        $b2rBackupComplete        = $row['b2rBackupComplete'];
+        $b2rBackupTotal        = $row['b2rBackupTotal'];
+    }}
+
+$stats = "<tr><td></td><td colspan='2'><strong>Impairment</strong></td><td colspan='2'><strong>Bin to Register</strong></td></tr>";
+$stats .= "<tr><td></td><td>Complete</td><td>Total</td><td>Complete</td><td>Total</td></tr>";
+$stats .= "<tr><td>Primary</td><td>$impPrimeComplete</td><td>$impPrimeTotal</td><td>$b2rPrimeComplete</td><td>$b2rPrimeTotal</td></tr>";
+$stats .= "<tr><td>Backup</td><td>$impBackupComplete</td><td>$impBackupTotal</td><td>$b2rBackupComplete</td><td>$b2rBackupTotal</td></tr>";
+$statsTbl = "<table class='table'>$stats</table>";
+
+
 ?>
 
 <script type="text/javascript">
@@ -90,6 +125,16 @@ $(document).ready(function() {
         <h1 class='display-4'>Toggle items between primary and backup</h1>
     </div>
 </div>
+
+
+<div class='row'>
+    <div class='col-6'>
+        <?=$statsTbl?>
+    </div>
+</div>
+
+
+
 
 
 
