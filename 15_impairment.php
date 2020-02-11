@@ -248,6 +248,8 @@ if ($result->num_rows > 0) {
         $findingID          = $row['findingID'];
         $countSCs           = $row['countSCs'];
 
+        $BIN_CODE_code = str_replace("&","%26",$BIN_CODE);
+
         $flag_status = "<h4><span class='badge badge-secondary'>NYC~</span></h4>";
         if(!empty($findingID)){
             $fCol = $arF['col'][$findingID];
@@ -258,7 +260,7 @@ if ($result->num_rows > 0) {
             }
         }
         $flag_type = "<h4><span class='badge badge-dark'>B2R</span></h4>";
-        $btnAction = "<a href='17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id' class='btn btn-primary'><span class='octicon octicon-zap' style='font-size:30px'></span></a>";
+        $btnAction = "<a href='17_b2r.php?BIN_CODE=$BIN_CODE_code&stkm_id=$stkm_id' class='btn btn-primary'><span class='octicon octicon-zap' style='font-size:30px'></span></a>";
 
 
 

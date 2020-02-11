@@ -48,9 +48,10 @@ if ($result->num_rows > 0) {
         $targetItemCount    = $row['targetItemCount'];
         $isBackup           = $row['isBackup'];
 
-        $btnBackup = "<a href='05_action.php?act=save_toggle_imp_backup&stkm_id=$stkm_id&targetID=$targetID&BIN_CODE=$BIN_CODE&isType=$isType&isBackup=1' class='btn btn-outline-dark'>Primary</a>";
+        $BIN_CODE_code = str_replace("&","%26",$BIN_CODE);
+        $btnBackup = "<a href='05_action.php?act=save_toggle_imp_backup&stkm_id=$stkm_id&targetID=$targetID&BIN_CODE=$BIN_CODE_code&isType=$isType&isBackup=1' class='btn btn-outline-dark'>Primary</a>";
         if($isBackup==1){
-            $btnBackup = "<a href='05_action.php?act=save_toggle_imp_backup&stkm_id=$stkm_id&targetID=$targetID&BIN_CODE=$BIN_CODE&isType=$isType&isBackup=0' class='btn btn-dark'>Backup</a>";
+            $btnBackup = "<a href='05_action.php?act=save_toggle_imp_backup&stkm_id=$stkm_id&targetID=$targetID&BIN_CODE=$BIN_CODE_code&isType=$isType&isBackup=0' class='btn btn-dark'>Backup</a>";
         }
         
         $btnType = "<span class='badge badge-primary'>B2R</span>";

@@ -4,6 +4,7 @@
 <?php
 $auto_storageID = $_GET["auto_storageID"];
 $BIN_CODE = $_GET["BIN_CODE"];
+$BIN_CODE_code = str_replace("&","%26",$BIN_CODE);
 
 $sql = "SELECT stkm_id, STOCK_CODE, ITEM_NAME, SOH, finalResult, finalResultPath FROM smartdb.sm18_impairment WHERE auto_storageID = '$auto_storageID'";
 // $sql .= " LIMIT 500; ";   
@@ -215,7 +216,7 @@ $(document).ready(function() {
             Extra stockcode investigation
             <a href='17_b2r.php?BIN_CODE=<?=$BIN_CODE?>&stkm_id=<?=$stkm_id?>' class='btn btn-outline-dark float-right'>Back</a>
         </h1>
-        <div class='dropdown'><button class='btn btn-outline-danger dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='dispBtnClear'>Clear</button><div class='dropdown-menu bg-danger' aria-labelledby='dropdownMenuButton'><a class='dropdown-item bg-danger text-light' href='05_action.php?act=save_clear_b2r_extra&auto_storageID=<?=$auto_storageID?>&BIN_CODE=<?=$BIN_CODE?>&stkm_id=<?=$stkm_id?>'>I'm sure</a></div></div>
+        <div class='dropdown'><button class='btn btn-outline-danger dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='dispBtnClear'>Clear</button><div class='dropdown-menu bg-danger' aria-labelledby='dropdownMenuButton'><a class='dropdown-item bg-danger text-light' href='05_action.php?act=save_clear_b2r_extra&auto_storageID=<?=$auto_storageID?>&BIN_CODE=<?=$BIN_CODE_code?>&stkm_id=<?=$stkm_id?>'>I'm sure</a></div></div>
     </div>
 </div>
 

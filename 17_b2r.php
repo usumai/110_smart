@@ -27,10 +27,11 @@ if ($result->num_rows > 0) {
         $findingID          = $row['findingID'];
         $checkFlag          = $row['checkFlag'];
 
+        $BIN_CODE_code = str_replace("&","%26",$BIN_CODE);
         if($checkFlag){
-            $btn_status = "<a href='05_action.php?act=save_is_toggle_check&toggle=null&STOCK_CODE=$STOCK_CODE&BIN_CODE=$BIN_CODE&stkm_id=$stkm_id' class='btn btn-outline-success'>Sighted</a>";
+            $btn_status = "<a href='05_action.php?act=save_is_toggle_check&toggle=null&STOCK_CODE=$STOCK_CODE&BIN_CODE=$BIN_CODE_code&stkm_id=$stkm_id' class='btn btn-outline-success'>Sighted</a>";
         }else{
-            $btn_status = "<a href='05_action.php?act=save_is_toggle_check&toggle=1&STOCK_CODE=$STOCK_CODE&BIN_CODE=$BIN_CODE&stkm_id=$stkm_id' class='btn btn-outline-dark'>Original</a>";
+            $btn_status = "<a href='05_action.php?act=save_is_toggle_check&toggle=1&STOCK_CODE=$STOCK_CODE&BIN_CODE=$BIN_CODE_code&stkm_id=$stkm_id' class='btn btn-outline-dark'>Original</a>";
         }
 
         if($storageID){
@@ -58,16 +59,16 @@ if ($result->num_rows > 0) {
         // $res_comment        = $row['res_comment'];
 
         if(empty($finalResult)){
-            $extraStatus = "<a href='18_b2r_extra.php?auto_storageID=$auto_storageID&BIN_CODE=$BIN_CODE&stkm_id=".$stkm_id."' class='list-group-item list-group-item-danger btnInvestigate' style='padding:5px;text-decoration:none'>Investigate</a>";
+            $extraStatus = "<a href='18_b2r_extra.php?auto_storageID=$auto_storageID&BIN_CODE=$BIN_CODE_code&stkm_id=".$stkm_id."' class='list-group-item list-group-item-danger btnInvestigate' style='padding:5px;text-decoration:none'>Investigate</a>";
         }else{
             $finalResultDisp = $finalResult;
             if($finalResult=='nstr'){
                 $finalResultDisp = "No finding";
             }
-            $extraStatus = "<a href='18_b2r_extra.php?auto_storageID=$auto_storageID&BIN_CODE=$BIN_CODE&stkm_id=".$stkm_id."' class='list-group-item list-group-item-success btnInvestigate' style='padding:5px;text-decoration:none'>$finalResultDisp</a>";
+            $extraStatus = "<a href='18_b2r_extra.php?auto_storageID=$auto_storageID&BIN_CODE=$BIN_CODE_code&stkm_id=".$stkm_id."' class='list-group-item list-group-item-success btnInvestigate' style='padding:5px;text-decoration:none'>$finalResultDisp</a>";
         }
         // $btnEditExra = "<button type='button' class='btn btn-link btnEditExtra' data-toggle='modal' data-target='#modal_add_extra' data-asi='$auto_storageID' data-sc='$extraSTOCK_CODE' data-in='$extraITEM_NAME' data-soh='$extraSOH'>$extraITEM_NAME</button>";
-        $btnEditExra = "<a href='18_b2r_edit.php?auto_storageID=$auto_storageID&BIN_CODE=$BIN_CODE&stkm_id=".$stkm_id."' class='btn btn-outline-dark'>Edit</a>";
+        $btnEditExra = "<a href='18_b2r_edit.php?auto_storageID=$auto_storageID&BIN_CODE=$BIN_CODE_code&stkm_id=".$stkm_id."' class='btn btn-outline-dark'>Edit</a>";
         $binExtra .= "<tr><td>$extraSTOCK_CODE</td><td>$extraITEM_NAME</td><td>$extraSOH</td><td>$btnEditExra</td><td align='right'>$extraStatus</td></tr>";
 
         $arrSample['extras'][] = $row;
@@ -78,7 +79,7 @@ $arrSample = json_encode($arrSample);
 
 $btnDelete=$btnAdd='';
 if(!empty($findingID)){
-    $btnDelete = "<div class='text-center'><div class='dropdown'><button class='btn btn-outline-danger dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='dispBtnClear'>Delete</button><div class='dropdown-menu bg-danger' aria-labelledby='dropdownMenuButton'><a class='dropdown-item bg-danger text-light' href='05_action.php?act=save_clear_b2r&BIN_CODE=".$BIN_CODE."&stkm_id=".$stkm_id."'>I'm sure</a></div></div></div>";
+    $btnDelete = "<div class='text-center'><div class='dropdown'><button class='btn btn-outline-danger dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='dispBtnClear'>Delete</button><div class='dropdown-menu bg-danger' aria-labelledby='dropdownMenuButton'><a class='dropdown-item bg-danger text-light' href='05_action.php?act=save_clear_b2r&BIN_CODE=".$BIN_CODE_code."&stkm_id=".$stkm_id."'>I'm sure</a></div></div></div>";
 
     if($findingID!=14){
         $btnAdd = "<br><br><br><button type='button' class='btn btn-outline-dark addExtra' data-toggle='modal' data-target='#modal_add_extra' v-if='ar.first_found_flag==1'>Register extra stockcode</button>";
@@ -216,9 +217,9 @@ $(document).ready(function() {
             <?=$btnAdd?>
 
             <li class="list-group-item hideInitialMenu q1"><b>Are there any stockcodes in addition to this list?</b></li>
-            <a class="list-group-item list-group-item-action list-group-item-success hideInitialMenu q1" href='05_action.php?act=save_b2r_nstr&BIN_CODE=<?=$BIN_CODE?>&stkm_id=<?=$stkm_id?>'>No</a>
+            <a class="list-group-item list-group-item-action list-group-item-success hideInitialMenu q1" href='05_action.php?act=save_b2r_nstr&BIN_CODE=<?=$BIN_CODE_code?>&stkm_id=<?=$stkm_id?>'>No</a>
 
-            <a class="list-group-item list-group-item-action list-group-item-danger hideInitialMenu q1" href='05_action.php?act=save_b2r_extras&BIN_CODE=<?=$BIN_CODE?>&stkm_id=<?=$stkm_id?>'>Yes</a>
+            <a class="list-group-item list-group-item-action list-group-item-danger hideInitialMenu q1" href='05_action.php?act=save_b2r_extras&BIN_CODE=<?=$BIN_CODE_code?>&stkm_id=<?=$stkm_id?>'>Yes</a>
 
         </ul>
     </div>
