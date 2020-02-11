@@ -8,7 +8,7 @@ $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_
 
 
 $rws = '';
-$sql = "SELECT isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, STOCK_CODE, ITEM_NAME, isBackup, COUNT(*) AS targetItemCount FROM smartdb.sm18_impairment WHERE stkm_id IN ($sqlInclude) AND isType='imp' AND delete_date IS NULL GROUP BY isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, STOCK_CODE, ITEM_NAME, isBackup"; 
+$sql = "SELECT isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, STOCK_CODE, ITEM_NAME, isBackup, COUNT(*) AS targetItemCount FROM smartdb.sm18_impairment WHERE stkm_id IN ($sqlInclude) AND LEFT(isType,3)='imp' AND delete_date IS NULL GROUP BY isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, STOCK_CODE, ITEM_NAME, isBackup"; 
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {   
@@ -48,9 +48,9 @@ if ($result->num_rows > 0) {
         $targetItemCount    = $row['targetItemCount'];
         $isBackup           = $row['isBackup'];
 
-        $btnBackup = "<a href='05_action.php?act=save_toggle_imp_backup&stkm_id=$stkm_id&targetID=$targetID&BIN_CODE=$BIN_CODE&STOCK_CODE=$STOCK_CODE&isType=$isType&isBackup=1' class='btn btn-outline-dark'>Primary</a>";
+        $btnBackup = "<a href='05_action.php?act=save_toggle_imp_backup&stkm_id=$stkm_id&targetID=$targetID&BIN_CODE=$BIN_CODE&isType=$isType&isBackup=1' class='btn btn-outline-dark'>Primary</a>";
         if($isBackup==1){
-            $btnBackup = "<a href='05_action.php?act=save_toggle_imp_backup&stkm_id=$stkm_id&targetID=$targetID&BIN_CODE=$BIN_CODE&STOCK_CODE=$STOCK_CODE&isType=$isType&isBackup=0' class='btn btn-dark'>Backup</a>";
+            $btnBackup = "<a href='05_action.php?act=save_toggle_imp_backup&stkm_id=$stkm_id&targetID=$targetID&BIN_CODE=$BIN_CODE&isType=$isType&isBackup=0' class='btn btn-dark'>Backup</a>";
         }
         
         $btnType = "<span class='badge badge-primary'>B2R</span>";
@@ -60,19 +60,18 @@ if ($result->num_rows > 0) {
 
 
 $sqlStats = "SELECT 
-SUM(CASE WHEN isType='imp' AND isBackup<>1 AND res_create_date THEN 1 ELSE 0 END)   AS impPrimeComplete, 
-SUM(CASE WHEN isType='imp' AND isBackup<>1 THEN 1 ELSE 0 END)	                    AS impPrimeTotal,
-SUM(CASE WHEN isType='imp' AND isBackup=1 AND res_create_date THEN 1 ELSE 0 END)    AS impBackupComplete,
-SUM(CASE WHEN isType='imp' AND isBackup=1 THEN 1 ELSE 0 END) 	                    AS impBackupTotal,
-SUM(CASE WHEN isType='b2r' AND isBackup<>1 AND res_create_date THEN 1 ELSE 0 END)   AS b2rPrimeComplete,
-SUM(CASE WHEN isType='b2r' AND isBackup<>1 THEN 1 ELSE 0 END)	                    AS b2rPrimeTotal,
+SUM(CASE WHEN LEFT(isType,3)='imp' AND isBackup IS NULL AND res_create_date THEN 1 ELSE 0 END)   AS impPrimeComplete, 
+SUM(CASE WHEN LEFT(isType,3)='imp' AND isBackup IS NULL THEN 1 ELSE 0 END)	                    AS impPrimeTotal,
+SUM(CASE WHEN LEFT(isType,3)='imp' AND isBackup=1 AND res_create_date THEN 1 ELSE 0 END)    AS impBackupComplete,
+SUM(CASE WHEN LEFT(isType,3)='imp' AND isBackup=1 THEN 1 ELSE 0 END) 	                    AS impBackupTotal,
+SUM(CASE WHEN isType='b2r' AND isBackup IS NULL AND res_create_date THEN 1 ELSE 0 END)   AS b2rPrimeComplete,
+SUM(CASE WHEN isType='b2r' AND isBackup IS NULL THEN 1 ELSE 0 END)	                    AS b2rPrimeTotal,
 SUM(CASE WHEN isType='b2r' AND isBackup=1 AND res_create_date THEN 1 ELSE 0 END)    AS b2rBackupComplete,
 SUM(CASE WHEN isType='b2r' AND isBackup=1 THEN 1 ELSE 0 END) 	                    AS b2rBackupTotal
-
 FROM smartdb.sm18_impairment
-WHERE stkm_id=1";
+WHERE stkm_id IN ($sqlInclude)";
 // $sql .= " LIMIT 500; ";   
-// echo $sql;
+// echo "<br><br><br>".$sqlStats;
 $result = $con->query($sqlStats);
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {    
@@ -90,7 +89,7 @@ $stats = "<tr><td></td><td colspan='2'><strong>Impairment</strong></td><td colsp
 $stats .= "<tr><td></td><td>Complete</td><td>Total</td><td>Complete</td><td>Total</td></tr>";
 $stats .= "<tr><td>Primary</td><td>$impPrimeComplete</td><td>$impPrimeTotal</td><td>$b2rPrimeComplete</td><td>$b2rPrimeTotal</td></tr>";
 $stats .= "<tr><td>Backup</td><td>$impBackupComplete</td><td>$impBackupTotal</td><td>$b2rBackupComplete</td><td>$b2rBackupTotal</td></tr>";
-$statsTbl = "<table class='table'>$stats</table>";
+$statsTbl = "<table class='table table-sm'>$stats</table>";
 
 
 ?>

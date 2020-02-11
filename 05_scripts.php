@@ -364,7 +364,7 @@ function fnCalcImpairmentStats(){
                         SUM(CASE WHEN res_parent_storageID IS NOT NULL THEN 1 ELSE 0 END) AS rc_extras
                         FROM smartdb.sm18_impairment 
                         WHERE delete_date IS NULL 
-                        AND isType='imp' 
+                        AND LEFT(isType,3)='imp' 
                         AND sampleFlag=1 
                         AND isBackup IS NULL
                         AND stkm_id= $stkm_id 

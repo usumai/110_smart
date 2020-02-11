@@ -1554,7 +1554,7 @@ if ($act=='sys_pull_master') {
 
      $sql = "UPDATE smartdb.sm18_impairment SET isBackup=$isBackup WHERE targetID='$targetID' AND stkm_id='$stkm_id' ";
      if($isType=="imp"){
-          $sql .= " AND STOCK_CODE='$STOCK_CODE' AND isType='imp' ";
+          $sql .= " AND STOCK_CODE='$STOCK_CODE' AND LEFT(isType,3)='imp' ";
      }else{
           $sql .= " AND BIN_CODE='$BIN_CODE' AND isType='b2r' ";
      }
