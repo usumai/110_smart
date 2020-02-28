@@ -1,0 +1,39 @@
+
+
+
+
+What we need the b2r end result to look like:
+
+We want a table X that looks like:
+BIN_CODE
+stkm_id 
+
+Then we simply run an 
+insert into impairment table, from impairment table where stkmid=[STKMID] AND BIN_CODE = [BIN_CODE] AND isType='b2r'
+
+
+To build table X:
+We run the same comparison, but we ignore FF
+FF's might be present, but they will be wrapped in the BIN_CODE and transfered acordingly
+
+
+To test B2R success with mergeAll.php:
+STK1
+SELECT DSTRCT_CODE, WHOUSE_ID, BIN_CODE, COUNT(*) AS recordCount, fingerprint 
+FROM smartdb.sm18_impairment 
+WHERE isType='b2r'  
+AND isBackup IS NULL 
+AND stkm_id=1
+AND fingerprint IS NOT NULL
+GROUP BY DSTRCT_CODE, WHOUSE_ID, BIN_CODE, fingerprint
+ORDER BY BIN_CODE
+
+SKT2
+SELECT DSTRCT_CODE, WHOUSE_ID, BIN_CODE, COUNT(*) AS recordCount, fingerprint 
+FROM smartdb.sm18_impairment 
+WHERE isType='b2r'  
+AND isBackup IS NULL 
+AND stkm_id=2
+AND fingerprint IS NOT NULL
+GROUP BY DSTRCT_CODE, WHOUSE_ID, BIN_CODE, fingerprint
+ORDER BY BIN_CODE
