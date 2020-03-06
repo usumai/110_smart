@@ -27,6 +27,7 @@ fnMerge($mergeType, $tableName, $stkm_id_one, $stkm_id_two, $pkName, $storageIDN
 
 
 function fnMerge($mergeType, $tableName, $stkm_id_one, $stkm_id_two, $pkName, $storageIDName, $sqlFilter, $capableOfFF){
+    global $con;
     $qar    = [];
     $rows   = "";
     
@@ -118,12 +119,16 @@ function fnMerge($mergeType, $tableName, $stkm_id_one, $stkm_id_two, $pkName, $s
                         AND vt2.fpID IS NOT NULL
                         AND vt1.fpID <> vt2.fpID";
 
-    // $sql_allgood        = "$sql_a UNION $sql_b UNION $sql_c UNION $sql_d UNION $sql_e UNION $sql_f UNION $sql_g ";
+    $sql_allgood        = $qar["a"]["q"]." UNION ".$qar["b"]["q"]." UNION ".$qar["c"]["q"]." UNION ".$qar["g"]["q"];
     // $log .= !$debugMode ? $log: "<br><br><br><b>sql_allgood</b>$sql_allgood";
 
-    // $sql_needscomparison= $sql_h;
+    $sql_needscomparison= $qar["h"]["q"];
     // $log .= !$debugMode ? $log: "<br><br><br><b>sql_needscomparison</b><br>$sql_h";
 
+    mysqli_multi_query($con,$sql_allgood);
+    mysqli_multi_query($con,$sql_needscomparison);
+
+    
     foreach ($qar as $key => $value) {
         $recordCount = fnCountSQL($value["q"]);
         $rows.= "<tr>
