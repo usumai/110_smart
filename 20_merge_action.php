@@ -1,29 +1,125 @@
 <?php
-include "../01_dbcon.php"; 
-include "../05_scripts.php";
-$debugMode  = true;
+include "01_dbcon.php"; 
+include "05_scripts.php";
+$debugMode  = false;
+// $debugMode  = true;
 $log = "";
-
-// echo "<br>MergeConditionsMet:".fnCheckPreMergeConditions();
 if(fnCheckPreMergeConditions()){
+    echo $stk_type;
     fnGetStkDetails();
 }
 
 
 function fnCheckPreMergeConditions(){
-    global $con;
+    global $con, $debugMode, $stk_type;
     $sql = "SELECT count(*) AS mergeCount FROM smartdb.sm13_stk WHERE  stk_include = 1 and smm_delete_date IS NULL";
     $result = $con->query($sql);
     if ($result->num_rows > 0) {
         while($row = $result->fetch_assoc()) {
-            $mergeCount    = $row["mergeCount"];
+            $mergeCount     = $row["mergeCount"];
     }}
     return ($mergeCount==2);
 }
 
+
+
+
+
+
+
+
+
+
 function fnGetSourceStkStats($stkm_id){
+    global $con, $debugMode;
+
+    $sql_rc_orig = "            SELECT SUM(CASE WHEN storage_id IS NOT NULL AND flagTemplate IS NULL THEN 1 ELSE 0 END) AS rc_orig 
+                                FROM smartdb.sm14_ass 
+                                WHERE stkm_id=$stkm_id 
+                                AND delete_date IS NULL ";
     
-    global $con;
+    $sql_rc_orig_complete = "   SELECT SUM(CASE 
+                                            WHEN storage_id IS NOT NULL 
+                                            AND flagTemplate IS NULL 
+                                            AND res_reason_code IS NOT NULL 
+                                            THEN 1 ELSE 0 END) AS rc_orig_complete 
+                                FROM smartdb.sm14_ass 
+                                WHERE stkm_id=$stkm_id 
+                                AND delete_date IS NULL ";
+
+    $sql_rc_extras = "          SELECT SUM(CASE 
+                                            WHEN  first_found_flag=1 
+                                            AND flagTemplate IS NULL THEN 1 
+                                            WHEN rr_id IS NOT NULL 
+                                            AND flagTemplate IS NULL THEN 1 
+                                            ELSE 0 END) AS rc_extras 
+                                FROM smartdb.sm14_ass 
+                                WHERE stkm_id=$stkm_id 
+                                AND delete_date IS NULL ";
+    
+    $sqlStats = "SELECT 
+                    ($sql_rc_orig) AS rc_orig,
+                    ($sql_rc_orig_complete) AS rc_orig_complete,
+                    ($sql_rc_extras) AS rc_extras";
+    $result = $con->query($sqlStats);
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            $rc_orig            = $row["rc_orig"];
+            $rc_orig_complete   = $row["rc_orig_complete"];
+            $rc_extras          = $row["rc_extras"];
+    }}
+    
+    $resultz = "<tr>
+                    <td>$stkm_id</td>
+                    <td>$rc_orig</td>
+                    <td>$rc_orig_complete</td>
+                    <td>$rc_extras</td>
+                </tr>";
+
+    return $resultz;
+}
+
+
+
+
+function fnGetSourceStats($stk_type, $stkm_id_one, $stkm_id_two){
+    if ($stk_type=="stocktake") {
+        $preStats  = fnGetSourceStkStats($stkm_id_one);
+        $preStats .= fnGetSourceStkStats($stkm_id_two);
+        $preStats  = "<table border='1'>
+                        <tr>
+                            <td>stkm_id</td>
+                            <td>rc_orig</td>
+                            <td>rc_orig_complete</td>
+                            <td>rc_extras</td>
+                        </tr>$preStats
+                    </table>";
+    }elseif ($stk_type=="impairment") {
+        $preStats  = fnGetSourceImpStats($stkm_id_one);
+        $preStats .= fnGetSourceImpStats($stkm_id_two);
+        $preStats  = "<table border='1'>
+                        <tr>
+                            <td>stkm_id</td>
+                            <td>impComplete</td>
+                            <td>impTotal</td>
+                            <td>b2rComplete</td>
+                            <td>b2rTotal</td>
+                            <td>binCount_stkm</td>
+                            <td>XXX</td>
+                            
+                            <td>impPrimeComplete</td>
+                            <td>impPrimeTotal</td>
+                            <td>b2rPrimeComplete</td>
+                            <td>b2rPrimeTotal</td>
+                            <td>binCount_stkm_prime</td>
+                        </tr>$preStats
+                    </table>";
+    }
+    return $preStats;
+}
+function fnGetSourceImpStats($stkm_id){
+
+    global $con, $debugMode;
     $sqlStats = "SELECT 
     SUM(CASE WHEN LEFT(isType,3)='imp' AND isBackup IS NULL AND res_create_date THEN 1 ELSE 0 END)  AS impPrimeComplete, 
     SUM(CASE WHEN LEFT(isType,3)='imp' AND isBackup IS NULL THEN 1 ELSE 0 END)	                    AS impPrimeTotal,
@@ -42,14 +138,14 @@ function fnGetSourceStkStats($stkm_id){
         $result = $con->query($sqlStats);
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
-                // $impPrimeComplete   = $row["impPrimeComplete"];
-                // $impPrimeTotal      = $row["impPrimeTotal"];
+                $impPrimeComplete   = $row["impPrimeComplete"];
+                $impPrimeTotal      = $row["impPrimeTotal"];
                 // $impBackupComplete  = $row["impBackupComplete"];
                 // $impBackupTotal     = $row["impBackupTotal"];
                 $impComplete        = $row["impComplete"];
                 $impTotal           = $row["impTotal"];
-                // $b2rPrimeComplete   = $row["b2rPrimeComplete"];
-                // $b2rPrimeTotal      = $row["b2rPrimeTotal"];
+                $b2rPrimeComplete   = $row["b2rPrimeComplete"];
+                $b2rPrimeTotal      = $row["b2rPrimeTotal"];
                 // $b2rBackupComplete  = $row["b2rBackupComplete"];
                 // $b2rBackupTotal     = $row["b2rBackupTotal"];
                 $b2rComplete        = $row["b2rComplete"];
@@ -67,6 +163,16 @@ function fnGetSourceStkStats($stkm_id){
                 while($row = $result->fetch_assoc()) {
                     $binCount_stkm   = $row["binCount_stkm"];
         }}
+        
+        $sqlStats = "SELECT count(DISTINCT BIN_CODE) AS binCount_stkm_prime
+        FROM smartdb.sm18_impairment
+        WHERE stkm_id = $stkm_id
+        AND isType='b2r' AND isBackup IS NULL ";
+            $result = $con->query($sqlStats);
+            if ($result->num_rows > 0) {
+                while($row = $result->fetch_assoc()) {
+                    $binCount_stkm_prime   = $row["binCount_stkm_prime"];
+        }}
 
         $resultz = "<tr>
                         <td>$stkm_id</td>
@@ -75,6 +181,13 @@ function fnGetSourceStkStats($stkm_id){
                         <td>$b2rComplete</td>
                         <td>$b2rTotal</td>
                         <td>$binCount_stkm</td>
+                        <td>&nbsp;</td>
+                        <td>$impPrimeComplete</td>
+                        <td>$impPrimeTotal</td>
+                        <td>$b2rPrimeComplete</td>
+                        <td>$b2rPrimeTotal</td>
+                        <td>$binCount_stkm_prime</td>
+
                     </tr>";
 
         return $resultz;
@@ -84,8 +197,24 @@ function fnGetSourceStkStats($stkm_id){
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function fnGetStkDetails(){// Returns stkm_id_one, stkm_id_two, stkm_id_new
-    global $con;
+    global $con, $debugMode;
     $stkd = [];
     $cherry = 0;
 
@@ -105,19 +234,12 @@ function fnGetStkDetails(){// Returns stkm_id_one, stkm_id_two, stkm_id_new
             $stk_type           = $row["stk_type"];
     }}
 
-    $preStats  = fnGetSourceStkStats($stkm_id_one);
-    $preStats .= fnGetSourceStkStats($stkm_id_two);
-    $preStats  = "<table border='1'>
-                    <tr>
-                        <td>stkm_id</td>
-                        <td>impComplete</td>
-                        <td>impTotal</td>
-                        <td>b2rComplete</td>
-                        <td>b2rTotal</td>
-                        <td>binCount_stkm</td>
-                    </tr>$preStats
-                </table>";
-    echo $preStats."<br><br>";
+
+
+    $preStats = fnGetSourceStats($stk_type, $stkm_id_one, $stkm_id_two);
+    if ($debugMode){
+        echo "These are the statistics of the stocktakes prior to the merge.<br>".$preStats;
+    }
 
     // Create a new name for the stocktake
     if(strpos($stk_name, "MERGE")===false){
@@ -138,6 +260,9 @@ function fnGetStkDetails(){// Returns stkm_id_one, stkm_id_two, stkm_id_new
     while($row = $result->fetch_assoc()) {    
         $stkm_id_new = $row['stkm_id_new'];   
     }}
+    if ($debugMode){
+        echo "<br>Newly create merged stk_id:".$stkm_id_new;
+    }
 
     if ($stk_type=="impairment") {
         $tableName      = "smartdb.sm18_impairment";
@@ -155,10 +280,45 @@ function fnGetStkDetails(){// Returns stkm_id_one, stkm_id_two, stkm_id_new
         fnMerge($stk_type, $mergeType, $tableName, $stkm_id_one, $stkm_id_two, $pkName, $storageIDName, $sqlFilter, $capableOfFF, $stkm_id_new);
         
     }elseif ($stk_type=="stocktake") {
-        // $tableName      = "smartdb.sm18_impairment";
-        // $capableOfFF    = false;        
+        $tableName      = "smartdb.sm14_ass";
+        $capableOfFF    = true;
+        
+        $pkName         = "ass_id";
+        $storageIDName  = "storage_id";
+        $sqlFilter      = " ";
+        $mergeType      = "stk";   
+        fnMerge($stk_type, $mergeType, $tableName, $stkm_id_one, $stkm_id_two, $pkName, $storageIDName, $sqlFilter, $capableOfFF, $stkm_id_new);   
     }
 
+
+
+
+
+    
+
+    $sql = "SELECT COUNT(*) AS qCount FROM smartdb.sm20_quarantine WHERE stkm_id_new = '$stkm_id_new'";
+    $result = $con->query($sql);
+    if ($result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {    
+         $qCount    = $row['qCount'];  
+    }}
+
+    $qCount = (empty($qCount) ? 0 : $qCount);
+    if ($qCount>0){
+         $sql = "  UPDATE smartdb.sm13_stk SET merge_lock=1 WHERE stkm_id = $stkm_id_new;";
+         $nextAddr = "Location: 22_merge.php?stkm_id=$stkm_id_new";
+    }else{
+         $sql = "  UPDATE smartdb.sm13_stk SET merge_lock=NULL WHERE stkm_id = $stkm_id_new;";
+         $nextAddr = "Location: index.php";
+    }
+
+
+    fnStats($stkm_id_new);
+
+    if (!$debugMode){
+        runSql($sql);
+        header($nextAddr);
+   }
 }
 
 
@@ -169,7 +329,7 @@ function fnGetStkDetails(){// Returns stkm_id_one, stkm_id_two, stkm_id_new
 
 
 function fnMerge($stk_type, $mergeType, $tableName, $stkm_id_one, $stkm_id_two, $pkName, $storageIDName, $sqlFilter, $capableOfFF, $stkm_id_new){
-    global $con;
+    global $con, $debugMode;
     $qar    = [];
     $rows   = "";
     
@@ -226,8 +386,8 @@ function fnMerge($stk_type, $mergeType, $tableName, $stkm_id_one, $stkm_id_two, 
                             WHERE stkm_id = $stkm_id_one
                             AND $storageIDName IS NULL
                             AND fingerprint IS NOT NULL
-                            AND $pkName NOT IN (
-                                SELECT vt1.pkID
+                            AND fingerprint NOT IN (
+                                SELECT vt1.fpID
                                 FROM $sql1n, $sql2n
                                 WHERE vt1.fpID = vt2.fpID)";
 
@@ -238,9 +398,9 @@ function fnMerge($stk_type, $mergeType, $tableName, $stkm_id_one, $stkm_id_two, 
                             WHERE stkm_id = $stkm_id_two
                             AND $storageIDName IS NULL
                             AND fingerprint IS NOT NULL
-                            AND $pkName NOT IN (
-                                SELECT vt1.pkID
-                                FROM $sql1n, $sql2n
+                            AND fingerprint NOT IN (
+                                SELECT vt1.fpID
+                                FROM $sql1n,$sql2n
                                 WHERE vt1.fpID = vt2.fpID)";
     }
     $qar["g"]["t"] = $title = "No result";
@@ -261,6 +421,7 @@ function fnMerge($stk_type, $mergeType, $tableName, $stkm_id_one, $stkm_id_two, 
                         AND vt2.fpID IS NOT NULL
                         AND vt1.fpID <> vt2.fpID";
 
+
     $sql_allgood        = $qar["a"]["q"]." UNION ".$qar["b"]["q"]." UNION ".$qar["c"]["q"]." UNION ".$qar["g"]["q"];
     // $log .= !$debugMode ? $log: "<br><br><br><b>sql_allgood</b>$sql_allgood";
 
@@ -278,7 +439,6 @@ function fnMerge($stk_type, $mergeType, $tableName, $stkm_id_one, $stkm_id_two, 
         $recordCount = fnCountSQL($value["q"]);
         $extrapolatedCount = "na";
         if ($mergeType=="b2r") {
-            // echo "<br>".$key;
             $stkm_id_target = $stkm_id_one;
             if($key=="c"){
                 $stkm_id_target = $stkm_id_two;
@@ -298,9 +458,9 @@ function fnMerge($stk_type, $mergeType, $tableName, $stkm_id_one, $stkm_id_two, 
                 </tr>";
     }
     $table = "<table border=1><tr><td>$mergeType</td></tr><tr><td>Serial</td><td>Title</td><td width='20%'>Description</td><td>Query</td><td>Count</td><td>Extrapolated Bins</td></tr>$rows</table>";
-    echo $table;
-
-
+    if ($debugMode){
+        echo $table;
+    }
 
 
 
@@ -315,13 +475,16 @@ function fnMerge($stk_type, $mergeType, $tableName, $stkm_id_one, $stkm_id_two, 
         SELECT $stkm_id_new, storageID, rowNo, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID, finalResult, finalResultPath, fingerprint
         FROM smartdb.sm18_impairment
         WHERE auto_storageID IN (SELECT pkID FROM ($sql_allgood) AS vt_merge_allgood);";
-        //  echo "<br><br><br>$sql";
         runSql($sql);
     
     
-        $sql = "  INSERT INTO smartdb.sm20_quarantine (stkm_id, auto_storageID_one, auto_storageID_two)
-        SELECT $stkm_id_new, stID1, stID2 FROM ($sql_needscomparison) AS vtCompare;";
-        // echo "<br><br><br>$sql";
+        $sql = "  INSERT IGNORE INTO smartdb.sm20_quarantine (stkm_id, auto_storageID_one, auto_storageID_two)
+        SELECT $stkm_id_new, pkID1, pkID2 FROM ($sql_needscomparison) AS vtCompare;";
+        $sql = "    INSERT INTO smartdb.sm20_quarantine (
+                        stkm_id_new, stkm_id_one, stkm_id_two, isType, pkID1, pkID2, stID1 )
+                    SELECT 
+                        $stkm_id_new, $stkm_id_one, $stkm_id_two, 'imp', pkID1, pkID2, pkID1  
+                    FROM ($sql_needscomparison) AS vtCompare;";
         runSql($sql);
     }elseif ($stk_type=="impairment"&&$mergeType=="b2r") {
         // B2R merge process has a list of the rows aggregated to bin_code, when the transfer happens it needs to extrapolate this to include transactional records
@@ -333,20 +496,42 @@ function fnMerge($stk_type, $mergeType, $tableName, $stkm_id_one, $stkm_id_two, 
         
         $sql_b2r_stk1  = $qar["a"]["q"]." UNION ".$qar["b"]["q"]." UNION ".$qar["g"]["q"];
         $sql_b2r_stk2  = $qar["c"]["q"];
-        $sql_b2r_stk1a = $sql_base." WHERE BIN_CODE IN (SELECT pkID FROM ($sql_b2r_stk1) AS vt_merge_allgood) AND stkm_id=$stkm_id_one;";
-        $sql_b2r_stk2a = $sql_base." WHERE BIN_CODE IN (SELECT pkID FROM ($sql_b2r_stk2) AS vt_merge_allgood) AND stkm_id=$stkm_id_two;";
-        // echo "<br><br><br><h1>sql_b2r_stk1</h1>$sql_b2r_stk1a";
-        // echo "<br><br><br>$sql_b2r_stk2a";
+        $sql_b2r_stk1a = $sql_base." WHERE isType='b2r' AND BIN_CODE IN (SELECT pkID FROM ($sql_b2r_stk1) AS vt_merge_allgood) AND stkm_id=$stkm_id_one;";
+        $sql_b2r_stk2a = $sql_base." WHERE isType='b2r' AND BIN_CODE IN (SELECT pkID FROM ($sql_b2r_stk2) AS vt_merge_allgood) AND stkm_id=$stkm_id_two;";
         runSql($sql_b2r_stk1a);
         runSql($sql_b2r_stk2a);
-        
-        
-            $sql = "  INSERT INTO smartdb.sm20_quarantine (stkm_id, auto_storageID_one, auto_storageID_two)
-            SELECT $stkm_id_new, stID1, stID2 FROM ($sql_needscomparison) AS vtCompare;";
-            // echo "<br><br><br>$sql";
-            runSql($sql);
-    }
 
+        $sql = "    INSERT IGNORE INTO smartdb.sm20_quarantine (
+                        stkm_id_new, stkm_id_one, stkm_id_two, isType, stID1, BIN_CODE)
+                    SELECT 
+                        $stkm_id_new, $stkm_id_one, $stkm_id_two, '$mergeType', stID1 , stID1
+                    FROM ($sql_needscomparison) AS vtCompare;";
+        runSql($sql);
+        
+    }elseif ($stk_type=="stocktake") {
+
+        $sql_allgood        = $qar["a"]["q"]." UNION ".$qar["b"]["q"]." UNION ".$qar["c"]["q"]." UNION ".$qar["d"]["q"]." UNION ".$qar["e"]["q"]." UNION ".$qar["f"]["q"]." UNION ".$qar["g"]["q"];
+
+
+        $sql = "  INSERT INTO smartdb.sm14_ass (create_date, create_user, delete_date, delete_user, stkm_id, storage_id, stk_include, Asset, Subnumber, genesis_cat, first_found_flag, rr_id, fingerprint, res_create_date, res_create_user, res_reason_code, res_reason_code_desc, res_comment, AssetDesc1, AssetDesc2, AssetMainNoText, Class, assetType, Inventory, Quantity, SNo, InventNo, accNo, Location, Room, State, latitude, longitude, CurrentNBV, AcqValue, OrigValue, ScrapVal, ValMethod, RevOdep, CapDate, LastInv, DeactDate, PlRetDate, CCC_ParentName, CCC_GrandparentName, GrpCustod, CostCtr, WBSElem, Fund, RspCCtr, CoCd, PlateNo, Vendor, Mfr, UseNo, res_AssetDesc1, res_AssetDesc2, res_AssetMainNoText, res_Class, res_assetType, res_Inventory, res_Quantity, res_SNo, res_InventNo, res_accNo, res_Location, res_Room, res_State, res_latitude, res_longitude, res_CurrentNBV, res_AcqValue, res_OrigValue, res_ScrapVal, res_ValMethod, res_RevOdep, res_CapDate, res_LastInv, res_DeactDate, res_PlRetDate, res_CCC_ParentName, res_CCC_GrandparentName, res_GrpCustod, res_CostCtr, res_WBSElem, res_Fund, res_RspCCtr, res_CoCd, res_PlateNo, res_Vendor, res_Mfr, res_UseNo)
+        SELECT create_date, create_user, delete_date, delete_user, $stkm_id_new, storage_id, 0, Asset, Subnumber, genesis_cat, first_found_flag, rr_id, fingerprint, res_create_date, res_create_user, res_reason_code, res_reason_code_desc, res_comment, AssetDesc1, AssetDesc2, AssetMainNoText, Class, assetType, Inventory, Quantity, SNo, InventNo, accNo, Location, Room, State, latitude, longitude, CurrentNBV, AcqValue, OrigValue, ScrapVal, ValMethod, RevOdep, CapDate, LastInv, DeactDate, PlRetDate, CCC_ParentName, CCC_GrandparentName, GrpCustod, CostCtr, WBSElem, Fund, RspCCtr, CoCd, PlateNo, Vendor, Mfr, UseNo, res_AssetDesc1, res_AssetDesc2, res_AssetMainNoText, res_Class, res_assetType, res_Inventory, res_Quantity, res_SNo, res_InventNo, res_accNo, res_Location, res_Room, res_State, res_latitude, res_longitude, res_CurrentNBV, res_AcqValue, res_OrigValue, res_ScrapVal, res_ValMethod, res_RevOdep, res_CapDate, res_LastInv, res_DeactDate, res_PlRetDate, res_CCC_ParentName, res_CCC_GrandparentName, res_GrpCustod, res_CostCtr, res_WBSElem, res_Fund, res_RspCCtr, res_CoCd, res_PlateNo, res_Vendor, res_Mfr, res_UseNo
+        FROM smartdb.sm14_ass
+        WHERE ass_id IN (SELECT pkID FROM ($sql_allgood) AS vt_merge_allgood);";
+        runSql($sql);
+
+
+
+
+
+        $sql = "    INSERT IGNORE INTO smartdb.sm20_quarantine (
+            stkm_id_new, stkm_id_one, stkm_id_two, isType, pkID1, pkID2, stID1 )
+        SELECT 
+            $stkm_id_new, $stkm_id_one, $stkm_id_two, 'stk', pkID1, pkID2, stID1  
+        FROM ($sql_needscomparison) AS vtCompare;";
+        runSql($sql);
+
+
+    }
 
 
 
@@ -376,9 +561,8 @@ function fnMerge($stk_type, $mergeType, $tableName, $stkm_id_one, $stkm_id_two, 
 
 
 function fnCountSQL($stmt){
-    global $con;
+    global $con, $debugMode;
     $sql = "SELECT COUNT(*) AS recCount FROM ($stmt) AS vt";
-    // echo "<br><br>".$sql;
     $result = $con->query($sql);
     if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {    

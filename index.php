@@ -119,7 +119,7 @@ $(function() {
         </thead>
         <tbody></tbody>
     </table>
-    <a href='05_action.php?act=save_merge_initiate' id='btnMerge' class='btn btn-sm btn-outline-dark float-right'>Merge</a>
+    <a href='20_merge_action.php' id='btnMerge' class='btn btn-sm btn-outline-dark float-right'>Merge</a>
     <br>
     <hr>
     <form action="05_action.php" method="post" enctype="multipart/form-data" id="form_upload">

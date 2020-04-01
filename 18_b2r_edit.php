@@ -45,7 +45,7 @@ if ($result->num_rows > 0) {
                 <input type="hidden" name="stkm_id" value="<?=$stkm_id?>">
                 <input type="hidden" name="auto_storageID" value="<?=$auto_storageID?>">
                 <input type="hidden" name="act" value="save_b2r_add_extra">
-                <a href='05_action.php?act=save_delete_extra&auto_storageID=<?=$auto_storageID?>&stkm_id=<?=$stkm_id?>&BIN_CODE=<?=$BIN_CODE_code?>' class='btn btn-outline-danger'>Delete</a>
+                <a href='05_action.php?act=save_delete_extra&auto_storageID=<?=$auto_storageID?>&stkm_id=<?=$stkm_id?>&BIN_CODE=<?=$BIN_CODE?>' class='btn btn-outline-danger'>Delete</a>
                 <input type="submit" class="btn btn-outline-dark float-right" value='Save' id='btnAddSC'>     
             </form>
         </div>

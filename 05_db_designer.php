@@ -80,7 +80,7 @@ function fnInitiateDatabase(){
               `res_reason_code` varchar(255) DEFAULT NULL,
               `res_reason_code_desc` varchar(255) DEFAULT NULL,
               `res_completed` int(1) DEFAULT NULL,
-              `res_comment` varchar(255) DEFAULT NULL,
+              `res_comment` varchar(2000) DEFAULT NULL,
 
               `AssetDesc1` varchar(255) DEFAULT NULL,
               `AssetDesc2` varchar(255) DEFAULT NULL,
@@ -337,18 +337,23 @@ function fnInitiateDatabase(){
 
 
     $sql_save = "CREATE TABLE $dbname.sm20_quarantine (
-         `q_id` INT(11) NOT NULL AUTO_INCREMENT, 
-         `stkm_id` INT(11),
-         `auto_storageID_one` INT(11),
-         `auto_storageID_two` INT(11),
-         `complete_date` datetime NULL,
-         `selected_auto_storageID` INT(11),
-         PRIMARY KEY (`q_id`));";
+        `q_id` INT(11) NOT NULL AUTO_INCREMENT, 
+        `stkm_id_new` INT(11) NULL,
+        `stkm_id_one` INT(11) NULL,
+        `stkm_id_two` INT(11) NULL,
+        `isType` VARCHAR(255) NULL,
+        `stID1` VARCHAR(255) NULL,
+        `pkID1` VARCHAR(255) NULL,
+        `pkID2` VARCHAR(255) NULL,
+        `BIN_CODE` VARCHAR(255) NULL,
+        `res_pkID_selected` VARCHAR(255) NULL,
+        `res_stkm_id_selected` VARCHAR(255) NULL,
+        `complete_date` datetime NULL,
+        PRIMARY KEY (`q_id`),
+        UNIQUE KEY `index_single_storage_candidate` (`stkm_id_new`, `stID1`));";
 //     echo "<br><br>".$sql_save;
     mysqli_multi_query($con,$sql_save);
 
-
-    
     $sql_save = "UPDATE smartdb.sm10_set SET rr_count = (SELECT COUNT(*) AS rr_count FROM smartdb.sm12_rwr) WHERE smartm_id =1";
     mysqli_multi_query($con,$sql_save);
 

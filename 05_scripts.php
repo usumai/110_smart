@@ -46,7 +46,7 @@ function cleanvalue($fieldvalue) {
     return $fieldvalue;
 }
 
-function checkExtrasFinished($BIN_CODE){
+function checkExtrasFinished($BIN_CODE, $stkm_id){
     global $con;
 
     $fingerprint        = time();
@@ -62,38 +62,21 @@ function checkExtrasFinished($BIN_CODE){
          findingID=16,
          fingerprint='$fingerprint'
          WHERE BIN_CODE='$BIN_CODE' 
-         AND isType='b2r' ";
+         AND isType='b2r' 
+         AND stkm_id=$stkm_id";
     }else{
          $sql = "UPDATE smartdb.sm18_impairment SET 
          findingID=15
          WHERE BIN_CODE='$BIN_CODE' 
-         AND isType='b2r' ";
+         AND isType='b2r' 
+         AND stkm_id=$stkm_id";
     }
     runSql($sql);
     
-    fnCalcImpairmentStats();
+    fnStats($stkm_id);
 }
 
 
-function fnCalcStats($stkm_id){
-    global $con;
-
-    $sql_rc_orig = "SELECT SUM(CASE WHEN storage_id IS NOT NULL AND flagTemplate IS NULL THEN 1 ELSE 0 END) AS rc_orig FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id AND delete_date IS NULL ";
-
-    $sql_rc_orig_complete = "SELECT SUM(CASE WHEN storage_id IS NOT NULL AND flagTemplate IS NULL  AND res_reason_code IS NOT NULL THEN 1 ELSE 0 END) AS rc_orig_complete FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id AND delete_date IS NULL ";
-
-    $sql_rc_extras = "SELECT SUM(CASE WHEN  first_found_flag=1 AND flagTemplate IS NULL THEN 1 WHEN rr_id IS NOT NULL AND flagTemplate IS NULL THEN 1 ELSE 0 END) AS rc_extras FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id AND delete_date IS NULL ";
-
-
-    $sql_save = "UPDATE smartdb.sm13_stk SET 
-         rc_orig=($sql_rc_orig),
-         rc_orig_complete=($sql_rc_orig_complete),
-         rc_extras=($sql_rc_extras)
-         WHERE stkm_id = $stkm_id;";
-    // echo $sql_save;
-    mysqli_multi_query($con,$sql_save);
-
-}
 
 
 
@@ -171,7 +154,7 @@ function fnUpload_stocktake($arr, $dev){
     }
     $sql = "UPDATE smartdb.sm14_ass SET stk_include=0 WHERE stkm_id=$stkm_id_new; ";
     runSql($sql);
-    fnCalcStats($stkm_id_new);
+    fnStats($stkm_id_new);
 }
 
 // impairment_code
@@ -234,7 +217,7 @@ function fnUpload_impairment($arr, $dev){
          $stkm_id_new.",".$ass['storageID'].",".$ass['rowNo'].",".$ass['DSTRCT_CODE'].",".$ass['WHOUSE_ID'].",".$ass['SUPPLY_CUST_ID'].",".$ass['SC_ACCOUNT_TYPE'].",".$ass['STOCK_CODE'].",".$ass['ITEM_NAME'].",".$ass['STK_DESC'].",".$ass['BIN_CODE'].",".$ass['INVENT_CAT'].",".$ass['INVENT_CAT_DESC'].",".$ass['TRACKING_IND'].",".$ass['SOH'].",".$ass['TRACKING_REFERENCE'].",".$ass['LAST_MOD_DATE'].",".$ass['sampleFlag'].",".$ass['serviceableFlag'].",".$ass['isBackup'].",".$ass['isType'].",".$ass['targetID'].",".$ass['delete_date'].",".$ass['delete_user'].",".$ass['res_create_date'].",".$ass['res_update_user'].",".$ass['findingID'].",".$ass['res_comment'].",".$ass['res_evidence_desc'].",".$ass['res_unserv_date'].",".$ass['isChild'].",".$ass['res_parent_storageID'].",".$ass['fingerprint']." ); ";
          mysqli_multi_query($con,$sql_save);
     }
-    fnCalcImpairmentStats();
+    fnStats($stkm_id);
 }
 
 
@@ -329,72 +312,237 @@ function fnUpload_rawremainder($arr, $dev){
 
 
 
+// ini_set('display_startup_errors', 1);
+// ini_set('display_errors', 'On');
+// error_reporting(-1);
+// // mysqli_report(MYSQLI_REPORT_ALL); 
+
+
+// function fnStats($stkm_id){
+//      global $con;
+ 
+//      $sql_rc_orig = "SELECT SUM(CASE WHEN storage_id IS NOT NULL AND flagTemplate IS NULL THEN 1 ELSE 0 END) AS rc_orig FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id AND delete_date IS NULL ";
+ 
+//      $sql_rc_orig_complete = "SELECT SUM(CASE WHEN storage_id IS NOT NULL AND flagTemplate IS NULL  AND res_reason_code IS NOT NULL THEN 1 ELSE 0 END) AS rc_orig_complete FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id AND delete_date IS NULL ";
+ 
+//      $sql_rc_extras = "SELECT SUM(CASE WHEN  first_found_flag=1 AND flagTemplate IS NULL THEN 1 WHEN rr_id IS NOT NULL AND flagTemplate IS NULL THEN 1 ELSE 0 END) AS rc_extras FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id AND delete_date IS NULL ";
+ 
+ 
+//      $sql_save = "UPDATE smartdb.sm13_stk SET 
+//           rc_orig=($sql_rc_orig),
+//           rc_orig_complete=($sql_rc_orig_complete),
+//           rc_extras=($sql_rc_extras)
+//           WHERE stkm_id = $stkm_id;";
+//      // echo $sql_save;
+//      mysqli_multi_query($con,$sql_save);
+ 
+//  }
+
+// function fnCalcStkStats($stkm_id){
+//      global $con;
+//      $rc_orig            = 0;
+//      $rc_orig_complete   = 0;
+//      $rc_extras          = 0;
+
+//      $sql1 = " SELECT 
+//                COUNT(DISTINCT BIN_CODE, DSTRCT_CODE) AS rc_orig, 
+//                COUNT(DISTINCT CASE WHEN res_create_date THEN BIN_CODE ELSE NULL END) AS rc_orig_complete,
+//                COUNT(DISTINCT CASE WHEN storageID IS NULL THEN BIN_CODE ELSE NULL END) AS rc_extras
+//                FROM smartdb.sm18_impairment
+//                WHERE isType='b2r'
+//                AND delete_date IS NULL 
+//                AND isBackup IS NULL
+//                AND stkm_id=$stkm_id";
+//      $sql2 = "SELECT 
+//                SUM(CASE WHEN storageID IS NOT NULL THEN 1 ELSE 0 END) AS rc_orig, 
+//                SUM(CASE WHEN storageID IS NOT NULL AND res_create_date IS NOT NULL THEN 1 ELSE 0 END) AS rc_orig_complete, 
+//                SUM(CASE WHEN res_parent_storageID IS NOT NULL THEN 1 ELSE 0 END) AS rc_extras
+//                FROM smartdb.sm18_impairment 
+//                WHERE delete_date IS NULL 
+//                AND LEFT(isType,3)='imp' 
+//                AND sampleFlag=1 
+//                AND isBackup IS NULL
+//                AND stkm_id= $stkm_id 
+//                GROUP BY stkm_id";
+
+
+//      $sql3 = "$sql1 UNION ALL $sql2";
+//      $sql4 = "SELECT SUM(rc_orig) AS rc_orig, SUM(rc_orig_complete) AS rc_orig_complete, SUM(rc_extras) AS rc_extras FROM ($sql3) AS vt";
+//      // echo "<br><br>$sql4";
+//      $result3 = $con->query($sql4);
+//      if ($result3->num_rows > 0) {
+//      while($row3 = $result3->fetch_assoc()) {
+//           $rc_orig            = $row3["rc_orig"];
+//           $rc_orig_complete   = $row3["rc_orig_complete"];
+//           $rc_extras          = $row3["rc_extras"];
+//      }}
+
+//      $sql5 = " UPDATE smartdb.sm13_stk SET 
+//                rc_orig = '$rc_orig', 
+//                rc_orig_complete = '$rc_orig_complete', 
+//                rc_extras = '$rc_extras' 
+//                WHERE stkm_id =$stkm_id
+//                ";
+//      mysqli_multi_query($con,$sql5);
+//  }
 
 
 
 
 
 
-
-
-
-function fnCalcImpairmentStats(){
-    global $con;
-
+// function fnCalcImpairmentStats(){
+//     global $con;
 
     
-    $sql = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include = 1 AND smm_delete_date IS NULL";
-    $result = $con->query($sql);
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-              $stkm_id            = $row["stkm_id"];
-              $rc_orig            = 0;
-              $rc_orig_complete   = 0;
+//     $sql = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include = 1 AND smm_delete_date IS NULL";
+//     $result = $con->query($sql);
+//     if ($result->num_rows > 0) {
+//         while($row = $result->fetch_assoc()) {
+//               $stkm_id            = $row["stkm_id"];
+//               $rc_orig            = 0;
+//               $rc_orig_complete   = 0;
 
-              $sql_count_b2r_extras = "SELECT COUNT(*) AS rc_extras FROM smartdb.sm18_impairment 
-              WHERE isType='b2r' AND stkm_id=$stkm_id AND isChild IS NOT NULL AND delete_date IS NULL";
-              $sql1 = "SELECT 
-                        COUNT(*) as rc_orig, 
-                        SUM(CASE WHEN findingID = 14 THEN 1 WHEN findingID = 16 THEN 1 ELSE 0 END) as rc_orig_complete,
-                        ($sql_count_b2r_extras) AS rc_extras
-                        FROM (SELECT stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, isChild, findingID FROM smartdb.sm18_impairment WHERE isType='b2r' AND delete_date IS NULL AND storageID=1  AND isBackup IS NULL AND stkm_id=$stkm_id GROUP BY stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, isChild, findingID) AS vtOne";
-              $sql2 = "SELECT 
-                        SUM(CASE WHEN storageID IS NOT NULL THEN 1 ELSE 0 END) AS rc_orig, 
-                        SUM(CASE WHEN storageID IS NOT NULL AND res_create_date IS NOT NULL THEN 1 ELSE 0 END) AS rc_orig_complete, 
-                        SUM(CASE WHEN res_parent_storageID IS NOT NULL THEN 1 ELSE 0 END) AS rc_extras
-                        FROM smartdb.sm18_impairment 
-                        WHERE delete_date IS NULL 
-                        AND LEFT(isType,3)='imp' 
-                        AND sampleFlag=1 
-                        AND isBackup IS NULL
-                        AND stkm_id= $stkm_id 
-                        GROUP BY stkm_id";
+//               $sql_count_b2r_extras = "SELECT COUNT(*) AS rc_extras FROM smartdb.sm18_impairment 
+//               WHERE isType='b2r' AND stkm_id=$stkm_id AND isChild IS NOT NULL AND delete_date IS NULL";
+//               $sql1 = "SELECT 
+//                         COUNT(*) as rc_orig, 
+//                         SUM(CASE WHEN findingID = 14 THEN 1 WHEN findingID = 16 THEN 1 ELSE 0 END) as rc_orig_complete,
+//                         ($sql_count_b2r_extras) AS rc_extras
+//                         FROM (SELECT stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, isChild, findingID FROM smartdb.sm18_impairment WHERE isType='b2r' AND delete_date IS NULL AND storageID=1  AND isBackup IS NULL AND stkm_id=$stkm_id GROUP BY stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, isChild, findingID) AS vtOne";
+//               $sql2 = "SELECT 
+//                         SUM(CASE WHEN storageID IS NOT NULL THEN 1 ELSE 0 END) AS rc_orig, 
+//                         SUM(CASE WHEN storageID IS NOT NULL AND res_create_date IS NOT NULL THEN 1 ELSE 0 END) AS rc_orig_complete, 
+//                         SUM(CASE WHEN res_parent_storageID IS NOT NULL THEN 1 ELSE 0 END) AS rc_extras
+//                         FROM smartdb.sm18_impairment 
+//                         WHERE delete_date IS NULL 
+//                         AND LEFT(isType,3)='imp' 
+//                         AND sampleFlag=1 
+//                         AND isBackup IS NULL
+//                         AND stkm_id= $stkm_id 
+//                         GROUP BY stkm_id";
 
 
-              $sql3 = "$sql1 UNION $sql2";
-              echo $sql3;
-              $sql4 = "SELECT SUM(rc_orig) AS rc_orig, SUM(rc_orig_complete) AS rc_orig_complete, SUM(rc_extras) AS rc_extras FROM ($sql3) AS vt";
-              echo "<br><br>$sql4";
-              $result2 = $con->query($sql4);
-              if ($result2->num_rows > 0) {
-              while($row2 = $result2->fetch_assoc()) {
-                   $rc_orig            = $row2["rc_orig"];
-                   $rc_orig_complete   = $row2["rc_orig_complete"];
-                   $rc_extras          = $row2["rc_extras"];
-              }}
+//               $sql3 = "$sql1 UNION $sql2";
+//           //     echo $sql3;
+//               $sql4 = "SELECT SUM(rc_orig) AS rc_orig, SUM(rc_orig_complete) AS rc_orig_complete, SUM(rc_extras) AS rc_extras FROM ($sql3) AS vt";
+//           //     echo "<br><br>$sql4";
+//               $result2 = $con->query($sql4);
+//               if ($result2->num_rows > 0) {
+//               while($row2 = $result2->fetch_assoc()) {
+//                    $rc_orig            = $row2["rc_orig"];
+//                    $rc_orig_complete   = $row2["rc_orig_complete"];
+//                    $rc_extras          = $row2["rc_extras"];
+//               }}
 
-              $sql5 = " UPDATE smartdb.sm13_stk SET 
-                        rc_orig = '$rc_orig', 
-                        rc_orig_complete = '$rc_orig_complete', 
-                        rc_extras = '$rc_extras' 
-                        WHERE stkm_id =$stkm_id
-                        ";
-              mysqli_multi_query($con,$sql5);
+//               $sql5 = " UPDATE smartdb.sm13_stk SET 
+//                         rc_orig = '$rc_orig', 
+//                         rc_orig_complete = '$rc_orig_complete', 
+//                         rc_extras = '$rc_extras' 
+//                         WHERE stkm_id =$stkm_id
+//                         ";
+//               mysqli_multi_query($con,$sql5);
 
-    }}
+//     }}
 
+
+// }
+
+
+
+
+
+
+
+
+
+function fnStats($stkm_id){
+     global $con;
+     $rc_orig            = 0;
+     $rc_orig_complete   = 0;
+     $rc_extras          = 0;
+
+     $sql = "SELECT * FROM smartdb.sm13_stk WHERE stkm_id=$stkm_id";
+     $result = $con->query($sql);
+     if ($result->num_rows > 0) {
+         while($row = $result->fetch_assoc()) {
+               $stk_type           = $row["stk_type"];
+     }}
+     // echo "stk_type:$stk_type";
+     if ($stk_type=="stocktake") {
+
+          $sql_rc_orig = "              SELECT SUM(CASE WHEN storage_id IS NOT NULL AND flagTemplate IS NULL THEN 1 ELSE 0 END) AS rc_orig 
+                                        FROM smartdb.sm14_ass 
+                                        WHERE stkm_id=$stkm_id 
+                                        AND delete_date IS NULL ";
+ 
+          $sql_rc_orig_complete = "     SELECT 
+                                             SUM(CASE 
+                                                  WHEN storage_id IS NOT NULL 
+                                                  AND flagTemplate IS NULL  
+                                                  AND res_reason_code IS NOT NULL THEN 1 ELSE 0 END) AS rc_orig_complete 
+                                        FROM smartdb.sm14_ass 
+                                        WHERE stkm_id=$stkm_id 
+                                        AND delete_date IS NULL ";
+      
+          $sql_rc_extras = "            SELECT 
+                                             SUM(CASE 
+                                                  WHEN  first_found_flag=1 
+                                                  AND flagTemplate IS NULL THEN 1 
+                                                  WHEN rr_id IS NOT NULL 
+                                                  AND flagTemplate IS NULL THEN 1 ELSE 0 END) AS rc_extras 
+                                        FROM smartdb.sm14_ass 
+                                        WHERE stkm_id=$stkm_id 
+                                        AND delete_date IS NULL ";
+      
+          $sql_save = "  UPDATE smartdb.sm13_stk SET 
+                              rc_orig=($sql_rc_orig),
+                              rc_orig_complete=($sql_rc_orig_complete),
+                              rc_extras=($sql_rc_extras)
+                         WHERE stkm_id = $stkm_id;";
+          echo $sql_rc_extras;
+          mysqli_multi_query($con,$sql_save);
+     }elseif ($stk_type=="impairment") {
+          $sql1 = " SELECT 
+                    COUNT(DISTINCT BIN_CODE, DSTRCT_CODE) AS rc_orig, 
+                    COUNT(DISTINCT CASE WHEN res_create_date THEN BIN_CODE ELSE NULL END) AS rc_orig_complete,
+                    0 AS rc_extras
+                    FROM smartdb.sm18_impairment
+                    WHERE isType='b2r'
+                    AND delete_date IS NULL 
+                    AND isBackup IS NULL
+                    AND stkm_id=$stkm_id";
+          $sql2 = "SELECT 
+                    SUM(CASE WHEN storageID IS NOT NULL THEN 1 ELSE 0 END) AS rc_orig, 
+                    SUM(CASE WHEN storageID IS NOT NULL AND res_create_date IS NOT NULL THEN 1 ELSE 0 END) AS rc_orig_complete, 
+                    SUM(CASE WHEN res_parent_storageID IS NOT NULL THEN 1 ELSE 0 END) AS rc_extras
+                    FROM smartdb.sm18_impairment 
+                    WHERE delete_date IS NULL 
+                    AND LEFT(isType,3)='imp' 
+                    AND sampleFlag=1 
+                    AND isBackup IS NULL
+                    AND stkm_id= $stkm_id 
+                    GROUP BY stkm_id";
+
+          $sql3 = "$sql1 UNION ALL $sql2";
+          $sql4 = "SELECT SUM(rc_orig) AS rc_orig, SUM(rc_orig_complete) AS rc_orig_complete, SUM(rc_extras) AS rc_extras FROM ($sql3) AS vt";
+          $result3 = $con->query($sql4);
+          if ($result3->num_rows > 0) {
+          while($row3 = $result3->fetch_assoc()) {
+               $rc_orig            = $row3["rc_orig"];
+               $rc_orig_complete   = $row3["rc_orig_complete"];
+               $rc_extras          = $row3["rc_extras"];
+          }}
+          $sql5 = " UPDATE smartdb.sm13_stk SET 
+                    rc_orig = '$rc_orig', 
+                    rc_orig_complete = '$rc_orig_complete', 
+                    rc_extras = '$rc_extras' 
+                    WHERE stkm_id =$stkm_id";
+          mysqli_multi_query($con,$sql5);
+     }
 
 }
+
 
 
 ?>

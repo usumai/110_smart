@@ -8,6 +8,7 @@ if (isset($_POST["act"])) {
 }else{
 	$act = $_GET["act"];
 }
+// echo $act;
 // $exportFileVersion=7;
 $this_version_no  = 11;
 $date_version_published = "2019-12-10 00:00:00";
@@ -945,7 +946,7 @@ if ($act=='sys_pull_master') {
      }}
      $data = json_encode($data);
      echo $data;
-     fnCalcStats($stkm_id);
+     fnStats($stkm_id);
 
 
 }elseif ($act=='save_AssetFieldValue'){
@@ -967,7 +968,7 @@ if ($act=='sys_pull_master') {
                $stkm_id	          = $row["stkm_id"];
      }}
      echo $confirmedValue;
-     fnCalcStats($stkm_id);
+     fnStats($stkm_id);
 
 }elseif ($act=='save_delete_photo'){
      $photo_filename     = "images/".$_GET["photo_filename"];
@@ -1132,7 +1133,7 @@ if ($act=='sys_pull_master') {
 
      $sql_save = "UPDATE smartdb.sm12_rwr SET rr_included=1 WHERE rr_id='$rr_id';";
      mysqli_multi_query($con,$sql_save);
-     fnCalcStats($stkm_id);
+     fnStats($stkm_id);
      header("Location: 11_ass.php?ass_id=".$ass_id);
 
 }elseif ($act=='get_rawremainder_asset_count') {
@@ -1357,7 +1358,7 @@ if ($act=='sys_pull_master') {
                WHERE 
                auto_storageID='$auto_storageID' ";
      runSql($sql);
-     fnCalcImpairmentStats();
+     fnStats($stkm_id);
 
      header("Location: 16_imp.php?auto_storageID=".$auto_storageID);
 
@@ -1374,7 +1375,7 @@ if ($act=='sys_pull_master') {
      fingerprint=NULL
      WHERE 
      auto_storageID='$auto_storageID' ";
-     echo $sql;
+     // echo $sql;
      runSql($sql);
 
      $sql = "DELETE FROM smartdb.sm18_impairment WHERE res_parent_storageID='$storageID' ";
@@ -1393,10 +1394,10 @@ if ($act=='sys_pull_master') {
      res_update_user=NULL,
      findingID=14,
      fingerprint='$fingerprint'
-     WHERE BIN_CODE='$BIN_CODE' AND isType='b2r' ";
+     WHERE BIN_CODE='$BIN_CODE' AND isType='b2r' AND stkm_id=$stkm_id";
      runSql($sql);
 
-     fnCalcImpairmentStats();
+     fnStats($stkm_id);
      header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
 
 }elseif ($act=='save_b2r_extras') {
@@ -1406,9 +1407,9 @@ if ($act=='sys_pull_master') {
      $sql = "UPDATE smartdb.sm18_impairment SET 
      findingID=15,
      fingerprint='$fingerprint'
-     WHERE BIN_CODE='$BIN_CODE'  AND isType='b2r' ";
+     WHERE BIN_CODE='$BIN_CODE'  AND isType='b2r' AND stkm_id=$stkm_id";
      runSql($sql);
-     fnCalcImpairmentStats();
+     fnStats($stkm_id);
      header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
      
 }elseif ($act=='save_clear_b2r') {
@@ -1423,15 +1424,16 @@ if ($act=='sys_pull_master') {
      res_evidence_desc=NULL,
      res_unserv_date=NULL,
      fingerprint=NULL
-     WHERE 
-     BIN_CODE='$BIN_CODE'  AND isType='b2r'";
+     WHERE BIN_CODE='$BIN_CODE'  
+     AND isType='b2r'
+     AND stkm_id=$stkm_id";
      runSql($sql);
 
      echo $sql;
-     $sql = "DELETE FROM smartdb.sm18_impairment WHERE BIN_CODE='$BIN_CODE' AND isChild=1 AND isType='b2r'";
+     $sql = "DELETE FROM smartdb.sm18_impairment WHERE BIN_CODE='$BIN_CODE' AND isChild=1 AND isType='b2r' AND stkm_id=$stkm_id";
      runSql($sql);
 
-     fnCalcImpairmentStats();
+     fnStats($stkm_id);
      header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
 
 }elseif ($act=='save_delete_extra') {
@@ -1441,7 +1443,7 @@ if ($act=='sys_pull_master') {
      $sql = "UPDATE smartdb.sm18_impairment SET delete_date=NOW() WHERE auto_storageID=$auto_storageID"; 
      // echo $sql;
      runSql($sql);
-     checkExtrasFinished($BIN_CODE);
+     checkExtrasFinished($BIN_CODE, $stkm_id);
      header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
 
 }elseif ($act=='save_b2r_add_extra') {
@@ -1498,7 +1500,7 @@ if ($act=='sys_pull_master') {
      }
      echo $sql;
      runSql($sql);
-     checkExtrasFinished($BIN_CODE);
+     checkExtrasFinished($BIN_CODE, $stkm_id);
      header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
 
 }elseif ($act=='save_b2r_extra') {
@@ -1513,7 +1515,7 @@ if ($act=='sys_pull_master') {
      finalResultPath='".$finalResultPath."'
      WHERE auto_storageID='$auto_storageID' ";
      echo runSql($sql);
-     checkExtrasFinished($BIN_CODE);
+     checkExtrasFinished($BIN_CODE, $stkm_id);
 
 }elseif ($act=='save_clear_b2r_extra') {
      $auto_storageID     = $_GET["auto_storageID"];
@@ -1524,7 +1526,7 @@ if ($act=='sys_pull_master') {
      finalResultPath=NULL
      WHERE auto_storageID='$auto_storageID' ";
      echo runSql($sql);
-     checkExtrasFinished($BIN_CODE);
+     checkExtrasFinished($BIN_CODE, $stkm_id);
 
      header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
 
@@ -1560,7 +1562,7 @@ if ($act=='sys_pull_master') {
      }
      echo $sql;
      echo runSql($sql);
-     fnCalcImpairmentStats();
+     fnStats($stkm_id);
      header("Location: 19_toggle.php");
 
 
@@ -1883,7 +1885,7 @@ if ($act=='sys_pull_master') {
           }
 
           
-          fnCalcStats($new_stkm_id);
+          fnStats($new_stkm_id);
 
 
 
@@ -1895,18 +1897,58 @@ if ($act=='sys_pull_master') {
      }
 
 }elseif ($act=='save_merge_select') {
-     $stkm_id                 = $_GET["stkm_id"];
-     $q_id                    = $_GET["q_id"];
-     $selected_auto_storageID = $_GET["selected_auto_storageID"];
+     $q_id     = $_GET["q_id"];
+     $stmnum   = $_GET["stmnum"];
 
-     $sql = "  UPDATE smartdb.sm20_quarantine SET complete_date = NOW(), selected_auto_storageID=$selected_auto_storageID WHERE q_id = $q_id;";
-     // echo "<br><br><br>$sql";
+     $sql = "SELECT * FROM smartdb.sm20_quarantine WHERE q_id = $q_id";
+     $result = $con->query($sql);
+     if ($result->num_rows > 0) {
+         while($row = $result->fetch_assoc()) {
+          $stkm_id_new             = $row["stkm_id_new"];
+          $stkm_id_one             = $row["stkm_id_one"];
+          $stkm_id_two             = $row["stkm_id_two"];
+          $isType                  = $row["isType"];
+          $pkID1                   = $row["pkID1"];
+          $pkID2                   = $row["pkID2"];
+          $BIN_CODE                = $row["BIN_CODE"];
+          $res_pkID_selected       = $row["res_pkID_selected"];
+          $res_stkm_id_selected    = $row["res_stkm_id_selected"];
+          $complete_date           = $row["complete_date"];
+     }}
+
+     if($stmnum=="one"){
+          $selectedStkm = $stkm_id_one;
+          $selectedPkID = " pkID1 ";
+     }elseif($stmnum=="two"){
+          $selectedStkm = $stkm_id_two;
+          $selectedPkID = " pkID2 ";
+     }
+
+     $sql = "  UPDATE smartdb.sm20_quarantine SET 
+               complete_date = NOW(), 
+               res_pkID_selected=$selectedPkID, 
+               res_stkm_id_selected=$selectedStkm
+               WHERE q_id = $q_id;";
+
+
+     echo "<br><br><br>$sql";
      runSql($sql);
      
-     header("Location: 20_merge.php?stkm_id=$stkm_id");
+     header("Location: 22_merge.php?stkm_id=$stkm_id_new");
 
 }elseif ($act=='save_merge_finalise') {
      $stkm_id                 = $_GET["stkm_id"];
+
+
+     $sql = "SELECT * FROM smartdb.sm20_quarantine WHERE stkm_id_new = $stkm_id";
+     $result = $con->query($sql);
+     if ($result->num_rows > 0) {
+         while($row = $result->fetch_assoc()) {
+          $stkm_id_one             = $row["stkm_id_one"];
+          $stkm_id_two             = $row["stkm_id_two"];
+     }}
+
+
 
      $sql = "SELECT * FROM smartdb.sm13_stk WHERE  stk_include = 1";
      $result = $con->query($sql);
@@ -1916,28 +1958,45 @@ if ($act=='sys_pull_master') {
      }}
 
      if($stk_type=="impairment"){
-          $sub = "SELECT selected_auto_storageID FROM smartdb.sm20_quarantine WHERE stkm_id = $stkm_id";
+          $sub = "SELECT res_pkID_selected FROM smartdb.sm20_quarantine WHERE stkm_id_new = $stkm_id AND isType='imp'";
           $sql = "  INSERT INTO smartdb.sm18_impairment (stkm_id, storageID, rowNo, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID, finalResult, finalResultPath, fingerprint)
           SELECT $stkm_id, storageID, rowNo, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID, finalResult, finalResultPath, fingerprint
           FROM smartdb.sm18_impairment
-          WHERE auto_storageID IN ($sub)";
+          WHERE auto_storageID IN ($sub); ";
+          runSql($sql);
+
+          $sub = "SELECT BIN_CODE FROM smartdb.sm20_quarantine WHERE res_stkm_id_selected = $stkm_id_one AND isType='b2r' AND stkm_id_new=$stkm_id";
+          $sql = "  INSERT INTO smartdb.sm18_impairment (stkm_id, storageID, rowNo, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID, finalResult, finalResultPath, fingerprint)
+          SELECT $stkm_id, storageID, rowNo, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID, finalResult, finalResultPath, fingerprint
+          FROM smartdb.sm18_impairment
+          WHERE BIN_CODE IN ($sub) AND stkm_id=$stkm_id_one; ";
+          runSql($sql);
+
+          $sub = "SELECT BIN_CODE FROM smartdb.sm20_quarantine WHERE res_stkm_id_selected = $stkm_id_two AND isType='b2r' AND stkm_id_new=$stkm_id";
+          $sql = "  INSERT INTO smartdb.sm18_impairment (stkm_id, storageID, rowNo, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID, finalResult, finalResultPath, fingerprint)
+          SELECT $stkm_id, storageID, rowNo, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID, finalResult, finalResultPath, fingerprint
+          FROM smartdb.sm18_impairment
+          WHERE BIN_CODE IN ($sub) AND stkm_id=$stkm_id_two; ";
+          runSql($sql);
+
+
           
      }elseif($stk_type=="stocktake"){
-          $sub = "SELECT selected_auto_storageID FROM smartdb.sm20_quarantine WHERE stkm_id = $stkm_id";
+          $sub = "SELECT res_pkID_selected FROM smartdb.sm20_quarantine WHERE stkm_id_new = $stkm_id";
           $sql = "  INSERT INTO smartdb.sm14_ass (create_date, create_user, delete_date, delete_user, stkm_id, storage_id, stk_include, Asset, Subnumber, genesis_cat, first_found_flag, rr_id, fingerprint, res_create_date, res_create_user, res_reason_code, res_reason_code_desc, res_comment, AssetDesc1, AssetDesc2, AssetMainNoText, Class, assetType, Inventory, Quantity, SNo, InventNo, accNo, Location, Room, State, latitude, longitude, CurrentNBV, AcqValue, OrigValue, ScrapVal, ValMethod, RevOdep, CapDate, LastInv, DeactDate, PlRetDate, CCC_ParentName, CCC_GrandparentName, GrpCustod, CostCtr, WBSElem, Fund, RspCCtr, CoCd, PlateNo, Vendor, Mfr, UseNo, res_AssetDesc1, res_AssetDesc2, res_AssetMainNoText, res_Class, res_assetType, res_Inventory, res_Quantity, res_SNo, res_InventNo, res_accNo, res_Location, res_Room, res_State, res_latitude, res_longitude, res_CurrentNBV, res_AcqValue, res_OrigValue, res_ScrapVal, res_ValMethod, res_RevOdep, res_CapDate, res_LastInv, res_DeactDate, res_PlRetDate, res_CCC_ParentName, res_CCC_GrandparentName, res_GrpCustod, res_CostCtr, res_WBSElem, res_Fund, res_RspCCtr, res_CoCd, res_PlateNo, res_Vendor, res_Mfr, res_UseNo)
           SELECT create_date, create_user, delete_date, delete_user, $stkm_id, storage_id, stk_include, Asset, Subnumber, genesis_cat, first_found_flag, rr_id, fingerprint, res_create_date, res_create_user, res_reason_code, res_reason_code_desc, res_comment, AssetDesc1, AssetDesc2, AssetMainNoText, Class, assetType, Inventory, Quantity, SNo, InventNo, accNo, Location, Room, State, latitude, longitude, CurrentNBV, AcqValue, OrigValue, ScrapVal, ValMethod, RevOdep, CapDate, LastInv, DeactDate, PlRetDate, CCC_ParentName, CCC_GrandparentName, GrpCustod, CostCtr, WBSElem, Fund, RspCCtr, CoCd, PlateNo, Vendor, Mfr, UseNo, res_AssetDesc1, res_AssetDesc2, res_AssetMainNoText, res_Class, res_assetType, res_Inventory, res_Quantity, res_SNo, res_InventNo, res_accNo, res_Location, res_Room, res_State, res_latitude, res_longitude, res_CurrentNBV, res_AcqValue, res_OrigValue, res_ScrapVal, res_ValMethod, res_RevOdep, res_CapDate, res_LastInv, res_DeactDate, res_PlRetDate, res_CCC_ParentName, res_CCC_GrandparentName, res_GrpCustod, res_CostCtr, res_WBSElem, res_Fund, res_RspCCtr, res_CoCd, res_PlateNo, res_Vendor, res_Mfr, res_UseNo
           FROM smartdb.sm14_ass
           WHERE ass_id IN ($sub)";
+          echo "<br><br>".$sql;
+          runSql($sql);
      }
-     echo "<br><br><br>$sql";
-     runSql($sql);
-     fnCalcStats($stkm_id);
+     fnStats($stkm_id);
 
      $sql = "  UPDATE smartdb.sm13_stk SET merge_lock=NULL WHERE stkm_id = $stkm_id;";
      runSql($sql);
 
 
-     header("Location: index.php");
+     // header("Location: index.php");
 
 
 
@@ -1996,7 +2055,7 @@ if ($act=='sys_pull_master') {
 
 
 }elseif ($act=='testarea') {
-     fnCalcImpairmentStats();
+     fnStats(7);
 
 }
 // echo $log;
