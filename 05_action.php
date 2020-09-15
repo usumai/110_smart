@@ -10,7 +10,7 @@ if (isset($_POST["act"])) {
 }
 // echo $act;
 // $exportFileVersion=7;
-$this_version_no  = 11;
+$this_version_no  = 12;
 $date_version_published = "2019-12-10 00:00:00";
 // Steps for relesing a new version:
 // 1. Update the version info above with version number one more than current
