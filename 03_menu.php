@@ -277,8 +277,11 @@ $(function(){
 							<!-- <a class='dropdown-item' href='05_action.php?act=sys_open_image_folder'>Image folder</a> -->
 
 							<div class='dropdown-divider'></div>
-							<h6 class='dropdown-header'>Software version<span class='float-right'>v"+sys["sett"][0]["versionLocal"]+"</span></h6>
-							<button type='button' class='dropdown-item btn text-danger' data-toggle='modal' data-target='#modal_confirm_update'>Update available</button>
+							<h6 class='dropdown-header'>Software version<span class='float-right'>v{{ sysd.versionLocal }}</span></h6>
+							<button type='button' v-if="sysd.versionLocal==sysd.versionRemote" class='dropdown-item btn' v-on:click='save_check_version()'>Check version</button>
+							<span v-if="vcheck==2" class='dropdown-item'>You need to be connected to the internet to check for a new version</span>
+
+							<button type='button' v-if="sysd.versionLocal<sysd.versionRemote" class='dropdown-item btn text-danger' data-toggle='modal' data-target='#modal_confirm_update'>Update available v{{ sysd.versionRemote }}</button>
 							
 							<span v-if='false'>
 								<div class='dropdown-divider'></div>
@@ -298,7 +301,6 @@ $(function(){
 
 
 				</ul>
-				<button class='nav-link text-danger' v-on:click='save_check_version()'>Check version</button>
 				<a href='10_stk.php' class='nav-link text-success' v-if="sysd.act_type=='ga_stk'">Summary</a>
 				<a href='15_impairment.php' class='nav-link text-success' v-if="sysd.act_type=='is_act'" >Summary</a>
 			</div>
@@ -540,6 +542,7 @@ let vm_menu = new Vue({
 		templd:{},
 		actvd:{},
 		rwrd:{},
+		vcheck:{},
 		search_resd:{},
 		template_ass_id:0,
 		menu_search:'',
@@ -590,8 +593,11 @@ let vm_menu = new Vue({
 		save_check_version(){
             payload     = {'act':'save_check_version'}
 			json		= fnapi(payload)
-			// this.rwrd 	= json[0]
-			console.log(json)
+			this.vcheck	= json[0]['test_results']
+			console.log(this.vcheck)
+			if(this.vcheck==1){
+				this.get_system()
+			}
 		},
 
 		get_search_results() {

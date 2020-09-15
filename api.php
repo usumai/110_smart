@@ -229,15 +229,28 @@ if ($act=="get_system") {
 
          $sql_save = "UPDATE smartdb.sm10_set SET date_last_update_check=NOW(), versionRemote=$latest_version_no; ";
          mysqli_multi_query($con,$sql_save);
-         $test_results = "Check performed";
+         $test_results = 1 ;//"Check performed and updated";
 
     }else{
-         $test_results = "Internet is required to check the version";
+         $test_results = 2 ;//"Internet is required to check the version";
     }
 
     // Compare remote to local and advise if update button should be displayed
-    $sql = "SELECT versionLocal, versionRemote, date_last_update_check, '$test_results' AS test_results FROM smartdb.sm10_set";
+    $sql = "SELECT '$test_results' AS test_results ";
     echo json_encode(qget($sql));
+
+    // $result = $con->query($sql);
+    // if ($result->num_rows > 0) {
+    //      while($row = $result->fetch_assoc()) {
+    //      $versionLocal	= $row["versionLocal"];
+    //      $versionRemote	= $row["versionRemote"];
+    // }}
+    // $data  = [];
+    // $data["versionLocal"]    = $versionLocal;
+    // $data["versionRemote"]   = $versionRemote;
+    // $data["test_results"]    = $test_results;
+    // $data = json_encode($data);
+    // echo $data;
     
     
 }
