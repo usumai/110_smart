@@ -60,6 +60,11 @@ if ($act=="get_system") {
     $sql = "    SELECT ass_id, res_create_date, res_asset_id, res_class, res_loc_location, res_loc_room, res_assetdesc1, res_assetdesc2, res_inventno, res_serialno, res_plateno, res_val_nbv, res_reason_code, CASE WHEN res_reason_code<>'' THEN 1 ELSE 0 END AS ass_status FROM smartdb.sm14_ass WHERE stk_include=1 AND delete_date IS NULL AND genesis_cat <> 'ga_template'";
     echo json_encode(qget($sql));
     
+}elseif ($act=="get_stk_assets_to_export") {
+	$stkm_id = $_POST["stkm_id"];
+    $sql = "    SELECT * FROM smartdb.sm14_ass WHERE stkm_id=$stkm_id AND genesis_cat <> 'ga_template'";
+    echo json_encode(qget($sql));
+    
 }elseif ($act=="get_stk_progress") {
     $sql = "    SELECT COUNT(*) as count_total, SUM(CASE WHEN res_reason_code<>'' THEN 1 ELSE 0 END) AS count_complete   FROM smartdb.sm14_ass WHERE stk_include = 1 AND delete_date IS NULL AND genesis_cat <> 'template'";
     echo json_encode(qget($sql));

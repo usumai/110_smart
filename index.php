@@ -2,6 +2,32 @@
 <?php include "02_header.php"; ?>
 <?php include "03_menu.php"; ?>
 
+
+
+<script src="includes/standalone.js"></script>
+
+<script>
+const config = {
+  filename: 'general-ledger-Q1',
+  sheet: {
+    data: [
+      [{
+        value: 'Income - Webshop',
+        type: 'string'
+      }, {
+        value: 1000,
+        type: 'number'
+      }]
+    ]
+  }
+};
+
+// zipcelx(config);
+</script>
+
+
+
+
 <div id="app">
     <div class='container-fluid'>
         <h1 class="mt-5 display-4">SMART Mobile</h1>
@@ -53,7 +79,7 @@
                     <button v-if='actv.smm_delete_date' v-on:click='save_activity_toggle_delete(actv.stkm_id,0)' class='btn btn-outline-secondary float-right'>Restore</button>
                 </td>
                 <td>
-                    <button class='btn btn-outline-dark float-right'>Excel</button>
+                    <button class='btn btn-outline-dark float-right' v-on:click="export_to_xls(actv.stkm_id)" v-if='false'>Excel</button>
                 </td>
                 <td>
                     <button class='btn btn-outline-dark float-right' v-on:click='export_activity(actvidx)'>Export</button>
@@ -119,6 +145,43 @@ let vm = new Vue({
             this.get_activities()
             // console.log(this.actvd)
         }, 
+        export_to_xls(activity_id){
+            payload     = {'act':'get_stk_assets_to_export', "stkm_id":activity_id}
+            res         = fnapi(payload)
+
+            data=[]
+            tbl = "<table>"
+            tbl+="<tr>"
+            for(let colidx in res[0]){
+                tbl+="<td>"+colidx+"</td>"
+                data
+            }
+            tbl+="</tr>"
+            for(let rowidx in res){
+                rowval = res[rowidx]
+                tbl+="<tr>"
+                for(let colidx in rowval){
+                    colval = rowval[colidx]
+                    tbl+="<td>"+colval+"</td>"
+                }
+                tbl+="</tr>"
+            }
+            tbl+="</table>"
+
+            data = [
+                [{
+                    value: 'Income - Webshop',
+                    type: 'string'
+                }, {
+                    value: 1000,
+                    type: 'number'
+                }]
+            ]
+
+            const config2 = {filename: 'general-ledger-Q1',sheet: {data}};
+            zipcelx(config2);
+            makeFileAndDL("test.xls", tbl)
+        },
         export_activity(activity_id){
             actv = this.actvd[activity_id]
             console.log(actv)
