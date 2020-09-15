@@ -204,6 +204,42 @@ if ($act=="get_system") {
                         OR accNo LIKE '%$search_term%' 
                         OR InventNo LIKE '%$search_term%'  ";
     echo json_encode(qget($sql));
+
+
+
+}elseif ($act=='save_check_version'){
+    // Steps for relesing a new version:
+    // 1. Update the version info above with version number one more than current
+    // 2. Update the 08_version.json as per above details
+    // 3. Delete json and xls files from directory to stop any leaks
+    // 4. Push local to master using toolshelf
+    $test_internet = @fsockopen("www.example.com", 80); //website, port  (try 80 or 443)
+    if ($test_internet){
+         $URL = 'https://raw.githubusercontent.com/usumai/110_smart/master/08_version.json';
+         $ch = curl_init();
+         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+         curl_setopt($ch, CURLOPT_URL, $URL);
+         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+         $data = curl_exec($ch);
+         curl_close($ch);
+         $json = json_decode($data, true);
+         $latest_version_no       = $json["latest_version_no"];
+         $version_publish_date    = $json["version_publish_date"];
+
+         $sql_save = "UPDATE smartdb.sm10_set SET date_last_update_check=NOW(), versionRemote=$latest_version_no; ";
+         mysqli_multi_query($con,$sql_save);
+         $test_results = "Check performed";
+
+    }else{
+         $test_results = "Internet is required to check the version";
+    }
+
+    // Compare remote to local and advise if update button should be displayed
+    $sql = "SELECT versionLocal, versionRemote, date_last_update_check, '$test_results' AS test_results FROM smartdb.sm10_set";
+    echo json_encode(qget($sql));
+    
+    
 }
 
 

@@ -298,6 +298,7 @@ $(function(){
 
 
 				</ul>
+				<button class='nav-link text-danger' v-on:click='save_check_version()'>Check version</button>
 				<a href='10_stk.php' class='nav-link text-success' v-if="sysd.act_type=='ga_stk'">Summary</a>
 				<a href='15_impairment.php' class='nav-link text-success' v-if="sysd.act_type=='is_act'" >Summary</a>
 			</div>
@@ -586,6 +587,12 @@ let vm_menu = new Vue({
 			console.log(this.rwrd)
 		},
 
+		save_check_version(){
+            payload     = {'act':'save_check_version'}
+			json		= fnapi(payload)
+			// this.rwrd 	= json[0]
+			console.log(json)
+		},
 
 		get_search_results() {
 			if (this.menu_search.length>3){
