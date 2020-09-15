@@ -4,7 +4,7 @@
 $search_term = $_GET["search_term"];
 
 $options_stks_template="";
-$sql = "SELECT * FROM smartdb.sm13_stk WHERE smm_delete_date IS NULL AND stk_include =1";
+$sql = "SELECT * FROM smartdb.sm13_stk WHERE smm_delete_date IS NULL";
 // echo $sql;
 $result2 = $con->query($sql);
 if ($result2->num_rows > 0) {

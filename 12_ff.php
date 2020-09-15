@@ -4,8 +4,21 @@
 <?php
 
 $options_stks="";
-$sql = "SELECT * FROM smartdb.sm13_stk WHERE stk_include=1 ORDER BY stk_name";
-// echo $sql;
+// $sql = "SELECT * FROM smartdb.sm13_stk WHERE stk_include=1 ORDER BY stk_name";
+// // echo $sql;
+
+
+$sql = "SELECT *
+		FROM smartdb.sm13_stk LEFT JOIN 
+		(SELECT stkm_id,
+		SUM(CASE WHEN genesis_cat='original' THEN 1 ELSE 0 END) AS rc_orig,
+		SUM(CASE WHEN genesis_cat='nonoriginal' THEN 1 ELSE 0 END) AS rc_extras,
+		SUM(CASE WHEN res_reason_code<>'' AND genesis_cat='original' THEN 1 ELSE 0 END) AS rc_orig_complete,
+		COUNT(*) AS rc_totalsent, stk_include
+		FROM smartdb.sm14_ass 
+		WHERE delete_date IS NULL
+		GROUP BY stkm_id ) AS vt1
+		ON smartdb.sm13_stk.stkm_id= vt1.stkm_id;";
 $result2 = $con->query($sql);
 if ($result2->num_rows > 0) {
   while($row2 = $result2->fetch_assoc()) {
@@ -13,12 +26,19 @@ if ($result2->num_rows > 0) {
     $stk_id  	= $row2["stk_id"];
     $stk_name  	= $row2["stk_name"];
 
-	$options_stks .= "<option value='".$stkm_id."'>STK#".$stk_id.": ".$stk_name."</option>";
+	$options_stks .= "<option value='".$stkm_id."'>STKM# $stkm_id. STK#".$stk_id.": ".$stk_name."</option>";
 }}
+
+
+
+
+
+
+
 
 $row_firstfound = "";
 
-$sql = "SELECT * FROM smartdb.sm15_rc WHERE rc_section='FF' ORDER BY res_reason_code";
+$sql = "SELECT * FROM smartdb.sm15_rc WHERE rc_action='SAVON' ORDER BY res_reason_code";
 // echo $sql;
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
@@ -26,9 +46,9 @@ if ($result->num_rows > 0) {
     $list_res_reason_code 	= $row['res_reason_code'];
     $list_rc_desc 			= $row['rc_desc'];
     $rc_long_desc 			= $row['rc_long_desc'];
-    $rc_examples 			= $row['rc_examples'];
+    $rc_example 			= $row['rc_example'];
     $list_rc_desc = str_replace("Asset First Found - ", "", $list_rc_desc);
-	$row_firstfound .= "<tr><td><button type='submit' name='res_reason_code' value='$list_res_reason_code' class='btn btn-primary'>$list_res_reason_code</button></td><td width='95%' align='center' style='padding-bottom:0px'><h5 class='card-title' style='margin-bottom:0px'>$list_rc_desc&nbsp;<small class='card-subtitle mb-2 text-muted'>$rc_long_desc. $rc_examples</small></h5></td><td align='right'><button type='submit' name='res_reason_code' value='$list_res_reason_code' class='btn btn-primary float-right'>$list_res_reason_code</button></td></tr>";
+	$row_firstfound .= "<tr><td><button type='submit' name='res_reason_code' value='$list_res_reason_code' class='btn btn-primary'>$list_res_reason_code</button></td><td width='95%' align='center' style='padding-bottom:0px'><h5 class='card-title' style='margin-bottom:0px'>$list_rc_desc&nbsp;<small class='card-subtitle mb-2 text-muted'>$rc_long_desc. $rc_example</small></h5></td><td align='right'><button type='submit' name='res_reason_code' value='$list_res_reason_code' class='btn btn-primary float-right'>$list_res_reason_code</button></td></tr>";
 }}
 
 

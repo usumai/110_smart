@@ -1,7 +1,30 @@
-
 //The functions withing This script file must be called from within the jquery doc-ready tages in other filrs in order for jquery to work
 
+function fnapi(data){
+    payload_res = $.ajax({
+        type: "POST",
+        url: "api.php",
+        dataType: "json",
+        data,
+        async:false,
+    }).responseText;
+    payload_res = IsJsonString(payload_res) ? JSON.parse(payload_res) : "Non-valid json was returned"+payload_res;
+    return payload_res;
+}
 
+function IsJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
+function fnratr(nosub, notot){//Make a percentage rate
+    res = nosub / notot
+    return res;
+}
 
 // function fnMakeIndexTable(){
 //     $("#tbl_stk tbody").html("");
@@ -11,7 +34,6 @@
 //         fnSetMenu(sys)
 //     })
 // }
-
 
 function fnDo(api, nextFn, sL){
     fns(sL,"Calling API:"+api)
@@ -57,81 +79,6 @@ function fnLoadTemplates(templateData){
 }
 
 
-function fnSetMenu(sys){
-    let system_stk_type = sys["system_stk_type"]
-
-    btnFF               = "<a class='dropdown-item text-primary' href='12_ff.php'>Add First Found</a>"
-    btnImages           = "<a class='dropdown-item' href='05_action.php?act=sys_open_image_folder'>Image folder</a>"
-    btnArchives         = "<a class='dropdown-item' href='06_admin.php'>Archived Stocktakes</a>"
-    btnReset            = "<button type='button' class='dropdown-item btn btn-danger' data-toggle='modal' data-target='#modal_confirm_reset'>Reset all data</button>"
-    
-    btnInverColor       = "<a class='dropdown-item' href='05_action.php?act=save_invertcolors'>Invert Colour Scheme</a>"
-    btnCreateTemplate   = "<a class='dropdown-item' href='05_action.php?act=save_createtemplatefile'>Create template file</a>"
-    btnBackups          = "<a class='dropdown-item' href='19_toggle.php'>Toggle primary/backup</a>"
-    // <?=$area_rr?>
-    
-    menuRR  = "<div class='dropdown-divider'></div><h6 class='dropdown-header'>Raw Remainder</h6><span class='dropdown-item'>Assets loaded: "+sys["sett"][0]["rr_count"]+"</span>"
-    // console.log("sys")
-    // console.log(sys)
-    helpContents=btnArchives+btnReset+btnInverColor
-    btnVAction  = "<div id='areaVersionAction'><button type='button' class='dropdown-item btn' id='btnCheckForUpdates'>Check for updates</button></div>"
-    styleUpdateAvailable =""
-    if (sys["sett"][0]["versionLocal"]<sys["sett"][0]["versionRemote"]){
-        btnVAction  = "<button type='button' class='dropdown-item btn text-danger' data-toggle='modal' data-target='#modal_confirm_update'>Update available</button>"
-        styleUpdateAvailable = " text-danger "
-    }
-    menuUpdate  = "<div class='dropdown-divider'></div><h6 class='dropdown-header'>Software version<span class='float-right'>v"+sys["sett"][0]["versionLocal"]+"</span></h6>"+btnVAction
-
-
-    menuAdd = ""
-    $("#menuSearch").hide();
-    if(system_stk_type=="stocktake"){
-        $(".initiateBTN").html("<a href='10_stk.php' class='nav-link text-success' >Summary</a>");
-        $("#menuSearch").show();
-        $("#tags").focus();
-        helpContents += btnImages+btnCreateTemplate
-        menuAdd = "<a class='nav-link dropdown-toggle' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='menuFF'>First found</a><div class='dropdown-menu' aria-labelledby='dropdown01' id='dropdown_adds'>"+btnFF+"<div class='dropdown-divider'></div><h6 class='dropdown-header'>Templates <a href='21_templates.php' class='float-right'>Edit</a></h6><div id='areaTemplates'></div></div>"
-    }else if(system_stk_type=="impairment"){
-        $(".initiateBTN").html("<a href='15_impairment.php' class='nav-link text-success' >Summary</a>");
-        helpContents += btnBackups
-    }else{
-        $(".initiateBTN").html("");
-    }
-
-
-
-
-    // console.log("Menu set:")
-    // console.log(typeof sys["pro"])
-    // console.log(sys["pro"])
-    users               = sys["pro"];
-    active_profile_id   = sys["sett"][0]["active_profile_id"];
-    btnUser = "";
-    if (Object.entries(users).length === 0){
-        console.log("No users exist")
-    }else{
-        // users       = ["Lucas","Sam","Max"];
-        activeUser  = 1;
-        for (let user in users){
-            profile_id              = users[user]["profile_id"]
-            profile_name            = users[user]["profile_name"]
-            profile_phone_number    = users[user]["profile_phone_number"]
-            // console.log("active_profile_id:"+active_profile_id)
-            // console.log("profile_id:"+profile_id)
-            if (active_profile_id==profile_id){
-                btnUser  += "<button type='button' class='dropdown-item btn text-success btnUser' data-toggle='modal' data-target='#modal_add_user' data-profile_id='"+profile_id+"' data-profile_name='"+profile_name+"' data-profile_phone_number='"+profile_phone_number+"'>"+profile_name+"</button>";
-            }else{
-                btnUser  += "<button type='button' class='dropdown-item btn btnUser' data-toggle='modal' data-target='#modal_add_user' data-profile_id='"+profile_id+"' data-profile_name='"+profile_name+"' data-profile_phone_number='"+profile_phone_number+"'>"+profile_name+"</button>";
-            }
-        }
-    }
-    btnAddUser  = "<button type='button' class='btn btnUser' data-toggle='modal' data-target='#modal_add_user' data-profile_id='0'>+ Add new user</button>"
-    menuUser    = "<div class='dropdown-divider'></div><h6 class='dropdown-header'>User management</span></h6>"+btnUser+btnAddUser
-
-    menuHelp    = "<a class='nav-link dropdown-toggle "+styleUpdateAvailable+"' href='#'data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='headingHelp'>Help</a><div class='dropdown-menu' aria-labelledby='dropdown01' id='dropdownHelp' >"+helpContents+menuRR+menuUpdate+menuUser+"</div>"
-    $("#menuHelp").html(menuHelp);
-    $("#menuAdd").html(menuAdd);
-}
 
 
 function fnCheckUpdates(data){
