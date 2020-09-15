@@ -861,14 +861,13 @@ if ($act=='sys_pull_master') {
      $result = $con->query($sql);
      if ($result->num_rows > 0) {
           while($row = $result->fetch_assoc()) {
-               $Asset              = $row["Asset"];
-               $Subnumber          = $row["Subnumber"];
-               $fingerprint        = $row["fingerprint"];
+               $res_asset_id           = $row["res_asset_id"];
+               $res_fingerprint        = $row["res_fingerprint"];
      }}
      if ($Asset=="First found") {
-          $photo_name              = "images/".$fingerprint;
+          $photo_name              = "images/".$res_fingerprint;
      }else{
-          $photo_name              = "images/".$Asset.'-'.$Subnumber;
+          $photo_name              = "images/".$res_asset_id;
      }
      $original_photo_name     = $photo_name;
      $counter = 1;
