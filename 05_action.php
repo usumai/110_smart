@@ -821,38 +821,6 @@ if ($act=='sys_pull_master') {
 // ####################################################################################
 // Asset page actions
 // ####################################################################################
-
-
-}elseif ($act=='get_ImgGallery'){
-     $ass_id   = $_POST["ass_id"];   
-
-     $sql = "SELECT Asset, Subnumber, fingerprint FROM smartdb.sm14_ass WHERE ass_id=$ass_id";
-     $result = $con->query($sql);
-     if ($result->num_rows > 0) {
-          while($row = $result->fetch_assoc()) {
-          $Asset	     = $row["Asset"];
-          $Subnumber     = $row["Subnumber"];
-          $fingerprint   = $row["fingerprint"];
-     }}
-
-     $a        = scandir("images/");
-     $img_list = "";
-     $images 	= "";
-     if ($Asset=="First found") {
-          $photo_name_test	= $fingerprint;
-     }else{
-          $photo_name_test	= $Asset.'-'.$Subnumber;
-     }
-     foreach ($a as $key => $photo_name) {
-          $photo_name_parts = explode("_",$photo_name);
-         if ($photo_name_parts[0]==$photo_name_test)  {
-               $img_list .= "<button type='button' class='btn thumb_photo' value='".$photo_name."' data-toggle='modal' data-target='#modal_show_pic'><img src='images/".$photo_name."?".time()."' width='200px'></button>"; 
-         }
-     }
-     
-     echo $img_list;
-
-
 }elseif ($act=='save_photo'){
      $ass_id   = $_POST["ass_id"];
      $input    = $_POST["res_img_data"];

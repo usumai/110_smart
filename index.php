@@ -4,7 +4,7 @@
 
 <div id="app">
     <div class='container-fluid'>
-        <h1 class="mt-5 display-4">SMART Mobile {{ message }}</h1>
+        <h1 class="mt-5 display-4">SMART Mobile</h1>
 
         <div class='row'>
             <div class='col-2'>
@@ -63,6 +63,16 @@
         </table>
         <button class='btn btn-outline-dark float-right' v-on:click='show_deleted=!show_deleted'>Show deleted</button>
 
+    </div>
+
+    
+    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+    <div class='row'>
+        <div class='col'>
+            <a href='00_status.html' class='btn btn-danger'>Fix me</a>
+        </div>
     </div>
 </div>
 
