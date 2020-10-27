@@ -92,6 +92,18 @@ if ($act=="create_ga_stocktake") {
     $stmt   ->bind_param("ss", $res_reason_code, $ass_id);
     $stmt   ->execute();
 
+}elseif ($act=='get_is_records') {
+    $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_delete_date IS NULL";
+    $sql  = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) ";
+
+
+    
+    echo json_encode(qget($sql));
+
+}elseif ($act=='get_is_settings') {
+    $sql = "SELECT findingID, color AS fCol, resAbbr AS fAbr FROM smartdb.sm19_result_cats;";
+    echo json_encode(qget($sql));
+
 }elseif ($act=="save_stk_delete_no_ass") {
     $ass_id     = $_POST["ass_id"];
     $direction  = $_POST["direction"];

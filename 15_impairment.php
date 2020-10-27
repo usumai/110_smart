@@ -186,8 +186,10 @@ if ($result->num_rows > 0) {
 
 
 $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_delete_date IS NULL";
-$sql = "SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND sampleFlag = 1 AND ((isBackup IS NULL) OR (isBackup=0)) AND isType ='imp' ";
+$sql  = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) ";
+// $sql .= " AND sampleFlag = 1 AND ((isBackup IS NULL) OR (isBackup=0)) AND isType ='imp' ";
 // $sql .= " LIMIT 500; ";   
+// echo $sql;
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {    

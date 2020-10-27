@@ -189,7 +189,7 @@ function fnUpload_rawremainder($arr, $dev){
 
 
 Function fnUpload_is_audit($arr, $dev){
-    global $con;
+    // global $con;
     $stk_id                  = $arr['stk_id'];
     $stk_name                = $arr['stk_name'];
     $dpn_extract_date        = $arr['dpn_extract_date'];
@@ -235,7 +235,7 @@ Function fnUpload_is_audit($arr, $dev){
                                 $ass['SUPPLY_CUST_ID'], $ass['SC_ACCOUNT_TYPE'], $ass['STOCK_CODE'], $ass['ITEM_NAME'], $ass['STK_DESC'], 
                                 $ass['BIN_CODE'], $ass['INVENT_CAT'], $ass['INVENT_CAT_DESC'], $ass['TRACKING_IND'], $ass['SOH'], 
                                 $ass['TRACKING_REFERENCE'], $ass['LAST_MOD_DATE'], $ass['sampleFlag'], $ass['serviceableFlag'], $ass['isBackup'], 
-                                $ass['isType'], $ass['targetID'], $ass['delete_date'], $ass['delete_user'], $ass['res_create_date'], 
+                                $ass['actType'], $ass['targetID'], $ass['delete_date'], $ass['delete_user'], $ass['res_create_date'], 
                                 $ass['res_update_user'], $ass['findingID'], $ass['res_comment'], $ass['res_evidence_desc'], $ass['res_unserv_date'], 
                                 $ass['isChild'], $ass['res_parent_storageID'], $ass['fingerprint']);
          $stmt   ->execute();

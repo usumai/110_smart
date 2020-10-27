@@ -93,7 +93,7 @@ function createIsImpairments($connection, $stocktakeId, $impairments) {
 			$record->sampleFlag, 
 			$record->serviceableFlag, 
 			$record->isBackup, 
-			$record->isType, 
+			$record->actType, 
 			$record->targetID, 
 			$record->delete_date, 
 			$record->delete_user, 
