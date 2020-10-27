@@ -357,8 +357,7 @@ function fnInitiateDatabase(){
 
     $sql_save = "CREATE TABLE $dbname.sm18_impairment (
          
-    `auto_storageID` INT(11) NOT NULL AUTO_INCREMENT, 
-    
+    `auto_storageID` INT(11) NOT NULL AUTO_INCREMENT,   
     `stkm_id` INT(11),
     `storageID` INT(11),
     `rowNo` INT(11),
@@ -376,18 +375,13 @@ function fnInitiateDatabase(){
     `SOH` INT(11),
     `TRACKING_REFERENCE` VARCHAR(255) NULL,
     `LAST_MOD_DATE` DATETIME NULL,
-
     `sampleFlag` INT(11),
     `serviceableFlag` INT(11), 
     `isBackup` INT(11),
     `isType` VARCHAR(255) NULL,
     `targetID` INT(11),
-
-    
-    
     `delete_date` datetime NULL,
     `delete_user` VARCHAR(255) NULL,
-
     `res_create_date` datetime NULL,
     `res_update_user` VARCHAR(255) NULL,
     `findingID` VARCHAR(255) NULL,
@@ -396,14 +390,11 @@ function fnInitiateDatabase(){
     `res_unserv_date` datetime NULL,
     `isChild` int(11) NULL,
     `res_parent_storageID` VARCHAR(255) NULL,
-
     `finalResult` VARCHAR(255) NULL,
     `finalResultPath` VARCHAR(255) NULL,
     `fingerprint` varchar(255) DEFAULT NULL,
     `checkFlag` int(11) NULL,
-    
     PRIMARY KEY (`auto_storageID`));";
-//     echo "<br><br>".$sql_save;
     mysqli_multi_query($con,$sql_save);
 
 

@@ -1,51 +1,54 @@
 <?php 
 include "01_dbcon.php"; 
+include "php/common/common.php";
+include "php/service/fileupload.php";
 
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-if (isset($_POST["act"])) {
+$request = getApiAction();
+   
+if($request != null) {
+    $act = $request->action;
+}elseif (isset($_POST["act"])) {
 	$act = $_POST["act"];
 }else{
 	$act = $_GET["act"];
 }
 
 
-function qget($sql){// Submits a basic sql and returns an array result
-    global $con;
-    $res = [];
-    $result = $con->query($sql);
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $res[] = $row;
-    }}
-    return $res;
-}
-
-
-
-
-if ($act=="get_system") {
-    $sql        = " SELECT *, (SELECT stk_type FROM smartdb.sm13_stk WHERE stkm_id IN (SELECT stkm_id FROM smartdb.sm14_ass WHERE stk_include=1 GROUP BY stkm_id) GROUP BY stk_type) AS act_type  FROM smartdb.sm10_set;";
-    echo json_encode(qget($sql));
-    
+if ($act=="create_ga_stocktake") {  
+    execWithErrorHandler(function() use ($con, $request){   
+        $stocktakeId = createGaStocktake($con, $request->data);
+        $result = ["stocktakeId" => $stocktakeId];
+        echo json_encode(new ResponseMessage("OK", $result));
+    });
+}elseif($act=="create_ga_assets") {
+    execWithErrorHandler(function() use ($con, $request){ 
+        createGaAssets($con, $request->data->stocktakeId, $request->data->assets);
+        echo json_encode(new ResponseMessage("OK",null));
+    });       
+}elseif ($act=="create_is_audit") {      
+    execWithErrorHandler(function() use ($con, $request){
+        $stocktakeId = createIsAudit($con, $request->data);
+        $result = ["stocktakeId" => $stocktakeId];
+        echo json_encode(new ResponseMessage("OK", $result));
+    });
+}elseif($act=="create_is_impairments") {
+    execWithErrorHandler(function() use ($con, $request){ 
+        createIsImpairments($con, $request->data->stocktakeId, $request->data->impairments);
+        echo json_encode(new ResponseMessage("OK",null));
+    });     
+}elseif ($act=="get_system") {
+    $sql        = "SELECT *, (SELECT stk_type FROM smartdb.sm13_stk WHERE stk_include=1 group by stk_type) AS act_type FROM smartdb.sm10_set;";
+    echo json_encode(qget($sql));    
 }elseif ($act=="get_activities") {
-    $sql = "SELECT * 
-            FROM smartdb.sm13_stk LEFT JOIN 
-                (SELECT stkm_id,
-                SUM(CASE WHEN genesis_cat='original' THEN 1 ELSE 0 END) AS rc_orig,
-                SUM(CASE WHEN genesis_cat='nonoriginal' THEN 1 ELSE 0 END) AS rc_extras,
-                SUM(CASE WHEN res_reason_code<>'' AND genesis_cat='original' THEN 1 ELSE 0 END) AS rc_orig_complete,
-                COUNT(*) AS rc_totalsent, stk_include
-                FROM smartdb.sm14_ass 
-                WHERE delete_date IS NULL
-                GROUP BY stkm_id ) AS vt1
-            ON smartdb.sm13_stk.stkm_id= vt1.stkm_id;";
-    echo json_encode(qget($sql));
-
+    getActivities();
 }elseif ($act=="save_activity_toggle_include") {
 	$stkm_id        = $_POST["stkm_id"];
     $stk_include    = $_POST["stk_include"];
-    $sql            = " UPDATE smartdb.sm14_ass SET stk_include = $stk_include WHERE stkm_id = $stkm_id ";
+    $sql            = "UPDATE smartdb.sm14_ass SET stk_include = $stk_include WHERE stkm_id = $stkm_id ";
+    $sql1            = "UPDATE smartdb.sm13_stk SET stk_include = $stk_include WHERE stkm_id = $stkm_id ";
+    mysqli_multi_query($con,$sql1);
     echo mysqli_multi_query($con,$sql);
 
 }elseif ($act=="save_activity_toggle_delete") {
@@ -54,8 +57,6 @@ if ($act=="get_system") {
     $delete_status  = $delete_status==1 ? " smm_delete_date=NOW() " :  " smm_delete_date=NULL ";
     $sql            = " UPDATE smartdb.sm13_stk SET $delete_status WHERE stkm_id = $stkm_id ";
     echo mysqli_multi_query($con,$sql);
-
-
 }elseif ($act=="get_stk_assets") {
     $sql = "    SELECT ass_id, res_create_date, res_asset_id, res_class, res_loc_location, res_loc_room, res_assetdesc1, res_assetdesc2, res_inventno, res_serialno, res_plateno, res_val_nbv, res_reason_code, CASE WHEN res_reason_code<>'' THEN 1 ELSE 0 END AS ass_status FROM smartdb.sm14_ass WHERE stk_include=1 AND delete_date IS NULL AND genesis_cat <> 'ga_template'";
     echo json_encode(qget($sql));
@@ -261,6 +262,50 @@ if ($act=="get_system") {
     
 }
 
+function qget($sql){
+    // Submits a basic sql and returns an array result
+    global $con;
+    $res = [];
+    $result = $con->query($sql);
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            $res[] = $row;
+    }}
+    return $res;
+}
 
+function getActivities() {
+/*    
+   $sql = "SELECT * 
+            FROM smartdb.sm13_stk LEFT JOIN 
+                (SELECT stkm_id,
+                SUM(CASE WHEN genesis_cat='original' THEN 1 ELSE 0 END) AS rc_orig,
+                SUM(CASE WHEN genesis_cat='nonoriginal' THEN 1 ELSE 0 END) AS rc_extras,
+                SUM(CASE WHEN res_reason_code<>'' AND genesis_cat='original' THEN 1 ELSE 0 END) AS rc_orig_complete,
+                COUNT(*) AS rc_totalsent, stk_include
+                FROM smartdb.sm14_ass 
+                WHERE delete_date IS NULL
+                GROUP BY stkm_id ) AS vt1
+            ON smartdb.sm13_stk.stkm_id= vt1.stkm_id;";
+*/            
 
+    $sql = "SELECT 
+                stk.*, 
+                vt1.rc_orig,
+                vt1.rc_extras,
+                vt1.rc_orig_complete,
+                vt1.rc_totalsent
+            FROM smartdb.sm13_stk as stk LEFT JOIN 
+                (SELECT stkm_id,
+                    SUM(CASE WHEN genesis_cat='original' THEN 1 ELSE 0 END) AS rc_orig,
+                    SUM(CASE WHEN genesis_cat='nonoriginal' THEN 1 ELSE 0 END) AS rc_extras,
+                    SUM(CASE WHEN res_reason_code<>'' AND genesis_cat='original' THEN 1 ELSE 0 END) AS rc_orig_complete,
+                    COUNT(*) AS rc_totalsent
+                FROM smartdb.sm14_ass 
+                WHERE delete_date IS NULL
+                GROUP BY stkm_id ) AS vt1
+            ON stk.stkm_id= vt1.stkm_id;";
+            
+    echo json_encode(qget($sql));
+}
 ?>

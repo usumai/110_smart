@@ -305,7 +305,7 @@ $(function(){
 
 				</ul>
 				<a href='10_stk.php' class='nav-link text-success' v-if="sysd.act_type=='ga_stk'">Summary</a>
-				<a href='15_impairment.php' class='nav-link text-success' v-if="sysd.act_type=='is_act'" >Summary</a>
+				<a href='15_impairment.php' class='nav-link text-success' v-if="sysd.act_type=='is_audit'" >Summary</a>
 			</div>
 		</nav>
 		<hr>
