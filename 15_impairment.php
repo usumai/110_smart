@@ -180,12 +180,13 @@ if ($result->num_rows > 0) {
         $fAbr       = $row['fAbr'];
         $arF['col'][$findingID] = $fCol;
         $arF['abr'][$findingID] = $fAbr;
-}}
+    }
+}
 
 
 
 $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_delete_date IS NULL";
-$sql = "SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND sampleFlag = 1 AND isBackup IS NULL AND LEFT(isType,3)='imp' AND delete_date IS NULL ";
+$sql = "SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND sampleFlag = 1 AND ((isBackup IS NULL) OR (isBackup=0)) AND isType ='imp' ";
 // $sql .= " LIMIT 500; ";   
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
@@ -213,8 +214,10 @@ if ($result->num_rows > 0) {
 
         $flag_status = "<h4><span class='badge badge-secondary'>NYC~</span></h4>";
         if(!empty($res_create_date)){
-            $fCol = $arF['col'][$findingID];
-            $fAbr = $arF['abr'][$findingID];
+
+            $fCol = array_key_exists($findingID, $arF['col']) ? $arF['col'][$findingID] : $findingID ;
+            $fAbr = array_key_exists($findingID, $arF['abr']) ? $arF['abr'][$findingID] : $findingID ;
+
             $flag_status = "<h4><span class='badge badge-$fCol'>FIN~$fAbr</span></h4>";
             if ($findingID==13){
                 $flag_status = "<h4><span class='badge badge-$fCol'>NYC~$fAbr</span></h4>";
@@ -234,7 +237,8 @@ if ($result->num_rows > 0) {
 
 // B2R items which have a storageID of 1 are those which are teh skeleton rows, without them, if a bin location is listed as a target, but does not have stock, the bin will not be sent from the DPN.
 $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_delete_date IS NULL";
-$sql = "SELECT  stkm_id, DSTRCT_CODE, WHOUSE_ID, BIN_CODE, findingID, COUNT(DISTINCT STOCK_CODE) AS countSCs  FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND isBackup IS NULL AND isType='b2r' AND delete_date IS NULL AND storageID=1 GROUP BY stkm_id, DSTRCT_CODE, WHOUSE_ID, BIN_CODE, findingID ";
+//$sql = "SELECT  stkm_id, DSTRCT_CODE, WHOUSE_ID, BIN_CODE, findingID, COUNT(DISTINCT STOCK_CODE) AS countSCs  FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND ((isBackup IS NULL) OR (isBackup=0)) AND isType='b2r' AND delete_date IS NULL AND storageID=1 GROUP BY stkm_id, DSTRCT_CODE, WHOUSE_ID, BIN_CODE, findingID ";
+$sql = "SELECT  stkm_id, DSTRCT_CODE, WHOUSE_ID, BIN_CODE, findingID, COUNT(DISTINCT STOCK_CODE) AS countSCs  FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND ((isBackup IS NULL) OR (isBackup=0)) AND isType='b2r' AND  storageID=1 GROUP BY stkm_id, DSTRCT_CODE, WHOUSE_ID, BIN_CODE, findingID ";
 // echo $sql;
 // $sql .= " LIMIT 500; ";   
 $result = $con->query($sql);
@@ -251,11 +255,13 @@ if ($result->num_rows > 0) {
         $BIN_CODE_code = str_replace("&","%26",$BIN_CODE);
 
         $flag_status = "<h4><span class='badge badge-secondary'>NYC~</span></h4>";
-        if(!empty($findingID)){
-            $fCol = $arF['col'][$findingID];
-            $fAbr = $arF['abr'][$findingID];
+        if(!empty($findingID)) {
+
+            $fCol = array_key_exists($findingID,$arF['col']) ? $arF['col'][$findingID] : $findingID;
+            $fAbr = array_key_exists($findingID,$arF['abr']) ? $arF['abr'][$findingID] : $findingID;
+
             $flag_status = "<h4><span class='badge badge-$fCol'>FIN~$fAbr</span></h4>";
-            if ($findingID==13){
+            if ($findingID==13) {
                 $flag_status = "<h4><span class='badge badge-$fCol'>NYC~$fAbr</span></h4>";
             }
         }
