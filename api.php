@@ -84,7 +84,6 @@ if ($act=="create_ga_stocktake") {
     $sql = "    SELECT * FROM smartdb.sm14_ass WHERE delete_date IS NULL AND genesis_cat = 'ga_template'";
     echo json_encode(qget($sql));
 
-
 }elseif ($act=="save_stk_ass_rc") {
 	$ass_id         = $_POST["ass_id"];
 	$res_reason_code= $_POST["res_reason_code"];
@@ -94,9 +93,14 @@ if ($act=="create_ga_stocktake") {
 
 }elseif ($act=='get_is_records') {
     $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_delete_date IS NULL";
-    $sql  = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) ";
+    $sqlimp  = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND isType <>'b2r'";
 
+    //Placeholder until data_source is added
+    $sqlb2r  = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND isType ='b2r' AND SOH =0";
+    // $sqlb2r  = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND isType ='b2r' AND data_source='skeleton' ";
 
+    $sql = $sqlimp." UNION ALL ".$sqlb2r;
+    // echo $sql;
     
     echo json_encode(qget($sql));
 
@@ -115,6 +119,80 @@ if ($act=="create_ga_stocktake") {
     $stmt   ->bind_param("s", $ass_id);
     $stmt   ->execute();
 
+}elseif ($act=='get_b2r_contents') {
+    $stkm_id    = $_POST["stkm_id"];
+    $BIN_CODE   = $_POST["BIN_CODE"];
+    // $sql        = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id = $stkm_id AND BIN_CODE = '$BIN_CODE'";
+    $sql        = " SELECT DSTRCT_CODE, WHOUSE_ID, BIN_CODE, STOCK_CODE, ITEM_NAME, SUM(SOH) as SOH ";
+    $sql       .= " FROM smartdb.sm18_impairment   ";
+    $sql       .= " WHERE isType = 'b2r' AND stkm_id = '$stkm_id' AND BIN_CODE = '$BIN_CODE' AND data_source <> 'skeleton' AND res_parent_storageID IS NULL  ";
+    $sql       .= " GROUP BY DSTRCT_CODE, WHOUSE_ID, BIN_CODE, STOCK_CODE, ITEM_NAME ";
+    echo json_encode(qget($sql));
+
+}elseif ($act=='get_b2r_extras') {
+    $stkm_id    = $_POST["stkm_id"];
+    $BIN_CODE   = $_POST["BIN_CODE"];
+    $sql        = " SELECT * FROM smartdb.sm18_impairment ";
+    $sql       .= " WHERE isType = 'b2r' AND stkm_id = '$stkm_id' AND BIN_CODE = '$BIN_CODE' AND res_parent_storageID IS NOT NULL ";
+    echo json_encode(qget($sql));
+
+}elseif ($act=='get_b2r_skeleton') {
+    $stkm_id    = $_POST["stkm_id"];
+    $BIN_CODE   = $_POST["BIN_CODE"];
+    $sql        = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id = $stkm_id AND BIN_CODE = '$BIN_CODE' AND data_source='skeleton'";
+    echo json_encode(qget($sql));
+
+}elseif ($act=='get_result_cats') {
+    $sql        = " SELECT * from smartdb.sm19_result_cats ";
+    echo json_encode(qget($sql));
+
+}elseif ($act=='save_b2r_result') {
+    $BIN_CODE       = $_POST["BIN_CODE"];
+    $stkm_id        = $_POST["stkm_id"];
+    $findingID      = $_POST["findingID"];
+    $current_user   = "user_function_not_made";
+    $fingerprint    = time();
+
+    $msg = "Not set";
+    if($findingID==0){//NSTR
+        $msg = "Clear results";
+        $stmt   = $con->prepare("   UPDATE smartdb.sm18_impairment 
+                                    SET res_create_date=NULL, res_update_user=NULL, findingID=NULL,fingerprint=NULL
+                                    WHERE BIN_CODE=? AND isType='b2r' AND stkm_id=?");
+        $stmt   ->bind_param("ss", $BIN_CODE, $stkm_id);
+    }else if($findingID==14){//NSTR
+        $msg = "NSTR";
+        $stmt   = $con->prepare("   UPDATE smartdb.sm18_impairment 
+                                    SET res_create_date=NOW(), res_update_user=?, findingID=?,fingerprint=?
+                                    WHERE BIN_CODE=? AND isType='b2r' AND stkm_id=?");
+        $stmt   ->bind_param("sssss", $current_user, $findingID, $fingerprint, $BIN_CODE, $stkm_id);
+    }else if($findingID==15){//There are extra stockcodes in the bin
+        $stmt   = $con->prepare("   UPDATE smartdb.sm18_impairment 
+                                    SET res_create_date=NULL, res_update_user=NULL, findingID=?,fingerprint=?
+                                    WHERE BIN_CODE=? AND isType='b2r' AND stkm_id=?");
+        $stmt   ->bind_param("ssss", $findingID, $fingerprint, $BIN_CODE, $stkm_id);
+    }
+    $stmt   ->execute();
+
+    echo $msg;
+
+
+}elseif ($act=='save_b2r_extra') {
+    $BIN_CODE       = $_POST["BIN_CODE"];
+    $stkm_id        = $_POST["stkm_id"];
+    $current_user   = "user_function_not_made";
+    $fingerprint    = time();
+
+    $stmt   = $con->prepare("   INSERT INTO smartdb.sm18_impairment (res_create_date, res_update_user, fingerprint, 
+                                res_parent_storageID, stkm_id, BIN_CODE, DSTRCT_CODE, WHOUSE_ID, isType, data_source)
+                                SELECT NOW(), ?, ?, storageID, stkm_id, BIN_CODE, DSTRCT_CODE, WHOUSE_ID, isType, 'extra'
+                                FROM smartdb.sm18_impairment
+                                WHERE BIN_CODE=? AND stkm_id=? AND data_source='skeleton'");
+    $stmt   ->bind_param("ssss",  $current_user, $fingerprint, $BIN_CODE, $stkm_id);
+    $stmt   ->execute();
+       
+
+    
 }elseif ($act=="save_textinput") {
 	$full_table_name    = $_POST["full_table_name"];
 	$column_name        = $_POST["column_name"];
@@ -200,13 +278,9 @@ if ($act=="create_ga_stocktake") {
     $sql = "SELECT ass_id FROM smartdb.sm14_ass ORDER BY ass_id DESC LIMIT 1;";
     echo json_encode(qget($sql));
     
-    
-
 }elseif ($act=="get_rr_stats") {
     $sql        = " SELECT COUNT(*) AS rr_rowcount FROM smartdb.sm12_rwr ";
     echo json_encode(qget($sql));
-
-
 
 }elseif ($act=="get_search_results") {
     $search_term    = $_POST["search_term"];
@@ -222,8 +296,6 @@ if ($act=="create_ga_stocktake") {
                         OR accNo LIKE '%$search_term%' 
                         OR InventNo LIKE '%$search_term%'  ";
     echo json_encode(qget($sql));
-
-
 
 }elseif ($act=='save_check_version'){
     // Steps for relesing a new version:

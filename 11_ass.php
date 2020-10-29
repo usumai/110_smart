@@ -95,7 +95,7 @@
                                 <input class='form-control' type='text' v-model='assd.res_reason_code' disabled>
                             </div>
                             <div class="form-group"><label>Asset Description</label>
-                                <textinput :primary_key='ass_id' db_name='smartdb' table_name='sm14_ass' 
+                                <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_assetdesc1' 
                                 :bound_value='assd.res_assetdesc1'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
@@ -103,7 +103,7 @@
                                 ></textinput>
                             </div>
                             <div class="form-group"><label>Asset Description 2</label>
-                                <textinput :primary_key='ass_id' db_name='smartdb' table_name='sm14_ass' 
+                                <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_assetdesc2' 
                                 :bound_value='assd.res_assetdesc2'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
@@ -111,7 +111,7 @@
                                 ></textinput>
                             </div>
                             <div class="form-group"><label>Asset Main No Text</label>
-                                <textinput :primary_key='ass_id' db_name='smartdb' table_name='sm14_ass' 
+                                <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_assettext' 
                                 :bound_value='assd.res_assettext'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
@@ -119,7 +119,7 @@
                                 ></textinput>
                             </div>
                             <div class="form-group"><label>Inventory</label>
-                                <textinput :primary_key='ass_id' db_name='smartdb' table_name='sm14_ass' 
+                                <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_inventory' 
                                 :bound_value='assd.res_inventory'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
@@ -127,7 +127,7 @@
                                 ></textinput>
                             </div>
                             <div class="form-group"><label>InventNo</label>
-                                <textinput :primary_key='ass_id' db_name='smartdb' table_name='sm14_ass' 
+                                <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_inventno' 
                                 :bound_value='assd.res_inventno'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
@@ -135,7 +135,7 @@
                                 ></textinput>
                             </div>
                             <div class="form-group"><label>Serial No</label>
-                                <textinput :primary_key='ass_id' db_name='smartdb' table_name='sm14_ass' 
+                                <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_serialno' 
                                 :bound_value='assd.res_serialno'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
@@ -145,7 +145,7 @@
                         </div>
                         <div class='col-3'>
                             <div class="form-group"><label>Location</label>
-                                <textinput :primary_key='ass_id' db_name='smartdb' table_name='sm14_ass' 
+                                <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_loc_location' 
                                 :bound_value='assd.res_loc_location'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
@@ -153,7 +153,7 @@
                                 ></textinput>
                             </div>
                             <div class="form-group"><label>Level/Room</label>
-                                <textinput :primary_key='ass_id' db_name='smartdb' table_name='sm14_ass' 
+                                <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_loc_room' 
                                 :bound_value='assd.res_loc_room'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
@@ -161,7 +161,7 @@
                                 ></textinput>
                             </div>
                             <div class="form-group"><label>Latitude</label>
-                                <textinput :primary_key='ass_id' db_name='smartdb' table_name='sm14_ass' 
+                                <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_latitude' 
                                 :bound_value='assd.res_latitude'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
@@ -169,7 +169,7 @@
                                 ></textinput>
                             </div>
                             <div class="form-group"><label>Longitude</label>
-                                <textinput :primary_key='ass_id' db_name='smartdb' table_name='sm14_ass' 
+                                <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_longitude' 
                                 :bound_value='assd.res_longitude'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
@@ -177,7 +177,7 @@
                                 ></textinput>
                             </div>
                             <div class="form-group"><label>GrpCustod</label>
-                                <textinput :primary_key='ass_id' db_name='smartdb' table_name='sm14_ass' 
+                                <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_grpcustod' 
                                 :bound_value='assd.res_grpcustod'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
@@ -185,7 +185,7 @@
                                 ></textinput>
                             </div>
                             <div class="form-group"><label>Quantity</label>
-                                <textinput :primary_key='ass_id' db_name='smartdb' table_name='sm14_ass' 
+                                <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_quantity' 
                                 :bound_value='assd.res_quantity'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
@@ -195,7 +195,7 @@
                         </div>
                         <div class='col-3'>
                             <div class="form-group"><label>Class</label>
-                                <textinput :primary_key='ass_id' db_name='smartdb' table_name='sm14_ass' 
+                                <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_class' 
                                 :bound_value='assd.res_class'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
@@ -203,7 +203,7 @@
                                 ></textinput>
                             </div>
                             <div class="form-group"><label>TypeName</label>
-                                <textinput :primary_key='ass_id' db_name='smartdb' table_name='sm14_ass' 
+                                <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_class_ga_cat' 
                                 :bound_value='assd.res_class_ga_cat'
                                 :disabled='true'
@@ -211,7 +211,7 @@
                                 ></textinput>
                             </div>
                             <div class="form-group"><label>CapDate {{assd.res_date_cap_clean}}</label>
-                                <textinput :primary_key='ass_id' db_name='smartdb' table_name='sm14_ass' 
+                                <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_date_cap' 
                                 :bound_value='assd.res_date_cap_clean'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
@@ -219,7 +219,7 @@
                                 ></textinput>
                             </div>
                             <div class="form-group"><label>LastInv {{assd.res_date_lastinv_clean}}</label>
-                                <textinput :primary_key='ass_id' db_name='smartdb' table_name='sm14_ass' 
+                                <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_date_lastinv' 
                                 :bound_value='assd.res_date_lastinv_clean'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
@@ -227,7 +227,7 @@
                                 ></textinput>
                             </div>
                             <div class="form-group"><label>CostCtr</label>
-                                <textinput :primary_key='ass_id' db_name='smartdb' table_name='sm14_ass' 
+                                <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_ccc' 
                                 :bound_value='assd.res_ccc'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
@@ -235,7 +235,7 @@
                                 ></textinput>
                             </div>
                             <div class="form-group"><label>CurrentNBV</label>
-                                <textinput :primary_key='ass_id' db_name='smartdb' table_name='sm14_ass' 
+                                <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_val_nbv' 
                                 :bound_value='assd.res_val_nbv'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
@@ -297,7 +297,7 @@
                     <div class='row'>
                         <div class='col-12'>
                             <div class="form-group"><h2>Comments</h2>
-                                <textinput :primary_key='ass_id' db_name='smartdb' table_name='sm14_ass' 
+                                <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_comment' 
                                 :bound_value='assd.res_comment'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
