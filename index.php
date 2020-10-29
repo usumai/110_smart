@@ -116,31 +116,33 @@ const config = {
                 <!-- Modal content-->
                 <div class="modal-content">
                     <div class="modal-header">                       
-                        <h4 class="modal-title">File Uploads</h4>
+                        <h4 class="modal-title">File Upload</h4>
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                     </div>
                     <div class="modal-body">
                         <div class="container" style="width:100%">
-                            <div v-if="upload.status == 'Processing'" class="container" style="width:100%">
-                                <div class="alert alert-info"><strong>{{upload.status}}</strong> {{upload.message}}</div>     
-                            </div>
-                            <div v-if="upload.status == 'Completed'" class="container" style="width:100%">
-                                <div class="alert alert-success"><strong>{{upload.status}}</strong> {{upload.message}}</div>     
-                            </div>                             
-                            <div v-if="upload.status == 'Error'" class="container" style="width:100%">
-                                <div class="alert alert-danger"><strong>{{upload.status}}</strong> {{upload.message}}</div>     
-                            </div>                            
+
+                            <div v-if="upload.status == 'Processing'" class="alert alert-info"><strong>{{upload.status}}!</strong> {{upload.message}}</div>     
+
+
+                            <div v-if="upload.status == 'Completed'" class="alert alert-success"><strong>{{upload.status}}!</strong> {{upload.message}}</div>     
+
+                            <div v-if="upload.status == 'Error'" class="alert alert-danger"><strong>{{upload.status}}!</strong> {{upload.message}}</div>     
+                          
                             <div class="progress">
                                 <div id="progress_bar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%">
                                     <span id="progress_value">0%</span>
                                 </div>
                             </div>
-                            <div><label>Current:</label> {{upload.current}}</div>
-                            <div><label>Total:</label> {{upload.total}}</div>
+                            <div></div>
+                            <div style="width: 100%; padding-top: 10px; display: flex;">
+                                <span style="width: 50%">Current: {{upload.current}}</span>
+                                <span style="width: 50%">Total: {{upload.total}}</span>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class='btn btn-outline-dark' data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
@@ -241,8 +243,9 @@ let vm = new Vue({
         isInclude(act_type){
             var includeAct=null;
             for(var act in this.actvd){
-                if(this.actvd[act].stk_include==1) {
+                if((this.actvd[act].stk_include==1) && (!this.actvd[act].smm_delete_date)){
                     includeAct=this.actvd[act];
+                    break;
                 }
             }
             if(includeAct==null)
