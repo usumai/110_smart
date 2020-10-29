@@ -2,6 +2,7 @@
 
 
 function createIsAudit($connection, $record) {
+
     $stmt   = $connection->prepare(
         "INSERT INTO smartdb.sm13_stk (
             stk_id,

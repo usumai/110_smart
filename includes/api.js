@@ -47,7 +47,7 @@ function createIsAudit (stocktake, progressCallback, completeCallback, errorCall
 	)
 	.then(response=> {
 		if(response.data.status=='ERROR') {
-			progressCallback(1,1,STATUS_ERROR,'creates IS activity');
+			progressCallback(0,1,STATUS_ERROR,'creates IS activity');
 			errorCallback(response.data.errors);
 		}else{
 			progressCallback(1,1,STATUS_COMPLETE,'creates IS activity');
@@ -145,7 +145,7 @@ function createGaStocktake (stocktake, progressCallback, completeCallback, error
 	)
 	.then(response=> {
 		if(response.data.status=='ERROR') {
-			progressCallback(1, 1, STATUS_ERROR, 'creates GA activity');
+			progressCallback(0, 1, STATUS_ERROR, 'creates GA activity');
 			errorCallback(response.data.errors);
 		}else{
 			progressCallback(1, 1, STATUS_COMPLETE, 'creates GA activity');
