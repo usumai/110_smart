@@ -3,8 +3,8 @@
 <?php include "03_menu.php"; ?>
 
 
-        <script src="includes/test/axios.min.js" ></script>            
-        <script src="includes/api.js" > </script>
+<script src="includes/test/axios.min.js" ></script>            
+<script src="includes/api.js" > </script>
 <script src="includes/standalone.js"></script>
 
 <script>
@@ -121,13 +121,13 @@ const config = {
                     </div>
                     <div class="modal-body">
                         <div class="container" style="width:100%">
-                            <div v-if="upload.status == 'Processing'" class="container">
-                                <div class="alert alert-info"><strong>{{upload.status}}</strong></div>     
+                            <div v-if="upload.status == 'Processing'" class="container" style="width:100%">
+                                <div class="alert alert-info"><strong>{{upload.status}}</strong> {{upload.message}}</div>     
                             </div>
-                            <div v-if="upload.status == 'Completed'" class="container">
-                                <div class="alert alert-success"><strong>{{upload.status}}</strong></div>     
+                            <div v-if="upload.status == 'Completed'" class="container" style="width:100%">
+                                <div class="alert alert-success"><strong>{{upload.status}}</strong> {{upload.message}}</div>     
                             </div>                             
-                            <div v-if="upload.status == 'Error'" class="container">
+                            <div v-if="upload.status == 'Error'" class="container" style="width:100%">
                                 <div class="alert alert-danger"><strong>{{upload.status}}</strong> {{upload.message}}</div>     
                             </div>                            
                             <div class="progress">

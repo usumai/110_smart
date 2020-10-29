@@ -1200,41 +1200,6 @@ if ($act=='sys_pull_master') {
      header("Location: 10_stk.php");
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // ####################################################################################
 // IS actions
 // ####################################################################################
@@ -1244,6 +1209,7 @@ if ($act=='sys_pull_master') {
      $storageID          = $_POST["storageID"];
      $stkm_id            = $_POST["stkm_id"];
      $res_update_user    = "";
+     $milisFlag          = $_POST["checked_to_milis"] == "1"? 1 : 0;
      $findingID          = $_POST["findingID"];
      function clnr($fieldVal){
           // echo "<br>".$fieldVal;
@@ -1283,8 +1249,8 @@ if ($act=='sys_pull_master') {
                echo "<br>$sql";
           }
 
-          $sql = "  UPDATE smartdb.sm18_impairment AS tblEdit, smartdb.sm18_impairment AS tblSource SET 	
-                    tblEdit.DSTRCT_CODE = tblSource.DSTRCT_CODE,
+          $sql = "  UPDATE smartdb.sm18_impairment AS tblEdit, smartdb.sm18_impairment AS tblSource 
+               SET 	tblEdit.DSTRCT_CODE = tblSource.DSTRCT_CODE,
                     tblEdit.WHOUSE_ID = tblSource.WHOUSE_ID,
                     tblEdit.SUPPLY_CUST_ID = tblSource.SUPPLY_CUST_ID,
                     tblEdit.SC_ACCOUNT_TYPE = tblSource.SC_ACCOUNT_TYPE,
@@ -1295,7 +1261,7 @@ if ($act=='sys_pull_master') {
                     tblEdit.INVENT_CAT = tblSource.INVENT_CAT,
                     tblEdit.TRACKING_IND = tblSource.TRACKING_IND,
                     tblEdit.TRACKING_REFERENCE = tblSource.TRACKING_REFERENCE,
-                    tblEdit.LAST_MOD_DATE = tblSource.LAST_MOD_DATE
+                    tblEdit.LAST_MOD_DATE = tblSource.LAST_MOD_DATE,
                     WHERE 	tblEdit.res_parent_storageID = tblSource.storageID
                     AND tblEdit.storageID IS NULL
                     AND tblSource.auto_storageID=$auto_storageID ";
@@ -1315,7 +1281,8 @@ if ($act=='sys_pull_master') {
                res_comment=$res_comment,  
                res_unserv_date=$res_unserv_date,
                res_create_date=NOW(),
-               fingerprint='$fingerprint'
+               fingerprint='$fingerprint',
+               checked_to_milis='$milisFlag'
                WHERE 
                auto_storageID='$auto_storageID' ";
      runSql($sql);
@@ -1689,8 +1656,8 @@ if ($act=='sys_pull_master') {
           $sql_allgood        = "$sql_a UNION $sql_b UNION $sql_c UNION $sql_d UNION $sql_e UNION $sql_f UNION $sql_g ";
           $sql_needscomparison= $sql_h;
 
-          $sql = "  INSERT INTO smartdb.sm18_impairment (stkm_id, storageID, rowNo, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID, finalResult, finalResultPath, fingerprint)
-          SELECT $new_stkm_id, storageID, rowNo, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID, finalResult, finalResultPath, fingerprint
+          $sql = "  INSERT INTO smartdb.sm18_impairment (stkm_id, storageID, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID, finalResult, finalResultPath, fingerprint)
+          SELECT $new_stkm_id, storageID, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID, finalResult, finalResultPath, fingerprint
           FROM smartdb.sm18_impairment
           WHERE auto_storageID IN (SELECT auto_storageID FROM ($sql_allgood) AS vt_merge_allgood);";
           // echo "<br><br><br>$sql";
@@ -1920,22 +1887,22 @@ if ($act=='sys_pull_master') {
 
      if($stk_type=="impairment"){
           $sub = "SELECT res_pkID_selected FROM smartdb.sm20_quarantine WHERE stkm_id_new = $stkm_id AND isType='imp'";
-          $sql = "  INSERT INTO smartdb.sm18_impairment (stkm_id, storageID, rowNo, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID, finalResult, finalResultPath, fingerprint)
-          SELECT $stkm_id, storageID, rowNo, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID, finalResult, finalResultPath, fingerprint
+          $sql = "  INSERT INTO smartdb.sm18_impairment (stkm_id, storageID,  DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID, finalResult, finalResultPath, fingerprint)
+          SELECT $stkm_id, storageID, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID, finalResult, finalResultPath, fingerprint
           FROM smartdb.sm18_impairment
           WHERE auto_storageID IN ($sub); ";
           runSql($sql);
 
           $sub = "SELECT BIN_CODE FROM smartdb.sm20_quarantine WHERE res_stkm_id_selected = $stkm_id_one AND isType='b2r' AND stkm_id_new=$stkm_id";
-          $sql = "  INSERT INTO smartdb.sm18_impairment (stkm_id, storageID, rowNo, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID, finalResult, finalResultPath, fingerprint)
-          SELECT $stkm_id, storageID, rowNo, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID, finalResult, finalResultPath, fingerprint
+          $sql = "  INSERT INTO smartdb.sm18_impairment (stkm_id, storageID, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID, finalResult, finalResultPath, fingerprint)
+          SELECT $stkm_id, storageID, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID, finalResult, finalResultPath, fingerprint
           FROM smartdb.sm18_impairment
           WHERE BIN_CODE IN ($sub) AND stkm_id=$stkm_id_one; ";
           runSql($sql);
 
           $sub = "SELECT BIN_CODE FROM smartdb.sm20_quarantine WHERE res_stkm_id_selected = $stkm_id_two AND isType='b2r' AND stkm_id_new=$stkm_id";
-          $sql = "  INSERT INTO smartdb.sm18_impairment (stkm_id, storageID, rowNo, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID, finalResult, finalResultPath, fingerprint)
-          SELECT $stkm_id, storageID, rowNo, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID, finalResult, finalResultPath, fingerprint
+          $sql = "  INSERT INTO smartdb.sm18_impairment (stkm_id, storageID, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID, finalResult, finalResultPath, fingerprint)
+          SELECT $stkm_id, storageID, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, SC_ACCOUNT_TYPE, STOCK_CODE, ITEM_NAME, STK_DESC, BIN_CODE, INVENT_CAT, INVENT_CAT_DESC, TRACKING_IND, SOH, TRACKING_REFERENCE, LAST_MOD_DATE, sampleFlag, serviceableFlag, isBackup, isType, targetID, delete_date, delete_user, res_create_date, res_update_user, findingID, res_comment, res_evidence_desc, res_unserv_date, isChild, res_parent_storageID, finalResult, finalResultPath, fingerprint
           FROM smartdb.sm18_impairment
           WHERE BIN_CODE IN ($sub) AND stkm_id=$stkm_id_two; ";
           runSql($sql);

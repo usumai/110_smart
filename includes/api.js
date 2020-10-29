@@ -19,15 +19,16 @@ function loadRawRemainder(uploadData, progressCallback, completeCallback, errorC
 }
 
 function loadIsAudit(uploadData, progressCallback, completeCallback, errorCallback){
+	let impairmentList=uploadData.results;
+	delete uploadData.results;
+
 	createIsAudit (
 		uploadData,
 		progressCallback,
 		(stocktakeRec)=>{
-			console.log(stocktakeRec);
-			console.log('stocktake_id: '+stocktakeRec.stocktakeId);
 			createIsImpairments (
 				stocktakeRec.stocktakeId, 
-				uploadData.results,
+				impairmentList,
 				progressCallback,
 				completeCallback,
 				errorCallback 
@@ -45,8 +46,6 @@ function createIsAudit (stocktake, progressCallback, completeCallback, errorCall
 		}
 	)
 	.then(response=> {
-		console.log('Create Audit Response:')
-		console.log(response);
 		if(response.data.status=='ERROR') {
 			progressCallback(1,1,STATUS_ERROR,'creates IS activity');
 			errorCallback(response.data.errors);
@@ -75,8 +74,6 @@ function createIsImpairments (stocktakeId, impairmentList, progressCallback, com
 				}
 			})
 			.then(response => {
-				console.log('Create Impairments Response:')
-				console.log(response);
 				if(response.data.status=='ERROR') {
 					progressCallback(current, total, STATUS_ERROR, 'creates IS impairment');
 					errorCallback(response.data.errors);
@@ -95,7 +92,6 @@ function createIsImpairments (stocktakeId, impairmentList, progressCallback, com
 		
 	}
 	if(batchBuff.length > 0){
-		console.log('Upload last batch: '+batchBuff.length);
 		axios.post('api.php', {
 			action: 'create_is_impairments', 
 			data : { 
@@ -104,8 +100,6 @@ function createIsImpairments (stocktakeId, impairmentList, progressCallback, com
 			}
 		})
 		.then(response => {
-			console.log('Create Impairments Response:')
-			console.log(response);
 			if(response.data.status=='ERROR') {
 				progressCallback(current, total, STATUS_ERROR, 'creates IS impairment');
 				errorCallback(response.data.errors);
@@ -119,15 +113,17 @@ function createIsImpairments (stocktakeId, impairmentList, progressCallback, com
 }
 
 function loadGaStocktake(uploadData, progressCallback, completeCallback, errorCallback) {
+	let assetList=uploadData.assetlist;
+	delete uploadData.assetlist;
+
+
 	createGaStocktake (
 		uploadData,
 		progressCallback,
 		(stocktakeRec)=>{
-			console.log(stocktakeRec);
-			console.log('stocktake_id: '+stocktakeRec.stocktakeId);
 			createGaAssets (
 				stocktakeRec.stocktakeId, 
-				uploadData.assetlist,
+				assetList,
 				progressCallback,
 				completeCallback,
 				errorCallback 
@@ -148,8 +144,6 @@ function createGaStocktake (stocktake, progressCallback, completeCallback, error
 		}
 	)
 	.then(response=> {
-		console.log('Create GA Stocktake Response:')
-		console.log(response);
 		if(response.data.status=='ERROR') {
 			progressCallback(1, 1, STATUS_ERROR, 'creates GA activity');
 			errorCallback(response.data.errors);
@@ -179,8 +173,6 @@ function createGaAssets (stocktakeId, assetList, progressCallback, completeCallb
 				}
 			})
 			.then(response => {
-				console.log('Create GA Assets Response:')
-				console.log(response);
 				if(response.data.status=='ERROR') {
 					progressCallback(current, total, STATUS_ERROR, 'creates GA asset');
 					errorCallback(response.data.errors);
@@ -200,7 +192,6 @@ function createGaAssets (stocktakeId, assetList, progressCallback, completeCallb
 		
 	}
 	if(batchBuff.length > 0){
-		console.log('Upload last batch: '+batchBuff.length);
 		axios.post('api.php', {
 			action: 'create_assets', 
 			data : { 
@@ -209,8 +200,6 @@ function createGaAssets (stocktakeId, assetList, progressCallback, completeCallb
 			}
 		})
 		.then(response => {
-			console.log('Create GA Assets Response:')
-			console.log(response);
 			if(response.data.status=='ERROR') {
 				progressCallback(current, total, STATUS_ERROR, 'creates GA asset');
 				errorCallback(response.data.errors);

@@ -196,7 +196,6 @@ if ($result->num_rows > 0) {
         $auto_storageID     = $row['auto_storageID'];    
         $stkm_id            = $row['stkm_id'];  
         $storageID          = $row['storageID'];
-        $rowNo              = $row['rowNo'];
         $DSTRCT_CODE        = $row['DSTRCT_CODE'];
         $WHOUSE_ID          = $row['WHOUSE_ID'];
         $SUPPLY_CUST_ID     = $row['SUPPLY_CUST_ID'];

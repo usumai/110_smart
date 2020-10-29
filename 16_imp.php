@@ -24,7 +24,6 @@ if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {    
         $auto_storageID     = $row['auto_storageID'];    
         $storageID          = $row['storageID'];
-        $rowNo              = $row['rowNo'];
         $DSTRCT_CODE        = $row['DSTRCT_CODE'];
         $WHOUSE_ID          = $row['WHOUSE_ID'];
         $SUPPLY_CUST_ID     = $row['SUPPLY_CUST_ID'];
@@ -44,8 +43,8 @@ if ($result->num_rows > 0) {
         $res_comment        = $row['res_comment'];
         $res_unserv_date    = $row['res_unserv_date'];
         $LAST_MOD_DATE      = $row['LAST_MOD_DATE'];
+        $checkedToMilis     = $row['checked_to_milis'];
         $stkm_id            = $row['stkm_id'];
-
         $arrSample[] = $row;
 }}
 
@@ -104,6 +103,7 @@ let arS = '<?=$arrSample?>'
     arS = JSON.parse(arS);
 let fID = arS[0]['findingID'];
 let rl  = arS['rl'];
+let milisEnabled=[2,3,5,6];
 // console.log(rl)
 
 //Declare other global variables
@@ -147,10 +147,15 @@ $(document).ready(function() {
         $('.dispQtrack').toggle(dispQtrack);
         $('.dispStrack').toggle(dispStrack);
         $('.complete').toggle(complete);
-        
+        $('#checked_milis').hide();
+        $('#checked_milis').prop('disabled', true);
         // $('#res_comment').prop('disabled', true);
         if(arS[0]['findingID']){
             let fID = arS[0]['findingID']
+            if(milisEnabled.findIndex((v)=>(v==fID))>=0){
+                $('#checked_milis').show();
+                $('#checked_milis').prop('disabled', false);
+            }
             $('#res_comment').prop('disabled', false);
 
             //Update the form values
@@ -439,6 +444,7 @@ $(document).ready(function() {
             <tr><td nowrap><b>Tracking reference</b></td><td><?=$TRACKING_REFERENCE?></td></tr>
             <tr><td nowrap><b>Last Mod Date</b></td><td><?=$LAST_MOD_DATE?></td></tr>
             <tr><td nowrap><b>Inventory category</b></td><td><?=$INVENT_CAT?></td></tr>
+            <tr id="checked_milis"><td nowrap><b>Checked To MILIS</b></td><td><input  type="checkbox" class="form-control" id="checked_to_milis" name="checked_to_milis" value="1" <?=($checkedToMilis==1 ? 'checked' : '') ?>></td></tr>
             <tr><td colspan='2' class='completezz'><b>Comments</b><textarea class='form-control' rows='5' name='res_comment' id='res_comment'><?=$res_comment?></textarea></td></tr>
             <tr id='areaDate'><td><b>Date</b></td><td><input type='text' class='form-control datepicker' name='res_unserv_date' id='res_unserv_date' value='<?=$res_unserv_date?>' readonly></td></tr>
             <tr id='areaSplit'><td colspan='2'>

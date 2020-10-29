@@ -48,7 +48,7 @@
                 </td>
             </tr>
 
-                <!-- { "auto_storageID": "751", "stkm_id": "5", "storageID": null, "rowNo": null, "DSTRCT_CODE": "7018", "WHOUSE_ID": "RSER",
+                <!-- { "auto_storageID": "751", "stkm_id": "5", "storageID": null, "DSTRCT_CODE": "7018", "WHOUSE_ID": "RSER",
                 
                  "SUPPLY_CUST_ID": "", "SC_ACCOUNT_TYPE": "", "STOCK_CODE": "015264783", 
                  "ITEM_NAME": "NAVIGATION SET, SATELLITE SIGNALS", "STK_DESC": "DAGR, COMPLETE W/BATTERY PACK", "BIN_CODE": "", "INVENT_CAT": "RE", 
