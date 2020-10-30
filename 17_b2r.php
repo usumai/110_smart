@@ -102,6 +102,7 @@
                     <td><b>Name</b></td>
                     <td><b>SOH</b></td>
                     <td><b>Comment</b></td>
+                    <td align='right'><b>Action</b></td>
                     <td align='right'><b>Status</b></td>
                 </tr>
                 <tr v-for="bin in json_bins_extr">
@@ -146,7 +147,13 @@
                                     inputtype='textarea'
                                     ></textinput>
                     </td>
-                    <td width='10%'><button class='btn btn-outline-dark float-right'>Action</button></td>
+                    <td width='10%' align='right'>
+                         <button class="btn btn-danger" v-on:click="save_delete_b2r_extra(bin.auto_storageID)" >Delete</button>
+                    </td>
+                    <td width='10%' align='right'>
+                        <a class='btn btn-outline-dark float-right' :href="'18_b2r_extra.php?auto_storageID='+bin.auto_storageID" v-if="bin.finalResult">{{ bin.finalResult }}</a>
+                        <a class='btn btn-outline-danger float-right' :href="'18_b2r_extra.php?auto_storageID='+bin.auto_storageID"  v-if="!bin.finalResult">Incomplete</a>
+                    </td>
                 </tr>
             </table>
         </div>
@@ -226,6 +233,11 @@ let vm = new Vue({
         }, 
         save_b2r_extra(){
             payload             = {'act':'save_b2r_extra', 'BIN_CODE':this.BIN_CODE, 'stkm_id':this.stkm_id}
+            json = fnapi(payload)
+            this.refresh_page()
+        }, 
+        save_delete_b2r_extra(auto_storageID){
+            payload             = {'act':'save_delete_b2r_extra', auto_storageID}
             json = fnapi(payload)
             this.refresh_page()
         }, 

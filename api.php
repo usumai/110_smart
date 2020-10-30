@@ -142,6 +142,40 @@ if ($act=="create_ga_stocktake") {
     $sql        = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id = $stkm_id AND BIN_CODE = '$BIN_CODE' AND data_source='skeleton'";
     echo json_encode(qget($sql));
 
+}elseif ($act=='get_b2r_bin') {
+    $auto_storageID    = $_POST["auto_storageID"];
+    $sql        = " SELECT * FROM smartdb.sm18_impairment  WHERE auto_storageID = $auto_storageID";
+    echo json_encode(qget($sql));
+
+
+}elseif ($act=='save_final_b2r_extra_result') {
+    $auto_storageID     = $_POST["auto_storageID"];
+    $finalResult        = $_POST["finalResult"];
+    $finalResultPath    = $_POST["finalResultPath"];
+    if($finalResult=="clear"){// Clear results
+        $msg = "Clear results";
+        $stmt   = $con->prepare("   UPDATE smartdb.sm18_impairment 
+                                    SET finalResult=NULL, finalResultPath=NULL
+                                    WHERE auto_storageID=? ");
+        $stmt   ->bind_param("s",  $auto_storageID);
+    }else{//set a value
+        $msg = "Result set";
+        $stmt   = $con->prepare("   UPDATE smartdb.sm18_impairment 
+                                    SET finalResult=?, finalResultPath=?
+                                    WHERE auto_storageID=? ");
+        $stmt   ->bind_param("sss", $finalResult, $finalResultPath, $auto_storageID);
+    }
+    $stmt   ->execute();
+    echo $msg;
+    
+
+}elseif ($act=='save_delete_b2r_extra') {
+    $auto_storageID     = $_POST["auto_storageID"];
+    $stmt   = $con->prepare("   DELETE FROM smartdb.sm18_impairment WHERE auto_storageID=? ");
+    $stmt   ->bind_param("s",  $auto_storageID);
+    $stmt   ->execute();
+    echo "Deleted record";
+
 }elseif ($act=='get_result_cats') {
     $sql        = " SELECT * from smartdb.sm19_result_cats ";
     echo json_encode(qget($sql));

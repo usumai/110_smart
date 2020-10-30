@@ -1,233 +1,223 @@
 <?php include "01_dbcon.php"; ?>
 <?php include "02_header.php"; ?>
 <?php include "03_menu.php"; ?>
-<?php
-$auto_storageID = $_GET["auto_storageID"];
-$BIN_CODE = $_GET["BIN_CODE"];
-$BIN_CODE_code = str_replace("&","%26",$BIN_CODE);
+<?php include "components/forminput.php"; ?>
 
-$sql = "SELECT stkm_id, STOCK_CODE, ITEM_NAME, SOH, finalResult, finalResultPath FROM smartdb.sm18_impairment WHERE auto_storageID = '$auto_storageID'";
-// $sql .= " LIMIT 500; ";   
-$result = $con->query($sql);
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {      
-        $stkm_id            = $row['stkm_id'];
-        $finalResult        = $row['finalResult'];
-        $finalResultPath    = $row['finalResultPath'];
-}}
-?>
+<div id="app">
+    <div class='container-fluid'>
+        <div class='row'>
+            <div class='col'>
+                <h1 class="display-4">
+                    Extra investigation: {{ json_b2r_record.STOCK_CODE }}
+                    <a  class='btn btn-outline-dark float-right' 
+                        :href="'17_b2r.php?stkm_id='+json_b2r_record.stkm_id+'&BIN_CODE='+json_b2r_record.BIN_CODE" >Back</a>
+                </h1>
+            </div>
+        </div>
 
-<script type="text/javascript">
-let ans = '<?=$finalResultPath?>'
-ansraw = {
-        1 : "",
-        2 : "",
-        3 : "",
-        4 : "",
-        5 : "",
-        6 : "",
-        7 : "",
-        8 : "",
-        9 : "",
-        10: "",
-    }
-if(ans==''){
-    ans = JSON.parse(JSON.stringify(ansraw));//Creates a copy of a basic object
-}else{
-    ans = JSON.parse(ans)
+        <div class='row'>
+            <div class='col lead'>
+                
+                <ul class="list-group list-group-flush text-center">
+                    <div>
+                        <div v-for="(trailval, trailidx) in json_path">
+                            <li class='list-group-item'><b>{{ json_questions[trailidx]['name'] }}</b></li>
+                            <li class='list-group-item'
+                                style="padding-top:3px;padding-bottom:3px" 
+                                :class="{'list-group-item-success':trailval=='Yes','list-group-item-danger':trailval=='No'}">
+                                <b>
+                                    {{ trailval }}
+                                    <button class="btn btn-outline-dark" v-on:click="select_repeal(trailidx)">X</button>
+                                </b></li>
+                        </div>
+                    </div>
+                    <div v-if="qres!='nstr'&&qres!='LE'&&qres!='FF'">
+                        <li class='list-group-item'><b>{{ json_questions[qres]['name'] }}</b></li>
+                        <button class='list-group-item list-group-item-action list-group-item-success'
+                                v-on:click="select_answer('Yes')">Yes</button>
+                        <button class='list-group-item list-group-item-action list-group-item-danger'
+                                v-on:click="select_answer('No')">No</button>
+                    </div>
+                    <div v-if="qres=='nstr'||qres=='LE'||qres=='FF'">
+                        <h1 class="display-4">Final result: {{ qres }}</h1>
+                        <button class="btn btn-dark" v-on:click="save_final_b2r_extra_result()">Save</button>
+                    </div>
+                </ul>
+                <br><br><button class="btn btn-danger" v-on:click="save_final_b2r_extra_result('clear')">Clear result</button>
+            </div>
+        </div>
+
+        <div v-if="dev"><hr>
+            <h1 class="display-4">Developer data</h1>
+            <div class="row">
+                <div class="col-3">json_questions<pre>{{ json_questions }}</pre></div>
+                <div class="col-3">json_path<pre>{{ json_path }}</pre></div>
+                <div class="col-3">qres<pre>{{ qres }}</pre></div>
+                <!-- <div class="col-3">current_question_or_res_idx<pre>{{ current_question_or_res_idx }}</pre></div> -->
+                <div class="col-3">json_b2r_record<pre>{{ json_b2r_record }}</pre></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+function fnapi(data){
+    payload_res = $.ajax({
+        type: "POST",
+        url: "api.php",
+        dataType: "json",
+        data,
+        async:false,
+    }).responseText;
+    payload_res = IsJsonString(payload_res) ? JSON.parse(payload_res) : "Non-valid json was returned"+payload_res;
+    return payload_res;
 }
-// console.log(typeof ans)
-// ans_backup = JSON.parse(JSON.stringify(ans));
-// console.log(typeof ans_backup)
-// console.log(ans== ans)
 
-let qns = {
-    1:{
-        name:   "Is the item a commonwealth asset?",
-        yesPath:"2",
-        noPath: "nstr",
+let vm = new Vue({
+    el: '#app',
+    data: {
+        dev:false,
+        auto_storageID:"<?=$_GET["auto_storageID"]?>",
+        json_path:{},
+        // current_question_or_res_idx:false,
+        json_b2r_record:{},
+        qres:false,
+        finalResult:false,
+        json_questions: {
+            1:{
+                name:   "Is the item a commonwealth asset?",
+                Yes:"2",
+                No: "nstr",
+            },
+            2:{
+                name:   "Is the item serial tracked?",
+                Yes:"3",
+                No: "4",
+            },
+            3:{
+                name:   "Does serial no. exists in WHS on MILIS?",
+                Yes:"4",
+                No: "FF",
+            },
+            4:{
+                name:   "Check dues in/out status. Check if the item was reciepted 72 hours pre-NAIS stocktake.",
+                Yes:"nstr",
+                No: "5",
+            },
+            5:{
+                name:   "Does it belong in a SCA?",
+                Yes:"nstr",
+                No: "6",
+            },
+            6:{
+                name:   "Does the item belong in this WHS?",
+                Yes:"7",
+                No: "10",
+            },
+            7:{
+                name:   "Verify inventory category. Does it fall under an exclusion list?",
+                Yes:"nstr",
+                No: "8",
+            },
+            8:{
+                name:   "Are there/have there been any other MILIS bins in the warehouse that contain/have contained this item/stockcode? Conduct district search",
+                Yes:"9",
+                No: "FF",
+            },
+            9:{
+                name:   "Is the physical SOH different to 1RB?",
+                Yes:"LE",
+                No: "FF",
+            },
+            10:{
+                name:   "Has this item ever been held in this warehouse? Conduct district search of stockcode.",
+                Yes:"7",
+                No: "FF",
+            },
+        }
     },
-    2:{
-        name:   "Is the item serial tracked?",
-        yesPath:"3",
-        noPath: "4",
+    created() {
+        this.get_b2r_bin()
     },
-    3:{
-        name:   "Does serial no. exists in WHS on MILIS?",
-        yesPath:"4",
-        noPath: "FF",
-    },
-    4:{
-        name:   "Check dues in/out status. Check if the item was reciepted 72 hours pre-NAIS stocktake.",
-        yesPath:"nstr",
-        noPath: "5",
-    },
-    5:{
-        name:   "Does it belong in a SCA?",
-        yesPath:"nstr",
-        noPath: "6",
-    },
-    6:{
-        name:   "Does the item belong in this WHS?",
-        yesPath:"7",
-        noPath: "10",
-    },
-    7:{
-        name:   "Verify inventory category. Does it fall under an exclusion list?",
-        yesPath:"nstr",
-        noPath: "8",
-    },
-    8:{
-        name:   "Are there/have there been any other MILIS bins in the warehouse that contain/have contained this item/stockcode? Conduct district search",
-        yesPath:"9",
-        noPath: "FF",
-    },
-    9:{
-        name:   "Is the physical SOH different to 1RB?",
-        yesPath:"LE",
-        noPath: "FF",
-    },
-    10:{
-        name:   "Has this item ever been held in this warehouse? Conduct district search of stockcode.",
-        yesPath:"7",
-        noPath: "FF",
-    },
-}
-// console.log(qns)
-let path, finalResult
-$(document).ready(function() {
-    
-    setPage()
-    function assessQuestion(qno){
-        questionText ="<li class='list-group-item history'><b>"+qns[qno]['name']+"</b></li>"
-        path+=questionText
-        if (ans[qno]){
-            btnRepeal = "&nbsp;<button type='button' class='btn btn-sm btn-outline-dark btnRepeal' value='"+qno+"'>X</button>"
-            if (ans[qno]=="Yes"){
-                nextStep = qns[qno]['yesPath']
-                path+="<li class='list-group-item list-group-item-success history'>Yes"+btnRepeal+"</li>"
+    methods:{
+        
+        get_b2r_bin(){
+            payload             = {'act':'get_b2r_bin', 'auto_storageID':this.auto_storageID}
+            json                = fnapi(payload)
+            this.json_b2r_record= json[0]
+            console.log("json_b2r_record")
+            console.log(this.json_b2r_record)
+            if (this.json_b2r_record.finalResultPath){
+                this.json_path = JSON.parse(this.json_b2r_record.finalResultPath)
+                this.build_path()
             }else{
-                nextStep = qns[qno]['noPath']
-                path+="<li class='list-group-item list-group-item-danger history'>No"+btnRepeal+"</li>"
+                this.json_path  = {}
+                this.qres       = 1
+            }            
+        }, 
+        build_path(){
+            end_loop = false
+            trailidx = 1
+            counter=0
+            do {
+                counter++; //To stop infinite loops
+
+                answer = this.json_path[trailidx]
+                console.log("Trail step:"+trailidx);console.log("answer:"+answer);console.log("qres:"+this.qres)
+                if (answer){//An answer at this level has been provided
+                    next_step = this.json_questions[trailidx][answer]
+                    this.qres = next_step
+                    if (next_step=='nstr'||next_step=='LE'||next_step=='FF'){//This answer is a result and does not lead to another step
+                        this.finalResult = next_step
+                        end_loop = true
+                    }else{//This answer is not a final result, but leads to another question
+                        trailidx = next_step
+                    }
+                }else{// An answer has not been provided
+                    // Present current question
+                    // this.current_question_or_res_idx = trailidx
+                    // end the loop
+                    end_loop = true
+                }
+     
             }
-        }else{
-            let btnYes = "<button class='list-group-item list-group-item-action list-group-item-success question'  value='Yes' data-qno='"+qno+"'>Yes</button>"
-            let btnNo = "<button class='list-group-item list-group-item-action list-group-item-danger question'  value='No' data-qno='"+qno+"'>No</button>"
-            path+=btnYes+btnNo
-            nextStep = "waiting"
-        }
-        return nextStep
+            while (end_loop==false&&counter<20);
+        }, 
+
+        select_answer(answerPath){
+            this.json_path[String(this.qres)] = answerPath
+            this.build_path()
+        }, 
+        select_repeal(repeal_to_idx){
+            console.log("repeal to:"+repeal_to_idx)
+            if(repeal_to_idx==1){
+                this.json_path  = {}
+                this.qres       = 1
+            }
+            for(idx in this.json_path){
+                if (idx>=repeal_to_idx) {
+                    idx=String(idx)
+                    console.log("Deleteing:"+idx)
+                    delete this.json_path[idx];
+                }
+            }
+            this.build_path()
+        }, 
+        save_final_b2r_extra_result(clearopt){
+            if(clearopt=="clear"){
+                payload = {'act':'save_final_b2r_extra_result', 'auto_storageID':this.auto_storageID, 'finalResult':clearopt, 'finalResultPath':JSON.stringify(this.json_path)}
+                json    = fnapi(payload)
+                this.get_b2r_bin()
+
+            }else{
+                payload = {'act':'save_final_b2r_extra_result', 'auto_storageID':this.auto_storageID, 'finalResult':this.qres, 'finalResultPath':JSON.stringify(this.json_path)}
+                json    = fnapi(payload)
+                window.location.replace("17_b2r.php?stkm_id="+this.json_b2r_record.stkm_id+"&BIN_CODE="+this.json_b2r_record.BIN_CODE);
+            }
+        }, 
     }
-
-    function setPage(){
-        path='';
-        $('.question').toggle(false);
-        isFinished = false
-        nextStep = 1
-        do {
-            nextStep = assessQuestion(nextStep)
-            if (nextStep=='nstr'||nextStep=='LE'||nextStep=='FF'||nextStep=='waiting'){
-                isFinished = true
-            }
-        }
-        while ( isFinished == false);
-        
-        if (nextStep!='waiting'){
-            finalResult         = nextStep
-            finalResult_disp    = nextStep
-            if (finalResult_disp=='nstr'){
-                finalResult_disp = "No further investigation"
-            }
-            path+="<li class='list-group-item'><b class='display-4'>"+finalResult_disp+"</b><br>Final result</li><br>"
-            path+="<button type='button' id='btnSave' class='btn btn-outline-dark'>Save</button>"
-        }
-        $("#workingChain").html(path);
-    }
-
-
-    $('body').on('click', '.question', function() {
-        let answer = $(this).val();
-        let qno = $(this).data('qno');
-        ans[qno] = answer;
-        
-        setPage()
-    })
-
-    $('body').on('click', '#btnSave', function() {
-        $.post("05_action.php",
-        {
-            act:            "save_b2r_extra",
-            auto_storageID: "<?=$auto_storageID?>",
-            BIN_CODE:       "<?=$BIN_CODE?>",
-            stkm_id:       "<?=$stkm_id?>",
-            finalResult,
-            finalResultPath:JSON.stringify(ans)
-        },
-        function(data, status){
-            console.log(data);
-            if(data=="success"){
-                window.location.replace("17_b2r.php?BIN_CODE=<?=$BIN_CODE?>&stkm_id=<?=$stkm_id?>");
-            }
-        });
-    })
-
-    function fnGetNextStep(qno){
-        if (ans[qno]=="Yes"){
-            nextStep = qns[qno]['yesPath']
-        }else{
-            nextStep = qns[qno]['noPath']
-        }
-        return nextStep
-    }
-
-    $('body').on('click', '.btnRepeal', function() {
-        let repealedQno = $(this).val();
-        repealedQno=Number(repealedQno)
-        ans_backup = JSON.parse(JSON.stringify(ansraw));//Create a copy of the basic empty ans array
-        caughtUp    = false
-        nextQno     = 1 //Start at the first question
-        do {//Loop through logic path until caughtup to repealed question
-            ans_backup[nextQno] = ans[nextQno] //Rebuild ans_backup
-            nextQno = fnGetNextStep(nextQno)
-            caughtUp = repealedQno==nextQno
-        }
-        while (!caughtUp);
-        ans = JSON.parse(JSON.stringify(ans_backup)); //Replace the page ans with the newly cleaed one
-        setPage()
-    })
-
-});
+})
 </script>
-
-<style>
-.history{
-    padding:1px;
-}
-</style>
-
-
-<br><br>
-
-<div class='container-fluid'>
-
-<div class='row'>
-    <div class='col'>
-        <h1 class='display-4'>
-            Extra stockcode investigation
-            <a href='17_b2r.php?BIN_CODE=<?=$BIN_CODE?>&stkm_id=<?=$stkm_id?>' class='btn btn-outline-dark float-right'>Back</a>
-        </h1>
-        <div class='dropdown'><button class='btn btn-outline-danger dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='dispBtnClear'>Clear</button><div class='dropdown-menu bg-danger' aria-labelledby='dropdownMenuButton'><a class='dropdown-item bg-danger text-light' href='05_action.php?act=save_clear_b2r_extra&auto_storageID=<?=$auto_storageID?>&BIN_CODE=<?=$BIN_CODE_code?>&stkm_id=<?=$stkm_id?>'>I'm sure</a></div></div>
-    </div>
-</div>
-
-<div class='row'>
-    <div class='col lead  auto-mx' id='menuleft'>
-        <ul class="list-group list-group-flush text-center">
-            <div id='workingChain'></div>
-        </ul>
-    </div>
-</div>
-
-
 
 <?php include "04_footer.php"; ?>
