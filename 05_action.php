@@ -1283,7 +1283,7 @@ if ($act=='sys_pull_master') {
                res_create_date=NOW(),
                fingerprint='$fingerprint',
                checked_to_milis='$milisFlag'
-               WHERE 
+            WHERE 
                auto_storageID='$auto_storageID' ";
      runSql($sql);
      fnStats($stkm_id);

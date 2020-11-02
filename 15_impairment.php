@@ -169,7 +169,7 @@ $rw_ass = "";
 
 
 
-
+$milisEnabled=[2,3,5,6];
 $arF = array();
 $sql = "SELECT findingID, color AS fCol, resAbbr AS fAbr FROM smartdb.sm19_result_cats;";
 $result = $con->query($sql);
@@ -212,7 +212,7 @@ if ($result->num_rows > 0) {
         $isType             = $row['isType'];
         $res_create_date    = $row['res_create_date'];
         $findingID          = $row['findingID'];
-
+        $checked_to_milis   = $row['checked_to_milis'];
         $flag_status = "<h4><span class='badge badge-secondary'>NYC~</span></h4>";
         if(!empty($res_create_date)){
 
@@ -220,7 +220,9 @@ if ($result->num_rows > 0) {
             $fAbr = array_key_exists($findingID, $arF['abr']) ? $arF['abr'][$findingID] : $findingID ;
 
             $flag_status = "<h4><span class='badge badge-$fCol'>FIN~$fAbr</span></h4>";
-            if ($findingID==13){
+            if (array_key_exists($findingID, $milisEnabled) && ($checked_to_milis==0)) {
+                $flag_status = "<h4><span class='badge badge-warning'>NYC~$fAbr</span></h4>";
+            }elseif ($findingID==13){
                 $flag_status = "<h4><span class='badge badge-$fCol'>NYC~$fAbr</span></h4>";
             }
         }

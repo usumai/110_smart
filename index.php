@@ -37,14 +37,8 @@ const config = {
         <h1 class="mt-5 display-4">SMART Mobile</h1>
          <div class='row'>
             <div class='col-2'>
-<!--            
-                <form action='05_upload.php' method='post' enctype="multipart/form-data" id="form_upload">
-                    <input type="file" name='file_upload' class="form-control-file">
-                    <button type='submit' class='btn btn-outline-dark'>Upload</button>
-                </form>
--->                
-                    <input type="file" ref="upload_file" class="form-control-file">
-                    <button type='submit' class='btn btn-outline-dark' v-on:click="uploadData">Upload</button>
+                <input type="file" ref="upload_file" class="form-control-file">
+                <button type='submit' class='btn btn-outline-dark' v-on:click="uploadData">Upload</button>
             </div>
         </div>
 
@@ -123,12 +117,8 @@ const config = {
                         <div class="container" style="width:100%">
 
                             <div v-if="upload.status == 'Processing'" class="alert alert-info"><strong>{{upload.status}}!</strong> {{upload.message}}</div>     
-
-
                             <div v-if="upload.status == 'Completed'" class="alert alert-success"><strong>{{upload.status}}!</strong> {{upload.message}}</div>     
-
                             <div v-if="upload.status == 'Error'" class="alert alert-danger"><strong>{{upload.status}}!</strong> {{upload.message}}</div>     
-                          
                             <div class="progress">
                                 <div id="progress_bar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%">
                                     <span id="progress_value">0%</span>

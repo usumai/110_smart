@@ -37,7 +37,17 @@ if ($act=="create_ga_stocktake") {
     execWithErrorHandler(function() use ($con, $request){ 
         createIsImpairments($con, $request->data->stocktakeId, $request->data->impairments);
         echo json_encode(new ResponseMessage("OK",null));
-    });     
+    });
+}elseif($act=="get_is_impairments") {
+    execWithErrorHandler(function() { 
+        $result = getIsImpairments();
+        echo json_encode(new ResponseMessage("OK",$result));
+    });       
+}elseif($act=="get_sm19_cat") {
+    execWithErrorHandler(function() { 
+        $result = getSM19Cats();
+        echo json_encode(new ResponseMessage("OK",$result));
+    });      
 }elseif ($act=="get_system") {
     $sql        = "SELECT *, (SELECT stk_type FROM smartdb.sm13_stk WHERE stk_include=1 group by stk_type) AS act_type FROM smartdb.sm10_set;";
     echo json_encode(qget($sql));    
@@ -284,6 +294,43 @@ function qget($sql){
             $res[] = $row;
     }}
     return $res;
+}
+
+function getIsDistrictList() {
+    $sql="SELECT 
+                DSTRCT_CODE, 
+                WHOUSE_ID 
+            FROM smartdb.sm18_impairment
+            WHERE stkm_id IN (
+                SELECT 
+                    stkm_id 
+                FROM 
+                    smartdb.sm13_stk 
+                WHERE 
+                    stk_include=1 AND 
+                    date(smm_delete_date) IS NULL
+                ) AND 
+                isBackup=0 AND 
+                LEFT(isType,3)='imp' AND 
+                date(delete_date) IS NULL 
+            GROUP BY DSTRCT_CODE, WHOUSE_ID";
+    return qget($sql);
+}
+
+function getIsImpairments() {
+    $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_delete_date IS NULL";
+    $sql  = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) ";
+    return qget($sql);
+}
+
+function getSM19Cats() {
+    $sql = "SELECT 
+			findingID, 
+			color, 
+			resAbbr
+		FROM smartdb.sm19_result_cats;";               
+
+	return qget($sql);
 }
 
 function getActivities() {

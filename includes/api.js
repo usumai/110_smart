@@ -2,6 +2,36 @@ let STATUS_ERROR='Error';
 let STATUS_PROCESS='Processing';
 let STATUS_COMPLETE='Completed';
 
+function getSm19Cats(completeCallback, errorCallback){
+	axios.post('api.php', 
+		{
+			action: 'get_sm19_cat',
+			data: {}
+		}
+	)
+	.then(response=> {
+		if(response.data.status=='ERROR') {
+			errorCallback(response.data.errors);
+		}else{
+			completeCallback(response.data.result);
+		}
+	});	
+}
+function getIsImpairments(completeCallback, errorCallback){
+	axios.post('api.php', 
+		{
+			action: 'get_is_impairments',
+			data: {}
+		}
+	)
+	.then(response=> {
+		if(response.data.status=='ERROR') {
+			errorCallback(response.data.errors);
+		}else{
+			completeCallback(response.data.result);
+		}
+	});	
+}
 function upload(uploadData, progressCallback, completeCallback, errorCallback) {
 	if (uploadData.type == 'ga_stk') {
 		loadGaStocktake(uploadData, progressCallback, completeCallback, errorCallback);
