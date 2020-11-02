@@ -1,290 +1,139 @@
 <?php include "01_dbcon.php"; ?>
 <?php include "02_header.php"; ?>
 <?php include "03_menu.php"; ?>
-<?php
 
+<div id="app">
+    <div class='container-fluid'>
+        <h1 class="mt-5 display-4">General Assets Stocktake</h1>
 
-function fnClNum($fv){
-    $fv = (empty($fv) ? 0 : $fv);
-    $fv = (is_nan($fv) ? 0 : $fv);
-    return $fv;
-}
-
-function fnPerc($tot,$sub){
-    $tot = fnClNum($tot);
-    $sub = fnClNum($sub);
-    if($tot>0){
-        $perc = $sub/$tot;
-        $perc = round(($perc*100),2);
-    }else{
-        $perc = 0;
-    }
-    return $perc;
-}
-
-
-$sql = "SELECT SUM(rc_orig) AS rc_orig, SUM(rc_orig_complete) AS rc_orig_complete FROM smartdb.sm13_stk  
-WHERE stk_include=1 AND smm_delete_date IS NULL";
-$result = $con->query($sql);
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        $rc_orig            = $row["rc_orig"];
-        $rc_orig_complete   = $row["rc_orig_complete"];
-}}
-
-$perc_complete  = fnPerc($rc_orig,$rc_orig_complete);
-
-
-$fltrBtns='';
-$sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_delete_date IS NULL";
-$sql = "SELECT DSTRCT_CODE, WHOUSE_ID FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND isBackup IS NULL AND LEFT(isType,3)='imp' AND delete_date IS NULL GROUP BY DSTRCT_CODE, WHOUSE_ID  ";
-// $sql .= " LIMIT 500; ";   
-// echo $sql;
-$result = $con->query($sql);
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {    
-        $DSTRCT_CODE        = $row['DSTRCT_CODE'];
-        $WHOUSE_ID          = $row['WHOUSE_ID'];
-        $fltrBtns.="<button class='btn btn-info btn_search_term' data-search_term='$DSTRCT_CODE~$WHOUSE_ID'>$DSTRCT_CODE~$WHOUSE_ID</button>&nbsp;";
-    }}
-
-
-
-
-
-
-
-
-?>
-
-
-
-<!-- <script type="text/javascript">
-$(document).ready(function() {
-    $('#table_assets').DataTable({
-        stateSave: true
-    });
-});
-</script> -->
-
-<script type="text/javascript">
-$(document).ready(function() {
-    $('#table_assets').DataTable({
-        stateSave: true
-    });
-    var table = $('#table_assets').DataTable();
-    $('#table_assets').on('search.dt', function() {
-        rr_search();
-    }); 
-    $(".btn_search_term").click(function(){
-        var search_term_new = $(this).data("search_term");
-        var search_term_current = $('.dataTables_filter input').val();
-        table.search(search_term_current+" "+search_term_new).draw();
-    });
-    $(".btn_search_term_clear").click(function(){
-        table.search(" ").draw();
-    });
-    rr_search();
-    function rr_search() {
-        var search_term = $('.dataTables_filter input').val();
-        if (search_term.length>4) {
-            $("#table_rr").html("");
-            $.post("05_action.php",
-            {
-                act: "get_rawremainder_asset_count",
-                search_term: search_term
-            },
-            function(data, status){
-                $("#area_rr_count").html(data)
-            });
-        }else{
-            $("#area_rr_count").html("Enter a search term greater than four characters to search the Raw Remainder dataset.")
-        }
-    }
-});
-</script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div class="container-fluid">
-    <br><br>
-    <div class="row">
-        <div class="col">
-            <h2><?=$rc_orig_complete?>/<?=$rc_orig?> total (<?=$perc_complete?>%)&nbsp;
-            <button class="btn btn-primary btn_search_term" data-search_term="FIN~">Completed</button>&nbsp;
-            <button class="btn btn-primary btn_search_term" data-search_term="NYC~">Incomplete</button>&nbsp;
-            <button class="btn btn-primary btn_search_term" data-search_term="~TBA">Pending</button>&nbsp;
-            <button class="btn btn-warning btn_search_term_clear">Clear search terms</button>
-            <?=$fltrBtns?></h2>
-        </div>
-    </div>
-
-    <table id="table_assets" class="table table-sm" width="100%">
-        <thead>
-            <tr>
-                <th>Action</th>
-                <th>DIST~WHSE</th>
-                <th>SCA</th>
-                <th>BIN_CODE</th>
-                <th>Stockcde</th>
-                <th>Name</th>
-                <th>Cat</th>
-                <th>SOH</th>
-                <th>TrkInd</th>
-                <th>TrkRef</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th class='text-right'>Action</th>
+        <table id="tbl_stk" class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Action</th>
+                    <th>DIST~WHSE</th>
+                    <th>SCA</th>
+                    <th>BIN_CODE</th>
+                    <th>Stockcde</th>
+                    <th>Name</th>
+                    <th>Cat</th>
+                    <th>SOH</th>
+                    <th>TrkInd</th>
+                    <th>TrkRef</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th class='text-right'>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            <tr v-for='(rec, recidx) in json_records'>
+                <td>
+                    <a  class='btn btn-primary' v-if="rec.isType!='b2r'"
+                        :href="'16_imp.php?auto_storageID='+rec.auto_storageID" ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
+                    <a  class='btn btn-primary' v-if="rec.isType=='b2r'"
+                        :href="'17_b2r.php?stkm_id='+rec.stkm_id+'&BIN_CODE='+rec.BIN_CODE" ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
+                </td>
+                <td>{{ rec.DSTRCT_CODE }}-{{ rec.WHOUSE_ID }}</td>
+                <td>{{ rec.SUPPLY_CUST_ID }}</td>
+                <td>{{ rec.BIN_CODE }}</td>
+                <td>{{ rec.STOCK_CODE }}</td>
+                <td>{{ rec.ITEM_NAME }}</td>
+                <td>{{ rec.INVENT_CAT }}</td>
+                <td>{{ rec.SOH }}</td>
+                <td>{{ rec.TRACKING_IND }}</td>
+                <td>{{ rec.TRACKING_REFERENCE }}</td>
+                <td>
+                    <h4 v-if="rec.isType=='b2r'"><span class='badge badge-dark' style="color:#f7fcb9">{{ rec.isType }}</span></h4>
+                    <h4 v-if="rec.isType=='impq'"><span class='badge badge-dark' style="color:#9ebcda">{{ rec.isType }}</span></h4>
+                    <h4 v-if="rec.isType=='imps'"><span class='badge badge-dark' style="color:#fde0dd">{{ rec.isType }}</span></h4>
+                </td>
+                <td> 
+                    <h4 v-if="rec.findingID"><span :class="'badge badge-'+json_is_settings[rec.findingID].fCol">FIN~{{ json_is_settings[rec.findingID].fAbr }}</span></h4>
+                    <h4 v-if="!rec.findingID"><span class='badge badge-secondary'>NYC~</span></h4>
+                </td>
+                <td>
+                    <a  class='btn btn-primary' v-if="rec.isType!='b2r'"
+                        :href="'16_imp.php?auto_storageID='+rec.auto_storageID" ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
+                    <a  class='btn btn-primary' v-if="rec.isType=='b2r'"
+                        :href="'17_b2r.php?stkm_id='+rec.stkm_id+'&BIN_CODE='+rec.BIN_CODE" ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
+                </td>
             </tr>
-        </thead>
-        <tbody>
 
+                <!-- { "auto_storageID": "751", "stkm_id": "5", "storageID": null, "rowNo": null, "DSTRCT_CODE": "7018", "WHOUSE_ID": "RSER",
+                
+                 "SUPPLY_CUST_ID": "", "SC_ACCOUNT_TYPE": "", "STOCK_CODE": "015264783", 
+                 "ITEM_NAME": "NAVIGATION SET, SATELLITE SIGNALS", "STK_DESC": "DAGR, COMPLETE W/BATTERY PACK", "BIN_CODE": "", "INVENT_CAT": "RE", 
+                 "INVENT_CAT_DESC": "Repair Pool", "TRACKING_IND": "E", 
+                 "SOH": "1", "TRACKING_REFERENCE": "", "LAST_MOD_DATE": null, "sampleFlag": null, "serviceableFlag": "1", "isBackup": "1", "isType": "imps", "targetID": "335", "delete_date": "0000-00-00 00:00:00", "delete_user": "", "res_create_date": "0000-00-00 00:00:00", "res_update_user": "", "findingID": "", "res_comment": "", "res_evidence_desc": "", "res_unserv_date": "0000-00-00 00:00:00", "isChild": null, "res_parent_storageID": null, "finalResult": "", "finalResultPath": "", "fingerprint": "", "checkFlag": null } -->
+            </tbody>
+        </table>
+    </div>
+</div>
 
+<script>
+$(document).ready(function() {
+    $('#tbl_stk').DataTable({
+        stateSave: true
+    });
+});
 
-
-
-<?php
-
-$assetType = "";
-
-$rw_ass = "";
-
-
-
-
-
-$milisEnabled=[2,3,5,6];
-$arF = array();
-$sql = "SELECT findingID, color AS fCol, resAbbr AS fAbr FROM smartdb.sm19_result_cats;";
-$result = $con->query($sql);
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {    
-        $findingID  = $row['findingID'];    
-        $fCol       = $row['fCol'];   
-        $fAbr       = $row['fAbr'];
-        $arF['col'][$findingID] = $fCol;
-        $arF['abr'][$findingID] = $fAbr;
+function IsJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
     }
+    return true;
+}
+
+function fnapi(data){
+    payload_res = $.ajax({
+        type: "POST",
+        url: "api.php",
+        dataType: "json",
+        data,
+        async:false,
+    }).responseText;
+    payload_res = IsJsonString(payload_res) ? JSON.parse(payload_res) : "Non-valid json was returned"+payload_res;
+    return payload_res;
+}
+
+function fnratr(nosub, notot){
+    res = nosub / notot
+    return res;
 }
 
 
 
-$sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_delete_date IS NULL";
-$sql  = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) ";
-// $sql .= " AND sampleFlag = 1 AND ((isBackup IS NULL) OR (isBackup=0)) AND isType ='imp' ";
-// $sql .= " LIMIT 500; ";   
-// echo $sql;
-$result = $con->query($sql);
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {    
-        $auto_storageID     = $row['auto_storageID'];    
-        $stkm_id            = $row['stkm_id'];  
-        $storageID          = $row['storageID'];
-        $DSTRCT_CODE        = $row['DSTRCT_CODE'];
-        $WHOUSE_ID          = $row['WHOUSE_ID'];
-        $SUPPLY_CUST_ID     = $row['SUPPLY_CUST_ID'];
-        $SC_ACCOUNT_TYPE    = $row['SC_ACCOUNT_TYPE'];
-        $STOCK_CODE         = $row['STOCK_CODE'];
-        $ITEM_NAME          = $row['ITEM_NAME'];
-        $BIN_CODE           = $row['BIN_CODE'];
-        $INVENT_CAT         = $row['INVENT_CAT'];
-        $TRACKING_IND       = $row['TRACKING_IND'];
-        $SOH                = $row['SOH'];
-        $TRACKING_REFERENCE = $row['TRACKING_REFERENCE'];
-        $STK_DESC           = $row['STK_DESC'];
-        $sampleFlag         = $row['sampleFlag'];
-        $isType             = $row['isType'];
-        $res_create_date    = $row['res_create_date'];
-        $findingID          = $row['findingID'];
-        $checked_to_milis   = $row['checked_to_milis'];
-        $flag_status = "<h4><span class='badge badge-secondary'>NYC~</span></h4>";
-        if(!empty($res_create_date)){
 
-            $fCol = array_key_exists($findingID, $arF['col']) ? $arF['col'][$findingID] : $findingID ;
-            $fAbr = array_key_exists($findingID, $arF['abr']) ? $arF['abr'][$findingID] : $findingID ;
 
-            $flag_status = "<h4><span class='badge badge-$fCol'>FIN~$fAbr</span></h4>";
-            if (array_key_exists($findingID, $milisEnabled) && ($checked_to_milis==0)) {
-                $flag_status = "<h4><span class='badge badge-warning'>NYC~$fAbr</span></h4>";
-            }elseif ($findingID==13){
-                $flag_status = "<h4><span class='badge badge-$fCol'>NYC~$fAbr</span></h4>";
+let vm = new Vue({
+    el: '#app',
+    data: {
+        json_records:{},
+        json_is_settings:{},
+    },
+    created() {
+        this.get_is_records()
+        this.get_is_settings()
+    },
+    methods:{
+        get_is_records(){
+            payload                 = {'act':'get_is_records'}
+            this.json_records       = fnapi(payload)
+            console.log(this.json_records)
+        }, 
+        get_is_settings(){
+            payload                 = {'act':'get_is_settings'}
+            json   = fnapi(payload)
+            this.json_is_settings = []
+            for(let idx in json){
+                setting = json[idx]
+                this.json_is_settings[setting.findingID] = setting
             }
-        }
-        
-        $flag_type = "<h4><span class='badge badge-dark'>IMP</span></h4>";
-        $btnAction = "<a href='16_imp.php?auto_storageID=$auto_storageID' class='btn btn-primary'><span class='octicon octicon-zap' style='font-size:30px'></span></a>";
-
-
-
-        echo "<tr><td>".$btnAction."</td><td>".$DSTRCT_CODE."~".$WHOUSE_ID."</td><td>".$SUPPLY_CUST_ID."</td><td>".$BIN_CODE."</td><td>".$STOCK_CODE."</td><td>".$ITEM_NAME."</td><td>".substr($INVENT_CAT,0,2)."</td><td>".$SOH."</td><td>".$TRACKING_IND."</td><td>".$TRACKING_REFERENCE."</td><td>".$flag_type."</td><td>".$flag_status."</td><td class='text-right'>".$btnAction."</td></tr>";
-
-}}
-
-
-
-// B2R items which have a storageID of 1 are those which are teh skeleton rows, without them, if a bin location is listed as a target, but does not have stock, the bin will not be sent from the DPN.
-$sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_delete_date IS NULL";
-//$sql = "SELECT  stkm_id, DSTRCT_CODE, WHOUSE_ID, BIN_CODE, findingID, COUNT(DISTINCT STOCK_CODE) AS countSCs  FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND ((isBackup IS NULL) OR (isBackup=0)) AND isType='b2r' AND delete_date IS NULL AND storageID=1 GROUP BY stkm_id, DSTRCT_CODE, WHOUSE_ID, BIN_CODE, findingID ";
-$sql = "SELECT  stkm_id, DSTRCT_CODE, WHOUSE_ID, BIN_CODE, findingID, COUNT(DISTINCT STOCK_CODE) AS countSCs  FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND ((isBackup IS NULL) OR (isBackup=0)) AND isType='b2r' AND  storageID=1 GROUP BY stkm_id, DSTRCT_CODE, WHOUSE_ID, BIN_CODE, findingID ";
-// echo $sql;
-// $sql .= " LIMIT 500; ";   
-$result = $con->query($sql);
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {        
-        $stkm_id            = $row['stkm_id'];  
-        $DSTRCT_CODE        = $row['DSTRCT_CODE'];
-        $WHOUSE_ID          = $row['WHOUSE_ID'];
-        // $SUPPLY_CUST_ID     = $row['SUPPLY_CUST_ID'];
-        $BIN_CODE           = $row['BIN_CODE'];
-        $findingID          = $row['findingID'];
-        $countSCs           = $row['countSCs'];
-
-        $BIN_CODE_code = str_replace("&","%26",$BIN_CODE);
-
-        $flag_status = "<h4><span class='badge badge-secondary'>NYC~</span></h4>";
-        if(!empty($findingID)) {
-
-            $fCol = array_key_exists($findingID,$arF['col']) ? $arF['col'][$findingID] : $findingID;
-            $fAbr = array_key_exists($findingID,$arF['abr']) ? $arF['abr'][$findingID] : $findingID;
-
-            $flag_status = "<h4><span class='badge badge-$fCol'>FIN~$fAbr</span></h4>";
-            if ($findingID==13) {
-                $flag_status = "<h4><span class='badge badge-$fCol'>NYC~$fAbr</span></h4>";
-            }
-        }
-        $flag_type = "<h4><span class='badge badge-dark'>B2R</span></h4>";
-        $btnAction = "<a href='17_b2r.php?BIN_CODE=$BIN_CODE_code&stkm_id=$stkm_id' class='btn btn-primary'><span class='octicon octicon-zap' style='font-size:30px'></span></a>";
-
-
-
-        echo "<tr><td>".$btnAction."</td><td>".$DSTRCT_CODE."~".$WHOUSE_ID."</td><td></td><td>".$BIN_CODE."</td><td></td><td></td><td></td><td>".$countSCs."</td><td></td><td></td><td>".$flag_type."</td><td>".$flag_status."</td><td class='text-right'>".$btnAction."</td></tr>";
-
-}}
-
-?>
-
-
-
-
-        </tbody>
-    </table>
-    
-</div>
+            console.log(this.json_is_settings)
+        }, 
+    }
+})
+</script>
 
 <?php include "04_footer.php"; ?>

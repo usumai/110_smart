@@ -117,6 +117,7 @@ function vdt(vval, vset){//Will return empty string or an error message
 Vue.component('textinput', {
     props: [
         'primary_key',
+        'primary_key_name',
         'inputtype',
         'bound_value',
         'disabled', 
@@ -211,7 +212,7 @@ Vue.component('textinput', {
             payload = { 'act':'save_textinput', 
                         'full_table_name':this.full_table_name, 
                         'column_name':this.column_name, 
-                        'primary_key_name':'ass_id', 
+                        'primary_key_name':this.primary_key_name, 
                         'primary_key':this.primary_key, 
                         'internal_val':this.internal_val, 
                         'indexpage':true}

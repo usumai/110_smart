@@ -86,7 +86,7 @@ function createIsImpairments($connection, $stocktakeId, $impairments) {
     foreach( $impairments as $record) {
 		$stmt->bind_param("ssssssssssssssssssssssssssssssssssssssssss", 
 			$stocktakeId,
-			$record->storageID, 
+			$record->storage_id, 
 			$record->DSTRCT_CODE, 
 			$record->WHOUSE_ID, 
 			$record->BIN_CODE,
