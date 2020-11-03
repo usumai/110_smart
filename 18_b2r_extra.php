@@ -91,48 +91,43 @@ let vm = new Vue({
                 No: "nstr",
             },
             2:{
-                name:   "Is the item serial tracked?",
-                Yes:"3",
-                No: "4",
+                name:   "Does the item belong to a SCA?",
+                Yes:"nstr",
+                No: "3",
             },
             3:{
-                name:   "Does serial no. exists in WHS on MILIS?",
-                Yes:"4",
-                No: "FF",
-            },
-            4:{
                 name:   "Check dues in/out status. Check if the item was reciepted 72 hours pre-NAIS stocktake.",
                 Yes:"nstr",
-                No: "5",
+                No: "4",
             },
-            5:{
-                name:   "Does it belong in a SCA?",
-                Yes:"nstr",
-                No: "6",
-            },
-            6:{
-                name:   "Does the item belong in this WHS?",
-                Yes:"7",
-                No: "10",
-            },
-            7:{
+            4:{
                 name:   "Verify inventory category. Does it fall under an exclusion list?",
                 Yes:"nstr",
                 No: "8",
             },
+            5:{
+                name:   "Is the item serial tracked?",
+                Yes:"6",
+                No: "7",
+            },
+            6:{
+                name:   "Is the serial tracked item(s) CURRENTLY held anywhere in the warehouse? Check the warehouse against the district.",
+                Yes:"LE",
+                No: "FF",
+            },
+            7:{
+                name:   "Is the quantity tracked item(s) CURRENTLY held anywhere in the warehouse? Check the warehouse against the district.",
+                Yes:"8",
+                No: "FF",
+            },
             8:{
-                name:   "Are there/have there been any other MILIS bins in the warehouse that contain/have contained this item/stockcode? Conduct district search",
+                name:   "Is the physical SOH different to 1RB or 1RS? Conduct muster where applicable",
                 Yes:"9",
                 No: "FF",
             },
             9:{
-                name:   "Is the physical SOH different to 1RB?",
+                name:   "Is the physical SOH different the same as the 1RB or 1RS?",
                 Yes:"LE",
-                No: "FF",
-            },
-            10:{
-                name:   "Has this item ever been held in this warehouse? Conduct district search of stockcode.",
-                Yes:"7",
                 No: "FF",
             },
         }
