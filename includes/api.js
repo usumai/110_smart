@@ -2,6 +2,57 @@ let STATUS_ERROR='Error';
 let STATUS_PROCESS='Processing';
 let STATUS_COMPLETE='Completed';
 
+function getUserProfiles(completeCallback, errorCallback){
+	axios.post('api.php', 
+		{
+			action: 'get_user_profiles',
+			data: {}
+		}
+	)
+	.then(response=> {
+		if(response.data.status=='ERROR') {
+			errorCallback(response.data.errors);
+		}else{
+			completeCallback(response.data.result);
+		}
+	});
+}
+function saveUserProfile(profileId, userName, userPhone, completeCallback, errorCallback){
+	axios.post('api.php', 
+		{
+			action: 'save_user_profile',
+			data: {
+				profile_id: profileId,
+				profile_name: userName,
+				profile_phone_number: userPhone
+			}
+		}
+	)
+	.then(response=> {
+		if(response.data.status=='ERROR') {
+			errorCallback(response.data.errors);
+		}else{
+			completeCallback(response.data.result);
+		}
+	});	
+}
+function deleteUserProfile(profileId, completeCallback, errorCallback){
+	axios.post('api.php', 
+		{
+			action: 'delete_user_profile',
+			data: {
+				profile_id: profileId
+			}
+		}
+	)
+	.then(response=> {
+		if(response.data.status=='ERROR') {
+			errorCallback(response.data.errors);
+		}else{
+			completeCallback(response.data.result);
+		}
+	});	
+}
 function getSm19Cats(completeCallback, errorCallback){
 	axios.post('api.php', 
 		{

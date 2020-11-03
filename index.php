@@ -3,8 +3,7 @@
 <?php include "03_menu.php"; ?>
 
 
-<script src="includes/test/axios.min.js" ></script>            
-<script src="includes/api.js" > </script>
+
 <script src="includes/standalone.js"></script>
 
 <script>

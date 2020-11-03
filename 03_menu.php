@@ -58,9 +58,7 @@ $(function(){
 
 
 
-// // console.log("Menu set:")
-// // console.log(typeof sys["pro"])
-// // console.log(sys["pro"])
+
 // users               = sys["pro"];
 // active_profile_id   = sys["sett"][0]["active_profile_id"];
 // btnUser = "";
@@ -70,9 +68,8 @@ $(function(){
 //     // users       = ["Lucas","Sam","Max"];
 //     activeUser  = 1;
 //     for (let user in users){
-//         profile_id              = users[user]["profile_id"]
-//         profile_name            = users[user]["profile_name"]
-//         profile_phone_number    = users[user]["profile_phone_number"]
+
+	
 //         // console.log("active_profile_id:"+active_profile_id)
 //         // console.log("profile_id:"+profile_id)
 //         if (active_profile_id==profile_id){
@@ -216,9 +213,6 @@ $(function(){
 
 
 <div id="appmenu">
-
-
-
 	<body class="d-flex flex-column h-100">
 	<header>
 		<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
@@ -266,7 +260,7 @@ $(function(){
 					</li>
 
 
-
+<!-- System Dropdown Menu -->
 					<li class="nav-item dropdown">
 						<a class='nav-link dropdown-toggle "+styleUpdateAvailable+"' href='#'data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='headingHelp'
 						:class="{'text-danger':sysd.versionLocal<sysd.versionRemote}">System</a>
@@ -286,15 +280,26 @@ $(function(){
 
 							<button type='button' v-if="sysd.versionLocal<sysd.versionRemote" class='dropdown-item btn text-danger' data-toggle='modal' data-target='#modal_confirm_update'>Update available v{{ sysd.versionRemote }}</button>
 							
-							<span v-if='false'>
+							<span v-if='true'>
 								<div class='dropdown-divider'></div>
 								<h6 class='dropdown-header'>User management</span></h6>
-								No users exist
-								<button type='button' class='dropdown-item btn text-success btnUser' data-toggle='modal' data-target='#modal_add_user' data-profile_id='"+profile_id+"' data-profile_name='"+profile_name+"' data-profile_phone_number='"+profile_phone_number+"'>"+profile_name+"</button>
+								<tr v-for='(actv, actvidx) in actvd'  v-if='!actv.smm_delete_date||actv.smm_delete_date&&show_deleted'>
+								<div v-if="userProfiles.length==0">No users exist</div>
+								<button 
+									v-if="userProfiles.length>0"
+									v-for="(profile, index) in userProfiles" 
+									@click="updateUserProfile(profile, index)"
+									type='button' 
+									class='dropdown-item btn text-success btnUser'
+									data-toggle='modal' 
+									data-target='#modal_add_user'>{{profile.profile_name}}</button>
 
-								<button type='button' class='dropdown-item btn btnUser' data-toggle='modal' data-target='#modal_add_user' data-profile_id='"+profile_id+"' data-profile_name='"+profile_name+"' data-profile_phone_number='"+profile_phone_number+"'>"+profile_name+"</button>
-
-								<button type='button' class='btn btnUser' data-toggle='modal' data-target='#modal_add_user' data-profile_id='0'>+ Add new user</button>
+								<button 
+									@click="updateUserProfile({profile_id:0,profile_name:'',profile_phone_number:''}, -1)"
+									type='button' 
+									class='btn btnUser' 
+									data-toggle='modal' 
+									data-target='#modal_add_user'>+ Add new user</button>
 							</span>
 
 
@@ -329,12 +334,7 @@ $(function(){
 	</header>
 
 
-
-
-
-
-
-
+	<!-- Initiate Asset Template Dialog -->
 	<div class="modal fade" id="modal_initiate_template" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
@@ -366,7 +366,7 @@ $(function(){
 
 
 
-	<!-- Modal -->
+	<!-- Update App Version Dialog -->
 	<div class="modal fade" id="modal_confirm_update" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
@@ -387,7 +387,7 @@ $(function(){
 	</div>
 	</div>
 
-	<!-- Modal -->
+	<!-- Push App Version Dialog -->
 	<div class="modal fade" id="modal_confirm_push" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
@@ -408,7 +408,7 @@ $(function(){
 	</div>
 	</div>
 
-	<!-- Modal -->
+	<!-- System Reset Dialog -->
 	<div class="modal fade" id="modal_confirm_reset" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
@@ -452,42 +452,41 @@ $(function(){
 	</div>
 	</div>
 
-	<!-- Modal -->
 
-
-
-
-
-	<!-- Modal -->
+	<!-- Add User Profile Dialog -->
 	<div class="modal fade" id="modal_add_user" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-		<div class="modal-header">
-			<h5 class="modal-title" id="exampleModalLabel">Create a new user</h5>
-			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-			<span aria-hidden="true">&times;</span>
-			</button>
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel">Create a new user</h5>
+					<button ref="add_user_dlg_btn_close" type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body"> 
+					<div v-if="user.error != ''" class="alert alert-danger"><strong>Error!</strong> {{user.error}}</div>
+					<p class="lead">
+					User name:
+					<input type='text' class='form-control' v-model='user.name' name='profile_name'>
+					User contact number:
+					<input type='text' class='form-control' v-model='user.phone' ame='profile_phone_number'>
+					<br><button 
+							v-if="user.name != ''" 
+							@click="deleteUser()"
+							type="button" class="btn btn-danger" id='btnDeleteUser'>Delete</button>
+					</p>  
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" id='btnSaveUser' @click="saveUser()">Save</button>
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+					
+				</div>
+			</div>
 		</div>
-		<div class="modal-body">  
-			<p class="lead">
-			User name:
-			<input type='text' class='form-control' id='profile_name' name='profile_name'>
-			User contact number:
-			<input type='text' class='form-control' id='profile_phone_number' name='profile_phone_number'>
-			<br><button type="button" class="btn btn-danger" id='btnDeleteUser'>Delete</button>
-			</p>  
-		</div>
-		<div class="modal-footer">
-			<button type="button" class="btn btn-primary" id='btnSaveUser'>Save</button>
-			<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-			
-		</div>
-		</div>
-	</div>
 	</div>
 
 
-	<!-- Modal -->
+	<!-- Help Dialog -->
 	<div class="modal fade" id="modal_help" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
@@ -541,6 +540,7 @@ $(function(){
 let vm_menu = new Vue({
     el: '#appmenu',
     data: {
+		userProfiles:[],
         sysd:{},
 		templd:{},
 		actvd:{},
@@ -551,14 +551,59 @@ let vm_menu = new Vue({
 		menu_search:'',
 		rr_search_res:0,
 		show_search_prompt:false,
+		user: {
+			index:0,
+			id: 0,
+			name:'',
+			phone:'',
+			error:''		
+		}
     },
     created() {
 		this.refresh_sys()
 		this.get_rr_stats()
-    },
+	},
+	mounted(){		
+		this.setUserProfiles();
+	},
     methods:{
+		setUserProfiles(){
+			getUserProfiles(result=>this.userProfiles=result, errors=>{});
+		},
+		updateUserProfile(profile, index){
+			this.user.index=index;
+			this.user.id=profile.profile_id;
+			this.user.name=profile.profile_name;
+			this.user.phone=profile.profile_phone_number;
+		},
+		saveUser(){
+			this.user.error='';
+			saveUserProfile(this.user.id,this.user.name,this.user.phone,
+			result=>{
+				this.$refs.add_user_dlg_btn_close.click();
+				this.setUserProfiles();
+			},
+			errors=>{
+				if(errors.length>0){
+					this.user.error=errors[0].info;
+				}
+			});
+		},
+		deleteUser(){
+			this.user.error='';
+			deleteUserProfile(this.user.id,
+			result=>{
+				this.$refs.add_user_dlg_btn_close.click();
+				this.setUserProfiles();
+			},
+			errors=>{
+				if(errors.length>0){
+					this.user.error=errors[0].info;
+				}
+			});
+		},
         refresh_sys(){
-			this.get_system()
+			this.get_system();
 		},
 		send_sys(){
 			return this.sysd

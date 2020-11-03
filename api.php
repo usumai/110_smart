@@ -48,6 +48,21 @@ if ($act=="create_ga_stocktake") {
         $result = getSM19Cats();
         echo json_encode(new ResponseMessage("OK",$result));
     });      
+}elseif($act=="save_user_profile") {
+    execWithErrorHandler(function() use ($con, $request){ 
+        $result = saveUserProfile($con, $request->data);
+        echo json_encode(new ResponseMessage("OK",$result));
+    });  
+}elseif($act=="delete_user_profile") {
+    execWithErrorHandler(function() use ($con, $request){ 
+        $result = deleteUserProfile($con, $request->data);
+        echo json_encode(new ResponseMessage("OK",$result));
+    });     
+}elseif($act=="get_user_profiles") {
+    execWithErrorHandler(function(){ 
+        echo json_encode(new ResponseMessage("OK",getUserProfiles()));
+    });           
+    
 }elseif ($act=="get_system") {
     $sql        = "SELECT *, (SELECT stk_type FROM smartdb.sm13_stk WHERE stk_include=1 group by stk_type) AS act_type FROM smartdb.sm10_set;";
     echo json_encode(qget($sql));    
@@ -438,6 +453,56 @@ function getSM19Cats() {
 
 	return qget($sql);
 }
+function getUserProfiles(){
+     $sql = "SELECT * FROM smartdb.sm11_pro WHERE date(delete_date) IS NULL;";
+    return qget($sql);
+}
+function deleteUserProfile($connection, $record){
+    $sql = "DELETE FROM smartdb.sm11_pro WHERE profile_id = $record->profile_id";
+    $connection->query($sql);
+    return $record->profile_id;
+}
+function saveUserProfile($connection, $record){
+
+    $insertSql = "INSERT INTO smartdb.sm11_pro (
+                    create_date, 
+                    profile_name, 
+                    profile_phone_number)
+                    VALUE (NOW(), ?, ?)";
+
+    $updateSql = "UPDATE smartdb.sm11_pro 
+                  SET 
+                    update_date=NOW(),
+                    profile_name=?,
+                    profile_phone_number=?
+                    WHERE profile_id=?";
+
+    $prodId=0;
+    if ($record->profile_id==0){
+        $stmt = $connection->prepare($insertSql);
+
+        $stmt->bind_param("ss", 
+            $record->profile_name, 
+            $record->profile_phone_number);        
+
+        $stmt->execute();
+        $prodId = $stmt->insert_id;  
+    }else{
+        $stmt = $connection->prepare($updateSql);
+
+        $stmt->bind_param("sss", 
+            $record->profile_name, 
+            $record->profile_phone_number,
+            $record->profile_id);        
+                
+        $stmt->execute();
+        $prodId = $record->profile_id;      
+    }
+
+    $connection->query("UPDATE smartdb.sm10_set SET active_profile_id=$prodId");
+    return $prodId;
+}
+
 
 function getActivities() {
 /*    
