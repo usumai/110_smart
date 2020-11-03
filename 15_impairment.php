@@ -47,7 +47,7 @@
                     <h4 v-if="rec.isType=='imps'"><span class='badge badge-dark' style="color:#fde0dd">{{ rec.isType }}</span></h4>
                 </td>
                 <td> 
-                    <h4 v-if="rec.findingID"><span :class="'badge badge-'+json_is_settings[rec.findingID].fCol">FIN~{{ json_is_settings[rec.findingID].fAbr }}</span></h4>
+                    <h4 v-if="rec.findingID"><span :class="'badge badge-'+getColorCode(rec)">FIN~{{ json_is_settings[rec.findingID].fAbr }}</span></h4>
                     <h4 v-if="!rec.findingID"><span class='badge badge-secondary'>NYC~</span></h4>
                 </td>
                 <td>
@@ -111,12 +111,19 @@ let vm = new Vue({
     data: {
         json_records:{},
         json_is_settings:{},
+        milisEnabled:[2,3,5,6]
     },
     created() {
         this.get_is_records()
         this.get_is_settings()
     },
     methods:{
+        getColorCode(rec){
+            if((this.milisEnabled.findIndex(v=>{return v==rec.findingID;}) >= 0) && (rec.checked_to_milis==0)){
+                return 'warning';
+            }
+            return this.json_is_settings[rec.findingID].fCol;
+        },
         get_is_records(){
             payload                 = {'act':'get_is_records'}
             this.json_records       = fnapi(payload)
