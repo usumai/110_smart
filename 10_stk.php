@@ -13,53 +13,54 @@
         <button class='btn btn-outline-dark' v-on:click="stk_table_search('NYC~')">Incomplete</button>
         <button class='btn btn-warning' v-on:click="stk_table_search('clear')">Clear search terms</button>
         <span id="area_rr_count">Enter a search term greater than four characters to search the Raw Remainder dataset.</span>
-
-        <table id="tbl_stk" class="table table-sm">
-            <thead>
-                <tr>
-                    <th>Action<br>&nbsp;</th>
-                    <th class="text-center">AssetID<br>Class</th>
-                    <!-- <th>Inventory</th> -->
-                    <th class="text-center">Location<br>Room</th>
-                    <th>Description<br>&nbsp;</th>
-                    <th class="text-center">InventNo<br>SerialNo</th>
-                    <th class="text-right">$NBV<br>&nbsp;</th>
-                    <th class="text-right">Custodian<br>&nbsp;</th>
-                    <th class="text-center">Status<br>&nbsp;</th>
-                    <th>Timestamp<br>&nbsp;</th>
-                    <th>Action<br>&nbsp;</th>
+        <div class="table-responsive-sm">
+            <table id="tbl_stk" class="table table-sm table-striped table-hover">
+                <thead class="table-dark">
+                    <tr >
+                        <th>Action<br>&nbsp;</th>
+                        <th class="text-center">AssetID<br>Class</th>
+                        <!-- <th>Inventory</th> -->
+                        <th class="text-center">Location<br>Room</th>
+                        <th>Description<br>&nbsp;</th>
+                        <th class="text-center">InventNo<br>SerialNo</th>
+                        <th class="text-right">$NBV<br>&nbsp;</th>
+                        <th class="text-right">Custodian<br>&nbsp;</th>
+                        <th class="text-center">Status<br>&nbsp;</th>
+                        <th>Timestamp<br>&nbsp;</th>
+                        <th>Action<br>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr v-for='(ass, assidx) in assd'>
+                    <td>
+                        <a :href="'11_ass.php?ass_id='+ass.ass_id" 
+                        class='btn btn-outline-dark'
+                        :class="{'btn-danger':ass.ass_status!=1}"
+                        ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
+                    </td>
+                    <td nowrap>{{ ass.res_asset_id }}<br>c{{ ass.res_class }}</td>
+                    <td>{{ ass.res_loc_location }}<br>{{ ass.res_loc_room }}</td>
+                    <td>{{ ass.res_assetdesc1 }}<br><small>{{ ass.res_assetdesc2 }}</small></td>
+                    <td>{{ ass.res_inventno }}<br><small>{{ ass.res_serialno }}</small></td>
+                    <td class="text-right">{{ ass.res_val_nbv }}</td>
+                    <td>{{ ass.res_plateno }}</td>
+                    <td>
+                        {{ ass.ass_status }}
+                        <span v-if="ass.ass_status==1">FIN~</span>
+                        <span v-if="ass.ass_status!=1">NYC~</span>
+                        <br>{{ ass.res_reason_code }}
+                    </td>
+                    <td>{{ ass.res_create_date }}</td>
+                    <td>
+                        <a :href="'11_ass.php?ass_id='+ass.ass_id" 
+                        class='btn btn-outline-dark float-right'
+                        :class="{'btn-danger':ass.ass_status!=1}"
+                        ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-            <tr v-for='(ass, assidx) in assd'>
-                <td>
-                    <a :href="'11_ass.php?ass_id='+ass.ass_id" 
-                    class='btn btn-outline-dark'
-                    :class="{'btn-danger':ass.ass_status!=1}"
-                    ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
-                </td>
-                <td nowrap>{{ ass.res_asset_id }}<br>c{{ ass.res_class }}</td>
-                <td>{{ ass.res_loc_location }}<br>{{ ass.res_loc_room }}</td>
-                <td>{{ ass.res_assetdesc1 }}<br><small>{{ ass.res_assetdesc2 }}</small></td>
-                <td>{{ ass.res_inventno }}<br><small>{{ ass.res_serialno }}</small></td>
-                <td class="text-right">{{ ass.res_val_nbv }}</td>
-                <td>{{ ass.res_plateno }}</td>
-                <td>
-                    {{ ass.ass_status }}
-                    <span v-if="ass.ass_status==1">FIN~</span>
-                    <span v-if="ass.ass_status!=1">NYC~</span>
-                    <br>{{ ass.res_reason_code }}
-                </td>
-                <td>{{ ass.res_create_date }}</td>
-                <td>
-                    <a :href="'11_ass.php?ass_id='+ass.ass_id" 
-                    class='btn btn-outline-dark float-right'
-                    :class="{'btn-danger':ass.ass_status!=1}"
-                    ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 

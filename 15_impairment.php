@@ -3,69 +3,65 @@
 <?php include "03_menu.php"; ?>
 
 <div id="app">
-    <div class='container-fluid'>
-        <h1 class="mt-5 display-4">General Assets Stocktake</h1>
-
-        <table id="tbl_stk" class="table table-sm">
-            <thead>
-                <tr>
-                    <th>Action</th>
-                    <th>DIST~WHSE</th>
-                    <th>SCA</th>
-                    <th>BIN_CODE</th>
-                    <th>Stockcde</th>
-                    <th>Name</th>
-                    <th>Cat</th>
-                    <th>SOH</th>
-                    <th>TrkInd</th>
-                    <th>TrkRef</th>
-                    <th>Type</th>
-                    <th>Status</th>
-                    <th class='text-right'>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-            <tr v-for='(rec, recidx) in json_records'>
-                <td>
-                    <a  class='btn btn-primary' v-if="rec.isType!='b2r'"
-                        :href="'16_imp.php?auto_storageID='+rec.auto_storageID" ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
-                    <a  class='btn btn-primary' v-if="rec.isType=='b2r'"
-                        :href="'17_b2r.php?stkm_id='+rec.stkm_id+'&BIN_CODE='+rec.BIN_CODE" ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
-                </td>
-                <td>{{ rec.DSTRCT_CODE }}-{{ rec.WHOUSE_ID }}</td>
-                <td>{{ rec.SUPPLY_CUST_ID }}</td>
-                <td>{{ rec.BIN_CODE }}</td>
-                <td>{{ rec.STOCK_CODE }}</td>
-                <td>{{ rec.ITEM_NAME }}</td>
-                <td>{{ rec.INVENT_CAT }}</td>
-                <td>{{ rec.SOH }}</td>
-                <td>{{ rec.TRACKING_IND }}</td>
-                <td>{{ rec.TRACKING_REFERENCE }}</td>
-                <td>
-                    <h4 v-if="rec.isType=='b2r'"><span class='badge badge-dark' style="color:#f7fcb9">{{ rec.isType }}</span></h4>
-                    <h4 v-if="rec.isType=='impq'"><span class='badge badge-dark' style="color:#9ebcda">{{ rec.isType }}</span></h4>
-                    <h4 v-if="rec.isType=='imps'"><span class='badge badge-dark' style="color:#fde0dd">{{ rec.isType }}</span></h4>
-                </td>
-                <td> 
-                    <h4 v-if="rec.findingID"><span :class="'badge badge-'+getColorCode(rec)">FIN~{{ json_is_settings[rec.findingID].fAbr }}</span></h4>
-                    <h4 v-if="!rec.findingID"><span class='badge badge-secondary'>NYC~</span></h4>
-                </td>
-                <td>
-                    <a  class='btn btn-primary' v-if="rec.isType!='b2r'"
-                        :href="'16_imp.php?auto_storageID='+rec.auto_storageID" ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
-                    <a  class='btn btn-primary' v-if="rec.isType=='b2r'"
-                        :href="'17_b2r.php?stkm_id='+rec.stkm_id+'&BIN_CODE='+rec.BIN_CODE" ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
-                </td>
-            </tr>
-
-                <!-- { "auto_storageID": "751", "stkm_id": "5", "storageID": null, "rowNo": null, "DSTRCT_CODE": "7018", "WHOUSE_ID": "RSER",
-                
-                 "SUPPLY_CUST_ID": "", "SC_ACCOUNT_TYPE": "", "STOCK_CODE": "015264783", 
-                 "ITEM_NAME": "NAVIGATION SET, SATELLITE SIGNALS", "STK_DESC": "DAGR, COMPLETE W/BATTERY PACK", "BIN_CODE": "", "INVENT_CAT": "RE", 
-                 "INVENT_CAT_DESC": "Repair Pool", "TRACKING_IND": "E", 
-                 "SOH": "1", "TRACKING_REFERENCE": "", "LAST_MOD_DATE": null, "sampleFlag": null, "serviceableFlag": "1", "isBackup": "1", "isType": "imps", "targetID": "335", "delete_date": "0000-00-00 00:00:00", "delete_user": "", "res_create_date": "0000-00-00 00:00:00", "res_update_user": "", "findingID": "", "res_comment": "", "res_evidence_desc": "", "res_unserv_date": "0000-00-00 00:00:00", "isChild": null, "res_parent_storageID": null, "finalResult": "", "finalResultPath": "", "fingerprint": "", "checkFlag": null } -->
-            </tbody>
-        </table>
+    <div class="container-fluid">
+        <h1 class="mt-5 display-6">General Assets Stocktake</h1>
+        <div class="table-responsive-sm">
+            <table id="tbl_stk" class="table table-sm table-striped table-hover">
+                <caption>            
+                </caption>
+                <thead class="table-dark">
+                    <tr style="">
+                        <th>Action</th>
+                        <th>DIST~WHSE</th>
+                        <th>SCA</th>
+                        <th>Bin<br/>No.</th>
+                        <th>Stock<br/>Code</th>
+                        <th>Name</th>
+                        <th>Cat</th>
+                        <th>SOH</th>
+                        <th>Tracking</th>
+                        <th>Reference <br/> No.</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th class='text-right'>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for='(rec, recidx) in json_records'>
+                        <td>
+                            <a  class='btn btn-primary' v-if="rec.isType!='b2r'"
+                                :href="'16_imp.php?auto_storageID='+rec.auto_storageID" ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
+                            <a  class='btn btn-primary' v-if="rec.isType=='b2r'"
+                                :href="'17_b2r.php?stkm_id='+rec.stkm_id+'&BIN_CODE='+rec.BIN_CODE" ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
+                        </td>
+                        <td>{{ rec.DSTRCT_CODE }}-{{ rec.WHOUSE_ID }}</td>
+                        <td>{{ rec.SUPPLY_CUST_ID }}</td>
+                        <td>{{ rec.BIN_CODE }}</td>
+                        <td>{{ rec.STOCK_CODE }}</td>
+                        <td>{{ rec.ITEM_NAME }}</td>
+                        <td>{{ rec.INVENT_CAT }}</td>
+                        <td>{{ rec.SOH }}</td>
+                        <td>{{ rec.TRACKING_IND }}</td>
+                        <td>{{ rec.TRACKING_REFERENCE }}</td>
+                        <td>
+                            <h4 v-if="rec.isType=='b2r'"><span class='badge badge-dark' style="color:#f7fcb9">{{ rec.isType }}</span></h4>
+                            <h4 v-if="rec.isType=='impq'"><span class='badge badge-dark' style="color:#9ebcda">{{ rec.isType }}</span></h4>
+                            <h4 v-if="rec.isType=='imps'"><span class='badge badge-dark' style="color:#fde0dd">{{ rec.isType }}</span></h4>
+                        </td>
+                        <td> 
+                            <h4><span :class="'badge badge-'+getStatusColor(rec)">{{getStatusCode(rec)}}~{{rec.findingID ? json_is_settings[rec.findingID].fAbr : '' }}</span></h4>
+                            <!-- <h4 v-if="!rec.findingID"><span class='badge badge-secondary'>NYC~</span></h4> -->
+                        </td>
+                        <td>
+                            <a  class='btn btn-primary' v-if="rec.isType!='b2r'"
+                                :href="'16_imp.php?auto_storageID='+rec.auto_storageID" ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
+                            <a  class='btn btn-primary' v-if="rec.isType=='b2r'"
+                                :href="'17_b2r.php?stkm_id='+rec.stkm_id+'&BIN_CODE='+rec.BIN_CODE" ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -118,11 +114,28 @@ let vm = new Vue({
         this.get_is_settings()
     },
     methods:{
-        getColorCode(rec){
-            if((this.milisEnabled.findIndex(v=>{return v==rec.findingID;}) >= 0) && (rec.checked_to_milis==0)){
-                return 'warning';
+        getStatusColor(rec){
+            if(rec.findingID){
+                if((this.milisEnabled.findIndex(v=>{return v==rec.findingID;}) >= 0) && (rec.checked_to_milis==0)){
+                    return 'warning';
+                }else{
+                    return 'success';
+                }
+            }else{
+                return 'secondary';
             }
-            return this.json_is_settings[rec.findingID].fCol;
+        },
+        getStatusCode(rec){
+            if(rec.findingID){
+                if((this.milisEnabled.findIndex(v=>{return v==rec.findingID;}) >= 0) 
+                    && (rec.checked_to_milis==0)){
+                    return 'NYC';
+                }else{
+                    return 'FIN';
+                }
+            }else{
+                return 'NYC';
+            }
         },
         get_is_records(){
             payload                 = {'act':'get_is_records'}

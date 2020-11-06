@@ -25,77 +25,81 @@ const config = {
 // zipcelx(config);
 </script>
 
-
-
-
 <div id="app">
     <div class='container-fluid'>
+        <h1 class="mt-5 display-6">Activities</h1>
+
         <div v-if="message !== ''" class="container">
             <div class="alert alert-danger"><strong>Error!</strong>{{message}}</div>     
         </div>
-        <h1 class="mt-5 display-4">SMART Mobile</h1>
-         <div class='row'>
-            <div class='col-2'>
-                <input type="file" ref="upload_file" class="form-control-file">
-                <button type='submit' class='btn btn-outline-dark' v-on:click="uploadData">Upload</button>
-            </div>
-        </div>
+        
 
-        <table id="tbl_stk" class="table lead" >
-            <thead>
-                <tr>
-                    <td>SMARTM#</td>
-                    <td>Type</td>
-                    <td>ID</td>
-                    <td>Name</td>
-                    <td align='right'>Orig</td>
-                    <td align='right'>Completed</td>
-                    <td align='right'>Extra</td>
-                    <td align='right'>Status</td>
-                    <td align='right'>Included</td>
-                    <td align='right'>Archive</td>
-                    <td align='right'>Excel</td>
-                    <td align='right'>Export</td>
+        <div class="table-responsive-sm">
+            <table id="tbl_stk" class="table table-sm table-striped table-hover lead" >
+                <caption>
+                    <button type="button" class='btn btn-primary float-right' v-on:click="openUploadDlg">Upload<i class="fa fa-upload ml-2"></i></button>
+                </caption>
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width: 120px">SMARTM#</th>
+                        <th style="width: 120px">Type</th>
+                        <th style="width: 70px">ID</th>
+                        <th >Name</th>
+                        <th style="width: 70px" align='right'>Orig</th>
+                        <th style="width: 120px" align='right'>Completed</th>
+                        <th style="width: 70px" align='right'>Extra</th>
+                        <th style="width: 70px" align='right'>Status</th>
+                        <th style="width: 12px" align='right'>Included</th>
+                        <th style="width: 12px" align='right'>Archive</th>
+                        <th style="width: 12px" align='right'>Excel</th>
+                        <th style="width: 12px" align='right'>Export</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr v-for='(actv, actvidx) in actvd'  v-if='!actv.smm_delete_date||actv.smm_delete_date&&show_deleted'>
+
+                
+                    <td>{{ actv.stkm_id }}</td>
+                    <td>{{ actv.isCat}}</td>
+                    <td>{{ actv.stk_id }}</td>
+                    <td>{{ actv.stk_name }}</td>
+                    <td >{{ actv.rc_orig }}</td>
+                    <td >{{ actv.rc_orig_complete }}</td>
+                    <td >{{ actv.rc_extras }}</td>
+                    <td >{{ ((actv.rc_orig_complete/actv.rc_orig)*100).toFixed(1) +'%' }}</td>
+                    <td>
+                        <button v-if='actv.stk_include==1' 
+                            v-on:click='save_activity_toggle_include(actv.stkm_id,0,actv.stk_type)' 
+                            class='btn btn-dark float-left'>
+                            <i class="fa fa-folder-minus ml-2"></i>
+                        </button>
+                        <button v-if='actv.stk_include!=1' 
+                            v-on:click='save_activity_toggle_include(actv.stkm_id,1,actv.stk_type)' 
+                            class='btn btn-outline-dark float-left'>
+                            <i class="fa fa-folder-plus ml-2"></i>
+                        </button>
+                    </td>
+                    <td>
+                        <button v-if='!actv.smm_delete_date'  
+                            v-on:click='save_activity_toggle_delete(actv.stkm_id,1)' 
+                            class='btn btn-outline-danger float-left'>
+                            <i class="fas fa-trash-alt ml-2"></i>
+                        </button>
+                        <button v-if='actv.smm_delete_date' v-on:click='save_activity_toggle_delete(actv.stkm_id,0)' class='btn btn-outline-secondary float-left'>Restore</button>
+                    </td>
+                    <td>
+                        <button class='btn btn-outline-dark float-left' v-on:click="export_to_xls(actv.stkm_id)" v-if='false'>Excel</button>
+                    </td>
+                    <td>
+                        <button class='btn btn-outline-dark float-left' v-on:click='export_activity(actvidx)'>Export</button>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-            <tr v-for='(actv, actvidx) in actvd'  v-if='!actv.smm_delete_date||actv.smm_delete_date&&show_deleted'>
-
-            
-                <td>{{ actv.stkm_id }}</td>
-                <td>{{ actv.stk_type }}</td>
-                <td>{{ actv.stk_id }}</td>
-                <td>{{ actv.stk_name }}</td>
-                <td align='right'>{{ actv.rc_orig }}</td>
-                <td align='right'>{{ actv.rc_orig_complete }}</td>
-                <td align='right'>{{ actv.rc_extras }}</td>
-                <td align='right'>{{ actv.rc_orig_complete/actv.rc_orig }}</td>
-                <td>
-                    <button v-if='actv.stk_include==1' v-on:click='save_activity_toggle_include(actv.stkm_id,0,actv.stk_type)' class='btn btn-dark float-right'>Included</button>
-                    <button v-if='actv.stk_include!=1' v-on:click='save_activity_toggle_include(actv.stkm_id,1,actv.stk_type)' class='btn btn-outline-dark float-right'>Include</button>
-                </td>
-                <td>
-                    <button v-if='!actv.smm_delete_date'  v-on:click='save_activity_toggle_delete(actv.stkm_id,1)' class='btn btn-outline-danger float-right'>Delete</button>
-                    <button v-if='actv.smm_delete_date' v-on:click='save_activity_toggle_delete(actv.stkm_id,0)' class='btn btn-outline-secondary float-right'>Restore</button>
-                </td>
-                <td>
-                    <button class='btn btn-outline-dark float-right' v-on:click="export_to_xls(actv.stkm_id)" v-if='false'>Excel</button>
-                </td>
-                <td>
-                    <button class='btn btn-outline-dark float-right' v-on:click='export_activity(actvidx)'>Export</button>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-        <button class='btn btn-outline-dark float-right' v-on:click='show_deleted=!show_deleted'>Show deleted</button>
-
+                </tbody>
+            </table>
+        </div>
+        <button class='btn btn-primary float-right' 
+            v-on:click='show_deleted=!show_deleted'>Show deleted</button>
     </div>
-<!-- 
-    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
--->
-
 
 
     <!-- progress bar -->
@@ -137,6 +141,9 @@ const config = {
             </div>
         </div>
     </div>
+    <div hidden>
+        <input hidden type="file" ref="upload_file" v-on:change="uploadData" class="form-control-file">
+    </div>
 </div>
 
 <script>
@@ -174,6 +181,9 @@ let vm = new Vue({
 
     } ,
     methods:{
+        openUploadDlg(){
+            this.$refs.upload_file.click();
+        },
         uploadData(){
             this.$refs.btn_open_progress.click();
             console.log("Upload file ...");

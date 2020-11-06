@@ -288,14 +288,14 @@ $(function(){
 								<button 
 									v-if="userProfiles.length>0"
 									v-for="(profile, index) in userProfiles" 
-									@click="updateUserProfile(profile, index)"
+									@click="setCurrentUserProfile(profile, index)"
 									type='button' 
 									class='dropdown-item btn text-success btnUser'
 									data-toggle='modal' 
-									data-target='#modal_add_user'>{{profile.profile_name}}</button>
+									data-target='#modal_add_user'>{{ profile.current ? '*'+profile.profile_name : profile.profile_name}}</button>
 
 								<button 
-									@click="updateUserProfile({profile_id:0,profile_name:'',profile_phone_number:''}, -1)"
+									@click="setCurrentUserProfile({profile_id:0,profile_name:'',profile_phone_number:''}, -1)"
 									type='button' 
 									class='btn btnUser' 
 									data-toggle='modal' 
@@ -368,23 +368,23 @@ $(function(){
 
 	<!-- Update App Version Dialog -->
 	<div class="modal fade" id="modal_confirm_update" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-		<div class="modal-header">
-			<h5 class="modal-title" id="exampleModalLabel">Update to latest version</h5>
-			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-			<span aria-hidden="true">&times;</span>
-			</button>
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">Update to latest version</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<p class="lead">Updating to the latest version will delete all data on this device. Are you Sure you want to proceed with the update?<br><br>Please keep device connected to the internet until the update is finished.</p>     
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+				<a type="button" class="btn btn-danger" href='05_action.php?act=sys_pull_master'>Update</a>
+			</div>
+			</div>
 		</div>
-		<div class="modal-body">
-			<p class="lead">Updating to the latest version will delete all data on this device. Are you Sure you want to proceed with the update?<br><br>Please keep device connected to the internet until the update is finished.</p>     
-		</div>
-		<div class="modal-footer">
-			<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-			<a type="button" class="btn btn-danger" href='05_action.php?act=sys_pull_master'>Update</a>
-		</div>
-		</div>
-	</div>
 	</div>
 
 	<!-- Push App Version Dialog -->
@@ -445,8 +445,7 @@ $(function(){
 			<p class="lead">Reseting SMARTm will delete all data on this device.<br><br>Are you sure you want to proceed?</p>  
 		</div>
 		<div class="modal-footer">
-			<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-			
+			<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>	
 		</div>
 		</div>
 	</div>
@@ -478,8 +477,7 @@ $(function(){
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-primary" id='btnSaveUser' @click="saveUser()">Save</button>
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-					
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>					
 				</div>
 			</div>
 		</div>
@@ -568,9 +566,20 @@ let vm_menu = new Vue({
 	},
     methods:{
 		setUserProfiles(){
-			getUserProfiles(result=>this.userProfiles=result, errors=>{});
+			getUserProfiles(result=>{
+
+				for(profile in result){
+					if(result[profile].profile_id==this.sysd.active_profile_id){
+						result[profile].current=true;
+						this.setCurrentUserProfile(result[profile], profile);
+					}
+				}
+				this.userProfiles=result;
+			}, errors=>{});
 		},
-		updateUserProfile(profile, index){
+		setCurrentUserProfile(profile, index){
+			console.log('**** setCurrentProfile **************');
+			console.log(profile);
 			this.user.index=index;
 			this.user.id=profile.profile_id;
 			this.user.name=profile.profile_name;

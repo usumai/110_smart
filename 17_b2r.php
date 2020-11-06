@@ -12,7 +12,6 @@
         </div>
 
         <div class='row'>
-
             <div class='col-3 lead' id='menuleft'>
                 <ul class="list-group list-group-flush text-center">
                     <div class='text-center' v-if="json_skeleton.findingID">
@@ -95,16 +94,20 @@
     </div>
     <div class="row">
         <div class="col">
-            <table class="table">
-                <tr><td colspan='4' class='text-center'><b><br>Extras</b></td></tr>
+        <div class="col table-responsive-sm">             
+        <table class="table table-sm table-striped table-hover ">
+            <caption style="caption-side: top"><h3><b>Extra</b></h3></caption>
+            <thead class="table-dark">
                 <tr>
-                    <td><b>Stockcode</b></td>
-                    <td><b>Name</b></td>
-                    <td><b>SOH</b></td>
-                    <td><b>Comment</b></td>
-                    <td align='right'><b>Action</b></td>
-                    <td align='right'><b>Status</b></td>
+                    <th><b>Stockcode</b></th>
+                    <th><b>Name</b></th>
+                    <th><b>SOH</b></th>
+                    <th><b>Comment</b></th>
+                    <th align='right'><b>Action</b></th>
+                    <th align='right'><b>Status</b></th>
                 </tr>
+            </thead>
+            <tbody>    
                 <tr v-for="bin in json_bins_extr">
                     <td width='10%'>
                         <textinput :primary_key='bin.auto_storageID' 
@@ -148,17 +151,20 @@
                                     ></textinput>
                     </td>
                     <td width='10%' align='right'>
-                         <button class="btn btn-danger" v-on:click="save_delete_b2r_extra(bin.auto_storageID)" >Delete</button>
+                        <button class="btn btn-danger" v-on:click="save_delete_b2r_extra(bin.auto_storageID)" >Delete</button>
                     </td>
                     <td width='10%' align='right'>
                         <a class='btn btn-outline-dark float-right' :href="'18_b2r_extra.php?auto_storageID='+bin.auto_storageID" v-if="bin.finalResult">{{ bin.finalResult }}</a>
                         <a class='btn btn-outline-danger float-right' :href="'18_b2r_extra.php?auto_storageID='+bin.auto_storageID"  v-if="!bin.finalResult">Incomplete</a>
                     </td>
                 </tr>
-            </table>
+            </tbody>
+        </table>
+        </div>
+
         </div>
     </div>
-
+<!--
     <div v-if="dev"><hr>
         <h1 class="display-4">Developer data</h1>
         <div class="row">
@@ -168,7 +174,7 @@
             <div class="col-3">json_bins_extr<pre>{{ json_bins_extr }}</pre></div>
         </div>
     </div>
-
+-->
 </div>
 
 <script>
@@ -200,10 +206,10 @@ let vm = new Vue({
     },
     methods:{
         refresh_page(){
-            this.get_b2r_skeleton()
-            this.get_b2r_contents()
-            this.get_b2r_extras()
-            this.get_result_cats()
+            this.get_b2r_skeleton();
+            this.get_b2r_contents();
+            this.get_b2r_extras();
+            this.get_result_cats();
         }, 
         get_b2r_skeleton(){
             payload             = {'act':'get_b2r_skeleton', 'BIN_CODE':this.BIN_CODE, 'stkm_id':this.stkm_id}

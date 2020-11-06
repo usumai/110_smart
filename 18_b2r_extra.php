@@ -38,12 +38,21 @@
                         <button class='list-group-item list-group-item-action list-group-item-danger'
                                 v-on:click="select_answer('No')">No</button>
                     </div>
-                    <div v-if="qres=='nstr'||qres=='LE'||qres=='FF'">
-                        <h1 class="display-4">Final result: {{ qres }}</h1>
-                        <button class="btn btn-dark" v-on:click="save_final_b2r_extra_result()">Save</button>
+                    <div>
+                        <h1 v-if="qres=='nstr'||qres=='LE'||qres=='FF'" class="display-4">Final result: {{qres == 'nstr' ? 'No Further Investigation Required' : qres }}</h1>
+                        <span>
+                            <button class="btn btn-danger" 
+                                v-on:click="save_final_b2r_extra_result('clear')">
+                                Clear result
+                            </button>
+                            <button class="btn btn-dark" 
+                                v-if="qres=='nstr'||qres=='LE'||qres=='FF'"
+                                v-on:click="save_final_b2r_extra_result()">
+                                Save
+                            </button>
+                        </span>
                     </div>
-                </ul>
-                <br><br><button class="btn btn-danger" v-on:click="save_final_b2r_extra_result('clear')">Clear result</button>
+                </ul>  
             </div>
         </div>
 
@@ -103,7 +112,7 @@ let vm = new Vue({
             4:{
                 name:   "Verify inventory category. Does it fall under an exclusion list?",
                 Yes:"nstr",
-                No: "8",
+                No: "5",
             },
             5:{
                 name:   "Is the item serial tracked?",

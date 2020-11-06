@@ -121,7 +121,7 @@ if ($act=="create_ga_stocktake") {
     $sqlimp  = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND isType <>'b2r'";
 
     //Placeholder until data_source is added
-    $sqlb2r  = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND isType ='b2r' AND SOH =0";
+    $sqlb2r  = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND isType ='b2r'";
     // $sqlb2r  = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND isType ='b2r' AND data_source='skeleton' ";
 
     $sql = $sqlimp." UNION ALL ".$sqlb2r;
@@ -164,7 +164,7 @@ if ($act=="create_ga_stocktake") {
 }elseif ($act=='get_b2r_skeleton') {
     $stkm_id    = $_POST["stkm_id"];
     $BIN_CODE   = $_POST["BIN_CODE"];
-    $sql        = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id = $stkm_id AND BIN_CODE = '$BIN_CODE' AND data_source='skeleton'";
+    $sql        = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id = $stkm_id AND BIN_CODE = '$BIN_CODE'";
     echo json_encode(qget($sql));
 
 }elseif ($act=='get_b2r_bin') {
@@ -505,36 +505,53 @@ function saveUserProfile($connection, $record){
 
 
 function getActivities() {
-/*    
-   $sql = "SELECT * 
-            FROM smartdb.sm13_stk LEFT JOIN 
-                (SELECT stkm_id,
-                SUM(CASE WHEN genesis_cat='original' THEN 1 ELSE 0 END) AS rc_orig,
-                SUM(CASE WHEN genesis_cat='nonoriginal' THEN 1 ELSE 0 END) AS rc_extras,
-                SUM(CASE WHEN res_reason_code<>'' AND genesis_cat='original' THEN 1 ELSE 0 END) AS rc_orig_complete,
-                COUNT(*) AS rc_totalsent, stk_include
-                FROM smartdb.sm14_ass 
-                WHERE delete_date IS NULL
-                GROUP BY stkm_id ) AS vt1
-            ON smartdb.sm13_stk.stkm_id= vt1.stkm_id;";
-*/            
-
-    $sql = "SELECT 
-                stk.*, 
-                vt1.rc_orig,
-                vt1.rc_extras,
-                vt1.rc_orig_complete,
-                vt1.rc_totalsent
-            FROM smartdb.sm13_stk as stk LEFT JOIN 
-                (SELECT stkm_id,
-                    SUM(CASE WHEN genesis_cat='original' THEN 1 ELSE 0 END) AS rc_orig,
-                    SUM(CASE WHEN genesis_cat='nonoriginal' THEN 1 ELSE 0 END) AS rc_extras,
-                    SUM(CASE WHEN res_reason_code<>'' AND genesis_cat='original' THEN 1 ELSE 0 END) AS rc_orig_complete,
-                    COUNT(*) AS rc_totalsent
-                FROM smartdb.sm14_ass 
-                WHERE delete_date IS NULL
-                GROUP BY stkm_id ) AS vt1
-            ON stk.stkm_id= vt1.stkm_id;";
+    $sql = "
+SELECT 
+    act.*, 
+    asset.*
+FROM 
+    smartdb.sm13_stk as act 
+    LEFT JOIN 
+    (
+        (
+            SELECT stkm_id,
+                'Stocktake' as isCat,
+	            SUM(CASE WHEN genesis_cat='original' THEN 1 ELSE 0 END) AS rc_orig,
+	            SUM(CASE WHEN genesis_cat='nonoriginal' THEN 1 ELSE 0 END) AS rc_extras,
+	            SUM(CASE WHEN res_reason_code<>'' AND genesis_cat='original' THEN 1 ELSE 0 END) AS rc_orig_complete,
+	            COUNT(*) AS rc_totalsent
+	        FROM smartdb.sm14_ass 
+	        WHERE delete_date IS NULL
+	        GROUP BY stkm_id
+        )
+        UNION all
+        (
+            SELECT stkm_id,
+                'B2R' as isCat,
+	            SUM(CASE WHEN data_source != 'extra' THEN 1 ELSE 0 END) AS rc_orig,
+	            SUM(CASE WHEN data_source ='extra' THEN 1 ELSE 0 END) AS rc_extras,
+	            SUM(CASE WHEN ((findingID != '') and (data_source != 'extra')) THEN 1 ELSE 0 END) AS rc_orig_complete,
+	            COUNT(*) AS rc_totalsent
+	        FROM smartdb.sm18_impairment 
+            WHERE date(delete_date) IS NULL
+                  AND isType='b2r'
+	        GROUP BY stkm_id        
+        )        
+        UNION all
+        (
+            SELECT stkm_id, 
+                'Impairment' as isCat,
+	            SUM(CASE WHEN data_source != 'extra' THEN 1 ELSE 0 END) AS rc_orig,
+	            SUM(CASE WHEN data_source ='extra' THEN 1 ELSE 0 END) AS rc_extras,
+	            SUM(CASE WHEN ((findingID != '') and (data_source != 'extra')) THEN 1 ELSE 0 END) AS rc_orig_complete,
+	            COUNT(*) AS rc_totalsent
+	        FROM smartdb.sm18_impairment 
+            WHERE date(delete_date) IS NULL
+                  AND isType!='b2r'
+	        GROUP BY stkm_id        
+        )
+    ) as asset
+    ON act.stkm_id=asset.stkm_id;";
             
     echo json_encode(qget($sql));
 }

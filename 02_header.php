@@ -62,7 +62,7 @@ $icon_spot_grey     = "<span class='octicon octicon-primitive-dot text-secondary
         <link rel="stylesheet" href="includes/octicons/octicons.min.css">
         <link rel="stylesheet" href="includes/fontawesome-free-5.8.2-web/css/all.css" rel="stylesheet"> <!--load all styles -->
         <link rel="stylesheet" href="includes/jquery-ui.css">
-        <!-- <link rel="stylesheet" href="includes/datatables/dataTables.bootstrap4.min.css"> -->
+        <link rel="stylesheet" href="includes/css/global.css">
         <script src="includes/jquery-3.4.1.min.js"></script>
 	    <script src="includes/jquery.validate.min.js"></script>
         <script src="includes/jquery-ui.js"></script>  
