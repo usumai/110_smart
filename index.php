@@ -141,6 +141,11 @@ const config = {
             </div>
         </div>
     </div>
+    <div class='row'>
+        <div class='col'>
+            <a href='00_status.html' class='btn btn-danger'>Fix me</a>
+        </div>
+    </div>    
     <div hidden>
         <input hidden type="file" ref="upload_file" v-on:change="uploadData" class="form-control-file">
     </div>

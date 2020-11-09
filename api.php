@@ -117,11 +117,11 @@ if ($act=="create_ga_stocktake") {
     $stmt   ->execute();
 
 }elseif ($act=='get_is_records') {
-    $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_delete_date IS NULL";
-    $sqlimp  = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND isType <>'b2r'";
+    $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND date(smm_delete_date) IS NULL";
+    $sqlimp  = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND (isType <> 'b2r') AND ((isBackup IS NULL) OR (isBackup=0))";
 
     //Placeholder until data_source is added
-    $sqlb2r  = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND isType ='b2r'";
+    $sqlb2r  = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND (isType = 'b2r') AND ((isBackup IS NULL) OR (isBackup=0)) AND data_source='skeleton'";
     // $sqlb2r  = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND isType ='b2r' AND data_source='skeleton' ";
 
     $sql = $sqlimp." UNION ALL ".$sqlb2r;

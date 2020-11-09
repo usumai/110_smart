@@ -6,7 +6,7 @@
     <div class="container-fluid">
         <h1 class="mt-5 display-6">General Assets Stocktake</h1>
         <div class="table-responsive-sm">
-            <table id="tbl_stk" class="table table-sm table-striped table-hover">
+            <table id="tbl_stk" class="table table-sm table-striped table-hover" style="overflow-y: scroll">
                 <caption>            
                 </caption>
                 <thead class="table-dark">

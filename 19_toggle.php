@@ -8,7 +8,7 @@ $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_
 
 
 $rws = '';
-$sql = "SELECT isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, STOCK_CODE, ITEM_NAME, isBackup, COUNT(*) AS targetItemCount FROM smartdb.sm18_impairment WHERE stkm_id IN ($sqlInclude) AND LEFT(isType,3)='imp' AND delete_date IS NULL GROUP BY isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, STOCK_CODE, ITEM_NAME, isBackup"; 
+$sql = "SELECT isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, STOCK_CODE, ITEM_NAME, isBackup, COUNT(*) AS targetItemCount FROM smartdb.sm18_impairment WHERE stkm_id IN ($sqlInclude) AND (LEFT(isType,3)='imp') AND date(delete_date) IS NULL GROUP BY isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, STOCK_CODE, ITEM_NAME, isBackup"; 
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {   
@@ -34,7 +34,7 @@ if ($result->num_rows > 0) {
 }}
 
 
-$sql = "SELECT isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, isBackup, COUNT(*) AS targetItemCount FROM smartdb.sm18_impairment WHERE stkm_id IN ($sqlInclude) AND isType='b2r' GROUP BY isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, isBackup";   
+$sql = "SELECT isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE,	STOCK_CODE, ITEM_NAME,  isBackup, COUNT(*) AS targetItemCount FROM smartdb.sm18_impairment WHERE stkm_id IN ($sqlInclude) AND (isType='b2r') AND date(delete_date) IS NULL GROUP BY isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, STOCK_CODE, ITEM_NAME, isBackup";   
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {    
@@ -47,7 +47,8 @@ if ($result->num_rows > 0) {
         $targetID           = $row['targetID'];
         $targetItemCount    = $row['targetItemCount'];
         $isBackup           = $row['isBackup'];
-
+        $STOCK_CODE         = $row['STOCK_CODE'];
+        $ITEM_NAME          = $row['ITEM_NAME'];
         $BIN_CODE_code = str_replace("&","%26",$BIN_CODE);
         $btnBackup = "<a href='05_action.php?act=save_toggle_imp_backup&stkm_id=$stkm_id&targetID=$targetID&BIN_CODE=$BIN_CODE_code&isType=$isType&isBackup=1' class='btn btn-outline-dark'>Primary</a>";
         if($isBackup==1){
@@ -56,21 +57,57 @@ if ($result->num_rows > 0) {
         
         $btnType = "<span class='badge badge-primary'>B2R</span>";
         
-        $rws.="<tr><td>$btnType</td><td>$targetID</td><td>$DSTRCT_CODE</td><td>$WHOUSE_ID</td><td>$SUPPLY_CUST_ID</td><td>$BIN_CODE</td><td></td><td></td><td>$targetItemCount</td><td>$btnBackup</td></tr>";
+        $rws.="<tr><td>$btnType</td><td>$targetID</td><td>$DSTRCT_CODE</td><td>$WHOUSE_ID</td><td>$SUPPLY_CUST_ID</td><td>$BIN_CODE</td><td>$STOCK_CODE</td><td>$ITEM_NAME</td><td>$targetItemCount</td><td>$btnBackup</td></tr>";
 }}
 
 
 $sqlStats = "SELECT 
-SUM(CASE WHEN LEFT(isType,3)='imp' AND isBackup IS NULL AND res_create_date THEN 1 ELSE 0 END)   AS impPrimeComplete, 
-SUM(CASE WHEN LEFT(isType,3)='imp' AND isBackup IS NULL THEN 1 ELSE 0 END)	                    AS impPrimeTotal,
-SUM(CASE WHEN LEFT(isType,3)='imp' AND isBackup=1 AND res_create_date THEN 1 ELSE 0 END)    AS impBackupComplete,
-SUM(CASE WHEN LEFT(isType,3)='imp' AND isBackup=1 THEN 1 ELSE 0 END) 	                    AS impBackupTotal,
-SUM(CASE WHEN isType='b2r' AND isBackup IS NULL AND res_create_date THEN 1 ELSE 0 END)   AS b2rPrimeComplete,
-SUM(CASE WHEN isType='b2r' AND isBackup IS NULL THEN 1 ELSE 0 END)	                    AS b2rPrimeTotal,
-SUM(CASE WHEN isType='b2r' AND isBackup=1 AND res_create_date THEN 1 ELSE 0 END)    AS b2rBackupComplete,
-SUM(CASE WHEN isType='b2r' AND isBackup=1 THEN 1 ELSE 0 END) 	                    AS b2rBackupTotal
-FROM smartdb.sm18_impairment
-WHERE stkm_id IN ($sqlInclude)";
+	SUM(CASE WHEN (
+					(LEFT(isType,3)='imp') AND 
+					(isBackup IS NULL or isBackup=0) AND 
+					(date(res_create_date) is not null)) 
+		THEN 1 ELSE 0 END
+	) AS impPrimeComplete, 
+	SUM(CASE WHEN (
+					(LEFT(isType,3)='imp') AND 
+					(isBackup IS NULL or isBackup=0)) 
+		THEN 1 ELSE 0 END
+	) AS impPrimeTotal,
+	SUM(CASE WHEN (
+					(LEFT(isType,3)='imp') AND 
+					(isBackup=1) AND 
+					(date(res_create_date) is not null)) 
+		THEN 1 ELSE 0 END
+	) AS impBackupComplete,
+	SUM(CASE WHEN (
+					(LEFT(isType,3)='imp') AND 
+					(isBackup=1)) 
+		THEN 1 ELSE 0 END
+	) AS impBackupTotal,
+	SUM(CASE WHEN (
+					(isType='b2r') AND 
+					(isBackup IS NULL or isBackup=0) AND 
+					(date(res_create_date) is not NULL)) 
+		THEN 1 ELSE 0 END
+	) AS b2rPrimeComplete,
+	SUM(CASE WHEN (
+					(isType='b2r') AND 
+					(isBackup IS NULL or isBackup=0)) 
+		THEN 1 ELSE 0 END
+	) AS b2rPrimeTotal,
+	SUM(
+		CASE WHEN (	(isType='b2r') AND 
+					(isBackup=1) AND 
+					(date(res_create_date) is not NULL)) 
+		THEN 1 ELSE 0 END
+	) AS b2rBackupComplete,
+	SUM(CASE WHEN (
+					(isType='b2r') AND 
+					(isBackup=1)) 
+		THEN 1 ELSE 0 END
+	) AS b2rBackupTotal
+	FROM smartdb.sm18_impairment
+	WHERE stkm_id IN ($sqlInclude)";
 // $sql .= " LIMIT 500; ";   
 // echo "<br><br><br>".$sqlStats;
 $result = $con->query($sqlStats);
@@ -139,8 +176,8 @@ $(document).ready(function() {
 
 
 <div class='row'>
-    <div class='col lead'> 
-        <table id='table_backup' class='table table-sm'>
+    <div class='col lead table-responsive-sm'> 
+        <table id='table_backup' class='table table-sm table-striped table-hover'>
             <thead>
                 <tr>
                     <th>Type</th>
