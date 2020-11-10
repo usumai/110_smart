@@ -64,8 +64,9 @@ if ($result->num_rows > 0) {
 $sqlStats = "SELECT 
 	SUM(CASE WHEN (
 					(LEFT(isType,3)='imp') AND 
-					(isBackup IS NULL or isBackup=0) AND 
-					(date(res_create_date) is not null)) 
+					((isBackup IS NULL) OR (isBackup=0)) AND 
+					((res_create_date IS NOT null) AND (date(res_create_date) <> '0000-00-00'))
+				   ) 
 		THEN 1 ELSE 0 END
 	) AS impPrimeComplete, 
 	SUM(CASE WHEN (
@@ -76,7 +77,8 @@ $sqlStats = "SELECT
 	SUM(CASE WHEN (
 					(LEFT(isType,3)='imp') AND 
 					(isBackup=1) AND 
-					(date(res_create_date) is not null)) 
+					((res_create_date IS NOT null) AND (date(res_create_date) <> '0000-00-00'))
+				 	)
 		THEN 1 ELSE 0 END
 	) AS impBackupComplete,
 	SUM(CASE WHEN (
@@ -87,7 +89,8 @@ $sqlStats = "SELECT
 	SUM(CASE WHEN (
 					(isType='b2r') AND 
 					(isBackup IS NULL or isBackup=0) AND 
-					(date(res_create_date) is not NULL)) 
+					((res_create_date IS NOT null) AND (date(res_create_date) <> '0000-00-00'))
+					)
 		THEN 1 ELSE 0 END
 	) AS b2rPrimeComplete,
 	SUM(CASE WHEN (
@@ -98,7 +101,8 @@ $sqlStats = "SELECT
 	SUM(
 		CASE WHEN (	(isType='b2r') AND 
 					(isBackup=1) AND 
-					(date(res_create_date) is not NULL)) 
+					((res_create_date IS NOT null) AND (date(res_create_date) <> '0000-00-00'))
+					) 
 		THEN 1 ELSE 0 END
 	) AS b2rBackupComplete,
 	SUM(CASE WHEN (

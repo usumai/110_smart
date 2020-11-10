@@ -518,22 +518,22 @@ FROM
                 'Stocktake' as isCat,
 	            SUM(CASE WHEN genesis_cat='original' THEN 1 ELSE 0 END) AS rc_orig,
 	            SUM(CASE WHEN genesis_cat='nonoriginal' THEN 1 ELSE 0 END) AS rc_extras,
-	            SUM(CASE WHEN res_reason_code<>'' AND genesis_cat='original' THEN 1 ELSE 0 END) AS rc_orig_complete,
+	            SUM(CASE WHEN res_reason_code <>'' AND genesis_cat='original' THEN 1 ELSE 0 END) AS rc_orig_complete,
 	            COUNT(*) AS rc_totalsent
 	        FROM smartdb.sm14_ass 
-	        WHERE delete_date IS NULL
+	        WHERE ((date(delete_date) IS NULL) or (date(delete_date)='0000-00-00'))
 	        GROUP BY stkm_id
         )
         UNION all
         (
             SELECT stkm_id,
                 'B2R' as isCat,
-	            SUM(CASE WHEN data_source != 'extra' THEN 1 ELSE 0 END) AS rc_orig,
-	            SUM(CASE WHEN data_source ='extra' THEN 1 ELSE 0 END) AS rc_extras,
-	            SUM(CASE WHEN ((findingID != '') and (data_source != 'extra')) THEN 1 ELSE 0 END) AS rc_orig_complete,
+	            SUM(CASE WHEN data_source <> 'extra' THEN 1 ELSE 0 END) AS rc_orig,
+	            SUM(CASE WHEN data_source = 'extra' THEN 1 ELSE 0 END) AS rc_extras,
+	            SUM(CASE WHEN ((findingID <> '') and (data_source <> 'extra')) THEN 1 ELSE 0 END) AS rc_orig_complete,
 	            COUNT(*) AS rc_totalsent
 	        FROM smartdb.sm18_impairment 
-            WHERE date(delete_date) IS NULL
+            WHERE ((date(delete_date) IS NULL) or (date(delete_date)='0000-00-00'))
                   AND isType='b2r'
 	        GROUP BY stkm_id        
         )        
@@ -541,13 +541,13 @@ FROM
         (
             SELECT stkm_id, 
                 'Impairment' as isCat,
-	            SUM(CASE WHEN data_source != 'extra' THEN 1 ELSE 0 END) AS rc_orig,
+	            SUM(CASE WHEN data_source <> 'extra' THEN 1 ELSE 0 END) AS rc_orig,
 	            SUM(CASE WHEN data_source ='extra' THEN 1 ELSE 0 END) AS rc_extras,
-	            SUM(CASE WHEN ((findingID != '') and (data_source != 'extra')) THEN 1 ELSE 0 END) AS rc_orig_complete,
+	            SUM(CASE WHEN ((findingID <> '') and (data_source <> 'extra')) THEN 1 ELSE 0 END) AS rc_orig_complete,
 	            COUNT(*) AS rc_totalsent
 	        FROM smartdb.sm18_impairment 
-            WHERE date(delete_date) IS NULL
-                  AND isType!='b2r'
+            WHERE ((date(delete_date) IS NULL) or (date(delete_date)='0000-00-00'))
+                  AND isType<>'b2r'
 	        GROUP BY stkm_id        
         )
     ) as asset
