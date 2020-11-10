@@ -27,7 +27,7 @@ $sql = "
 	WHERE 
 		stkm_id IN ($sqlInclude) AND 
 		(LEFT(isType,3)='imp') AND 
-		((delete_date IS NULL) OR (date(delete_date)='0000-00-00')) 
+		((date(delete_date) IS NULL) OR (date(delete_date)='0000-00-00')) 
 	GROUP BY 
 		isType, 
 		targetID, 
@@ -63,7 +63,36 @@ if ($result->num_rows > 0) {
 }}
 
 
-$sql = "SELECT isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE,	STOCK_CODE, ITEM_NAME,  isBackup, COUNT(*) AS targetItemCount FROM smartdb.sm18_impairment WHERE stkm_id IN ($sqlInclude) AND (isType='b2r') AND date(delete_date) IS NULL GROUP BY isType, targetID, stkm_id, DSTRCT_CODE, WHOUSE_ID, SUPPLY_CUST_ID, BIN_CODE, STOCK_CODE, ITEM_NAME, isBackup";   
+$sql = "
+	SELECT 
+		isType, 
+		targetID, 
+		stkm_id, 
+		DSTRCT_CODE, 
+		WHOUSE_ID, 
+		SUPPLY_CUST_ID, 
+		BIN_CODE,	
+		STOCK_CODE, 
+		ITEM_NAME,  
+		isBackup, 
+		COUNT(*) AS targetItemCount 
+	FROM smartdb.sm18_impairment 
+	WHERE 
+		stkm_id IN ($sqlInclude) AND 
+		(isType='b2r') AND 
+		((date(delete_date) IS NULL) OR (date(delete_date)='0000-00-00'))  
+	GROUP BY 
+		isType, 
+		targetID, 
+		stkm_id, 
+		DSTRCT_CODE, 
+		WHOUSE_ID, 
+		SUPPLY_CUST_ID, 
+		BIN_CODE, 
+		STOCK_CODE, 
+		ITEM_NAME, 
+		isBackup";   
+		
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {    
