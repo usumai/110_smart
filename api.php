@@ -17,14 +17,19 @@ if($request != null) {
 
 
 if ($act=="create_ga_stocktake") {  
-    execWithErrorHandler(function() use ($con, $request){   
+    execWithErrorHandler(function() use ($con, $request){ 
+    	 
         $stocktakeId = createGaStocktake($con, $request->data);
         $result = ["stocktakeId" => $stocktakeId];
         echo json_encode(new ResponseMessage("OK", $result));
     });
 }elseif($act=="create_ga_assets") {
     execWithErrorHandler(function() use ($con, $request){ 
-        createGaAssets($con, $request->data->stocktakeId, $request->data->assets);
+    	$result = ["processed" => 0]; 
+    	if($request->data->assets){
+        	createGaAssets($con, $request->data->stocktakeId, $request->data->assets);
+        	$result = ["processed" => count($request->data->assets)];
+        }
         echo json_encode(new ResponseMessage("OK",null));
     });       
 }elseif ($act=="create_is_audit") {      
@@ -35,8 +40,13 @@ if ($act=="create_ga_stocktake") {
     });
 }elseif($act=="create_is_impairments") {
     execWithErrorHandler(function() use ($con, $request){ 
-        createIsImpairments($con, $request->data->stocktakeId, $request->data->impairments);
-        echo json_encode(new ResponseMessage("OK",null));
+    	$result = ["processed" => 0];
+    	if($request->data->impairments){
+        	createIsImpairments($con, $request->data->stocktakeId, $request->data->impairments);
+        	$result = ["processed" => count($request->data->impairments)];
+        }
+        
+        echo json_encode(new ResponseMessage("OK",$result));
     });
 }elseif($act=="get_is_impairments") {
     execWithErrorHandler(function() { 

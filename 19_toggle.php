@@ -80,6 +80,7 @@ $sql = "
 	WHERE 
 		stkm_id IN ($sqlInclude) AND 
 		(isType='b2r') AND 
+		(data_source='skeleton') AND
 		((date(delete_date) IS NULL) OR (date(delete_date)='0000-00-00'))  
 	GROUP BY 
 		isType, 
@@ -146,18 +147,21 @@ $sqlStats = "SELECT
 	) AS impBackupTotal,
 	SUM(CASE WHEN (
 					(isType='b2r') AND 
-					(isBackup IS NULL or isBackup=0) AND 
+					(data_source='skeleton') AND
+					(isBackup IS NULL or isBackup=0) AND 				
 					((res_create_date IS NOT null) AND (date(res_create_date) <> '0000-00-00'))
 					)
 		THEN 1 ELSE 0 END
 	) AS b2rPrimeComplete,
 	SUM(CASE WHEN (
 					(isType='b2r') AND 
+					(data_source='skeleton') AND
 					(isBackup IS NULL or isBackup=0)) 
 		THEN 1 ELSE 0 END
 	) AS b2rPrimeTotal,
 	SUM(
 		CASE WHEN (	(isType='b2r') AND 
+					(data_source='skeleton') AND
 					(isBackup=1) AND 
 					((res_create_date IS NOT null) AND (date(res_create_date) <> '0000-00-00'))
 					) 
@@ -165,6 +169,7 @@ $sqlStats = "SELECT
 	) AS b2rBackupComplete,
 	SUM(CASE WHEN (
 					(isType='b2r') AND 
+					(data_source='skeleton') AND
 					(isBackup=1)) 
 		THEN 1 ELSE 0 END
 	) AS b2rBackupTotal

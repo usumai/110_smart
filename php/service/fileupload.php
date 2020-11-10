@@ -32,7 +32,13 @@ function createIsAudit($connection, $record) {
     return $stmt->insert_id;    
 }
 
-function createIsImpairments($connection, $stocktakeId, $impairments) {   
+function createIsImpairments($connection, $stocktakeId, $impairments) { 
+	if((! $stocktakeId) || ($stocktakeId=='')) {
+		throw new Exception("Unable to create Impairment records, required stocktake id");
+	}
+	if(! $impairments){
+		return;
+	}
     $stmt   = $connection->prepare(
 		"INSERT INTO smartdb.sm18_impairment (
         	stkm_id, 
@@ -162,6 +168,12 @@ function createGaStocktake($connection, $record) {
     return $stmt->insert_id;
 }
 function createGaAssets($connection, $stocktakeId, $assets) {
+	if((! $stocktakeId) || ($stocktakeId=='')) {
+		throw new Exception("Unable to create Asset records, required stocktake id");
+	}
+	if(! $assets){
+		return;
+	}
 	$stmt   = $connection->prepare(
 		"INSERT INTO smartdb.sm14_ass (
 			create_date,
