@@ -4,7 +4,7 @@
 
 <div id="app">
     <div class="container-fluid">
-        <h1 class="mt-5 display-6">General Assets Stocktake</h1>
+        <h1 class="mt-5 display-6">IS/B2R</h1>
         <div class="table-responsive-sm">
             <table id="tbl_stk" class="table table-sm table-striped table-hover" style="overflow-y: scroll">
                 <caption>            
@@ -23,7 +23,7 @@
                         <th>Reference <br/> No.</th>
                         <th>Type</th>
                         <th>Status</th>
-                        <th class='text-right'>Action</th>
+                        <th style="width: 70px">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -52,7 +52,7 @@
                             <h4><span :class="'badge badge-'+getStatusColor(rec)">{{getStatusCode(rec)}}~{{rec.findingID ? json_is_settings[rec.findingID].fAbr : '' }}</span></h4>
                             <!-- <h4 v-if="!rec.findingID"><span class='badge badge-secondary'>NYC~</span></h4> -->
                         </td>
-                        <td>
+                        <td class='float-right'>
                             <a  class='btn btn-primary' v-if="rec.isType!='b2r'"
                                 :href="'16_imp.php?auto_storageID='+rec.auto_storageID" ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
                             <a  class='btn btn-primary' v-if="rec.isType=='b2r'"
@@ -116,7 +116,10 @@ let vm = new Vue({
     methods:{
         getStatusColor(rec){
             if(rec.findingID){
-                if((this.milisEnabled.findIndex(v=>{return v==rec.findingID;}) >= 0) && (rec.checked_to_milis==0)){
+            	if((rec.isType=='b2r') && (rec.data_source=='skeleton') 
+                	&& (rec.findingID==15)){
+                	return 'warning';
+                }else if((this.milisEnabled.findIndex(v=>{return v==rec.findingID;}) >= 0) && (rec.checked_to_milis==0)){
                     return 'warning';
                 }else{
                     return 'success';
@@ -126,10 +129,14 @@ let vm = new Vue({
             }
         },
         getStatusCode(rec){
+
             if(rec.findingID){
-                if((this.milisEnabled.findIndex(v=>{return v==rec.findingID;}) >= 0) 
+                if((rec.isType=='b2r') && (rec.data_source=='skeleton') 
+                	&& (rec.findingID==15)){
+        			return 'NYC'; 
+        		} else if((this.milisEnabled.findIndex(v=>{return v==rec.findingID;}) >= 0) 
                     && (rec.checked_to_milis==0)){
-                    return 'NYC';
+                    return 'NYC';    
                 }else{
                     return 'FIN';
                 }

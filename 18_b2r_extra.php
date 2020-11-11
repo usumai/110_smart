@@ -110,7 +110,7 @@ let vm = new Vue({
                 No: "4",
             },
             4:{
-                name:   "Verify inventory category. Does it fall under an exclusion list?",
+                name:   "Verify inventory category. Does it fall under an exclusion list? (i.e. AD, DC, DD, DP, DR, DU, DV or QS)",
                 Yes:"nstr",
                 No: "5",
             },
@@ -131,11 +131,6 @@ let vm = new Vue({
             },
             8:{
                 name:   "Is the physical SOH different to 1RB or 1RS? Conduct muster where applicable",
-                Yes:"9",
-                No: "FF",
-            },
-            9:{
-                name:   "Is the physical SOH different the same as the 1RB or 1RS?",
                 Yes:"LE",
                 No: "FF",
             },

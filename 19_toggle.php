@@ -59,7 +59,7 @@ if ($result->num_rows > 0) {
         
         $btnType = "<span class='badge badge-info'>IMP</span>";
         
-        $rws.="<tr><td>$btnType</td><td>$targetID</td><td>$DSTRCT_CODE</td><td>$WHOUSE_ID</td><td>$SUPPLY_CUST_ID</td><td></td><td>$STOCK_CODE</td><td>$ITEM_NAME</td><td>$targetItemCount</td><td>$btnBackup</td></tr>";
+        $rws.="<tr><td>$btnType</td><td>$targetID</td><td>$DSTRCT_CODE</td><td>$WHOUSE_ID</td><td>$SUPPLY_CUST_ID</td><td></td><td>$STOCK_CODE</td><td>$ITEM_NAME</td><td>$targetItemCount</td><td class='float-right'>$btnBackup</td></tr>";
 }}
 
 
@@ -116,7 +116,7 @@ if ($result->num_rows > 0) {
         
         $btnType = "<span class='badge badge-primary'>B2R</span>";
         
-        $rws.="<tr><td>$btnType</td><td>$targetID</td><td>$DSTRCT_CODE</td><td>$WHOUSE_ID</td><td>$SUPPLY_CUST_ID</td><td>$BIN_CODE</td><td>$STOCK_CODE</td><td>$ITEM_NAME</td><td>$targetItemCount</td><td>$btnBackup</td></tr>";
+        $rws.="<tr><td>$btnType</td><td>$targetID</td><td>$DSTRCT_CODE</td><td>$WHOUSE_ID</td><td>$SUPPLY_CUST_ID</td><td>$BIN_CODE</td><td>$STOCK_CODE</td><td>$ITEM_NAME</td><td>$targetItemCount</td><td class='float-right'>$btnBackup</td></tr>";
 }}
 
 
@@ -245,7 +245,7 @@ $(document).ready(function() {
 <div class='row'>
     <div class='col lead table-responsive-sm'> 
         <table id='table_backup' class='table table-sm table-striped table-hover'>
-            <thead>
+            <thead class="table-dark">
                 <tr>
                     <th>Type</th>
                     <th>TargetID</th>

@@ -45,14 +45,14 @@ const config = {
                         <th style="width: 120px">Type</th>
                         <th style="width: 70px">ID</th>
                         <th >Name</th>
-                        <th style="width: 70px" align='right'>Orig</th>
-                        <th style="width: 120px" align='right'>Completed</th>
-                        <th style="width: 70px" align='right'>Extra</th>
-                        <th style="width: 70px" align='right'>Status</th>
-                        <th style="width: 12px" align='right'>Included</th>
-                        <th style="width: 12px" align='right'>Archive</th>
-                        <th style="width: 12px" align='right'>Excel</th>
-                        <th style="width: 12px" align='right'>Export</th>
+                        <th style="width: 70px" >Orig</th>
+                        <th style="width: 120px" >Completed</th>
+                        <th style="width: 70px" >Extra</th>
+                        <th style="width: 70px">Status</th>
+                        <th style="width: 12px">Included</th>
+                        <th style="width: 12px">Archive</th>
+                        <th style="width: 12px">Excel</th>
+                        <th style="width: 12px">Export</th>
                     </tr>
                 </thead>
                 <tbody>

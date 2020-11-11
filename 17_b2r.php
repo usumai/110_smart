@@ -49,22 +49,28 @@
                         <tr><td><b>Warehouse</b></td><td colspan='2' >{{ json_bins_orig[0].WHOUSE_ID }}</td><td></td></tr>
                         <tr><td><b>Bin</b></td><td colspan='2' >{{ BIN_CODE }}</td><td></td></tr>
                         <tr><td colspan='4' >&nbsp;</td></tr>
-                        <tr>
-                            <td colspan='4'>
-                                <b>Bin contents</b>
-                                <small>(Not all items listed must be sighted, but all additional stockcodes found must be registered.)</small>
-                                <!-- <button type="button" class="btn btn-primary btn-sm helpBtn float-right" data-toggle="modal" data-target="#helpModal" data-helpwords="This is the first help modal">?</button> -->
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><b>Stockcode</b></td>
-                            <td><b>Name</b></td>
-                            <td align='right'><b>SOH</b></td>
-                        </tr>
-                        <tr v-for="bin in json_bins_orig">
-                            <td>{{ bin.STOCK_CODE }}</td>
-                            <td>{{ bin.ITEM_NAME }}</td>
-                            <td>{{ bin.SOH }}</td>
+
+	                    <tr>
+		                	<table class="table table-sm table-striped">
+		                        <caption>
+	                                <b>Bin contents</b>
+	                                <small>(Not all items listed must be sighted, but all additional stockcodes found must be registered.)</small>		                        
+		                        </caption>
+		                        <thead class="table-dark">
+			                        <tr>
+			                            <th><b>Stockcode</b></th>
+			                            <th><b>Name</b></th>
+			                            <th align='right'><b>SOH</b></th>
+			                        </tr>
+		                        </thead>
+		                        <tbody>
+			                        <tr v-for="bin in json_bins_orig">
+			                            <td>{{ bin.STOCK_CODE }}</td>
+			                            <td>{{ bin.ITEM_NAME }}</td>
+			                            <td>{{ bin.SOH }}</td>
+			                        </tr>
+		                        </tbody>
+							</table>
                         </tr>
                     </table>
 
@@ -214,7 +220,17 @@ let vm = new Vue({
         get_b2r_skeleton(){
             payload             = {'act':'get_b2r_skeleton', 'BIN_CODE':this.BIN_CODE, 'stkm_id':this.stkm_id}
             json                = fnapi(payload)
-            this.json_skeleton  = json[0]
+            this.json_skeleton  = json[0];
+/*
+            rec = json[0];
+            if(rec.extra_total>0){
+            	if(rec.extra_complete==rec.extra_total){
+            		this.json_skeleton.findingID=16;
+            	}else if(rec.extra_incomplete>0){
+            		this.json_skeleton.findingID=15;
+            	}
+            }
+*/            
         }, 
         get_b2r_contents(){
             payload             = {'act':'get_b2r_contents', 'BIN_CODE':this.BIN_CODE, 'stkm_id':this.stkm_id}
@@ -225,7 +241,7 @@ let vm = new Vue({
             this.json_bins_extr = fnapi(payload)
         }, 
         get_result_cats(){
-            payload              = {'act':'get_result_cats'}
+            payload              = {act:'get_result_cats', isType: 'b2r'}
             json                = fnapi(payload)
             for(let result_cat_idx in json){
                 result_cat = json[result_cat_idx]

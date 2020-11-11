@@ -168,15 +168,11 @@ if ($act=="create_ga_stocktake") {
     $stkm_id    = $_POST["stkm_id"];
     $BIN_CODE   = $_POST["BIN_CODE"];
     $sql        = " SELECT * FROM smartdb.sm18_impairment ";
-    $sql       .= " WHERE isType = 'b2r' AND stkm_id = '$stkm_id' AND BIN_CODE = '$BIN_CODE' AND res_parent_storageID IS NOT NULL ";
+    $sql       .= " WHERE isType = 'b2r' AND stkm_id = '$stkm_id' AND BIN_CODE = '$BIN_CODE' AND data_source='extra' ";
     echo json_encode(qget($sql));
 
 }elseif ($act=='get_b2r_skeleton') {
-    $stkm_id    = $_POST["stkm_id"];
-    $BIN_CODE   = $_POST["BIN_CODE"];
-    $sql        = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id = $stkm_id AND BIN_CODE = '$BIN_CODE'";
-    echo json_encode(qget($sql));
-
+    echo json_encode(getB2RBinRecord($_POST["stkm_id"],$_POST["BIN_CODE"]));
 }elseif ($act=='get_b2r_bin') {
     $auto_storageID    = $_POST["auto_storageID"];
     $sql        = " SELECT * FROM smartdb.sm18_impairment  WHERE auto_storageID = $auto_storageID";
@@ -190,7 +186,8 @@ if ($act=="create_ga_stocktake") {
     if($finalResult=="clear"){// Clear results
         $msg = "Clear results";
         $stmt   = $con->prepare("   UPDATE smartdb.sm18_impairment 
-                                    SET finalResult=NULL, finalResultPath=NULL
+                                    SET finalResult=NULL, 
+                                    	finalResultPath=NULL
                                     WHERE auto_storageID=? ");
         $stmt   ->bind_param("s",  $auto_storageID);
     }else{//set a value
@@ -201,18 +198,42 @@ if ($act=="create_ga_stocktake") {
         $stmt   ->bind_param("sss", $finalResult, $finalResultPath, $auto_storageID);
     }
     $stmt   ->execute();
+    
+    //update parent bin status
+    updateB2RBinStatusByChildId($con, $auto_storageID, null);    
+    
     echo $msg;
     
 
 }elseif ($act=='save_delete_b2r_extra') {
     $auto_storageID     = $_POST["auto_storageID"];
+    
+  	$rec= qget("select 
+					stkm_id, 
+					BIN_CODE 
+				FROM smartdb.sm18_impairment 
+				WHERE auto_storageID= $auto_storageID");
+	  
+    
     $stmt   = $con->prepare("   DELETE FROM smartdb.sm18_impairment WHERE auto_storageID=? ");
     $stmt   ->bind_param("s",  $auto_storageID);
     $stmt   ->execute();
+    
+    //update parent bin status
+    if(count($rec)>0){
+		updateB2RBinStatus($con,$rec[0]["stkm_id"],$rec[0]["BIN_CODE"],null);
+	}		
+   
     echo "Deleted record";
 
 }elseif ($act=='get_result_cats') {
     $sql        = " SELECT * from smartdb.sm19_result_cats ";
+    if($_POST["isType"]){
+    	$byType=$_POST["isType"];
+    	
+    	$sql .= "WHERE isType='$byType'";
+    }
+    
     echo json_encode(qget($sql));
 
 }elseif ($act=='save_b2r_result') {
@@ -259,8 +280,8 @@ if ($act=="create_ga_stocktake") {
                                 WHERE BIN_CODE=? AND stkm_id=? AND data_source='skeleton'");
     $stmt   ->bind_param("ssss",  $current_user, $fingerprint, $BIN_CODE, $stkm_id);
     $stmt   ->execute();
-       
-
+    //update parent bin status
+    updateB2RBinStatus($con, $stkm_id ,  $BIN_CODE, null);
     
 }elseif ($act=="save_textinput") {
 	$full_table_name    = $_POST["full_table_name"];
@@ -463,15 +484,18 @@ function getSM19Cats() {
 
 	return qget($sql);
 }
+
 function getUserProfiles(){
      $sql = "SELECT * FROM smartdb.sm11_pro WHERE date(delete_date) IS NULL;";
     return qget($sql);
 }
+
 function deleteUserProfile($connection, $record){
     $sql = "DELETE FROM smartdb.sm11_pro WHERE profile_id = $record->profile_id";
     $connection->query($sql);
     return $record->profile_id;
 }
+
 function saveUserProfile($connection, $record){
 
     $insertSql = "INSERT INTO smartdb.sm11_pro (
@@ -513,6 +537,82 @@ function saveUserProfile($connection, $record){
     return $prodId;
 }
 
+function updateB2RBinStatusByChildId($connection, $childStorageId, $findingCode){
+	$rec= qget("select 
+					stkm_id, 
+					BIN_CODE 
+				FROM smartdb.sm18_impairment 
+				WHERE auto_storageID=$childStorageId");
+	if(count($rec)>0){
+		updateB2RBinStatus($connection,$rec[0]["stkm_id"],$rec[0]["BIN_CODE"],$findingCode);
+	}			
+}
+
+function updateB2RBinStatus ($connection, $stkId, $binId, $findingCode) {
+	$refs=array("NSTR"=>14,"TBA"=>15, "INV"=>16);
+	$status=null;
+	if($findingCode) {
+		$status=$refs[$findingCode];
+	}else{
+		$bin=getB2RBinRecord($stkId, $binId);
+		if(count($bin)>0){
+			$status=$bin[0]["findingID"];
+			if ($bin[0]["extra_total"]>0) {
+				if($bin[0]["extra_total"]==$bin[0]["extra_complete"]) {
+					$status=$refs["INV"];				
+				}elseif ($bin[0]["extra_incomplete"] > 0){
+					$status=$refs["TBA"];
+				}
+			}		
+		}
+	}
+	$sql=" update smartdb.sm18_impairment
+		   SET	findingID=? 
+		   where 
+				bin_code= ? AND 
+				stkm_id= ? AND 
+				data_source = 'skeleton'";
+	$stmt = $connection->prepare($sql);
+
+    $stmt->bind_param("sss", $status, $binId, $stkId);        
+    $stmt->execute();
+}
+
+function getB2RBinRecord($stkm_id, $BIN_CODE) {
+  
+    $sql = "
+		select 
+			r1.*, 
+			r2.extra_complete,
+			r2.extra_incomplete,
+			r2.extra_total
+		from 
+		(
+			select *
+			from smartdb.sm18_impairment
+			where 
+				bin_code= '$BIN_CODE' AND 
+				stkm_id= $stkm_id AND 
+				data_source = 'skeleton'
+		) as r1
+		left join
+		(
+			select 
+				stkm_id,
+				bin_code,
+				sum(CASE WHEN finalResult IS NOT NULL THEN 1 ELSE 0 END) as extra_complete,
+				sum(CASE WHEN finalResult IS NULL THEN 1 ELSE 0 END) as extra_incomplete,
+				count(*) as extra_total
+			from smartdb.sm18_impairment
+			where 
+				bin_code='$BIN_CODE' AND 
+				stkm_id= $stkm_id AND 
+				data_source = 'extra'
+		) as r2 
+		on (r1.stkm_id=r2.stkm_id AND r1.bin_code=r2.bin_code)";
+   
+    return qget($sql);
+}
 
 function getActivities() {
     $sql = "
