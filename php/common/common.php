@@ -22,7 +22,7 @@ function getAPIAction() {
 function execWithErrorHandler($callback){
     try {
         $callback();
-    }catch(Exception $e){
+    }catch(Throwable $e){
         $response = new ResponseMessage("ERROR", null);
         $response->errors[0]=new ErrorInfo(0,$e->getMessage());
         echo json_encode($response);

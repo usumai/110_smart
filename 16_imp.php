@@ -172,7 +172,9 @@ $(document).ready(function() {
 
             //Check if date required, date is set
             let res_unserv_date = $('#res_unserv_date').val();
-            if(arS['rl'][fID-1]['reqDate']==1&& res_unserv_date.length<=0){
+            if ((arS['rl'][fID-1]['reqDate']==1)  && 
+            	((res_unserv_date.length<=0) || 
+            	(res_unserv_date=='0000-00-00 00:00:00'))){
                 $('#btnSubmit').hide();
             }
 

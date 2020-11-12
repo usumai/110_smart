@@ -121,6 +121,8 @@ let vm = new Vue({
                 	return 'warning';
                 }else if((this.milisEnabled.findIndex(v=>{return v==rec.findingID;}) >= 0) && (rec.checked_to_milis==0)){
                     return 'warning';
+                } else if(rec.findingID==13){
+                    return 'warning';                     
                 }else{
                     return 'success';
                 }
@@ -136,7 +138,9 @@ let vm = new Vue({
         			return 'NYC'; 
         		} else if((this.milisEnabled.findIndex(v=>{return v==rec.findingID;}) >= 0) 
                     && (rec.checked_to_milis==0)){
-                    return 'NYC';    
+                    return 'NYC'; 
+                } else if(rec.findingID==13){
+                    return 'NYC';   
                 }else{
                     return 'FIN';
                 }

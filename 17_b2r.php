@@ -45,8 +45,8 @@
                                 </div>
                             </td>
                         </tr>
-                        <tr><td><b>District</b></td><td colspan='2' >{{ json_bins_orig[0].DSTRCT_CODE }}</td><td></td></tr>
-                        <tr><td><b>Warehouse</b></td><td colspan='2' >{{ json_bins_orig[0].WHOUSE_ID }}</td><td></td></tr>
+                        <tr><td><b>District</b></td><td colspan='2' >{{ json_skeleton.DSTRCT_CODE }}</td><td></td></tr>
+                        <tr><td><b>Warehouse</b></td><td colspan='2' >{{ json_skeleton.WHOUSE_ID }}</td><td></td></tr>
                         <tr><td><b>Bin</b></td><td colspan='2' >{{ BIN_CODE }}</td><td></td></tr>
                         <tr><td colspan='4' >&nbsp;</td></tr>
 
@@ -220,17 +220,7 @@ let vm = new Vue({
         get_b2r_skeleton(){
             payload             = {'act':'get_b2r_skeleton', 'BIN_CODE':this.BIN_CODE, 'stkm_id':this.stkm_id}
             json                = fnapi(payload)
-            this.json_skeleton  = json[0];
-/*
-            rec = json[0];
-            if(rec.extra_total>0){
-            	if(rec.extra_complete==rec.extra_total){
-            		this.json_skeleton.findingID=16;
-            	}else if(rec.extra_incomplete>0){
-            		this.json_skeleton.findingID=15;
-            	}
-            }
-*/            
+            this.json_skeleton  = json[0];        
         }, 
         get_b2r_contents(){
             payload             = {'act':'get_b2r_contents', 'BIN_CODE':this.BIN_CODE, 'stkm_id':this.stkm_id}

@@ -29,7 +29,14 @@ function createIsAudit($connection, $record) {
 		$record->rc_extras,
 		$record->type);            
     $stmt->execute();
-    return $stmt->insert_id;    
+    if($stmt->error){
+		$errorMsg = $stmt->error;
+		$stmt->close();
+		throw new Exception($errorMsg);
+	}
+    $id= $stmt->insert_id;
+    $stmt->close();
+    return $id;    
 }
 
 function createIsImpairments($connection, $stocktakeId, $impairments) { 
@@ -134,8 +141,13 @@ function createIsImpairments($connection, $stocktakeId, $impairments) {
 			$record->delete_date,
 			$record->delete_user);		
 		$stmt->execute();
+		if($stmt->error){
+			$errorMsg = $stmt->error;
+			$stmt->close();
+			throw new Exception($errorMsg);
+		}
   	}
-
+	$stmt->close();
 }
 
 function createGaStocktake($connection, $record) {
@@ -165,7 +177,14 @@ function createGaStocktake($connection, $record) {
 		$record->rc_orig_complete, 
 		$record->rc_extras);
     $stmt->execute();
-    return $stmt->insert_id;
+    if($stmt->error){
+		$errorMsg = $stmt->error;
+		$stmt->close();
+		throw new Exception($errorMsg);
+	}    
+    $id=$stmt->insert_id;
+    $stmt->close();
+    return $id;
 }
 function createGaAssets($connection, $stocktakeId, $assets) {
 	if((! $stocktakeId) || ($stocktakeId=='')) {
@@ -338,6 +357,12 @@ function createGaAssets($connection, $stocktakeId, $assets) {
 			$row->res_loc_longitude);
 
 		$stmt->execute();
+		if($stmt->error){
+			$errorMsg = $stmt->error;
+			$stmt->close();
+			throw new Exception($errorMsg);
+		}	
 	}
+	$stmt->close();
 }
 ?>

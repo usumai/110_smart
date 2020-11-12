@@ -123,14 +123,14 @@ if ($result->num_rows > 0) {
 $sqlStats = "SELECT 
 	SUM(CASE WHEN (
 					(LEFT(isType,3)='imp') AND 
-					((isBackup IS NULL) OR (isBackup=0)) AND 
+					(isBackup<>1) AND 
 					((res_create_date IS NOT null) AND (date(res_create_date) <> '0000-00-00'))
 				   ) 
 		THEN 1 ELSE 0 END
 	) AS impPrimeComplete, 
 	SUM(CASE WHEN (
 					(LEFT(isType,3)='imp') AND 
-					(isBackup IS NULL or isBackup=0)) 
+					(isBackup<>1)) 
 		THEN 1 ELSE 0 END
 	) AS impPrimeTotal,
 	SUM(CASE WHEN (
@@ -145,25 +145,24 @@ $sqlStats = "SELECT
 					(isBackup=1)) 
 		THEN 1 ELSE 0 END
 	) AS impBackupTotal,
-	SUM(CASE WHEN (
-					(isType='b2r') AND 
+	SUM(CASE WHEN ( (isType='b2r') AND 
 					(data_source='skeleton') AND
-					(isBackup IS NULL or isBackup=0) AND 				
-					((res_create_date IS NOT null) AND (date(res_create_date) <> '0000-00-00'))
-					)
+					(isBackup <> 1) AND 				
+					(findingID in (14,16))
+				  )
 		THEN 1 ELSE 0 END
 	) AS b2rPrimeComplete,
 	SUM(CASE WHEN (
 					(isType='b2r') AND 
 					(data_source='skeleton') AND
-					(isBackup IS NULL or isBackup=0)) 
+					(isBackup <> 1)) 
 		THEN 1 ELSE 0 END
 	) AS b2rPrimeTotal,
 	SUM(
 		CASE WHEN (	(isType='b2r') AND 
 					(data_source='skeleton') AND
 					(isBackup=1) AND 
-					((res_create_date IS NOT null) AND (date(res_create_date) <> '0000-00-00'))
+					(findingID in (14,16))
 					) 
 		THEN 1 ELSE 0 END
 	) AS b2rBackupComplete,

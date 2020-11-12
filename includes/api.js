@@ -83,6 +83,7 @@ function getIsImpairments(completeCallback, errorCallback){
 		}
 	});	
 }
+
 function upload(uploadData, progressCallback, completeCallback, errorCallback) {
 	if (uploadData.type == 'ga_stk') {
 		loadGaStocktake(uploadData, progressCallback, completeCallback, errorCallback);
@@ -144,8 +145,10 @@ function createIsImpairments (stocktakeId, impairmentList, progressCallback, com
 	var n=0;
 	progressCallback(current,total,STATUS_PROCESS,'creates IS impairment');
 	for(var rec in impairmentList) {
+	
 		batchBuff[n++]=impairmentList[rec]; 
 		current++;
+
 		if(n>=batchSize) {
 			axios.post('api.php', {
 				action: 'create_is_impairments', 
@@ -159,7 +162,7 @@ function createIsImpairments (stocktakeId, impairmentList, progressCallback, com
 					progressCallback(current, total, STATUS_ERROR, 'creates IS impairment');
 					errorCallback(response.data.errors);
 				}else{
-					if(current==total) {	
+					if(current>=total) {	
 						progressCallback(current, total, STATUS_COMPLETE, 'creates IS impairment');
 						completeCallback(response.data.result);
 					}else{
@@ -177,7 +180,7 @@ function createIsImpairments (stocktakeId, impairmentList, progressCallback, com
 			action: 'create_is_impairments', 
 			data : { 
 				stocktakeId: stocktakeId, 
-				assets : batchBuff
+				impairments : batchBuff
 			}
 		})
 		.then(response => {
@@ -259,7 +262,7 @@ function createGaAssets (stocktakeId, assetList, progressCallback, completeCallb
 					errorCallback(response.data.errors);
 				}else{
 					
-					if(current==total) {		
+					if(current>=total) {		
 						progressCallback(current, total, STATUS_COMPLETE, 'creates GA asset');		
 						completeCallback(response.data.result);
 					}else{
