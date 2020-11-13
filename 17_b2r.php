@@ -58,9 +58,9 @@
 		                        </caption>
 		                        <thead class="table-dark">
 			                        <tr>
-			                            <th><b>Stockcode</b></th>
-			                            <th><b>Name</b></th>
-			                            <th align='right'><b>SOH</b></th>
+			                            <th>Stockcode</th>
+			                            <th>Name</th>
+			                            <th>SOH</th>
 			                        </tr>
 		                        </thead>
 		                        <tbody>
@@ -105,12 +105,13 @@
             <caption style="caption-side: top"><h3><b>Extra</b></h3></caption>
             <thead class="table-dark">
                 <tr>
-                    <th><b>Stockcode</b></th>
-                    <th><b>Name</b></th>
-                    <th><b>SOH</b></th>
-                    <th><b>Comment</b></th>
-                    <th align='right'><b>Action</b></th>
-                    <th align='right'><b>Status</b></th>
+                    <th>Stockcode</th>
+                    <th>Name</th>
+                    <th>SOH</th>
+                    <th>Comment</th>
+                    <th class='text-right'>Status</th>
+                    <th class='text-right'>Action</th>
+
                 </tr>
             </thead>
             <tbody>    
@@ -156,13 +157,14 @@
                                     inputtype='textarea'
                                     ></textinput>
                     </td>
-                    <td width='10%' align='right'>
-                        <button class="btn btn-danger" v-on:click="save_delete_b2r_extra(bin.auto_storageID)" >Delete</button>
-                    </td>
-                    <td width='10%' align='right'>
+                    <td width='10%'>
                         <a class='btn btn-outline-dark float-right' :href="'18_b2r_extra.php?auto_storageID='+bin.auto_storageID" v-if="bin.finalResult">{{ bin.finalResult }}</a>
                         <a class='btn btn-outline-danger float-right' :href="'18_b2r_extra.php?auto_storageID='+bin.auto_storageID"  v-if="!bin.finalResult">Incomplete</a>
                     </td>
+                    <td width='10%' class="text-right">
+                        <button class="btn btn-danger" v-on:click="save_delete_b2r_extra(bin.auto_storageID)" >Delete</button>
+                    </td>
+
                 </tr>
             </tbody>
         </table>
