@@ -339,8 +339,20 @@ let vm = new Vue({
                 payload                         = {'act':'get_stk_assets_export', 'stkm_id':actv.stkm_id }
                 header_obj['assetlist']         = fnapi(payload)
                 
-            }else if (export_type=="ga_rr"){
+            }else if (actv.stk_type=="is_audit"){
+                name_suffix                     = actv.stk_name
+                header_obj['stkm_id']           = actv.stkm_id
+                header_obj['stk_id']            = actv.stk_id
+                header_obj['stk_name']          = actv.stk_name
 
+                header_obj['rc_orig']           = actv.rc_orig
+                header_obj['rc_orig_complete']  = actv.rc_orig_complete
+                header_obj['rc_extras']         = actv.rc_extras
+                header_obj['rc_totalsent']      = actv.rc_totalsent
+                header_obj['asset_lock_date']   = ''
+
+                payload                         = {'act':'get_stk_assets_export', 'stkm_id':actv.stkm_id }
+                header_obj['impairments']         = fnapi(payload)           	
             }
 
             // date_name = new Date().toISOString().replace(/-/g,'').replace(/:/g,'').substring(2,15)

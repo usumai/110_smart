@@ -6,7 +6,7 @@
     <div class="container-fluid">
         <h1 class="mt-5 display-6">IS/B2R</h1>
         <div class="table-responsive-sm">
-            <table id="tbl_stk" class="table table-sm table-striped table-hover" style="overflow-y: scroll">
+            <table id="tbl_stk" class="table table-sm table-striped table-border table-hover" style="overflow-y: scroll">
                 <caption>            
                 </caption>
                 <thead class="table-dark">
@@ -27,7 +27,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for='(rec, recidx) in json_records'>
+                    <tr v-for='(rec, recidx) in json_records' :ref="rec.auto_storageID == <?=$current_row ?> ? 'current_row' : ''">
                         <td>
                             <a  class='btn btn-primary' v-if="rec.isType!='b2r'"
                                 :href="'16_imp.php?auto_storageID='+rec.auto_storageID" ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
@@ -54,9 +54,13 @@
                         </td>
                         <td class='float-right'>
                             <a  class='btn btn-primary' v-if="rec.isType!='b2r'"
-                                :href="'16_imp.php?auto_storageID='+rec.auto_storageID" ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
+                                :href="'16_imp.php?auto_storageID='+rec.auto_storageID+'&current_row='+rec.auto_storageID" >
+                                <span class='octicon octicon-zap' style='font-size:30px'></span>
+                            </a>
                             <a  class='btn btn-primary' v-if="rec.isType=='b2r'"
-                                :href="'17_b2r.php?stkm_id='+rec.stkm_id+'&BIN_CODE='+rec.BIN_CODE" ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
+                                :href="'17_b2r.php?stkm_id='+rec.stkm_id+'&BIN_CODE='+rec.BIN_CODE+'&current_row='+rec.auto_storageID" >
+                                <span class='octicon octicon-zap' style='font-size:30px'></span>
+                            </a>
                         </td>
                     </tr>
                 </tbody>
@@ -112,6 +116,11 @@ let vm = new Vue({
     created() {
         this.get_is_records()
         this.get_is_settings()
+    },
+    mounted() {
+     	if(this.$refs.current_row) {
+    		this.$refs.current_row[0].scrollIntoView();
+    	}   
     },
     methods:{
         getStatusColor(rec){

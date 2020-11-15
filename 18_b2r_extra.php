@@ -86,6 +86,7 @@ function fnapi(data){
 let vm = new Vue({
     el: '#app',
     data: {
+    	current_row: <?=$current_row?>,
         dev:false,
         auto_storageID:"<?=$_GET["auto_storageID"]?>",
         json_path:{},
@@ -205,14 +206,24 @@ let vm = new Vue({
         }, 
         save_final_b2r_extra_result(clearopt){
             if(clearopt=="clear"){
-                payload = {'act':'save_final_b2r_extra_result', 'auto_storageID':this.auto_storageID, 'finalResult':clearopt, 'finalResultPath':JSON.stringify(this.json_path)}
-                json    = fnapi(payload)
-                this.get_b2r_bin()
+                payload = {
+              			'act':'save_final_b2r_extra_result', 
+              			'auto_storageID':this.auto_storageID, 
+              			'finalResult':clearopt, 
+              			'finalResultPath':JSON.stringify(this.json_path),
+                };
+                json    = fnapi(payload);
+                this.get_b2r_bin();
 
             }else{
-                payload = {'act':'save_final_b2r_extra_result', 'auto_storageID':this.auto_storageID, 'finalResult':this.qres, 'finalResultPath':JSON.stringify(this.json_path)}
-                json    = fnapi(payload)
-                window.location.replace("17_b2r.php?stkm_id="+this.json_b2r_record.stkm_id+"&BIN_CODE="+this.json_b2r_record.BIN_CODE);
+                payload = {
+                	'act':'save_final_b2r_extra_result', 
+                	'auto_storageID':this.auto_storageID, 
+                	'finalResult':this.qres, 
+                	'finalResultPath':JSON.stringify(this.json_path),
+                	};
+                json    = fnapi(payload);
+                window.location.replace("17_b2r.php?current_row="+this.current_row+"&stkm_id="+this.json_b2r_record.stkm_id+"&BIN_CODE="+this.json_b2r_record.BIN_CODE);
             }
         }, 
     }

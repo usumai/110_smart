@@ -158,8 +158,8 @@
                                     ></textinput>
                     </td>
                     <td width='10%'>
-                        <a class='btn btn-outline-dark float-right' :href="'18_b2r_extra.php?auto_storageID='+bin.auto_storageID" v-if="bin.finalResult">{{ bin.finalResult }}</a>
-                        <a class='btn btn-outline-danger float-right' :href="'18_b2r_extra.php?auto_storageID='+bin.auto_storageID"  v-if="!bin.finalResult">Incomplete</a>
+                        <a class='btn btn-outline-dark float-right' :href="'18_b2r_extra.php?current_row='+current_row+'&auto_storageID='+bin.auto_storageID" v-if="bin.finalResult">{{ bin.finalResult }}</a>
+                        <a class='btn btn-outline-danger float-right' :href="'18_b2r_extra.php?current_row='+current_row+'&auto_storageID='+bin.auto_storageID"  v-if="!bin.finalResult">Incomplete</a>
                     </td>
                     <td width='10%' class="text-right">
                         <button class="btn btn-danger" v-on:click="save_delete_b2r_extra(bin.auto_storageID)" >Delete</button>
@@ -204,6 +204,7 @@ let vm = new Vue({
         dev:true,
         BIN_CODE:"<?=$_GET["BIN_CODE"]?>",
         stkm_id:"<?=$_GET["stkm_id"]?>",
+        current_row: <?=$current_row?>,
         json_bins_orig:{},
         json_bins_extr:{},
         json_skeleton:{},
