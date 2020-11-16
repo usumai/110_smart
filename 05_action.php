@@ -3,6 +3,14 @@ include "01_dbcon.php";
 include "05_scripts.php";
 include "05_db_designer.php";
 
+$current_row=0;
+if(array_key_exists("current_row",$_POST)){
+	$current_row=$_POST["current_row"];
+}elseif(array_key_exists("current_row",$_GET)){
+	$current_row=$_GET["current_row"];
+}
+
+
 if (isset($_POST["act"])) {
 	$act = $_POST["act"];
 }else{
@@ -845,7 +853,7 @@ if ($act=='sys_pull_master') {
           $photo_name = $original_photo_name.'_'.$counter.'.jpg';
      }
      file_put_contents($photo_name, file_get_contents($input));
-     header("Location: 11_ass.php?ass_id=".$ass_id);
+     header("Location: 11_ass.php?current_row=$current_row&ass_id=".$ass_id);
 
 
 }elseif ($act=='save_ResetAssetResults'){ 
@@ -945,7 +953,7 @@ if ($act=='sys_pull_master') {
      fclose($myFileLink);
      unlink($photo_filename) or die("Couldn't delete file");
 
-     header("Location: 11_ass.php?ass_id=".$ass_id);
+     header("Location: 11_ass.php?current_row=$current_row&ass_id=".$ass_id);
 
 
 
@@ -1020,7 +1028,7 @@ if ($act=='sys_pull_master') {
      WHERE ass_id =$ass_id ;";
      // echo "<br><br><br>$sql";
      runSql($sql);
-     header("Location: 11_ass.php?ass_id=".$ass_id);
+     header("Location: 11_ass.php?current_row=$current_row&ass_id=".$ass_id);
 
 }elseif ($act=='save_initiate_template') {
      $ass_id        = $_POST["ass_id"];
@@ -1042,7 +1050,7 @@ if ($act=='sys_pull_master') {
           $new_ass_id	= $row["ass_id"];
      }}
      echo "<br><br>new_ass_id: $new_ass_id";
-     header("Location: 11_ass.php?ass_id=".$new_ass_id);
+     header("Location: 11_ass.php?current_row=$current_row&ass_id=".$new_ass_id);
 
 
 
@@ -1095,7 +1103,7 @@ if ($act=='sys_pull_master') {
      $sql_save = "UPDATE smartdb.sm12_rwr SET rr_included=1 WHERE rr_id='$rr_id';";
      mysqli_multi_query($con,$sql_save);
      fnStats($stkm_id);
-     header("Location: 11_ass.php?ass_id=".$ass_id);
+     header("Location: 11_ass.php?current_row=$current_row&ass_id=".$ass_id);
 
 }elseif ($act=='get_rawremainder_asset_count') {
      $search_term = $_POST["search_term"];
@@ -1288,7 +1296,7 @@ if ($act=='sys_pull_master') {
      runSql($sql);
      fnStats($stkm_id);
 
-     header("Location: 16_imp.php?auto_storageID=".$auto_storageID);
+     header("Location: 16_imp.php?current_row=$current_row&auto_storageID=".$auto_storageID);
 
 }elseif ($act=='save_clear_msi_bin') {
      $auto_storageID     = $_GET["auto_storageID"];
@@ -1309,7 +1317,7 @@ if ($act=='sys_pull_master') {
      $sql = "DELETE FROM smartdb.sm18_impairment WHERE res_parent_storageID='$storageID' ";
      runSql($sql);
 
-     header("Location: 16_imp.php?auto_storageID=".$auto_storageID);
+     header("Location: 16_imp.php?current_row=$current_row&auto_storageID=".$auto_storageID);
 
 }elseif ($act=='save_b2r_nstr') {
      $BIN_CODE = $_GET["BIN_CODE"];
@@ -1326,7 +1334,7 @@ if ($act=='sys_pull_master') {
      runSql($sql);
 
      fnStats($stkm_id);
-     header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
+     header("Location: 17_b2r.php?current_row=$current_row&BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
 
 }elseif ($act=='save_b2r_extras') {
      $BIN_CODE = $_GET["BIN_CODE"];
@@ -1362,7 +1370,7 @@ if ($act=='sys_pull_master') {
      runSql($sql);
 
      fnStats($stkm_id);
-     header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
+     header("Location: 17_b2r.php?current_row=$current_row&BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
 
 }elseif ($act=='save_delete_extra') {
      $auto_storageID     = $_GET["auto_storageID"];
@@ -1372,7 +1380,7 @@ if ($act=='sys_pull_master') {
      // echo $sql;
      runSql($sql);
      checkExtrasFinished($BIN_CODE, $stkm_id);
-     header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
+     header("Location: 17_b2r.php?current_row=$current_row&BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
 
 }elseif ($act=='save_b2r_add_extra') {
      $auto_storageID     = $_POST["auto_storageID"];
@@ -1429,7 +1437,7 @@ if ($act=='sys_pull_master') {
      echo $sql;
      runSql($sql);
      checkExtrasFinished($BIN_CODE, $stkm_id);
-     header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
+     header("Location: 17_b2r.php?current_row=$current_row&BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
 
 }elseif ($act=='save_b2r_extra') {
      $auto_storageID     = $_POST["auto_storageID"];
@@ -1456,7 +1464,7 @@ if ($act=='sys_pull_master') {
      echo runSql($sql);
      checkExtrasFinished($BIN_CODE, $stkm_id);
 
-     header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
+     header("Location: 17_b2r.php?current_row=$current_row&BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
 
 }elseif ($act=='save_is_toggle_check') {
      $toggle        = $_GET["toggle"];
@@ -1466,7 +1474,7 @@ if ($act=='sys_pull_master') {
      $sql = "UPDATE smartdb.sm18_impairment SET checkFlag=$toggle WHERE STOCK_CODE='$STOCK_CODE' AND BIN_CODE='$BIN_CODE'";
      echo runSql($sql);
 
-     header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
+     header("Location: 17_b2r.php?current_row=$current_row&BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
      
 }elseif ($act=='save_toggle_imp_backup') {
      $stkm_id       = $_GET["stkm_id"];
@@ -1491,7 +1499,7 @@ if ($act=='sys_pull_master') {
      echo $sql;
      echo runSql($sql);
      fnStats($stkm_id);
-     header("Location: 19_toggle.php");
+     header("Location: 19_toggle.php?current_row=$current_row");
 
 
 

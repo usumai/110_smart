@@ -476,6 +476,7 @@ $(document).ready(function() {
                     <span id='splityLanding'></span>
 
                     <input type='hidden' name='act' value='save_msi_bin_stk'>
+                    <input type='hidden' name='current_row' id='current_row' value='<?=$current_row?>'>
                     <input type='hidden' name='findingID' id='findingID' value='<?=$findingID?>'>
                     <input type='hidden' name='stkm_id' id='stkm_id' value='<?=$stkm_id?>'>
                     <input type='hidden' name='auto_storageID' value='<?=$auto_storageID?>'>

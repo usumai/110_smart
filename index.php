@@ -325,43 +325,37 @@ let vm = new Vue({
             header_obj['unique_file_id']    = "TBA"
             name_suffix = ""
             if (actv.stk_type=="ga_stk"){
-                name_suffix                     = actv.stk_name
-                header_obj['stkm_id']           = actv.stkm_id
-                header_obj['stk_id']            = actv.stk_id
-                header_obj['stk_name']          = actv.stk_name
+                name_suffix                     = actv.stk_name;
+                header_obj['stkm_id']           = actv.stkm_id;
+                header_obj['stk_id']            = actv.stk_id;
+                header_obj['stk_name']          = actv.stk_name;
 
-                header_obj['rc_orig']           = actv.rc_orig
-                header_obj['rc_orig_complete']  = actv.rc_orig_complete
-                header_obj['rc_extras']         = actv.rc_extras
-                header_obj['rc_totalsent']      = actv.rc_totalsent
+                header_obj['rc_orig']           = actv.rc_orig;
+                header_obj['rc_orig_complete']  = actv.rc_orig_complete;
+                header_obj['rc_extras']         = actv.rc_extras;
+                header_obj['rc_totalsent']      = actv.rc_totalsent;
                 header_obj['asset_lock_date']   = ''
 
-                payload                         = {'act':'get_stk_assets_export', 'stkm_id':actv.stkm_id }
-                header_obj['assetlist']         = fnapi(payload)
+                payload                         = {'act':'get_stk_assets_export', 'stkm_id':actv.stkm_id };
+                header_obj['assetlist']         = fnapi(payload);
                 
             }else if (actv.stk_type=="is_audit"){
-                name_suffix                     = actv.stk_name
-                header_obj['stkm_id']           = actv.stkm_id
-                header_obj['stk_id']            = actv.stk_id
-                header_obj['stk_name']          = actv.stk_name
+                name_suffix                     = actv.stk_name;
 
-                header_obj['rc_orig']           = actv.rc_orig
-                header_obj['rc_orig_complete']  = actv.rc_orig_complete
-                header_obj['rc_extras']         = actv.rc_extras
-                header_obj['rc_totalsent']      = actv.rc_totalsent
-                header_obj['asset_lock_date']   = ''
-
-                payload                         = {'act':'get_stk_assets_export', 'stkm_id':actv.stkm_id }
-                header_obj['impairments']         = fnapi(payload)           	
+                payload = {'act':'export_is', 'stkm_id':actv.stkm_id };
+                header_obj= fnapi(payload);
+                header_obj['type']              = actv.stk_type;
+                header_obj['file_version']      = 12;
+                header_obj['smm_extract_date']  = new Date().toISOString().substring(0,19);
+                header_obj['smm_extract_user']  = null;
+                header_obj['unique_file_id']    = "TBA"		
             }
 
-            // date_name = new Date().toISOString().replace(/-/g,'').replace(/:/g,'').substring(2,15)
             date_name_short = new Date().toISOString().replace(/-/g,'').replace(/:/g,'').substring(2,8)
             name_suffix     = name_suffix!='' ? '_'+name_suffix : name_suffix;
             file_name       = date_name_short   + "_SMARTM" + name_suffix + ".json"
             json_string     = JSON.stringify(header_obj)
             makeFileAndDL(file_name, json_string)
-            // return header_obj
         }, 
     }
 })
