@@ -60,14 +60,14 @@
 			                        <tr>
 			                            <th>Stockcode</th>
 			                            <th>Name</th>
-			                            <th>SOH</th>
+<!-- 		                            <th>SOH</th> -->
 			                        </tr>
 		                        </thead>
 		                        <tbody>
 			                        <tr v-for="bin in json_bins_orig">
 			                            <td>{{ bin.STOCK_CODE }}</td>
 			                            <td>{{ bin.ITEM_NAME }}</td>
-			                            <td>{{ bin.SOH }}</td>
+<!-- 			                        <td>{{ bin.SOH }}</td> 	-->
 			                        </tr>
 		                        </tbody>
 							</table>

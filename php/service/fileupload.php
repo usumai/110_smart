@@ -97,6 +97,15 @@ function createIsImpairments($connection, $stocktakeId, $impairments) {
 				?,?);");
 
     foreach( $impairments as $record) {
+    	$createDate = DateTime::createFromFormat("d-m-Y h:i:s A", str_replace('/','-', $record->create_date));
+    	$createDate = ($createDate ? $createDate->format("Y-m-d H:i:s") : "0000-00-00 00:00:00");
+    	
+		$modDate = DateTime::createFromFormat("d-m-Y", str_replace('/','-', $record->last_mod_date));
+		$modDate = ($modDate ? $modDate->format("Y-m-d") : "0000-00-00");
+		
+		$extractDate=DateTime::createFromFormat("d-m-Y", str_replace('/','-', $record->ExtractDate));
+		$extractDate= $extractDate ? $extractDate->format("Y-m-d") : "0000-00-00";
+		
 		$stmt->bind_param("ssssssssssssssssssssssssssssssssssssssssss", 
 			$stocktakeId,
 			$record->storage_id, 
@@ -114,7 +123,7 @@ function createIsImpairments($connection, $stocktakeId, $impairments) {
 			$record->TRACKING_IND,
 			$record->SOH, 
 			$record->TRACKING_REFERENCE,
-			$record->LAST_MOD_DATE,
+			$modDate,
 			$record->sampleFlag,
 			$record->serviceableFlag,
 			$record->checked_to_milis,
@@ -135,8 +144,8 @@ function createIsImpairments($connection, $stocktakeId, $impairments) {
 			$record->finalResultPath,
 			$record->fingerprint,
 			$record->data_source,
-			$record->extract_date,
-			$record->create_date,
+			$extractDate,
+			$createDate,
 			$record->create_user,
 			$record->delete_date,
 			$record->delete_user);		

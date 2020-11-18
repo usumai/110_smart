@@ -3,6 +3,7 @@
 <?php include "03_menu.php"; ?>
 
 <?php
+include "php/common/common.php";
 
 $sqlInclude = "
 	SELECT stkm_id 
@@ -121,64 +122,193 @@ if ($result->num_rows > 0) {
         $rws.="<tr><td>$btnType</td><td>$targetID</td><td>$DSTRCT_CODE</td><td>$WHOUSE_ID</td><td>$SUPPLY_CUST_ID</td><td>$BIN_CODE</td><td>$STOCK_CODE</td><td>$ITEM_NAME</td><td>$targetItemCount</td><td class='float-right'>$btnBackup</td></tr>";
 }}
 
+$impMilisFindingIDs = getFindingIDsString("imp%",  $isImpAbbrsWithMilisEnabled);
+$impCompletedFindingIDs = getFindingIDsString("imp%", $isImpAbbrsCompletedStatus);	
+$b2rCompletedFindingIDs = getFindingIDsString("b2r", $isB2rAbbrsCompletedStatus);	
 
-$sqlStats = "SELECT 
-	SUM(CASE WHEN (
-					(LEFT(isType,3)='imp') AND 
-					(isBackup<>1) AND 
-					((res_create_date IS NOT null) AND (date(res_create_date) <> '0000-00-00'))
-				   ) 
-		THEN 1 ELSE 0 END
-	) AS impPrimeComplete, 
-	SUM(CASE WHEN (
-					(LEFT(isType,3)='imp') AND 
-					(isBackup<>1)) 
-		THEN 1 ELSE 0 END
-	) AS impPrimeTotal,
-	SUM(CASE WHEN (
-					(LEFT(isType,3)='imp') AND 
-					(isBackup=1) AND 
-					((res_create_date IS NOT null) AND (date(res_create_date) <> '0000-00-00'))
-				 	)
-		THEN 1 ELSE 0 END
-	) AS impBackupComplete,
-	SUM(CASE WHEN (
-					(LEFT(isType,3)='imp') AND 
-					(isBackup=1)) 
-		THEN 1 ELSE 0 END
-	) AS impBackupTotal,
-	SUM(CASE WHEN ( (isType='b2r') AND 
-					(data_source='skeleton') AND
-					(isBackup <> 1) AND 				
-					(findingID in (14,16))
-				  )
-		THEN 1 ELSE 0 END
-	) AS b2rPrimeComplete,
-	SUM(CASE WHEN (
-					(isType='b2r') AND 
-					(data_source='skeleton') AND
-					(isBackup <> 1)) 
-		THEN 1 ELSE 0 END
-	) AS b2rPrimeTotal,
-	SUM(
-		CASE WHEN (	(isType='b2r') AND 
-					(data_source='skeleton') AND
-					(isBackup=1) AND 
-					(findingID in (14,16))
-					) 
-		THEN 1 ELSE 0 END
-	) AS b2rBackupComplete,
-	SUM(CASE WHEN (
-					(isType='b2r') AND 
-					(data_source='skeleton') AND
-					(isBackup=1)) 
-		THEN 1 ELSE 0 END
-	) AS b2rBackupTotal
-	FROM smartdb.sm18_impairment
-	WHERE stkm_id IN ($sqlInclude)";
-// $sql .= " LIMIT 500; ";   
-// echo "<br><br><br>".$sqlStats;
+
+
+$sqlStats = "
+select 
+	sum(stat.impPrimaryCompleteFlag) as impPrimeComplete,
+	sum(stat.impPrimaryTotalFlag) as impPrimeTotal,
+	
+	sum(stat.impBackupCompleteFlag) as impBackupComplete,
+	sum(stat.impBackupTotalFlag) as impBackupTotal,
+	
+	sum(stat.b2rPrimaryCompleteFlag) as b2rPrimeComplete,
+	sum(stat.b2rPrimaryTotalFlag) as b2rPrimeTotal,
+
+	sum(stat.b2rBackupCompleteFlag) as b2rBackupComplete,
+	sum(stat.b2rBackupTotalFlag) as  b2rBackupTotal
+from (
+	select 
+		(CASE WHEN (t.impPrimaryTotal>0 AND t.impPrimaryComplete=t.impPrimaryTotal) THEN 1 ELSE 0 END) as impPrimaryCompleteFlag,
+		(CASE WHEN (t.impPrimaryTotal>0) THEN 1 ELSE 0 END) as impPrimaryTotalFlag,
+	
+		(CASE WHEN (t.b2rPrimaryTotal>0 AND t.b2rPrimaryComplete=t.b2rPrimaryTotal) THEN 1 ELSE 0 END) as b2rPrimaryCompleteFlag,
+		(CASE WHEN (t.b2rPrimaryTotal>0) THEN 1 ELSE 0 END) as b2rPrimaryTotalFlag,
+	
+		(CASE WHEN (t.impBackupTotal>0 AND t.impBackupComplete=t.impBackupTotal) THEN 1 ELSE 0 END) as impBackupCompleteFlag,
+		(CASE WHEN (t.impBackupTotal>0) THEN 1 ELSE 0 END) as impBackupTotalFlag,
+	
+		(CASE WHEN (t.b2rBackupTotal>0 AND t.b2rBackupComplete=t.b2rBackupTotal) THEN 1 ELSE 0 END) as b2rBackupCompleteFlag,
+		(CASE WHEN (t.b2rBackupTotal>0) THEN 1 ELSE 0 END) as b2rBackupTotalFlag
+	
+		from (
+	
+			select
+				(CASE WHEN isBackup=1 THEN 1 ELSE 0 END) as backup,
+				DSTRCT_CODE,
+				WHOUSE_ID,
+				BIN_CODE,
+				STOCK_CODE,
+				isType,
+				SUM(CASE WHEN(	isType like 'imp%' 
+								AND (isBackup<>1) 
+								AND findingID IN (
+									SELECT findingID 
+									FROM smartdb.sm19_result_cats 
+									WHERE 
+										isType like 'imp%' 
+										AND resAbbr in ('SER','USWD','USND','NIC','SPLT')
+								)
+						)
+						THEN (
+			    			CASE WHEN ( findingID in (
+					 						SELECT findingID 
+											FROM smartdb.sm19_result_cats 
+											WHERE 
+												isType like 'imp%' 
+												AND resAbbr in ('USWD','USND')   			
+			    						) 
+			    						AND (checked_to_milis<>1)
+			    					)
+			    				 THEN 0 
+			    				 ELSE 1 
+			    			END				
+						) 
+						ELSE 0
+						END
+				) as impPrimaryComplete,
+				
+				SUM(CASE WHEN(
+							(isType like 'imp%' )
+							AND (isBackup<>1) 
+						)
+						THEN 1
+						ELSE 0
+						END
+				) as impPrimaryTotal,
+		
+				SUM(CASE WHEN ( findingID in (
+				
+									SELECT findingID 
+									FROM smartdb.sm19_result_cats 
+									WHERE 
+										isType='b2r' 
+										AND resAbbr in ('INV','NSTR')
+								) AND
+								(isType='b2r') 
+								AND (isBackup <> 1)
+								AND	(data_source='skeleton') 
+								
+							  )
+						THEN 1 
+						ELSE 0 
+					END
+				) AS b2rPrimaryComplete,
+			
+				SUM(CASE WHEN(
+							(isType='b2r' )
+							AND (isBackup<>1) 
+							AND (data_source='skeleton')
+						)
+						THEN 1
+						ELSE 0
+						END
+				) as b2rPrimaryTotal,
+				
+				SUM(CASE WHEN(	isType like 'imp%' 
+								AND (isBackup=1) 
+								AND findingID IN (
+									SELECT findingID 
+									FROM smartdb.sm19_result_cats 
+									WHERE 
+										isType like 'imp%' 
+										AND resAbbr in ('SER','USWD','USND','NIC','SPLT')
+								)
+						)
+						THEN (
+			    			CASE WHEN ( findingID in (
+					 						SELECT findingID 
+											FROM smartdb.sm19_result_cats 
+											WHERE 
+												isType like 'imp%' 
+												AND resAbbr in ('USWD','USND')   			
+			    						) 
+			    						AND (checked_to_milis<>1)
+			    					)
+			    				 THEN 0 
+			    				 ELSE 1 
+			    			END				
+						) 
+						ELSE 0
+						END
+				) as impBackupComplete,
+				
+				SUM(CASE WHEN(
+							(isType like 'imp%' )
+							AND (isBackup=1) 
+						)
+						THEN 1
+						ELSE 0
+						END
+				) as impBackupTotal,
+		
+				SUM(CASE WHEN ( findingID in (
+				
+									SELECT findingID 
+									FROM smartdb.sm19_result_cats 
+									WHERE 
+										isType='b2r' 
+										AND resAbbr in ('INV','NSTR')
+								) AND
+								(isType='b2r') 
+								AND (isBackup = 1)
+								AND	(data_source='skeleton') 
+								
+							  )
+						THEN 1 
+						ELSE 0 
+					END
+				) AS b2rBackupComplete,
+			
+				SUM(CASE WHEN(
+							(isType='b2r' )
+							AND (isBackup=1) 
+							AND (data_source='skeleton')
+						)
+						THEN 1
+						ELSE 0
+						END
+				) as b2rBackupTotal		
+			FROM smartdb.sm18_impairment
+			WHERE
+				data_source <> 'extra'
+				AND stkm_id IN ($sqlInclude)			
+			GROUP BY
+				isBackup,
+				DSTRCT_CODE,
+				WHOUSE_ID,
+				BIN_CODE,
+				STOCK_CODE,
+				isType				
+	) as t
+) as stat";
+
 $result = $con->query($sqlStats);
+
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {    
         $impPrimeComplete        = $row['impPrimeComplete'];

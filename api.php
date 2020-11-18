@@ -465,17 +465,7 @@ if ($act=="create_ga_stocktake") {
     
 }
 
-function qget($sql){
-    // Submits a basic sql and returns an array result
-    global $con;
-    $res = [];
-    $result = $con->query($sql);
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $res[] = $row;
-    }}
-    return $res;
-}
+
 
 function getIsDistrictList() {
     $sql="SELECT 
@@ -643,7 +633,15 @@ function getB2RBinRecord($stkm_id, $BIN_CODE) {
     return qget($sql);
 }
 
+
+
 function getActivities() {
+	$abbrs=["SER","USWD","USND","NIC","SPLT"];
+	$milisAbbrs=["USWD","USND"];
+	$b2rAbbrs=["INV","NSTR"];
+	$impMilisFindingIDs=getFindingIDsString("imp%",$milisAbbrs);
+	$impCompletedFindingIDs=getFindingIDsString("imp%",$abbrs);	
+	$b2rCompletedFindingIDs=getFindingIDsString("b2r",$b2rAbbrs);	
     $sql = "
 SELECT 
     act.*, 
@@ -667,9 +665,16 @@ FROM
         (
             SELECT stkm_id,
                 'B2R' as isCat,
-	            SUM(CASE WHEN data_source <> 'extra' THEN 1 ELSE 0 END) AS rc_orig,
-	            SUM(CASE WHEN data_source = 'extra' THEN 1 ELSE 0 END) AS rc_extras,
-	            SUM(CASE WHEN ((findingID <> '') and (data_source <> 'extra')) THEN 1 ELSE 0 END) AS rc_orig_complete,
+	            SUM(CASE WHEN ( (data_source='skeleton') AND 
+	            				(isBackup<>1)) THEN 1 ELSE 0 END) 
+	            		AS rc_orig,
+	            SUM(CASE WHEN (	(data_source = 'extra') AND 
+	            				(isBackup<>1)) THEN 1 ELSE 0 END) 
+	            		AS rc_extras,
+	            SUM(CASE WHEN (	(findingID in ($b2rCompletedFindingIDs)) AND 
+	            				(data_source = 'skeleton') AND
+	            				(isBackup<>1)) THEN 1 ELSE 0 END) 
+	            		AS rc_orig_complete,
 	            COUNT(*) AS rc_totalsent
 	        FROM smartdb.sm18_impairment 
             WHERE ((date(delete_date) IS NULL) or (date(delete_date)='0000-00-00'))
@@ -680,13 +685,32 @@ FROM
         (
             SELECT stkm_id, 
                 'Impairment' as isCat,
-	            SUM(CASE WHEN data_source <> 'extra' THEN 1 ELSE 0 END) AS rc_orig,
-	            SUM(CASE WHEN data_source ='extra' THEN 1 ELSE 0 END) AS rc_extras,
-	            SUM(CASE WHEN ((findingID <> '') and (data_source <> 'extra')) THEN 1 ELSE 0 END) AS rc_orig_complete,
+	            SUM(
+	            	CASE WHEN ((data_source <> 'extra') AND 
+	            			   (isBackup<>1)) 
+	            		THEN 1 
+	            		ELSE 0 
+	            		END
+	            ) AS rc_orig,
+	            SUM(CASE WHEN ( (data_source ='extra') AND 
+	            				(isBackup<>1)) THEN 1 ELSE 0 END) 
+	            		AS rc_extras,
+	            SUM(CASE WHEN ( (findingID in ($impCompletedFindingIDs)) AND 
+	            				(data_source <> 'extra') AND 
+	            				(isBackup<>1)) 
+	            		THEN (
+	            			CASE WHEN (findingID in ($impMilisFindingIDs) AND (checked_to_milis<>1))
+	            				 THEN 0 
+	            				 ELSE 1 
+	            			END
+	            		) 
+	            		ELSE 0 
+	            	END
+	            ) AS rc_orig_complete,
 	            COUNT(*) AS rc_totalsent
 	        FROM smartdb.sm18_impairment 
             WHERE ((date(delete_date) IS NULL) or (date(delete_date)='0000-00-00'))
-                  AND isType<>'b2r'
+                  AND isType like 'imp%'
 	        GROUP BY stkm_id        
         )
     ) as asset

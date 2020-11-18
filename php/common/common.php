@@ -1,5 +1,11 @@
 <?php
 
+
+$isImpAbbrsWithMilisEnabled = ["USWD","USND"];
+$isImpAbbrsCompletedStatus = ["SER","USWD","USND","NIC","SPLT"];
+$isB2rAbbrsCompletedStatus = ["INV","NSTR"];
+
+
 function getAPIAction() {
     if(!array_key_exists("CONTENT_TYPE",$_SERVER))
         return null;
@@ -17,6 +23,64 @@ function getAPIAction() {
         }
     }
     return null;   
+}
+
+function qget($sql){
+    // Submits a basic sql and returns an array result
+    global $con;
+    $res = [];
+    $result = $con->query($sql);
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            $res[] = $row;
+    }}
+    return $res;
+}
+
+function getFindingIDs($isType, $findingCodes){
+	$codes="";
+	$findingIDs=[];
+	$first=0;
+	foreach($findingCodes as $code){
+		if($first==0){
+			$codes.= "'".$code."'";
+			$first=1;
+		}else{
+			$codes.= ",'".$code."'";
+		}
+	}
+		
+	$rows = qget("
+				SELECT findingID 
+				FROM smartdb.sm19_result_cats 
+				WHERE 
+					isType like '$isType' AND
+					resAbbr in ($codes)");
+					
+	if(count($rows)>0){
+		$index=0;
+		foreach($rows as $rec){
+			$findingIDs[$index++]=$rec["findingID"];
+		}
+	}
+		
+	return $findingIDs;
+}
+
+//convert array of findingID abbr code to a comma separate list of findingID string
+function getFindingIDsString($isType, $findingCodes){
+	$idArray=getFindingIDs($isType,  $findingCodes);
+	$findingIDsString="";
+	$first=0;
+	foreach ($idArray as $findingID ){		
+		if($first==0){		
+			$findingIDsString .= $findingID;
+			$first=1;			
+		}else{
+			$findingIDsString .= ",".$findingID;
+		}
+	}
+	return $findingIDsString;
 }
 
 function execWithErrorHandler($callback){
