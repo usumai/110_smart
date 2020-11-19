@@ -666,15 +666,27 @@ FROM
             SELECT stkm_id,
                 'B2R' as isCat,
 	            SUM(CASE WHEN ( (data_source='skeleton') AND 
-	            				(isBackup<>1)) THEN 1 ELSE 0 END) 
-	            		AS rc_orig,
+	            				((isBackup is NULL) OR (isBackup=0))
+	            			) 
+	            		THEN 1 
+	            		ELSE 0 
+	            		END
+	            ) AS rc_orig,
 	            SUM(CASE WHEN (	(data_source = 'extra') AND 
-	            				(isBackup<>1)) THEN 1 ELSE 0 END) 
-	            		AS rc_extras,
+	            				((isBackup is NULL) OR (isBackup=0))
+	            			) 
+	            		 THEN 1 
+	            		 ELSE 0 
+	            	END
+	            ) AS rc_extras,
 	            SUM(CASE WHEN (	(findingID in ($b2rCompletedFindingIDs)) AND 
 	            				(data_source = 'skeleton') AND
-	            				(isBackup<>1)) THEN 1 ELSE 0 END) 
-	            		AS rc_orig_complete,
+	            				((isBackup is NULL) OR (isBackup=0))
+	            			) 
+	            		THEN 1 
+	            		ELSE 0 
+	            		END
+	            ) AS rc_orig_complete,
 	            COUNT(*) AS rc_totalsent
 	        FROM smartdb.sm18_impairment 
             WHERE ((date(delete_date) IS NULL) or (date(delete_date)='0000-00-00'))
@@ -687,17 +699,23 @@ FROM
                 'Impairment' as isCat,
 	            SUM(
 	            	CASE WHEN ((data_source <> 'extra') AND 
-	            			   (isBackup<>1)) 
+	            			   ((isBackup is NULL) OR (isBackup=0))
+	            			   ) 
 	            		THEN 1 
 	            		ELSE 0 
 	            		END
 	            ) AS rc_orig,
 	            SUM(CASE WHEN ( (data_source ='extra') AND 
-	            				(isBackup<>1)) THEN 1 ELSE 0 END) 
-	            		AS rc_extras,
-	            SUM(CASE WHEN ( (findingID in ($impCompletedFindingIDs)) AND 
+	            				((isBackup is NULL) OR (isBackup=0))
+	            			) 
+	            		THEN 1 
+	            		ELSE 0 
+	            		END
+	            ) AS rc_extras,
+	            SUM(CASE WHEN ((findingID in ($impCompletedFindingIDs)) AND 
 	            				(data_source <> 'extra') AND 
-	            				(isBackup<>1)) 
+	            				((isBackup is NULL) OR (isBackup=0))
+	            			) 
 	            		THEN (
 	            			CASE WHEN (findingID in ($impMilisFindingIDs) AND (checked_to_milis<>1))
 	            				 THEN 0 
