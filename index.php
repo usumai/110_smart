@@ -102,50 +102,54 @@ const config = {
     </div>
 
 
-    <!-- progress bar -->
-    <div class="container">
-        <!-- Trigger the modal with a button -->
-        <button ref="btn_open_progress" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#dlg_progress" style="visibility:hidden;">Open Progress Dlg</button>
+<!-- upload progress dialog  -->
+<div class="container">
+    <button ref="btn_open_progress" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#dlg_progress" style="visibility:hidden;">Open Progress Dlg</button>
 
-        <!-- Modal -->
-        <div class="modal fade" id="dlg_progress" role="dialog">
-            <div class="modal-dialog">
-                <!-- Modal content-->
-                <div class="modal-content">
-                    <div class="modal-header">                       
-                        <h4 class="modal-title">File Upload</h4>
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="container" style="width:100%">
+    <!-- Modal -->
+    <div class="modal fade" id="dlg_progress" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">                       
+                    <h4 class="modal-title">File Upload</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="container" style="width:100%">
 
-                            <div v-if="upload.status == 'Processing'" class="alert alert-info"><strong>{{upload.status}}!</strong> {{upload.message}}</div>     
-                            <div v-if="upload.status == 'Completed'" class="alert alert-success"><strong>{{upload.status}}!</strong> {{upload.message}}</div>     
-                            <div v-if="upload.status == 'Error'" class="alert alert-danger"><strong>{{upload.status}}!</strong> {{upload.message}}</div>     
-                            <div class="progress">
-                                <div id="progress_bar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%">
-                                    <span id="progress_value">0%</span>
-                                </div>
-                            </div>
-                            <div></div>
-                            <div style="width: 100%; padding-top: 10px; display: flex;">
-                                <span style="width: 50%">Current: {{upload.current}}</span>
-                                <span style="width: 50%">Total: {{upload.total}}</span>
+                        <div v-if="upload.status == 'Processing'" class="alert alert-info"><strong>{{upload.status}}!</strong> {{upload.message}}</div>     
+                        <div v-if="upload.status == 'Completed'" class="alert alert-success"><strong>{{upload.status}}!</strong> {{upload.message}}</div>     
+                        <div v-if="upload.status == 'Error'" class="alert alert-danger"><strong>{{upload.status}}!</strong> {{upload.message}}</div>     
+                        <div class="progress">
+                            <div id="progress_bar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%">
+                                <span id="progress_value">0%</span>
                             </div>
                         </div>
+                        <div></div>
+                        <div style="width: 100%; padding-top: 10px; display: flex;">
+                            <span style="width: 50%">Current: {{upload.current}}</span>
+                            <span style="width: 50%">Total: {{upload.total}}</span>
+                        </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class='btn btn-outline-dark' data-dismiss="modal">Close</button>
-                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class='btn btn-outline-dark' data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
+</div>
+						
+    
+    
+<!--     
     <div class='row'>
         <div class='col'>
             <a href='00_status.html' class='btn btn-danger'>Fix me</a>
         </div>
     </div>    
+-->    
     <div hidden>
         <input hidden type="file" ref="upload_file" v-on:change="uploadData" class="form-control-file">
     </div>
@@ -204,12 +208,9 @@ let vm = new Vue({
                 //$('#progress_bar').width(event.loaded+'%').attr('aria-valuenow',event.loaded).attr('aria-valuemax',event.total);
             };
             reader.onload = event => {
-                console.log("Processing file content: ");
-                console.log(event.target.result);
                 let uploadData=JSON.parse(event.target.result);
                 upload( uploadData, this.onUploadProgress,				
                     (result)=>{
-                        console.log(result);
                         this.get_activities();
 				    },
                     (errors)=>{

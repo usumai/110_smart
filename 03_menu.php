@@ -20,7 +20,7 @@ if ($result->num_rows > 0) {
 
 ?>
 
-
+<script src="includes/test/axios.min.js" ></script>     
 <script>
   
 $(function(){
@@ -282,6 +282,8 @@ $(function(){
 							<h6 class='dropdown-header'>Newest available version<span class='float-right'>v{{ sysd.versionRemote }}</span></h6>
 							<h6 class='dropdown-header'>Last checked<span class='float-right'>{{ sysd.date_last_update_check }}</span></h6>
 							<button type='button' v-if="sysd.versionLocal==sysd.versionRemote" class='dropdown-item btn' v-on:click='save_check_version()'>Check for new version</button>
+							<button type='button' class='dropdown-item btn' data-toggle="modal" data-target="#update_confirm_dlg"><i class="fas fa-cloud-download-alt ml-2"></i> Force Software Update</button>
+
 							<span v-if="vcheck==2" class='dropdown-item'>You need to be connected to the internet to check for a new version</span>
 
 							<button type='button' v-if="sysd.versionLocal<sysd.versionRemote" class='dropdown-item btn text-danger' data-toggle='modal' data-target='#modal_confirm_update'>Update available v{{ sysd.versionRemote }}</button>
@@ -370,6 +372,40 @@ $(function(){
 	</div>
 
 
+<!-- Force Update Modal dialog -->
+<div width='500px' height='300px' class="modal fade" id="update_confirm_dlg" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="background-color: #5a95ca;">
+        <h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke">Software Update</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+		<table width='100%' height='100%'>
+			<tr>
+			  <td align='center'>
+			      <p><strong>Warning:</strong> Software Update and SMART data reset</p>
+			      <p style="color: red">This will delete all application data stored on this device, so make sure you backup everything before attempting this.</p>
+			      <p><strong>Please make sure you are connected to the internet.</strong></p>
+			  </td>
+			</tr>
+			<tr>
+				<td>
+					<div v-if="(updateResponse != '') && (!updateError)" class="alert alert-info">{{updateResponse}}</div>   
+					<div v-if="(updateResponse != '') && (updateError)" class="alert alert-danger">{{updateResponse}}</div>    
+				</td>
+			</tr>
+		</table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" v-on:click="forceUpdateToLatest()">Update</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 	<!-- Update App Version Dialog -->
@@ -512,6 +548,10 @@ $(function(){
 
 
 
+
+
+
+
 </div>
 
 
@@ -561,7 +601,10 @@ let vm_menu = new Vue({
 			name:'',
 			phone:'',
 			error:''		
-		}
+		},
+		updateResponse:'',
+		updateError: false
+		
     },
     created() {
 		this.refresh_sys()
@@ -662,7 +705,17 @@ let vm_menu = new Vue({
 				this.get_system()
 			}
 		},
-
+		forceUpdateToLatest(){
+			axios.get('00_fixme.php',{params:{}})
+				.then(response=>{
+					if(response.data.status == 'OK'){
+						this.updateResponse=response.data.result.info;
+					}else if(response.data.status =='ERROR'){
+						this.updateError=true;
+						this.updateResponse= (response.data.errors && response.data.errors.length>0 ) ? response.data.errors[0].info : 'There is an error from remote server';
+					}
+				});
+		},
 		get_search_results() {
 			if (this.menu_search.length>3){
 				this.show_search_prompt = false

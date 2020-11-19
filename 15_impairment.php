@@ -109,20 +109,30 @@ function fnratr(nosub, notot){
 let vm = new Vue({
     el: '#app',
     data: {
+    	error:"",
         json_records:{},
         json_is_settings:{},
-        milisEnabled:[2,3,5,6]
+        milisEnabled:[]
     },
     created() {
+		this.updateMilisEnableFindingIDs();
         this.get_is_records()
         this.get_is_settings()
     },
     mounted() {
      	if(this.$refs.current_row) {
     		this.$refs.current_row[0].scrollIntoView();
-    	}   
+    	}      	
     },
     methods:{
+		updateMilisEnableFindingIDs(){
+			getMilisEnableFindingIDs(
+	    		data=>this.milisEnabled=data, 
+	    		errors=>{
+	    			this.error= (errors && errors.length>0) ? this.error=error[0].info : '';
+	    		}
+	    	);
+		},
         getStatusColor(rec){
             if(rec.findingID){
             	if((rec.isType=='b2r') && (rec.data_source=='skeleton') 

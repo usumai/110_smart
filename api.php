@@ -1,10 +1,11 @@
 <?php 
 include "01_dbcon.php"; 
-include "php/common/common.php";
+
 include "php/service/ActivityImport.php";
 include "php/service/ActivityExport.php";
+include "php/common/common.php";
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-
+set_exception_handler('errorHandler');
 $request = getApiAction();
    
 if($request != null) {
@@ -52,7 +53,12 @@ if ($act=="create_ga_stocktake") {
     execWithErrorHandler(function() { 
         $result = getIsImpairments();
         echo json_encode(new ResponseMessage("OK",$result));
-    });       
+    });      
+}elseif($act=="get_milis_finding_ids") {
+    execWithErrorHandler(function() use ($isImpAbbrsWithMilisEnabled) {     	
+        $result = getFindingIDs("imp%", $isImpAbbrsWithMilisEnabled);
+        echo json_encode(new ResponseMessage("OK",$result));
+    });     
 }elseif($act=="get_sm19_cat") {
     execWithErrorHandler(function() { 
         $result = getSM19Cats();

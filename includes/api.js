@@ -2,6 +2,21 @@ let STATUS_ERROR='Error';
 let STATUS_PROCESS='Processing';
 let STATUS_COMPLETE='Completed';
 
+function getMilisEnableFindingIDs(completeCallback, errorCallback){
+	axios.post('api.php', 
+		{
+			action: 'get_milis_finding_ids',
+			data: {}
+		}
+	)
+	.then(response=> {
+		if(response.data.status=='ERROR') {
+			errorCallback(response.data.errors);
+		}else{
+			completeCallback(response.data.result);
+		}
+	});
+}
 function getUserProfiles(completeCallback, errorCallback){
 	axios.post('api.php', 
 		{
