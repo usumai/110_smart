@@ -1,8 +1,8 @@
 <?php 
 include "01_dbcon.php"; 
 include "php/common/common.php";
-include "php/service/fileupload.php";
-
+include "php/service/ActivityImport.php";
+include "php/service/ActivityExport.php";
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 $request = getApiAction();

@@ -45,9 +45,9 @@ const config = {
                         <th style="width: 120px">Type</th>
                         <th style="width: 70px">ID</th>
                         <th >Name</th>
-                        <th style="width: 70px" >Orig</th>
-                        <th style="width: 120px" >Completed</th>
-                        <th style="width: 70px" >Extra</th>
+                        <th style="width: 70px">Orig</th>
+                        <th style="width: 120px">Completed</th>
+                        <th style="width: 70px">Extra</th>
                         <th style="width: 70px">Status</th>
                         <th style="width: 12px">Included</th>
                         <th style="width: 12px">Archive</th>

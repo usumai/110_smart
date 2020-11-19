@@ -13,7 +13,7 @@ include "php/common/common.php";
 // arming clear switch
 // Clear breaks
 
-$milisFindingIDs=getFindingIDsString("imp%",$isAbbrsWithMilisEnabled);
+$milisFindingIDs=getFindingIDsString("imp%",$isImpAbbrsWithMilisEnabled);
 
 
 $auto_storageID = $_GET["auto_storageID"];
@@ -449,7 +449,10 @@ $(document).ready(function() {
             <tr><td nowrap><b>Tracking reference</b></td><td><?=$TRACKING_REFERENCE?></td></tr>
             <tr><td nowrap><b>Last Modification Date</b></td><td><?=$LAST_MOD_DATE?></td></tr>
             <tr><td nowrap><b>Inventory category</b></td><td><?=$INVENT_CAT?></td></tr>
-            <tr id="checked_milis"><td nowrap><b>Checked To MILIS</b></td><td><input  type="checkbox" class="form-control" id="checked_to_milis" name="checked_to_milis" value="1" <?=($checkedToMilis==1 ? 'checked' : '') ?>></td></tr>
+            <tr id="checked_milis">
+            	<td nowrap><b>Checked To MILIS</b></td>
+            	<td><input  type="checkbox" class="form-control" id="checked_to_milis" name="checked_to_milis" value="1" <?=($checkedToMilis==1 ? 'checked' : '') ?>></input></td>
+            </tr>
             <tr><td colspan='2' class='completezz'><b>Comments</b><textarea class='form-control' rows='5' name='res_comment' id='res_comment'><?=$res_comment?></textarea></td></tr>
             <tr id='areaDate'><td><b>Date</b></td><td><input type='text' class='form-control datepicker' name='res_unserv_date' id='res_unserv_date' value='<?=$res_unserv_date?>' readonly></td></tr>
             <tr id='areaSplit'><td colspan='2'>
