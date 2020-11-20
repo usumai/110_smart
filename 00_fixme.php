@@ -12,7 +12,6 @@ function() {
 
 	$con = new mysqli($servername, $username, $password);
 	
-	throw new Exception("Connection failed: " . $con->connect_error);
 	// Check connection
 	if ($con->connect_error) {
 	    throw new Exception("Connection failed: " . $con->connect_error);
