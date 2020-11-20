@@ -342,34 +342,34 @@ $(function(){
 	</header>
 
 
-	<!-- Initiate Asset Template Dialog -->
-	<div class="modal fade" id="modal_initiate_template" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-		<div class="modal-dialog" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="exampleModalLabel">Initiate asset template</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-			
-				<form method='post' action='05_action.php'>
-					<div class="modal-body">  
-						<p class="lead">Please select a stocktake to initiate this template into</p>
-						<select name='stkm_id' class='form-control' v-if='actvd'>
-							<option v-for='(activity, index) in actvd' :value="activity.stkm_id">{{activity.stk_id}}. {{activity.stk_name}}</option>
-						</select>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-						<button type="submit" class="btn btn-outline-danger">Initiate</button>
-						<input type='hidden' name='act' value='save_initiate_template'>
-						<input type='hidden' name='ass_id' v-model="template_ass_id">
-					</div>
-				</form>
+<!-- Initiate Asset Template Dialog -->
+<div class="modal fade" id="modal_initiate_template" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header" style="background-color: #5a95ca;">
+				<h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke">Initiate asset template</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
 			</div>
+		
+			<form method='post' action='05_action.php'>
+				<div class="modal-body">  
+					<p class="lead">Please select a stocktake to initiate this template into</p>
+					<select name='stkm_id' class='form-control' v-if='actvd'>
+						<option v-for='(activity, index) in actvd' :value="activity.stkm_id">{{activity.stk_id}}. {{activity.stk_name}}</option>
+					</select>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+					<button type="submit" class="btn btn-outline-danger">Initiate</button>
+					<input type='hidden' name='act' value='save_initiate_template'>
+					<input type='hidden' name='ass_id' v-model="template_ass_id">
+				</div>
+			</form>
 		</div>
 	</div>
+</div>
 
 
 <!-- Force Update Modal dialog -->
@@ -412,41 +412,41 @@ $(function(){
 		</table>
       </div>
       <div class="modal-footer">
-      	<button type="button" ref="update_ok" class="btn btn-primary" v-on:click="forceUpdateToLatest()">Update</button>
-        <button type="button" ref="update_close" class="btn btn-primary" data-dismiss="modal">Close</button>       
+      	<button type="button" ref="update_ok" class="btn btn-outline-dark" v-on:click="forceUpdateToLatest()">Update</button>
+        <button type="button" ref="update_close" class="btn btn-outline-dark" data-dismiss="modal">Close</button>       
       </div>
     </div>
   </div>
 </div>
 
 
-	<!-- Update App Version Dialog -->
-	<div class="modal fade" id="modal_confirm_update" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-		<div class="modal-dialog" role="document">
-			<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="exampleModalLabel">Update to latest version</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-				<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<div class="modal-body">
-				<p class="lead">Updating to the latest version will delete all data on this device. Are you Sure you want to proceed with the update?<br><br>Please keep device connected to the internet until the update is finished.</p>     
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-				<a type="button" class="btn btn-danger" href='05_action.php?act=sys_pull_master'>Update</a>
-			</div>
-			</div>
+<!-- Update App Version Dialog -->
+<div class="modal fade" id="modal_confirm_update" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+		<div class="modal-header" style="background-color: #5a95ca;">
+			<h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke">Update to latest version</h5>
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+		<div class="modal-body">
+			<p class="lead">Updating to the latest version will delete all data on this device. Are you Sure you want to proceed with the update?<br><br>Please keep device connected to the internet until the update is finished.</p>     
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+			<a type="button" class="btn btn-danger" href='05_action.php?act=sys_pull_master'>Update</a>
+		</div>
 		</div>
 	</div>
+</div>
 
 	<!-- Push App Version Dialog -->
 	<div class="modal fade" id="modal_confirm_push" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
-		<div class="modal-header">
-			<h5 class="modal-title" id="exampleModalLabel">Push this version to the master</h5>
+		<div class="modal-header" style="background-color: #5a95ca;">
+			<h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke">Push this version to the master</h5>
 			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 			<span aria-hidden="true">&times;</span>
 			</button>
@@ -466,8 +466,8 @@ $(function(){
 	<div class="modal fade" id="modal_confirm_reset" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
-		<div class="modal-header">
-			<h5 class="modal-title" id="exampleModalLabel">Delete all data</h5>
+		<div class="modal-header" style="background-color: #5a95ca;">
+			<h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke">Delete all data</h5>
 			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 			<span aria-hidden="true">&times;</span>
 			</button>
@@ -489,8 +489,8 @@ $(function(){
 	<div class="modal fade" id="modal_confirm_reset_minus_rr" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
-		<div class="modal-header">
-			<h5 class="modal-title" id="exampleModalLabel">Delete all data except for raw remainder data</h5>
+		<div class="modal-header" style="background-color: #5a95ca;">
+			<h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke">Delete all data except for raw remainder data</h5>
 			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 			<span aria-hidden="true">&times;</span>
 			</button>
@@ -510,8 +510,8 @@ $(function(){
 	<div class="modal fade" id="modal_add_user" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="exampleModalLabel">Create a new user</h5>
+				<div class="modal-header" style="background-color: #5a95ca;">
+					<h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke">Create a new user</h5>
 					<button ref="add_user_dlg_btn_close" type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 					</button>
@@ -542,8 +542,8 @@ $(function(){
 	<div class="modal fade" id="modal_help" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
-		<div class="modal-header">
-			<h5 class="modal-title" id="exampleModalLabel">Help</h5>
+		<div class="modal-header" style="background-color: #5a95ca;">
+			<h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke">Help</h5>
 			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 			<span aria-hidden="true">&times;</span>
 			</button>

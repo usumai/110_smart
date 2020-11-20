@@ -111,8 +111,8 @@ const config = {
         <div class="modal-dialog">
             <!-- Modal content-->
             <div class="modal-content">
-                <div class="modal-header">                       
-                    <h4 class="modal-title">File Upload</h4>
+                <div class="modal-header" style="background-color: #5a95ca;">                       
+                    <h5 class="modal-title" style="color: whitesmoke">File Upload</h5>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
