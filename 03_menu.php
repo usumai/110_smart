@@ -392,10 +392,12 @@ $(function(){
 			  </td>
 			</tr>
 			<tr>
-				<td>
-					<div v-if="(updateResponse != '') && (!updateError)" class="alert alert-info">{{updateResponse}}</div>   
-					<div v-if="(updateResponse != '') && (updateError)" class="alert alert-danger">{{updateResponse}}</div>    
+				<td v-if="(updateResponse) && (updateResponse.length>0) && (!updateError)">
+					<div class="alert alert-info"><i v-for='info in updateResponse'>{{info}}</i></div>   
 				</td>
+				<td v-if="(updateResponse) && (updateResponse.length>0) && (updateError)">
+					<div class="alert alert-danger"><i v-for='error in updateResponse'>{{error.info}}</i></div>    
+				</td>				
 			</tr>
 		</table>
       </div>
@@ -712,7 +714,7 @@ let vm_menu = new Vue({
 						this.updateResponse=response.data.result.info;
 					}else if(response.data.status =='ERROR'){
 						this.updateError=true;
-						this.updateResponse= (response.data.errors && response.data.errors.length>0 ) ? response.data.errors[0].info : 'There is an error from remote server';
+						this.updateResponse=response.data.errors;
 					}
 				});
 		},
