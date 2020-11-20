@@ -282,7 +282,7 @@ $(function(){
 							<h6 class='dropdown-header'>Newest available version<span class='float-right'>v{{ sysd.versionRemote }}</span></h6>
 							<h6 class='dropdown-header'>Last checked<span class='float-right'>{{ sysd.date_last_update_check }}</span></h6>
 							<button type='button' v-if="sysd.versionLocal==sysd.versionRemote" class='dropdown-item btn' v-on:click='save_check_version()'>Check for new version</button>
-							<button type='button' class='dropdown-item btn' data-toggle="modal" data-target="#update_confirm_dlg"><i class="fas fa-cloud-download-alt ml-2"></i> Force Software Update</button>
+							<button type='button' class='dropdown-item btn' data-toggle="modal" v-on:click="initSoftwareUpdate()" data-target="#update_confirm_dlg"><i class="fas fa-cloud-download-alt ml-2"></i> Force Software Update</button>
 
 							<span v-if="vcheck==2" class='dropdown-item'>You need to be connected to the internet to check for a new version</span>
 
@@ -386,24 +386,34 @@ $(function(){
 		<table width='100%' height='100%'>
 			<tr>
 			  <td align='center'>
-			      <p><strong>Warning:</strong> Software Update and SMART data reset</p>
-			      <p style="color: red">This will delete all application data stored on this device, so make sure you backup everything before attempting this.</p>
-			      <p><strong>Please make sure you are connected to the internet.</strong></p>
+			      <p style="text-align: left;"><strong>Warning:</strong></p>
+			      <p style="text-align: justify;"><i style="color: red">SmartM Software update and data reset. This will delete all application data stored on this device, so make sure you backup everything before attempting this.</i></p>
+			      <p style="text-align: left;">Please make sure you are connected to the internet.</p>
 			  </td>
 			</tr>
 			<tr>
+				<td ref="update_spinner" style="text-align: center">
+					<div class="spinner-border text-info" role="status">
+					  <span class="sr-only">Updating...</span>
+					</div>				
+				</td>
 				<td v-if="(updateResponse) && (updateResponse.length>0) && (!updateError)">
-					<div class="alert alert-info"><i v-for='info in updateResponse'>{{info}}</i></div>   
+					<div  class="alert alert-info"><strong>Update Completed!</strong>
+						<div v-for='info in updateResponse'><i>{{info}}</i></div>
+					</div>   
 				</td>
 				<td v-if="(updateResponse) && (updateResponse.length>0) && (updateError)">
-					<div class="alert alert-danger"><i v-for='error in updateResponse'>{{error.info}}</i></div>    
+					<div class="alert alert-danger">
+						<strong>Update Failed!</strong>
+						<div v-for='error in updateResponse'><i >{{error.info}}</i></div>
+					</div>    
 				</td>				
 			</tr>
 		</table>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" v-on:click="forceUpdateToLatest()">Update</button>
+      	<button type="button" ref="update_ok" class="btn btn-primary" v-on:click="forceUpdateToLatest()">Update</button>
+        <button type="button" ref="update_close" class="btn btn-primary" data-dismiss="modal">Close</button>       
       </div>
     </div>
   </div>
@@ -707,9 +717,18 @@ let vm_menu = new Vue({
 				this.get_system()
 			}
 		},
+		initSoftwareUpdate(){
+			this.updateResponse=[];
+			this.updateError=false;
+			this.$refs.update_ok.hidden=false;
+			this.$refs.update_spinner.hidden=true;
+		},
 		forceUpdateToLatest(){
-			axios.get('00_fixme.php',{params:{}})
+			this.$refs.update_ok.hidden=true;
+			this.$refs.update_spinner.hidden=false;
+			axios.get('00_fixme.php',{params:{}})				
 				.then(response=>{
+					this.$refs.update_spinner.hidden=true;
 					if(response.data.status == 'OK'){
 						this.updateResponse=response.data.result.info;
 					}else if(response.data.status =='ERROR'){
