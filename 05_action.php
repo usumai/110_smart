@@ -1248,11 +1248,19 @@ if ($act=='sys_pull_master') {
                     $splityDate = 'null';
                }
                $sql = "  INSERT INTO smartdb.sm18_impairment (
-                              res_create_date, res_update_user, findingID, res_unserv_date, 
-                              res_parent_storageID, SOH, fingerprint, isType, stkm_id)
+                              res_create_date, 
+                              res_update_user, 
+                              findingID, 
+                              res_unserv_date, 
+                              res_parent_storageID, 
+                              data_source,
+                              SOH, 
+                              fingerprint, 
+                              isType, 
+                              stkm_id)
                          VALUES (
                               NOW(),'$res_update_user','$splityResult',$splityDate,
-                              '$storageID','$splityCount','$fingerprint','imp', '$stkm_id')";
+                              '$storageID','extra','$splityCount','$fingerprint','imp', '$stkm_id')";
                runSql($sql);
                echo "<br>$sql";
           }

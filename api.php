@@ -162,15 +162,30 @@ if ($act=="create_ga_stocktake") {
     $stmt   ->execute();
 
 }elseif ($act=='get_is_records') {
-    $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND date(smm_delete_date) IS NULL";
-    $sqlimp  = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND (isType <> 'b2r') AND ((isBackup IS NULL) OR (isBackup=0))";
-
-    //Placeholder until data_source is added
-    $sqlb2r  = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND (isType = 'b2r') AND ((isBackup IS NULL) OR (isBackup=0)) AND data_source='skeleton'";
-    // $sqlb2r  = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) AND isType ='b2r' AND data_source='skeleton' ";
-
+    $sqlInclude = "
+    	SELECT stkm_id 
+    	FROM smartdb.sm13_stk 
+    	WHERE stk_include=1 
+    		AND ((date(smm_delete_date) IS NULL) OR (date(smm_delete_date)='0000-00-00'))";
+ 
+    $sqlimp  = "
+    	SELECT * 
+    	FROM smartdb.sm18_impairment  
+    	WHERE stkm_id IN ($sqlInclude ) 
+    		AND ( LEFT(isType,3) = 'imp') 
+    		AND ((isBackup IS NULL) OR (isBackup=0))
+  			AND (data_source <> 'extra')";
+    		
+    $sqlb2r  = "
+    	SELECT * 
+    	FROM smartdb.sm18_impairment
+    	WHERE stkm_id IN ($sqlInclude ) 
+    		AND (isType = 'b2r') 
+    		AND ((isBackup IS NULL) OR (isBackup=0)) 
+    		AND data_source='skeleton'";
+  
     $sql = $sqlimp." UNION ALL ".$sqlb2r;
-    // echo $sql;
+
     
     echo json_encode(qget($sql));
 
@@ -495,8 +510,11 @@ function getIsDistrictList() {
 }
 
 function getIsImpairments() {
-    $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND smm_delete_date IS NULL";
-    $sql  = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id IN ($sqlInclude ) ";
+    $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND ((smm_delete_date IS NULL) OR (date(smm_delete_date)='0000-00-00'))";
+    $sql  = "
+    		SELECT * 
+    		FROM smartdb.sm18_impairment  
+    		WHERE stkm_id IN ($sqlInclude ) ";
     return qget($sql);
 }
 

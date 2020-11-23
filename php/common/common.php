@@ -95,7 +95,7 @@ function execWithErrorHandler($callback){
 
 function errorHandler($error){
 	$response = new ResponseMessage("ERROR", null);
-    $response->errors[0]=new ErrorInfo(0,$e->getMessage());
+    $response->errors[0]=new ErrorInfo(0, $error ? $error->getMessage() : "Unknown system exception occured");
     echo json_encode($response);
 }
 
