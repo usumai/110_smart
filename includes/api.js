@@ -160,7 +160,10 @@ function createIsImpairments (stocktakeId, impairmentList, progressCallback, com
 	var n=0;
 	progressCallback(current,total,STATUS_PROCESS,'creates IS impairment');
 	for(var rec in impairmentList) {
-	
+		impairmentList[rec].STK_DESC = impairmentList[rec].STK_DESC ? impairmentList[rec].STK_DESC.replace("\n","") : impairmentList[rec].STK_DESC;
+		impairmentList[rec].ITEM_NAME = impairmentList[rec].ITEM_NAME ? impairmentList[rec].ITEM_NAME.replace("\n","") : impairmentList[rec].ITEM_NAME;
+
+		
 		batchBuff[n++]=impairmentList[rec]; 
 		current++;
 

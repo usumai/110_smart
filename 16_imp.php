@@ -14,7 +14,7 @@ include "php/common/common.php";
 // Clear breaks
 
 $milisFindingIDs=getFindingIDsString("imp%",$isImpAbbrsWithMilisEnabled);
-
+$warningFindingIDs=getFindingIDsString("imp%",$isImpAbbrsWithWarningEnabled);
 
 $auto_storageID = $_GET["auto_storageID"];
 
@@ -105,7 +105,8 @@ let arS = '<?=$arrSample?>'
     arS = JSON.parse(arS);
 let fID = arS[0]['findingID'];
 let rl  = arS['rl'];
-let milisEnabled=[<?=$milisFindingIDs?>];
+let milisEnabled=[<?= $milisFindingIDs ?>];
+let warningEnabled=[<?= $warningFindingIDs ?>]
 // console.log(rl)
 
 //Declare other global variables
@@ -159,9 +160,11 @@ $(document).ready(function() {
             if(milisEnabled.findIndex((v)=>(v==fID))>=0){
                 $('#checked_milis').show();
                 $('#checked_milis').prop('disabled', false);
-                $('#comment_warn_msg').show();
+                
             }
-
+            if(warningEnabled.findIndex((v)=>(v==fID))>=0){
+            	$('#comment_warn_msg').show();
+            }
             $('#res_comment').prop('disabled', false);
 
             //Update the form values

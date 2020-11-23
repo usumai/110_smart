@@ -1,6 +1,6 @@
 <?php
 
-
+$isImpAbbrsWithWarningEnabled = ["USND"];
 $isImpAbbrsWithMilisEnabled = ["USWD","USND"];
 $isImpAbbrsCompletedStatus = ["SER","USWD","USND","NIC","SPLT"];
 $isB2rAbbrsCompletedStatus = ["INV","NSTR"];

@@ -1,16 +1,18 @@
 <?php include "01_dbcon.php"; ?>
 <?php include "02_header.php"; ?>
 <?php include "03_menu.php"; ?>
+<style type="text/css">
 
+</style>
 <div id="app">
     <div class="container-fluid">
         <h1 class="mt-5 display-6">IS/B2R</h1>
         <div class="table-responsive-sm">
-            <table id="tbl_stk" class="table table-sm table-striped table-border table-hover" style="overflow-y: scroll">
+            <table id="tbl_stk" class="table table-sm table-striped table-border table-hover" >
                 <caption>            
                 </caption>
                 <thead class="table-dark">
-                    <tr style="">
+                    <tr>
                         <th>Action</th>
                         <th>DIST~WHSE</th>
                         <th>SCA</th>

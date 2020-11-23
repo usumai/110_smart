@@ -76,5 +76,7 @@ $icon_spot_grey     = "<span class='octicon octicon-primitive-dot text-secondary
                 overflow-y: scroll;
             }
             <?=$scheme_color?>
+            
+          
         </style>
 	</head>
