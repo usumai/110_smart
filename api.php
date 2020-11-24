@@ -129,8 +129,10 @@ if ($act=="create_ga_stocktake") {
     			  
     	if(count($imps)>0){
     		$activity["impairments"]=$imps;
+    		$activity["rc_totalsent"]=count($imps);
     	}else{
     		$activity["impairments"]=array();
+    		$activity["rc_totalsent"]=0;
     	}
     		  
 	};

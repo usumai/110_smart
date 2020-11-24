@@ -338,6 +338,7 @@ let vm = new Vue({
                 payload                         = {'act':'get_stk_assets_export', 'stkm_id':actv.stkm_id };
                 header_obj['assetlist']         = fnapi(payload);
                 
+                
             }else if (actv.stk_type=="is_audit"){
                 name_suffix                     = actv.stk_name;
 
