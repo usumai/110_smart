@@ -52,8 +52,14 @@ if ($result->num_rows > 0) {
 
 
 if($findingID>0){  
-    $getBackBtn = "<div class='text-center complete'><div class='dropdown'><button class='btn btn-outline-danger complete dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='dispBtnClear'>Delete</button><div class='dropdown-menu bg-danger' aria-labelledby='dropdownMenuButton'>
-    <a class='dropdown-item bg-danger text-light' href='05_action.php?act=save_clear_msi_bin&auto_storageID=".$auto_storageID."&storageID=$storageID'>I'm sure</a></div></div></div>";
+    $getBackBtn = "<div class='text-center complete'>
+					<div class='dropdown'>
+						<button class='btn btn-outline-danger complete dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='dispBtnClear'>Delete</button>
+						<div class='dropdown-menu bg-danger' aria-labelledby='dropdownMenuButton'>
+    						<a class='dropdown-item bg-danger text-light' href='05_action.php?act=save_clear_msi_bin&auto_storageID=".$auto_storageID."&storageID=$storageID'>I'm sure</a>
+						</div>
+					</div>
+				</div>";
 }else{
     $getBackBtn = "<div class='text-center complete'><button class='btn btn-outline-dark' id='btnClear'>Back</button></div>";  
 }
@@ -62,16 +68,30 @@ if($findingID>0){
 if ($findingID==11){
     $splityTotal = 0;
     $maxSplity = 0;
-    $sql = "SELECT auto_storageID, findingID AS splityResult, res_create_date, SOH AS splityCount, res_unserv_date AS splityDate FROM smartdb.sm18_impairment WHERE res_parent_storageID = $storageID";   
+    $sql = "SELECT 
+				auto_storageID, 
+				findingID AS splityResult, 
+				res_create_date, 
+				SOH AS splityCount, 
+				checked_to_milis AS splityMilis,
+				res_unserv_date AS splityDate 
+			FROM 
+				smartdb.sm18_impairment 
+			WHERE 
+				res_parent_storageID = $storageID";   
+
     $result = $con->query($sql);
+
     if ($result->num_rows > 0) {
+
         while($row = $result->fetch_assoc()) { 
             $splitty_auto_storageID     = $row['auto_storageID']; 
             if($splitty_auto_storageID>$maxSplity){
                 $maxSplity = $splitty_auto_storageID;
             }
             $arrSample['splitys'][] = $row;
-    }}
+    	}
+	}
     $arrSample['maxSplity']     = $maxSplity;
 
 }else{ 
@@ -113,7 +133,7 @@ let warningEnabled=[<?= $warningFindingIDs ?>]
 let dispQtrack,dispStrack,complete;
 
 $(document).ready(function() {
-    
+   
     //Copy the menu to the other side of the page
     let menuright = $('#menuleft').html();
     $('#menuright').html(menuright);
@@ -130,7 +150,7 @@ $(document).ready(function() {
         splityOptions += "</option>";
     }
     $('#splityResult').html(splityOptions);
-
+    $('#splityResult').val('');
 
 
     //Initialise the page
@@ -156,7 +176,6 @@ $(document).ready(function() {
 
         if(arS[0]['findingID']){
             let fID = arS[0]['findingID']
-            console.log("************FindingID: "+fID);
             if(milisEnabled.findIndex((v)=>(v==fID))>=0){
                 $('#checked_milis').show();
                 $('#checked_milis').prop('disabled', false);
@@ -200,12 +219,20 @@ $(document).ready(function() {
                 let splityRows      = "";
                 let totalSplitySOH  = 0;
                 let splityHidden    = "";
+
                 $('.splityRow').remove();
                 for (let key in arS['splitys']) {
                     
                     let splityCount     = arS['splitys'][key]['splityCount']
                     let splityDate      = arS['splitys'][key]['splityDate']
                     let splityResult    = arS['splitys'][key]['splityResult']
+                    let splityMilis     = arS['splitys'][key]['splityMilis']
+                    
+                    if(warningEnabled.findIndex((v)=>(v==splityResult))>=0){
+                    	$('#comment_warn_msg').show();
+                    }
+                    
+                    
                     let btnRemoveSplity = "<button type='button' class='btn btn-outline-dark btnRemoveSplity' value='"+key+"'><i class='fas fa-minus'></i></button>"
 
 
@@ -213,13 +240,13 @@ $(document).ready(function() {
                         splityDate = ''
                     }
                     
-                    splityRows += "<tr class='splityRow'><td>"+splityCount+"</td><td>"+arS['rl'][splityResult-1]['findingName']+"</td><td>"+splityDate+"</td><td>"+btnRemoveSplity+"</td></tr>"
+                    splityRows += "<tr class='splityRow'><td>"+splityCount+"</td><td>"+arS['rl'][splityResult-1]['findingName']+"</td><td>"+splityDate+"</td><td>"+(splityMilis==1?"X":"")+"</td><td>"+btnRemoveSplity+"</td></tr>"
 
                     splityHidden+="<input type='hidden' name='splityRecord[]' value='"+key+"'>"
                     splityHidden+="<input type='hidden' name='splityCount["+key+"]' value='"+splityCount+"'>"
                     splityHidden+="<input type='hidden' name='splityResult["+key+"]' value='"+splityResult+"'>"
                     splityHidden+="<input type='hidden' name='splityDate["+key+"]' value='"+splityDate+"'>"
-
+                    splityHidden+="<input type='hidden' name='splityMilis["+key+"]' value='"+splityMilis+"'>"
                     totalSplitySOH += Number(splityCount);
                 }
                 $('#splityTable tr:last').before(splityRows)
@@ -228,7 +255,7 @@ $(document).ready(function() {
 
                 console.log('totalSplitySOH:'+totalSplitySOH);
                 console.log('SOH:'+arS[0]['SOH']);
-                if(totalSplitySOH<arS[0]['SOH']){
+                if(totalSplitySOH < arS[0]['SOH']){
                     $('#btnSubmit').hide();
                 }else{
                     $('#btnSubmit').show();
@@ -296,19 +323,21 @@ $(document).ready(function() {
         let splityCount     = $('#splityCount').val();
         let splityResult    = $('#splityResult').val();
         let splityDate      = $('#splityDate').val();
-        
+        let splityMilis     = $('#splityMilis').prop('checked') ? 1 : 0;
         arS['splitys'][newMaxS] = {
             splityCount,
             splityResult,
-            splityDate
+            splityDate,
+            splityMilis
         }
         setPage()
 
-
+		$('#splityMilis').prop('checked',false);
         $('#splityCount').val('');
-        $('#splityResult').val(1);
+        $('#splityResult').val('');
         $('#splityDate').val('');
         $("#addSplity").prop('disabled', true);
+        
     })
 
     $(document).on('click', ".btnRemoveSplity", function(){
@@ -318,10 +347,15 @@ $(document).ready(function() {
     });
 
     validateSplity()
+    
     function validateSplity(){
         let splityCount     = $('#splityCount').val();
         let splityResult    = $('#splityResult').val();
         let splityDate      = $('#splityDate').val();
+        
+        let splityMilis    =  $('#splityMilis').prop('checked');
+
+        
         $("#addSplity").prop('disabled', false);
 
         if(isNaN(splityCount)){
@@ -335,7 +369,12 @@ $(document).ready(function() {
             if(arS['rl'][splityResult-1]['reqDate']==1&& splityDate.length<=0){
                 $("#addSplity").prop('disabled', true);
             }
+            if((milisEnabled.findIndex((v)=>(v==splityResult))>=0) && (!splityMilis)){
+            	$("#addSplity").prop('disabled', true);
+            }
         }
+        
+        
     }
 
 
@@ -482,16 +521,18 @@ $(document).ready(function() {
                         <td width='20%'>Count</td>
                         <td>Sighted</td>
                         <td>Date</td>
+                        <td>Checked To MILIS</td>
                         <td>&nbsp;</td>
                     </tr>
                     <tr>
                         <td><input type='text' class='form-control splity' name='splityCount' id='splityCount'></td>
                         <td>
                             <select class='form-control splity' name='splityResult' id='splityResult'>
-                                <option value='1'></option>
+                                <option value=''></option>
                             </select>
                         </td>
                         <td><input type='text' class='form-control datepicker splity' name='splityDate' id='splityDate' readonly></td>
+                        <td><input type='checkbox' class='form-control splity' name='splityMilis' id='splityMilis'></td>               
                         <td><button type='button' class='btn btn-outline-dark float-right' id='addSplity'><i class='fas fa-plus'></i></button></td>
                     </tr>
                     <tr><td id='splityTotal'></td><td>Total</td><td></td><td></td></tr>

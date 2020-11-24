@@ -184,30 +184,27 @@ let vm = new Vue({
         }
     },
     created() {
-        this.get_activities()
+
     },
     mounted () {
-
+    	 this.get_activities();
     } ,
     methods:{
         openUploadDlg(){
+        	this.$refs.upload_file.value='';
             this.$refs.upload_file.click();
         },
         uploadData(){
             this.$refs.btn_open_progress.click();
-            console.log("Upload file ...");
-            let file=this.$refs.upload_file.files[0]
 
-            console.log("Select file: "+file.name+"("+file.size+")");
+            let file=this.$refs.upload_file.files[0]
 
             let reader = new FileReader();
             reader.onprogress = event => {
-                //console.log("onprogress event:");
-                //console.log(event);
-                //$('#progress_value').text(event.loaded+'%');
-                //$('#progress_bar').width(event.loaded+'%').attr('aria-valuenow',event.loaded).attr('aria-valuemax',event.total);
+
             };
             reader.onload = event => {
+
                 let uploadData=JSON.parse(event.target.result);
                 upload( uploadData, this.onUploadProgress,				
                     (result)=>{
@@ -223,6 +220,7 @@ let vm = new Vue({
                 )
             };
             reader.readAsText(file);
+            
 
         },
         onUploadProgress (current, total, status, message){
@@ -242,7 +240,7 @@ let vm = new Vue({
             axios.get('api.php', {params: {act:'get_activities'}})
             .then(response=> {
                 this.actvd   = response.data;
-                console.log(this.actvd)
+                console.log(this.actvd);
             })
         }, 
         isInclude(act_type){

@@ -1220,7 +1220,7 @@ if ($act=='sys_pull_master') {
      $milisFlag          = $_POST["checked_to_milis"] == "1"? 1 : 0;
      $findingID          = $_POST["findingID"];
      function clnr($fieldVal){
-          // echo "<br>".$fieldVal;
+
           if(empty($fieldVal)&&$fieldVal==''){
                $fieldVal    = 'null';
           }else{
@@ -1241,6 +1241,7 @@ if ($act=='sys_pull_master') {
                $splityCount   = $_POST['splityCount'][$value];
                $splityResult  = $_POST['splityResult'][$value];
                $splityDate    = $_POST['splityDate'][$value];
+               $splityMilis    = $_POST['splityMilis'][$value];
                // echo "<br><b>".$splityCount." - ".$splityResult." - ".$splityDate."</b>";
                if(!empty($splityDate)){
                     $splityDate = clnr($splityDate);    
@@ -1250,6 +1251,7 @@ if ($act=='sys_pull_master') {
                $sql = "  INSERT INTO smartdb.sm18_impairment (
                               res_create_date, 
                               res_update_user, 
+                              checked_to_milis,
                               findingID, 
                               res_unserv_date, 
                               res_parent_storageID, 
@@ -1259,8 +1261,17 @@ if ($act=='sys_pull_master') {
                               isType, 
                               stkm_id)
                          VALUES (
-                              NOW(),'$res_update_user','$splityResult',$splityDate,
-                              '$storageID','extra','$splityCount','$fingerprint','imp', '$stkm_id')";
+                              NOW(),
+                              '$res_update_user',
+                               $splityMilis,
+                              '$splityResult',
+                               $splityDate,
+                              '$storageID',
+                              'extra',
+                              '$splityCount',
+                              '$fingerprint',                              
+                              'imp', 
+                              '$stkm_id')";
                runSql($sql);
                echo "<br>$sql";
           }
@@ -1310,16 +1321,20 @@ if ($act=='sys_pull_master') {
      $auto_storageID     = $_GET["auto_storageID"];
      $storageID          = $_GET["storageID"];
 
-     $sql = "UPDATE smartdb.sm18_impairment SET 
-     res_create_date=NULL,
-     res_update_user=NULL,
-     findingID=NULL,  
-     res_evidence_desc=NULL,
-     res_unserv_date=NULL,
-     fingerprint=NULL
+     $sql = "
+     UPDATE smartdb.sm18_impairment 
+     SET 
+     	res_create_date=NULL,
+     	res_update_user=NULL,
+     	findingID=NULL,  
+     	res_evidence_desc=NULL,
+     	res_unserv_date=NULL,
+     	res_comment=NULL,
+     	checked_to_milis=0,
+     	fingerprint=NULL
      WHERE 
-     auto_storageID='$auto_storageID' ";
-     // echo $sql;
+     	auto_storageID='$auto_storageID' ";
+     
      runSql($sql);
 
      $sql = "DELETE FROM smartdb.sm18_impairment WHERE res_parent_storageID='$storageID' ";

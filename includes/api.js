@@ -158,6 +158,7 @@ function createIsImpairments (stocktakeId, impairmentList, progressCallback, com
 	var batchSize=10;
 	var batchBuff=[];
 	var n=0;
+	var completed=0;
 	progressCallback(current,total,STATUS_PROCESS,'creates IS impairment');
 	for(var rec in impairmentList) {
 		impairmentList[rec].STK_DESC = impairmentList[rec].STK_DESC ? impairmentList[rec].STK_DESC.replace("\n","") : impairmentList[rec].STK_DESC;
@@ -168,6 +169,7 @@ function createIsImpairments (stocktakeId, impairmentList, progressCallback, com
 		current++;
 
 		if(n>=batchSize) {
+
 			axios.post('api.php', {
 				action: 'create_is_impairments', 
 				data : { 
@@ -176,11 +178,12 @@ function createIsImpairments (stocktakeId, impairmentList, progressCallback, com
 				}
 			})
 			.then(response => {
+				completed += batchSize;
 				if(response.data.status=='ERROR') {
 					progressCallback(current, total, STATUS_ERROR, 'creates IS impairment');
 					errorCallback(response.data.errors);
 				}else{
-					if(current>=total) {	
+					if(completed >= total) {	
 						progressCallback(current, total, STATUS_COMPLETE, 'creates IS impairment');
 						completeCallback(response.data.result);
 					}else{
@@ -202,6 +205,7 @@ function createIsImpairments (stocktakeId, impairmentList, progressCallback, com
 			}
 		})
 		.then(response => {
+			
 			if(response.data.status=='ERROR') {
 				progressCallback(current, total, STATUS_ERROR, 'creates IS impairment');
 				errorCallback(response.data.errors);
