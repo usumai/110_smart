@@ -1,9 +1,9 @@
 <?php 
 include "01_dbcon.php"; 
-
+include "php/common/common.php";
 include "php/service/ActivityImport.php";
 include "php/service/ActivityExport.php";
-include "php/common/common.php";
+
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 set_exception_handler('errorHandler');
 $request = getApiAction();
@@ -109,34 +109,7 @@ if ($act=="create_ga_stocktake") {
     
 }elseif ($act=="export_is") {
 	$stkm_id = $_POST["stkm_id"];
-	$activity=array();
-	
-	$activityRes=qget(" 
-			SELECT * 
-			FROM smartdb.sm13_stk
-			WHERE 
-				stkm_id=$stkm_id");
-					
-	if(count($activityRes)>0)
-	{
-		$activity=$activityRes[0];
-		$imps =qget("
-    		SELECT * 
-    		FROM smartdb.sm18_impairment 
-    		WHERE 
-    			  stkm_id=$stkm_id AND 
-    			  ((date(delete_date) IS NULL) OR (date(delete_date)='0000-00-00'))");
-    			  
-    	if(count($imps)>0){
-    		$activity["impairments"]=$imps;
-    		$activity["rc_totalsent"]=count($imps);
-    	}else{
-    		$activity["impairments"]=array();
-    		$activity["rc_totalsent"]=0;
-    	}
-    		  
-	};
-
+	$activity= exportISActivity($stkm_id);
     echo json_encode($activity);	   
 }elseif ($act=="get_stk_progress") {
     $sql = "    SELECT COUNT(*) as count_total, SUM(CASE WHEN res_reason_code<>'' THEN 1 ELSE 0 END) AS count_complete   FROM smartdb.sm14_ass WHERE stk_include = 1 AND delete_date IS NULL AND genesis_cat <> 'template'";
