@@ -133,37 +133,14 @@ if ($act=="create_ga_stocktake") {
 	$ass_id         = $_POST["ass_id"];
 	$res_reason_code= $_POST["res_reason_code"];
     $stmt   = $con->prepare("UPDATE smartdb.sm14_ass SET res_reason_code=? WHERE ass_id=?;");
-    $stmt   ->bind_param("ss", $res_reason_code, $ass_id);
+    $stmt   ->bind_pairam("ss", $res_reason_code, $ass_id);
     $stmt   ->execute();
 
 }elseif ($act=='get_is_records') {
-    $sqlInclude = "
-    	SELECT stkm_id 
-    	FROM smartdb.sm13_stk 
-    	WHERE stk_include=1 
-    		AND ((date(smm_delete_date) IS NULL) OR (date(smm_delete_date)='0000-00-00'))";
- 
-    $sqlimp  = "
-    	SELECT * 
-    	FROM smartdb.sm18_impairment  
-    	WHERE stkm_id IN ($sqlInclude ) 
-    		AND ( LEFT(isType,3) = 'imp') 
-    		AND ((isBackup IS NULL) OR (isBackup=0))
-  			AND (data_source <> 'extra')";
-    		
-    $sqlb2r  = "
-    	SELECT * 
-    	FROM smartdb.sm18_impairment
-    	WHERE stkm_id IN ($sqlInclude ) 
-    		AND (isType = 'b2r') 
-    		AND ((isBackup IS NULL) OR (isBackup=0)) 
-    		AND data_source='skeleton'";
-  
-    $sql = $sqlimp." UNION ALL ".$sqlb2r;
-
-    
-    echo json_encode(qget($sql));
-
+    execWithErrorHandler(function() { 
+        $result = getIsRecords();
+        echo json_encode(new ResponseMessage("OK",$result));
+    });     
 }elseif ($act=='get_is_settings') {
     $sql = "SELECT findingID, color AS fCol, resAbbr AS fAbr FROM smartdb.sm19_result_cats;";
     echo json_encode(qget($sql));
@@ -632,7 +609,34 @@ function getB2RBinRecord($stkm_id, $BIN_CODE) {
     return qget($sql);
 }
 
+function getIsRecords (){
+    $sqlInclude = "
+    	SELECT stkm_id 
+    	FROM smartdb.sm13_stk 
+    	WHERE stk_include=1 
+    		AND ((date(smm_delete_date) IS NULL) OR (date(smm_delete_date)='0000-00-00'))";
+ 
+    $sqlimp  = "
+    	SELECT * 
+    	FROM smartdb.sm18_impairment  
+    	WHERE stkm_id IN ($sqlInclude ) 
+    		AND ( LEFT(isType,3) = 'imp') 
+    		AND ((isBackup IS NULL) OR (isBackup=0))
+  			AND (data_source <> 'extra')";
+    		
+    $sqlb2r  = "
+    	SELECT * 
+    	FROM smartdb.sm18_impairment
+    	WHERE stkm_id IN ($sqlInclude ) 
+    		AND (isType = 'b2r') 
+    		AND ((isBackup IS NULL) OR (isBackup=0)) 
+    		AND data_source='skeleton'";
+  
+    $sql = $sqlimp." UNION ALL ".$sqlb2r;
 
+    
+    return qget($sql);
+}
 
 function getActivities() {
 	$abbrs=["SER","USWD","USND","NIC","SPLT"];
@@ -711,13 +715,17 @@ FROM
 	            		ELSE 0 
 	            		END
 	            ) AS rc_extras,
-	            SUM(CASE WHEN ((findingID in ($impCompletedFindingIDs)) AND 
+	            SUM(CASE WHEN (findingID in ($impCompletedFindingIDs)) AND 
 	            				(data_source <> 'extra') AND 
-	            				((isBackup is NULL) OR (isBackup=0))
-	            			) 
+	            				((isBackup is NULL) OR (isBackup=0))           			
 	            		THEN (
-	            			CASE WHEN (findingID in ($impMilisFindingIDs) AND (checked_to_milis<>1))
-	            				 THEN 0 
+	            			CASE WHEN ((findingID=11) 
+	            						AND ((select sum(i.SOH) 
+	            							 from  smartdb.sm18_impairment i 
+	            							 where i.res_parent_storageID=b.storageID) < b.SOH))
+	            				 	THEN 0
+	            			     WHEN ((findingID in ($impMilisFindingIDs)) AND (checked_to_milis<>1))
+	            				 	THEN 0 
 	            				 ELSE 1 
 	            			END
 	            		) 
@@ -725,14 +733,13 @@ FROM
 	            	END
 	            ) AS rc_orig_complete,
 	            COUNT(*) AS rc_totalsent
-	        FROM smartdb.sm18_impairment 
+	        FROM smartdb.sm18_impairment b
             WHERE ((date(delete_date) IS NULL) or (date(delete_date)='0000-00-00'))
                   AND isType like 'imp%'
 	        GROUP BY stkm_id        
         )
     ) as asset
     ON act.stkm_id=asset.stkm_id;";
-            
-    echo json_encode(qget($sql));
+    echo json_encode(new ResponseMessage("OK", qget($sql)));
 }
 ?>

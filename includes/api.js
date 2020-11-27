@@ -1,39 +1,46 @@
 let STATUS_ERROR='Error';
 let STATUS_PROCESS='Processing';
 let STATUS_COMPLETE='Completed';
+let API_ENDPOINT='api.php';
 
+
+function processResponse(httpResponse, completeCallback, errorCallback){
+	if(httpResponse.data && httpResponse.data.status) {
+		if((httpResponse.data.status=='ERROR')&&(errorCallback)) {
+			errorCallback(httpResponse.data.errors ? httpResponse.data.errors : [{code: -1, info: 'A system error occured on server'}]);
+		}else if((httpResponse.data.status=='OK')&&(completeCallback)){
+			completeCallback(httpResponse.data.result ? httpResponse.data.result : {});
+		}
+	}else{
+		if(completeCallback) {
+			completeCallback(httpResponse.data ? httpResponse.data : {});
+		}
+	}
+}
 function getMilisEnableFindingIDs(completeCallback, errorCallback){
-	axios.post('api.php', 
+	axios.post(API_ENDPOINT, 
 		{
 			action: 'get_milis_finding_ids',
 			data: {}
 		}
 	)
 	.then(response=> {
-		if(response.data.status=='ERROR') {
-			errorCallback(response.data.errors);
-		}else{
-			completeCallback(response.data.result);
-		}
+		processResponse(response,completeCallback, errorCallback);
 	});
 }
 function getUserProfiles(completeCallback, errorCallback){
-	axios.post('api.php', 
+	axios.post(API_ENDPOINT, 
 		{
 			action: 'get_user_profiles',
 			data: {}
 		}
 	)
 	.then(response=> {
-		if(response.data.status=='ERROR') {
-			errorCallback(response.data.errors);
-		}else{
-			completeCallback(response.data.result);
-		}
+		processResponse(response, completeCallback, errorCallback);
 	});
 }
 function saveUserProfile(profileId, userName, userPhone, completeCallback, errorCallback){
-	axios.post('api.php', 
+	axios.post(API_ENDPOINT, 
 		{
 			action: 'save_user_profile',
 			data: {
@@ -44,15 +51,11 @@ function saveUserProfile(profileId, userName, userPhone, completeCallback, error
 		}
 	)
 	.then(response=> {
-		if(response.data.status=='ERROR') {
-			errorCallback(response.data.errors);
-		}else{
-			completeCallback(response.data.result);
-		}
-	});	
+		processResponse(response,completeCallback, errorCallback);
+	});
 }
 function deleteUserProfile(profileId, completeCallback, errorCallback){
-	axios.post('api.php', 
+	axios.post(API_ENDPOINT, 
 		{
 			action: 'delete_user_profile',
 			data: {
@@ -61,42 +64,30 @@ function deleteUserProfile(profileId, completeCallback, errorCallback){
 		}
 	)
 	.then(response=> {
-		if(response.data.status=='ERROR') {
-			errorCallback(response.data.errors);
-		}else{
-			completeCallback(response.data.result);
-		}
-	});	
+		processResponse(response,completeCallback, errorCallback);
+	});
 }
 function getSm19Cats(completeCallback, errorCallback){
-	axios.post('api.php', 
+	axios.post(API_ENDPOINT, 
 		{
 			action: 'get_sm19_cat',
 			data: {}
 		}
 	)
 	.then(response=> {
-		if(response.data.status=='ERROR') {
-			errorCallback(response.data.errors);
-		}else{
-			completeCallback(response.data.result);
-		}
-	});	
+		processResponse(response,completeCallback, errorCallback);
+	});
 }
 function getIsImpairments(completeCallback, errorCallback){
-	axios.post('api.php', 
+	axios.post(API_ENDPOINT, 
 		{
 			action: 'get_is_impairments',
 			data: {}
 		}
 	)
 	.then(response=> {
-		if(response.data.status=='ERROR') {
-			errorCallback(response.data.errors);
-		}else{
-			completeCallback(response.data.result);
-		}
-	});	
+		processResponse(response,completeCallback, errorCallback);
+	});
 }
 
 function upload(uploadData, progressCallback, completeCallback, errorCallback) {
@@ -136,7 +127,7 @@ function loadIsAudit(uploadData, progressCallback, completeCallback, errorCallba
 }
 function createIsAudit (stocktake, progressCallback, completeCallback, errorCallback) {
 	progressCallback(0,1,STATUS_PROCESS,'creates IS activity');
-	axios.post('api.php', 
+	axios.post(API_ENDPOINT, 
 		{
 			action: 'create_is_audit',
 			data: stocktake
@@ -170,7 +161,7 @@ function createIsImpairments (stocktakeId, impairmentList, progressCallback, com
 
 		if(n>=batchSize) {
 
-			axios.post('api.php', {
+			axios.post(API_ENDPOINT, {
 				action: 'create_is_impairments', 
 				data : { 
 					stocktakeId: stocktakeId, 
@@ -197,7 +188,7 @@ function createIsImpairments (stocktakeId, impairmentList, progressCallback, com
 		
 	}
 	if(batchBuff.length > 0){
-		axios.post('api.php', {
+		axios.post(API_ENDPOINT, {
 			action: 'create_is_impairments', 
 			data : { 
 				stocktakeId: stocktakeId, 
@@ -217,7 +208,15 @@ function createIsImpairments (stocktakeId, impairmentList, progressCallback, com
 	}
 	
 }
-
+function getIsRecords(completeCallback, errorCallback){
+	axios.post(API_ENDPOINT, {
+			action: 'get_is_records', 
+			data : {}
+	})
+	.then(response=> {
+		processResponse(response,completeCallback, errorCallback);
+	});
+}
 function loadGaStocktake(uploadData, progressCallback, completeCallback, errorCallback) {
 	let assetList=uploadData.assetlist;
 	delete uploadData.assetlist;
@@ -243,7 +242,7 @@ function loadGaStocktake(uploadData, progressCallback, completeCallback, errorCa
 
 function createGaStocktake (stocktake, progressCallback, completeCallback, errorCallback) {
 	progressCallback(0, 1, STATUS_PROCESS, 'creates GA activity');
-	axios.post('api.php', 
+	axios.post(API_ENDPOINT, 
 		{
 			action: 'create_ga_stocktake',
 			data: stocktake
@@ -271,7 +270,7 @@ function createGaAssets (stocktakeId, assetList, progressCallback, completeCallb
 		batchBuff[n++]=assetList[rec]; 
 		current++;
 		if(n>=batchSize) {
-			axios.post('api.php', {
+			axios.post(API_ENDPOINT, {
 				action: 'create_ga_assets', 
 				data : { 
 					stocktakeId: stocktakeId, 
@@ -298,7 +297,7 @@ function createGaAssets (stocktakeId, assetList, progressCallback, completeCallb
 		
 	}
 	if(batchBuff.length > 0){
-		axios.post('api.php', {
+		axios.post(API_ENDPOINT, {
 			action: 'create_assets', 
 			data : { 
 				stocktakeId: stocktakeId, 

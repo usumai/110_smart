@@ -1217,8 +1217,10 @@ if ($act=='sys_pull_master') {
      $storageID          = $_POST["storageID"];
      $stkm_id            = $_POST["stkm_id"];
      $res_update_user    = "";
-     $milisFlag          = $_POST["checked_to_milis"] == "1"? 1 : 0;
+     $milisFlag          = (array_key_exists("checked_to_milis",$_POST) && $_POST["checked_to_milis"] == "1") ? 1 : 0;
      $findingID          = $_POST["findingID"];
+     $res_comment 		 = $_POST["res_comment"];
+     
      function clnr($fieldVal){
 
           if(empty($fieldVal)&&$fieldVal==''){
@@ -1242,13 +1244,13 @@ if ($act=='sys_pull_master') {
                $splityResult  = $_POST['splityResult'][$value];
                $splityDate    = $_POST['splityDate'][$value];
                $splityMilis    = $_POST['splityMilis'][$value];
-               // echo "<br><b>".$splityCount." - ".$splityResult." - ".$splityDate."</b>";
+
                if(!empty($splityDate)){
                     $splityDate = clnr($splityDate);    
                }else{
                     $splityDate = 'null';
                }
-               $sql = "  INSERT INTO smartdb.sm18_impairment (
+               $sql = "INSERT INTO smartdb.sm18_impairment (
                               res_create_date, 
                               res_update_user, 
                               checked_to_milis,
@@ -1266,17 +1268,16 @@ if ($act=='sys_pull_master') {
                                $splityMilis,
                               '$splityResult',
                                $splityDate,
-                              '$storageID',
+                               $storageID,
                               'extra',
-                              '$splityCount',
+                               $splityCount,
                               '$fingerprint',                              
                               'imp', 
-                              '$stkm_id')";
+                              $stkm_id)";
                runSql($sql);
-               echo "<br>$sql";
           }
 
-          $sql = "  UPDATE smartdb.sm18_impairment AS tblEdit, smartdb.sm18_impairment AS tblSource 
+          $sql = "UPDATE smartdb.sm18_impairment AS tblEdit, smartdb.sm18_impairment AS tblSource 
                SET 	tblEdit.DSTRCT_CODE = tblSource.DSTRCT_CODE,
                     tblEdit.WHOUSE_ID = tblSource.WHOUSE_ID,
                     tblEdit.SUPPLY_CUST_ID = tblSource.SUPPLY_CUST_ID,
@@ -1289,7 +1290,7 @@ if ($act=='sys_pull_master') {
                     tblEdit.TRACKING_IND = tblSource.TRACKING_IND,
                     tblEdit.TRACKING_REFERENCE = tblSource.TRACKING_REFERENCE,
                     tblEdit.LAST_MOD_DATE = tblSource.LAST_MOD_DATE,
-                    WHERE 	tblEdit.res_parent_storageID = tblSource.storageID
+               WHERE tblEdit.res_parent_storageID = tblSource.storageID
                     AND tblEdit.storageID IS NULL
                     AND tblSource.auto_storageID=$auto_storageID ";
           runSql($sql);
@@ -1301,17 +1302,17 @@ if ($act=='sys_pull_master') {
           $res_unserv_date = 'null';
      }
 
-     $res_comment = clnr($_POST["res_comment"]);
+     
 
      $sql = "UPDATE smartdb.sm18_impairment SET 
-               findingID='$findingID',  
-               res_comment=$res_comment,  
+               findingID='$findingID',
+               res_comment='$res_comment',
                res_unserv_date=$res_unserv_date,
                res_create_date=NOW(),
                fingerprint='$fingerprint',
-               checked_to_milis='$milisFlag'
+               checked_to_milis=$milisFlag
             WHERE 
-               auto_storageID='$auto_storageID' ";
+               auto_storageID=$auto_storageID";
      runSql($sql);
      fnStats($stkm_id);
 

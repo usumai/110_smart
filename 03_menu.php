@@ -268,7 +268,7 @@ $(function(){
 
 <!-- System Dropdown Menu -->
 					<li class="nav-item dropdown">
-						<a class='nav-link dropdown-toggle "+styleUpdateAvailable+"' href='#'data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='headingHelp'
+						<a class='nav-link dropdown-toggle' href='#' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='headingHelp'
 						:class="{'text-danger':sysd.versionLocal<sysd.versionRemote}"><b>System</b></a>
 						<div class='dropdown-menu' aria-labelledby='dropdown01' id='dropdownHelp'>
 

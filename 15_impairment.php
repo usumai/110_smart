@@ -8,22 +8,58 @@
     <div class="container-fluid">
         <h1 class="mt-5 display-6">IS/B2R</h1>
         <div class="table-responsive-sm">
-            <table id="tbl_stk" class="table table-sm table-striped table-border table-hover" >
+            <table id="tbl_stk" class="table table-sm table-striped table-border" >
                 <caption>            
                 </caption>
                 <thead class="table-dark">
                     <tr>
                         <th>Action</th>
-                        <th>DIST~WHSE</th>
+                        <th >DIST<br/>WHSE
+                        	<div class="dropdown"  style="display: inline">
+                                  <a class="btn-outline" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                 		<span class="fas fa-sort-amount-down"></span>
+                                  </a>                                
+                                  <div class="dropdown-menu" aria-labelledby="warehouseFilter">
+                                    <a class="dropdown-item"  v-for="(rec, i) in  filters.warehouse" @click="search(rec)">{{rec}}</a>
+                                  </div>
+                        	</div>                                     
+                        </th>
                         <th>SCA</th>
-                        <th>Bin<br/>No.</th>
-                        <th>Stock<br/>Code</th>
+                        <th>Bin<br/>No.
+                        	<div class="dropdown"  style="display: inline">
+                                  <a class="btn-outline" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                 		<span class="fas fa-sort-amount-down"></span>
+                                  </a>                                
+                                  <div class="dropdown-menu" aria-labelledby="binFilter">
+                                    <a class="dropdown-item"  v-for="(rec, i) in  filters.bincode" @click="search(rec)">{{rec}}</a>
+                                  </div>
+                        	</div>                              
+                        </th>
+                        <th>Stock<br/>Code
+                        	<div class="dropdown"  style="display: inline">
+                                  <a class="btn-outline" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                 		<span class="fas fa-sort-amount-down"></span>
+                                  </a>                                
+                                  <div class="dropdown-menu" aria-labelledby="stockFilter">
+                                    <a class="dropdown-item"  v-for="(rec, i) in  filters.stockcode" @click="search(rec)">{{rec}}</a>
+                                  </div>
+                        	</div>                          
+                        </th>
                         <th>Name</th>
                         <th>Cat</th>
                         <th>SOH</th>
                         <th>Tracking</th>
                         <th>Reference <br/> No.</th>
-                        <th>Type</th>
+                        <th>Type
+                        	<div class="dropdown"  style="display: inline">
+                                  <a class="btn-outline" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                 		<span class="fas fa-sort-amount-down"></span>
+                                  </a>                                
+                                  <div class="dropdown-menu" aria-labelledby="typeFilter">
+                                    <a class="dropdown-item"  v-for="(rec, i) in  filters.type" @click="search(rec)">{{rec}}</a>
+                                  </div>
+                        	</div>                              
+                        </th>
                         <th>Status</th>
                         <th style="width: 70px">Action</th>
                     </tr>
@@ -68,15 +104,13 @@
                 </tbody>
             </table>
         </div>
+        
+         
     </div>
 </div>
 
 <script>
-$(document).ready(function() {
-    $('#tbl_stk').DataTable({
-        stateSave: true
-    });
-});
+
 
 function IsJsonString(str) {
     try {
@@ -114,19 +148,59 @@ let vm = new Vue({
     	error:"",
         json_records:{},
         json_is_settings:{},
-        milisEnabled:[]
+        milisEnabled:[],
+        updateList: 0,
+        filters:{
+            warehouse:[],
+            stockcode:[],
+            bincode: [],
+            type: ['All','b2r','imp','impq','imps']
+        }
     },
     created() {
+    	console.log("Event Created...");
 		this.updateMilisEnableFindingIDs();
         this.get_is_records()
         this.get_is_settings()
     },
     mounted() {
+
+        console.log("Event Mounted...");
      	if(this.$refs.current_row) {
     		this.$refs.current_row[0].scrollIntoView();
     	}      	
     },
+    beforeMount(){
+    	console.log("Event BeforeMount...");
+    },
+    beforeUpdate(){
+    	console.log("Event BeforeUpdate...");
+    },    
+    updated(){
+    	console.log("Event Updated...");
+    	if(this.updateList==1){
+            $('#tbl_stk').DataTable({
+                stateSave: true
+            });
+            this.updateList=0;
+    	}
+    }, 
+    beforeDestroy(){
+    	console.log("Event BeforeDestroy...");
+    }, 
+    Destroyed(){
+    	console.log("Event BeforeDestroy...");
+    },               
     methods:{
+
+        search(filterText) {
+            if(filterText=='All'){
+            	$('#tbl_stk').DataTable().search('');
+            }else{
+            	$('#tbl_stk').DataTable().search(filterText);
+            }
+        	
+        },
 		updateMilisEnableFindingIDs(){
 			getMilisEnableFindingIDs(
 	    		data=>this.milisEnabled=data, 
@@ -170,9 +244,41 @@ let vm = new Vue({
             }
         },
         get_is_records(){
-            payload                 = {'act':'get_is_records'}
-            this.json_records       = fnapi(payload)
-            console.log(this.json_records)
+        	this.updateList=1;
+        	getIsRecords(data=>{
+
+            	
+                var warehouseMap=[];
+                var bincodeMap=[];
+                var stockcodeMap=[];
+                for(i in data){
+                	warehouseMap[data[i].DSTRCT_CODE+'-'+data[i].WHOUSE_ID]=1;
+                    bincodeMap[data[i].BIN_CODE]=1;
+                    stockcodeMap[data[i].STOCK_CODE]=1;
+                }
+                var i=0;
+                this.filters.warehouse[i++]='All';
+                for(var key in warehouseMap){
+                    this.filters.warehouse[i++]=key;
+                }
+                i=0;
+                this.filters.bincode[i++]='All';
+                for(var key in bincodeMap){
+                    this.filters.bincode[i++]=key;
+                }
+                i=0;
+                this.filters.stockcode[i++]='All';
+                for(var key in stockcodeMap){
+                    this.filters.stockcode[i++]=key;
+                }
+            	this.json_records=data;
+
+
+            	console.log(this.json_records);
+            },errors=>{
+                this.error=errors[0].info;
+            });
+            
         }, 
         get_is_settings(){
             payload                 = {'act':'get_is_settings'}

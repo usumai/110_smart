@@ -238,10 +238,17 @@ let vm = new Vue({
         },
         get_activities(){
             axios.get('api.php', {params: {act:'get_activities'}})
-            .then(response=> {
-                this.actvd   = response.data;
-                console.log(this.actvd);
-            })
+            .then(response => {
+            	console.log(response);
+            	processResponse(response,
+            		data=>{
+            			this.actvd   = data;
+            		}, 
+            		errors=>{
+            			this.message = errors[0].info; 
+            		});                
+                
+            });
         }, 
         isInclude(act_type){
             var includeAct=null;

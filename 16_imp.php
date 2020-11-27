@@ -150,9 +150,12 @@ $(document).ready(function() {
         splityOptions += "</option>";
     }
     $('#splityResult').html(splityOptions);
+    
+    
     $('#splityResult').val('');
-
-
+    $("#splityDate").val('');
+    $("#splityMilis").prop('checked',false);
+    
     //Initialise the page
     setPage()
 
@@ -366,11 +369,23 @@ $(document).ready(function() {
         }
 
         if(splityResult){
-            if(arS['rl'][splityResult-1]['reqDate']==1&& splityDate.length<=0){
-                $("#addSplity").prop('disabled', true);
+            if(arS['rl'][splityResult-1]['reqDate']==1) {
+            	if (splityDate.length<=0){
+                	$("#addSplity").prop('disabled', true);
+            	}
+            	$("#splityDate").prop('disabled', false);
+            }else{
+            	$("#splityDate").val('');
+            	$("#splityDate").prop('disabled', true);
             }
-            if((milisEnabled.findIndex((v)=>(v==splityResult))>=0) && (!splityMilis)){
-            	$("#addSplity").prop('disabled', true);
+            if((milisEnabled.findIndex((v)=>(v==splityResult))>=0)){
+            	if(!splityMilis){
+            		$("#addSplity").prop('disabled', true);
+            	}
+            	$("#splityMilis").prop('disabled', false);
+            }else{
+            	$("#splityMilis").prop('checked', false);
+            	$("#splityMilis").prop('disabled', true);
             }
         }
         
