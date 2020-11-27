@@ -65,7 +65,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for='(rec, recidx) in json_records' :ref="rec.auto_storageID == <?=$current_row ?> ? 'current_row' : ''">
+                    <tr v-for='(rec, recidx) in json_records' :ref="rec.auto_storageID == <?=$current_row ?> ? 'current_row' : ''" :id="rec.auto_storageID == <?=$current_row ?> ? 'current_row' : ''">
                         <td>
                             <a  class='btn btn-primary' v-if="rec.isType!='b2r'"
                                 :href="'16_imp.php?auto_storageID='+rec.auto_storageID" ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
@@ -283,7 +283,7 @@ let vm = new Vue({
         get_is_settings(){
             payload                 = {'act':'get_is_settings'}
             json   = fnapi(payload)
-            this.json_is_settings = []
+            this.json_is_settings = [];
             for(let idx in json){
                 setting = json[idx]
                 this.json_is_settings[setting.findingID] = setting

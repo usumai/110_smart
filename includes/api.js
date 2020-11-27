@@ -107,7 +107,18 @@ function loadRawRemainder(uploadData, progressCallback, completeCallback, errorC
 }
 
 function loadIsAudit(uploadData, progressCallback, completeCallback, errorCallback){
-	let impairmentList=uploadData.results;
+	let impairmentList=[];
+	if(!uploadData.impairments){
+		if(!uploadData.results){
+			return;
+		}else{
+			impairmentList=uploadData.results;
+		}
+	}else{
+		impairmentList=uploadData.impairments;
+	}
+	 
+	
 	delete uploadData.results;
 
 	createIsAudit (
