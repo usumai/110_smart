@@ -166,9 +166,11 @@ let vm = new Vue({
     mounted() {
 
         console.log("Event Mounted...");
+ /*       
      	if(this.$refs.current_row) {
     		this.$refs.current_row[0].scrollIntoView();
-    	}      	
+    	}    
+ */  	
     },
     beforeMount(){
     	console.log("Event BeforeMount...");
@@ -184,6 +186,11 @@ let vm = new Vue({
             });
             this.updateList=0;
     	}
+     	if(this.$refs.current_row) {
+         	console.log("Scrolling into view: ");
+         	console.log(this.$refs.current_row);
+    		this.$refs.current_row[0].scrollIntoView();
+    	}    
     }, 
     beforeDestroy(){
     	console.log("Event BeforeDestroy...");

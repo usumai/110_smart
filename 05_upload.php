@@ -167,7 +167,7 @@ function fnUpload_rawremainder($arr, $dev){
     mysqli_multi_query($con,$sql_save);
     
     $abbrevs       = $arr['abbrevs'];
-    //print_r($abbrevs);
+
     foreach($abbrevs as $abbRow) {
          $file_type     = $abbRow['file_type'];
          $file_ref      = $abbRow['file_ref'];

@@ -6,24 +6,6 @@
 
 <script src="includes/standalone.js"></script>
 
-<script>
-const config = {
-  filename: 'general-ledger-Q1',
-  sheet: {
-    data: [
-      [{
-        value: 'Income - Webshop',
-        type: 'string'
-      }, {
-        value: 1000,
-        type: 'number'
-      }]
-    ]
-  }
-};
-
-// zipcelx(config);
-</script>
 
 <div id="app">
     <div class='container-fluid'>
@@ -88,10 +70,10 @@ const config = {
                         <button v-if='actv.smm_delete_date' v-on:click='save_activity_toggle_delete(actv.stkm_id,0)' class='btn btn-outline-secondary float-left'>Restore</button>
                     </td>
                     <td>
-                        <button class='btn btn-outline-dark float-left' v-on:click="export_to_xls(actv.stkm_id)" v-if='false'>Excel</button>
+                        <button class='btn btn-outline-dark float-left' v-on:click="export_activity(actvidx,'xslx')">Excel</button>
                     </td>
                     <td>
-                        <button class='btn btn-outline-dark float-left' v-on:click='export_activity(actvidx)'>Export</button>
+                        <button class='btn btn-outline-dark float-left' v-on:click="export_activity(actvidx,'json')">Export</button>
                     </td>
                 </tr>
                 </tbody>
@@ -191,10 +173,13 @@ let vm = new Vue({
     } ,
     methods:{
         openUploadDlg(){
+
         	this.$refs.upload_file.value='';
             this.$refs.upload_file.click();
+
         },
         uploadData(){
+
             this.$refs.btn_open_progress.click();
 
             let file=this.$refs.upload_file.files[0]
@@ -220,8 +205,6 @@ let vm = new Vue({
                 )
             };
             reader.readAsText(file);
-            
-
         },
         onUploadProgress (current, total, status, message){
             this.upload.current=current;
@@ -288,7 +271,7 @@ let vm = new Vue({
             tbl = "<table>"
             tbl+="<tr>"
             for(let colidx in res[0]){
-                tbl+="<td>"+colidx+"</td>"
+                tbl+="<td>"+colidx+"</td>";
                 data
             }
             tbl+="</tr>"
@@ -313,11 +296,14 @@ let vm = new Vue({
                 }]
             ]
 
-            const config2 = {filename: 'general-ledger-Q1',sheet: {data}};
-            zipcelx(config2);
-            makeFileAndDL("test.xls", tbl)
+            const config = {
+           		filename: 'general-ledger-Q1', 
+           		sheet: {data}
+            };
+            zipcelx(config);
+            //makeFileAndDL("test.xls", tbl)
         },
-        export_activity(activity_id){
+        export_activity(activity_id, exportFormat){
             actv = this.actvd[activity_id]
             console.log(actv)
             header_obj                      = {}
@@ -357,12 +343,76 @@ let vm = new Vue({
                 header_obj['smm_extract_user']  = null;
                 header_obj['unique_file_id']    = "TBA"		
             }
-
+            
             date_name_short = new Date().toISOString().replace(/-/g,'').replace(/:/g,'').substring(2,8)
             name_suffix     = name_suffix!='' ? '_'+name_suffix : name_suffix;
-            file_name       = date_name_short   + "_SMARTM" + name_suffix + ".json"
-            json_string     = JSON.stringify(header_obj)
-            makeFileAndDL(file_name, json_string)
+            
+            if(exportFormat=='json'){
+            	file_name       = date_name_short   + "_SMARTM" + name_suffix + ".json";
+                json_string     = JSON.stringify(header_obj);
+                makeFileAndDL(file_name, json_string);
+            }else if(exportFormat=='xslx'){
+            	file_name = date_name_short   + "_SMARTM" + name_suffix;
+                data = [
+                	[{
+                        value: 'type',
+                        type: 'string'
+                    },{
+                        value: 'file_version',
+                        type: 'string'
+                    },{
+                    	value: 'stk_name',
+                    	type: 'string'
+                    },{
+                    	value: 'dpn_extract_date',
+                    	type: 'string'
+                    },{
+                    	value: 'dpn_extract_user',
+                    	type: 'string'
+                    },{
+                    	value: 'smm_extract_date',
+                    	type: 'string'
+                    },{
+                    	value: 'smm_extract_user',
+                    	type: 'string'
+                    },{
+                    	value: 'unique_file_id',
+                    	type: 'string'
+                    }],
+                    [{
+                        value:  header_obj['type'],
+                        type: 'string'
+                    },{
+                        value: header_obj['file_version'],
+                        type: 'string'
+                    },{
+                    	value: header_obj['stk_name'],
+                    	type: 'string'
+                    },{
+                    	value: header_obj['dpn_extract_date'],
+                    	type: 'string'
+                    },{
+                    	value: header_obj['dpn_extract_user'],
+                    	type: 'string'
+                    },{
+                    	value: header_obj['smm_extract_date'],
+                    	type: 'string'
+                    },{
+                    	value: header_obj['smm_extract_user'],
+                    	type: 'string'
+                    },{
+                    	value:  header_obj['unique_file_id'] ,
+                    	type: 'string'
+                    }]
+                                    
+                ];         
+                const config = {
+                	filename: file_name, 
+                	sheet: {data}
+                };
+                zipcelx(config);
+            }
+
         }, 
     }
 })

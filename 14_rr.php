@@ -46,15 +46,15 @@ if ($result->num_rows > 0) {
 
 
 <div class="container">
-	<div class="row">
+	<div class="row" style="margin-top: 15px">
 		<h2>Raw remainder assets. Search result for: "<?=$search_term?>" </h2>
 		This page will only show the first 100 results, search for a more specific term above.
 	</div>
 	<div class="row">
 	    <div class="col-lg">    	
 
-      		<table id="table_assets" class="table table-sm" width="100%">
-	        	<thead>
+      		<table id="table_assets" class="table table-sm table-striped table-border" width="100%">
+	        	<thead class="table-dark">
 		    		<tr>
 		    			<th>Action</th>
 		    			<th>Asset</th>

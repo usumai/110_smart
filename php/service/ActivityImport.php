@@ -40,12 +40,15 @@ function createIsAudit($connection, $record) {
 }
 
 function createIsImpairments($connection, $stocktakeId, $impairments) { 
+    
 	if((! $stocktakeId) || ($stocktakeId=='')) {
 		throw new Exception("Unable to create Impairment records, required stocktake id");
 	}
+	
 	if(! $impairments){
 		return;
 	}
+	
     $stmt   = $connection->prepare(
 		"INSERT INTO smartdb.sm18_impairment (
         	stkm_id, 
@@ -159,6 +162,145 @@ function createIsImpairments($connection, $stocktakeId, $impairments) {
 	$stmt->close();
 }
 
+function clearGaRawRemainder($connection){
+    $sql = "TRUNCATE TABLE smartdb.sm12_rwr; ";
+    mysqli_multi_query($connection, $sql);
+    
+    $sql = "TRUNCATE TABLE smartdb.sm16_file; ";
+    mysqli_multi_query($connection,$sql);
+}
+
+function createGaAbbrs($connection, $abbrList){
+   
+    $sql = "
+        INSERT INTO smartdb.sm16_file (
+            file_type,
+            file_ref,
+            file_desc) 
+        VALUES (?,?,?)";
+    
+    $stmt = $connection->prepare($sql);
+
+    foreach ($abbrList as $record) {
+       
+        $stmt->bind_param("sss",
+            $record->file_type,
+            $record->file_ref,
+            $record->file_desc);
+        
+        $stmt->execute();
+        
+        if($stmt->error){
+            $errorMsg = $stmt->error;
+            $stmt->close();
+            throw new Exception($errorMsg);
+        }	
+    }
+    $stmt->close();
+}
+
+function createGaRawRemainders($connection, $rrList){
+
+    $sql="  INSERT INTO smartdb.sm12_rwr (
+                Asset,
+                accNo,
+                InventNo,
+                AssetDesc1,
+                Class,
+                ParentName) 
+            VALUES (?,?,?,?,
+                    (SELECT
+                        file_desc
+                    FROM
+                        smartdb.sm16_file
+                    WHERE
+                        file_type='abbrev_class'
+                        AND file_ref = ?
+                    ),
+                    (SELECT
+                        file_desc
+                    FROM
+                        smartdb.sm16_file
+                    WHERE
+                        file_type='abbrev_owner'
+                        AND file_ref = ?
+                    )
+            )";
+    
+    $stmt = $connection->prepare($sql);
+    
+    
+    foreach ($rrList as $record) {
+        
+        if ($record->f1 != "END") {
+            
+            $parent=substr($record->f1,0,1);
+            $class= substr($record->f1,1,1);
+            $asset = substr($record->f1,2);
+            $accNo     = $record->f2;
+            $inventNo  = $record->f3;
+            $assetDesc = $record->f4;
+            
+            $stmt->bind_param("ssssss", 
+                    $asset, 
+                    $accNo, 
+                    $inventNo, 
+                    $assetDesc,
+                    $class,
+                    $parent);
+            
+            $stmt->execute();       
+            
+            if($stmt->error){
+                $errorMsg = $stmt->error;
+                $stmt->close();
+                throw new Exception($errorMsg);
+            }	
+        }
+    }
+    
+    $stmt->close();
+  
+}
+
+function updateGaRawRemainderAbbr($connection){
+    
+    // Update the RR with the updated abbreviations
+    
+    $sql = "
+        UPDATE smartdb.sm12_rwr r
+        SET ParentName= (SELECT
+                            file_desc
+                        FROM
+                            smartdb.sm16_file
+                        WHERE
+                            file_type='abbrev_owner'
+                            AND file_ref = SUBSTRING(r.Asset,1,1)
+            ),
+            Class =     (SELECT
+                            file_desc
+                        FROM
+                            smartdb.sm16_file
+                        WHERE
+                            file_type='abbrev_class'
+                            AND file_ref = SUBSTRING(r.Asset,2,1)
+            ),
+            Asset = SUBSTRING(r.Asset,3)";
+    
+    mysqli_multi_query($connection, $sql);
+}
+
+function updateSettings($connection, $record){
+    $sql = "
+        UPDATE smartdb.sm10_set
+        SET rr_extract_date='$record->rr_extract_date',
+            rr_extract_user='$record->rr_extract_user',
+            rr_count = $record->rr_count
+        WHERE smartm_id = $record->smartm_id; ";
+    
+    mysqli_multi_query($connection, $sql);
+}
+
 function createGaStocktake($connection, $record) {
 
     $stmt   = $connection->prepare(
@@ -174,6 +316,7 @@ function createGaStocktake($connection, $record) {
 			rc_orig_complete, 
 			rc_extras) 
 		VALUES(?,?,?,?,?,?,?,?,?,?);");
+    
     $stmt->bind_param("ssssssssss", 
 		$record->stk_id, 
 		$record->stk_name, 
@@ -185,7 +328,9 @@ function createGaStocktake($connection, $record) {
 		$record->rc_orig, 
 		$record->rc_orig_complete, 
 		$record->rc_extras);
+    
     $stmt->execute();
+    
     if($stmt->error){
 		$errorMsg = $stmt->error;
 		$stmt->close();
@@ -195,6 +340,7 @@ function createGaStocktake($connection, $record) {
     $stmt->close();
     return $id;
 }
+
 function createGaAssets($connection, $stocktakeId, $assets) {
 	if((! $stocktakeId) || ($stocktakeId=='')) {
 		throw new Exception("Unable to create Asset records, required stocktake id");

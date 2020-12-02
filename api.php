@@ -31,8 +31,41 @@ if ($act=="create_ga_stocktake") {
         	createGaAssets($con, $request->data->stocktakeId, $request->data->assets);
         	$result = ["processed" => count($request->data->assets)];
         }
-        echo json_encode(new ResponseMessage("OK",null));
+        echo json_encode(new ResponseMessage("OK",$result));
+    });   
+}elseif ($act=="clear_ga_rr"){
+    execWithErrorHandler(function() use ($con, $request){ 
+    	$result = ["processed" => 0]; 
+   		clearGaRawRemainder($con);
+        echo json_encode(new ResponseMessage("OK",$result));
     });       
+}elseif ($act=="create_ga_abbrs"){
+    execWithErrorHandler(function() use ($con, $request){ 
+    	$result = ["processed" => 0]; 
+    	if($request->data->abbrevs){
+    		createGaAbbrs($con,$request->data->abbrevs);
+        	$result = ["processed" => count($request->data->abbrevs), "correlationId"=>$request->data->correlationId];
+        }
+        echo json_encode(new ResponseMessage("OK",$result));
+    });       
+}elseif ($act=="create_ga_raw_remainders"){
+    execWithErrorHandler(function() use ($con, $request){ 
+    	$result = ["processed" => 0]; 
+    	if($request->data->assetRows){
+    		createGaRawRemainders($con,$request->data->assetRows);
+        	$result = ["processed" => count($request->data->assetRows), "correlationId"=>$request->data->correlationId];
+        }
+        echo json_encode(new ResponseMessage("OK",$result));
+    });    
+}elseif ($act=="update_settings"){
+    execWithErrorHandler(function() use ($con, $request){ 
+    	$result = ["processed" => 0]; 
+    	if($request->data->settings){
+    		updateSettings($con,$request->data->settings);
+        	$result = ["processed" => 1];
+        }
+        echo json_encode(new ResponseMessage("OK",$result));
+    });              
 }elseif ($act=="create_is_audit") {      
     execWithErrorHandler(function() use ($con, $request){
         $stocktakeId = createIsAudit($con, $request->data);
