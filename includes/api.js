@@ -112,159 +112,15 @@ function loadIsAudit(uploadData, progressCallback, completeCallback, errorCallba
 }
 
 function createGaAbbrs(abbrList, progressCallback, completeCallback, errorCallback){
-	var current=0;
-	var total=abbrList.length;
-	var batchSize=100;
-	var batchBuff=[];
-	var batchCounter=0;
-	var n=0;
-	var completed = 0;
-	progressCallback(current, total, STATUS_PROCESS, 'creates GA abbr record');	
-	for(var rec in abbrList) {
-		batchBuff[n++]=abbrList[rec]; 
-		current++;
-		if(n>=batchSize) {
-			var xaId='xa_'+(++batchCounter);
-			pendingTasks[xaId]=n;
-			
-			axios.post(API_ENDPOINT, {
-				action: 'create_ga_abbrs', 
-				data : { 
-					correlationId: xaId,
-					abbrevs : batchBuff
-				}
-			})
-			.then(response => {
-				completed += batchSize;
-				if(response.data.status=='ERROR') {
-					progressCallback(current, total, STATUS_ERROR, 'creates GA abbr record');
-					errorCallback(response.data.errors);
-				}else if(response.data.status=='OK'){
-					delete pendingTasks[response.data.result.correlationId];
-					var remain=Object.keys(pendingTasks).length;
-					
-					if(remain==0) {		
-						progressCallback(completed, total, STATUS_COMPLETE, 'creates GA abbr record');		
-						completeCallback(response.data.result);
-					}else if(response.data.status=='OK'){
-						progressCallback(completed, total, STATUS_PROCESS, 'creates GA abbr record');
-					}
-				}
-			});
-			n=0;
-			batchBuff=[];
-		}   		
-	}
-	
-	if(batchBuff.length > 0){
-		var xaId='xa_'+(++batchCounter);
-		pendingTasks[xaId]=n;
-		
-		axios.post(API_ENDPOINT, {
-			action: 'create_ga_abbrs', 
-			data : { 
-				correlationId: xaId,
-				abbrevs : batchBuff
-			}
-		})
-		.then(response => {
-			completed += batchBuff.length;
-			if(response.data.status=='ERROR') {
-				progressCallback(completed, total, STATUS_ERROR, 'creates GA abbr record');
-				errorCallback(response.data.errors);
-			}else if(response.data.status=='OK'){
-				delete pendingTasks[response.data.result.correlationId];
-				var remain=Object.keys(pendingTasks).length;
-			
-				if(remain==0) {		
-					progressCallback(completed, total, STATUS_COMPLETE, 'creates GA abbr record');		
-					completeCallback(response.data.result);
-				}else{
-					progressCallback(completed, total, STATUS_PROCESS, 'creates GA abbr record');
-				}
-			}
-		});
-	}
+	apiRequestParallel('create_ga_abbrs', abbrList, {}, 10, 
+					   'GA abbr records', 
+					   progressCallback, completeCallback, errorCallback);
 }
 
 function createGaRawRemainders(rrList, progressCallback, completeCallback, errorCallback){
-	var current=0;
-	var total=rrList.length;
-	var batchSize=1000;
-	var batchBuff=[];
-	var batchCounter=0;
-	var n=0;
-	var completed = 0;
-	progressCallback(current, total, STATUS_PROCESS, 'creates GA raw remainder asset');	
-	
-	for(var rec in rrList) {
-		batchBuff[n++]=rrList[rec]; 
-		current++;
-		if(n>=batchSize) {
-			var xaId='xa_'+(++batchCounter);
-			pendingTasks[xaId]=n;
-			
-			axios.post(API_ENDPOINT, {
-				action: 'create_ga_raw_remainders', 
-				data : { 
-					correlationId: xaId,
-					assetRows : batchBuff
-				}
-			})
-			.then(response => {
-				completed += batchSize;
-				if(response.data.status=='ERROR') {
-					progressCallback(current, total, STATUS_ERROR, 'creates GA raw remainder asset');
-					errorCallback(response.data.errors);
-				}else if(response.data.status=='OK'){
-					delete pendingTasks[response.data.result.correlationId];
-					var remain=Object.keys(pendingTasks).length;
-					console.log('ACK: '+response.data.result.correlationId+', Remain: '+remain+', Completed: '+completed);
-					console.log(Object.keys(pendingTasks));
-					
-					if(remain==0) {		
-						progressCallback(completed, total, STATUS_COMPLETE, 'creates GA raw remainder asset');		
-						completeCallback(response.data.result);
-					}else{
-						progressCallback(completed, total, STATUS_PROCESS, 'creates GA raw remainder asset');
-					}
-				}
-			});
-			n=0;
-			batchBuff=[];
-		}   		
-	}
-	
-	if(batchBuff.length > 0){
-		var xaId='xa_'+(++batchCounter);
-		pendingTasks[xaId]=n;
-		
-		axios.post(API_ENDPOINT, {
-			action: 'create_ga_raw_remainders', 
-			data : { 
-				correlationId: xaId,
-				assetRows : batchBuff
-			}
-		})
-		.then(response => {
-			completed += batchBuff.length;
-			if(response.data.status=='ERROR') {
-				progressCallback(current, total, STATUS_ERROR, 'creates GA raw remainder asset');
-				errorCallback(response.data.errors);
-			}else if(response.data.status=='OK'){
-				delete pendingTasks[response.data.result.correlationId];
-				var remain=Object.keys(pendingTasks).length;
-			
-				if(remain==0) {		
-					progressCallback(completed, total, STATUS_COMPLETE, 'creates GA raw remainder asset');		
-					completeCallback(response.data.result);
-				}else{
-					progressCallback(completed, total, STATUS_PROCESS, 'creates GA raw remainder asset');
-				}
-			}
-		});
-	}
-		
+	apiRequestParallel('create_ga_raw_remainders', rrList, {}, 1000, 
+					   'GA raw remainder asset records', 
+					   progressCallback, completeCallback, errorCallback);
 }
 
 function clearGaRawRemainder(progressCallback, completeCallback, errorCallback){
@@ -301,70 +157,12 @@ function createIsAudit (stocktake, progressCallback, completeCallback, errorCall
 }
 
 function createIsImpairments (stocktakeId, impairmentList, progressCallback, completeCallback, errorCallback) {
-	var current=0;
-	var total= impairmentList.length;
-	var batchSize=10;
-	var batchBuff=[];
-	var n=0;
-	var completed=0;
-	progressCallback(current,total,STATUS_PROCESS,'creates IS impairment');
-	for(var rec in impairmentList) {
-		impairmentList[rec].STK_DESC = impairmentList[rec].STK_DESC ? impairmentList[rec].STK_DESC.replace("\n","") : impairmentList[rec].STK_DESC;
-		impairmentList[rec].ITEM_NAME = impairmentList[rec].ITEM_NAME ? impairmentList[rec].ITEM_NAME.replace("\n","") : impairmentList[rec].ITEM_NAME;
-
-		
-		batchBuff[n++]=impairmentList[rec]; 
-		current++;
-
-		if(n>=batchSize) {
-
-			axios.post(API_ENDPOINT, {
-				action: 'create_is_impairments', 
-				data : { 
-					stocktakeId: stocktakeId, 
-					impairments : batchBuff
-				}
-			})
-			.then(response => {
-				completed += batchSize;
-				if(response.data.status=='ERROR') {
-					progressCallback(current, total, STATUS_ERROR, 'creates IS impairment');
-					errorCallback(response.data.errors);
-				}else{
-					if(completed >= total) {	
-						progressCallback(current, total, STATUS_COMPLETE, 'creates IS impairment');
-						completeCallback(response.data.result);
-					}else{
-						progressCallback(current, total, STATUS_PROCESS, 'creates IS impairment');
-					}
-				}
-			});
-			n=0;
-			batchBuff=[];
-		}                    
-		
-	}
-	if(batchBuff.length > 0){
-		axios.post(API_ENDPOINT, {
-			action: 'create_is_impairments', 
-			data : { 
-				stocktakeId: stocktakeId, 
-				impairments : batchBuff
-			}
-		})
-		.then(response => {
-			
-			if(response.data.status=='ERROR') {
-				progressCallback(current, total, STATUS_ERROR, 'creates IS impairment');
-				errorCallback(response.data.errors);
-			}else{
-				progressCallback(current, total, STATUS_COMPLETE, 'creates IS impairment');
-				completeCallback(response.data.result);
-			}
-		});
-	}
-	
+	apiRequestParallel('create_is_impairments',  
+						impairmentList, {stocktakeId: stocktakeId}, 50, 
+					   'IS impairment records',	progressCallback, 
+					   completeCallback, errorCallback);
 }
+
 function getIsRecords(completeCallback, errorCallback){
 	axios.post(API_ENDPOINT, {
 			action: 'get_is_records', 
@@ -397,64 +195,12 @@ function createGaStocktake (stocktake, progressCallback, completeCallback, error
 }
 
 function createGaAssets (stocktakeId, assetList, progressCallback, completeCallback, errorCallback) {
-	var current=0;
-	var total=assetList.length;
-	var batchSize=10;
-	var batchBuff=[];
-	var n=0;
-	progressCallback(current, total, STATUS_PROCESS, 'creates GA asset');	
-	for(var rec in assetList) {
-		batchBuff[n++]=assetList[rec]; 
-		current++;
-		if(n>=batchSize) {
-			axios.post(API_ENDPOINT, {
-				action: 'create_ga_assets', 
-				data : { 
-					stocktakeId: stocktakeId, 
-					assets : batchBuff
-				}
-			})
-			.then(response => {
-				if(response.data.status=='ERROR') {
-					progressCallback(current, total, STATUS_ERROR, 'creates GA asset');
-					errorCallback(response.data.errors);
-				}else{
-					
-					if(current>=total) {		
-						progressCallback(current, total, STATUS_COMPLETE, 'creates GA asset');		
-						completeCallback(response.data.result);
-					}else{
-						progressCallback(current, total, STATUS_PROCESS, 'creates GA asset');
-					}
-				}
-			});
-			n=0;
-			batchBuff=[];
-		}                    
-		
-	}
-	if(batchBuff.length > 0){
-		axios.post(API_ENDPOINT, {
-			action: 'create_assets', 
-			data : { 
-				stocktakeId: stocktakeId, 
-				assets : batchBuff
-			}
-		})
-		.then(response => {
-			if(response.data.status=='ERROR') {
-				progressCallback(current, total, STATUS_ERROR, 'creates GA asset');
-				errorCallback(response.data.errors);
-			}else{
-				progressCallback(current, total, STATUS_COMPLETE, 'creates GA asset');
-				completeCallback(response.data.result);
-			}
-		});
-	}
-	
+
+	apiRequestParallel('create_ga_assets',  
+					assetList, {stocktakeId: stocktakeId}, 50, 
+					'GA asset records', progressCallback, 
+					completeCallback, errorCallback);
 }
-
-
 
 function getMilisEnableFindingIDs(completeCallback, errorCallback){
 	axios.post(API_ENDPOINT, 
@@ -580,4 +326,131 @@ function apiRequest(apiName, requestData, progressMessage, progressCallback, com
 			}
 		}
 	});
+}
+
+
+function apiRequestParallel(apiName, records, params, chunkSize, progressMessage, 
+							progressCallback, completeCallback, errorCallback) 
+{
+
+	var total=records.length;
+	var chunkBuff=[];
+	var chunkCounter=0;
+	var n=0;
+	var completed = 0;
+	
+	if(progressCallback){
+		progressCallback(completed, total, STATUS_PROCESS, progressMessage);	
+	}
+	
+	for(var i in records) {
+		
+		chunkBuff[n++]=records[i]; 
+		
+		if(n>=chunkSize) {
+		
+			var taskNum='SID:'+(++chunkCounter);
+			
+			pendingTasks[taskNum]=n;
+			
+			var requestData={
+				action: apiName, 
+				data : {					 
+					taskId: taskNum,
+					records : chunkBuff
+				}
+			}
+			if((params)&&(Object.keys(params).length>0)){
+				for(key in params){
+					requestData.data[key]=params[key];
+				}
+			}
+			axios.post(API_ENDPOINT, requestData)
+			.then(
+				httpResponse => {
+
+					if (httpResponse.data.status=='ERROR') {
+	
+						if( progressCallback){
+							progressCallback(completed, total, STATUS_ERROR, progressMessage);
+						}
+						
+						errorCallback(httpResponse.data.errors);
+					
+					} else if(httpResponse.data.status=='OK') {
+					
+						completed += httpResponse.data.result.processed;
+						delete pendingTasks[httpResponse.data.result.taskId];
+						var remain=Object.keys(pendingTasks).length;
+						
+						if(remain==0) {		
+							if(progressCallback){
+								progressCallback(completed, total, STATUS_COMPLETE, progressMessage);		
+							}						
+							completeCallback({processed: completed});
+						}else{
+							if(progressCallback){
+								progressCallback(completed, total, STATUS_PROCESS, progressMessage);
+							}
+						}
+					}
+				}
+			);
+			n=0;
+			chunkBuff=[];
+		}   		
+	}
+	
+	if(chunkBuff.length > 0){
+		var taskNum='SID:'+(++chunkCounter);
+		
+		pendingTasks[taskNum]=n;
+		var requestData={
+			action: apiName, 
+			data : {					 
+				taskId: taskNum,
+				records : chunkBuff
+			}
+		}
+		if((params)&&(Object.keys(params).length>0)){
+			for(key in params){
+				requestData.data[key]=params[key];
+			}
+		}		
+		axios.post(API_ENDPOINT, requestData) 
+		.then(
+			httpResponse => {
+
+				if(httpResponse.data.status=='ERROR') {
+				
+					if( progressCallback){
+						progressCallback(completed, total, STATUS_ERROR, progressMessage);
+
+					}
+					
+					errorCallback(httpResponse.data.errors);
+				
+				}else if(httpResponse.data.status == 'OK'){
+				
+					completed += httpResponse.data.result.processed;
+					delete pendingTasks[httpResponse.data.result.taskId];
+					var remain=Object.keys(pendingTasks).length;
+					
+					if(remain==0) {		
+						if(progressCallback){
+							progressCallback(completed, total, STATUS_COMPLETE, progressMessage);		
+						}						
+						completeCallback({processed: completed});
+					}else{
+						if(progressCallback){
+							progressCallback(completed, total, STATUS_PROCESS, progressMessage);
+						}
+					}
+				}
+			}
+		);
+		n=0;
+		chunkBuff=[];
+
+	}
 }

@@ -26,10 +26,16 @@ if ($act=="create_ga_stocktake") {
     });
 }elseif($act=="create_ga_assets") {
     execWithErrorHandler(function() use ($con, $request){ 
-    	$result = ["processed" => 0]; 
-    	if($request->data->assets){
-        	createGaAssets($con, $request->data->stocktakeId, $request->data->assets);
-        	$result = ["processed" => count($request->data->assets)];
+    
+    	$result = ["processed" => 0,
+					"taskId"=>$request->data->taskId]; 
+    
+    	if($request->data->records){
+    	
+        	createGaAssets($con, $request->data->stocktakeId, $request->data->records);
+        	    		
+        	$result = [ "processed" => count($request->data->records), 
+        				"taskId"=>$request->data->taskId];
         }
         echo json_encode(new ResponseMessage("OK",$result));
     });   
@@ -41,22 +47,30 @@ if ($act=="create_ga_stocktake") {
     });       
 }elseif ($act=="create_ga_abbrs"){
     execWithErrorHandler(function() use ($con, $request){ 
-    	$result = ["processed" => 0]; 
-    	if($request->data->abbrevs){
-    		createGaAbbrs($con,$request->data->abbrevs);
-        	$result = ["processed" => count($request->data->abbrevs), "correlationId"=>$request->data->correlationId];
+    	$result = ["processed" => 0,
+					"taskId"=>$request->data->taskId];  
+    	if($request->data->records){
+    	
+    		createGaAbbrs($con,$request->data->records);
+    		
+        	$result = [ "processed" => count($request->data->records), 
+        				"taskId"=>$request->data->taskId];
         }
         echo json_encode(new ResponseMessage("OK",$result));
     });       
 }elseif ($act=="create_ga_raw_remainders"){
     execWithErrorHandler(function() use ($con, $request){ 
-    	$result = ["processed" => 0]; 
-    	if($request->data->assetRows){
-    		createGaRawRemainders($con,$request->data->assetRows);
-        	$result = ["processed" => count($request->data->assetRows), "correlationId"=>$request->data->correlationId];
+    	$result = ["processed" => 0,
+					"taskId"=>$request->data->taskId]; 
+    	if($request->data->records){
+    		
+    		createGaRawRemainders($con,$request->data->records);
+    		
+        	$result = [ "processed" => count($request->data->records), 
+        				"taskId"=>$request->data->taskId];
         }
         echo json_encode(new ResponseMessage("OK",$result));
-    });    
+    });        
 }elseif ($act=="update_settings"){
     execWithErrorHandler(function() use ($con, $request){ 
     	$result = ["processed" => 0]; 
@@ -74,10 +88,15 @@ if ($act=="create_ga_stocktake") {
     });
 }elseif($act=="create_is_impairments") {
     execWithErrorHandler(function() use ($con, $request){ 
-    	$result = ["processed" => 0];
-    	if($request->data->impairments){
-        	createIsImpairments($con, $request->data->stocktakeId, $request->data->impairments);
-        	$result = ["processed" => count($request->data->impairments)];
+    	$result = ["processed" => 0,
+    				"taskId"=>$request->data->taskId];
+    	if($request->data->records){
+    	
+        	createIsImpairments($con, $request->data->stocktakeId, $request->data->records);
+            		
+        	$result = [ "processed" => count($request->data->records), 
+        				"taskId"=>$request->data->taskId];
+
         }
         
         echo json_encode(new ResponseMessage("OK",$result));
