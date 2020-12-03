@@ -7,27 +7,27 @@ let pendingTasks=[];
 
 function upload(uploadData, progressCallback, completeCallback, errorCallback) {
 	if (uploadData.type == 'ga_stk') {
-		loadGaStocktake(uploadData, progressCallback, completeCallback, errorCallback);
+		uploadGaStocktake(uploadData, progressCallback, completeCallback, errorCallback);
 	}else if (uploadData.type == 'raw remainder v2'){
-		loadGaRawRemainder(uploadData, progressCallback, completeCallback, errorCallback);
+		uploadGaRawRemainder(uploadData, progressCallback, completeCallback, errorCallback);
 	}else if (uploadData.type == 'ga_rr') {
-		loadGaRawRemainder(uploadData, progressCallback, completeCallback, errorCallback);
+		uploadGaRawRemainder(uploadData, progressCallback, completeCallback, errorCallback);
 	}else if (uploadData.type == 'is_audit') {
-		loadIsAudit(uploadData, progressCallback, completeCallback, errorCallback);
+		uploadIsAudit(uploadData, progressCallback, completeCallback, errorCallback);
 	}	
 }
 
 
-function loadGaRawRemainder(uploadData, progressCallback, completeCallback, errorCallback){
+function uploadGaRawRemainder(uploadData, progressCallback, completeCallback, errorCallback){
 	if((!uploadData.abbrevs)||(uploadData.abbrevs.length<=0))
 	{
-		errorCallback({code: 1, info: 'Raw Remainder JSON file is missing abbrev list'});
+		errorCallback([{code: 1, info: 'Raw Remainder JSON file is missing abbrev list'}]);
 		return;
 	}
 	
 	if((!uploadData.assetRows)||(uploadData.assetRows.length<=0))
 	{
-		errorCallback({code: 1, info: 'Raw Remainder JSON file is missing asset list'});
+		errorCallback([{code: 1, info: 'Raw Remainder JSON file is missing asset list'}]);
 		return;
 	}	
 	
@@ -57,7 +57,7 @@ function loadGaRawRemainder(uploadData, progressCallback, completeCallback, erro
 	);
 }
 
-function loadGaStocktake(uploadData, progressCallback, completeCallback, errorCallback) {
+function uploadGaStocktake(uploadData, progressCallback, completeCallback, errorCallback) {
 	let assetList=uploadData.assetlist;
 	delete uploadData.assetlist;
 
@@ -80,20 +80,24 @@ function loadGaStocktake(uploadData, progressCallback, completeCallback, errorCa
 
 }
 
-function loadIsAudit(uploadData, progressCallback, completeCallback, errorCallback){
+function uploadIsAudit(uploadData, progressCallback, completeCallback, errorCallback){
+	
 	let impairmentList=[];
 	if(!uploadData.impairments){
 		if(!uploadData.results){
+			errorCallback([{code: -1, info: 'Empty impairment list'}]);
 			return;
 		}else{
 			impairmentList=uploadData.results;
+			delete uploadData.results;
 		}
 	}else{
 		impairmentList=uploadData.impairments;
+		delete uploadData.impairments;
 	}
 	 
 	
-	delete uploadData.results;
+	
 
 	createIsAudit (
 		uploadData,

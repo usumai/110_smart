@@ -17,7 +17,7 @@
         
 
         <div class="table-responsive-sm">
-            <table id="tbl_stk" class="table table-sm table-striped table-hover lead" >
+            <table id="tbl_stk" class="table table-sm table-striped table-hover" >
                 <caption>
                     <button type="button" class='btn btn-primary float-right' v-on:click="openUploadDlg">Upload<i class="fa fa-upload ml-2"></i></button>
                 </caption>

@@ -222,8 +222,8 @@ $(function(){
 <div id="appmenu">
 	<body class="d-flex flex-column h-100">
 	<header>
-		<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-			<a class="navbar-brand" href="index.php"><h3><b>smartM</b></h3></a>
+		<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark lead">
+			<a class="navbar-brand" href="index.php">smartM</a>
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
 			</button>
@@ -237,7 +237,7 @@ $(function(){
 					</li>
 
 					<li class="nav-item dropdown" v-if="sysd.act_type=='ga_stk'">
-						<a class='nav-link dropdown-toggle' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='menuFF'><b>First Found</b></a>
+						<a class='nav-link dropdown-toggle' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='menuFF'>First Found</a>
 						<div class='dropdown-menu' aria-labelledby='dropdown01' id='dropdown_adds'>
 							<h6 class='dropdown-header'>First found</h6>
 							<a class='dropdown-item' href='12_ff.php'>Add First Found</a>
@@ -251,14 +251,14 @@ $(function(){
 
 
 					<li class="nav-item dropdown" v-if="sysd.act_type=='is_audit'">
-						<a class='nav-link dropdown-toggle "+styleUpdateAvailable+"' href='#' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='headingHelp'><b>IS tools</b></a>
+						<a class='nav-link dropdown-toggle "+styleUpdateAvailable+"' href='#' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='headingHelp'>IS tools</a>
 						<div class='dropdown-menu' aria-labelledby='dropdown01' id='dropdownHelp'>
 							<a class='dropdown-item' href='19_toggle.php'>Toggle primary/backup</a>
 						</div>
 					</li>
 
 					<li class="nav-item dropdown" v-if="sysd.act_type=='ga_stk'">
-						<a class='nav-link dropdown-toggle "+styleUpdateAvailable+"' href='#'data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='headingHelp'><b>GA Tools</b></a>
+						<a class='nav-link dropdown-toggle "+styleUpdateAvailable+"' href='#'data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='headingHelp'>GA Tools</a>
 						<div class='dropdown-menu' aria-labelledby='dropdown01' id='dropdownHelp'>
 							<h6 class='dropdown-header'>Raw Remainder</h6>
 							<span class='dropdown-item'>Assets loaded: {{ rwrd.rr_rowcount }}</span>
@@ -269,7 +269,7 @@ $(function(){
 <!-- System Dropdown Menu -->
 					<li class="nav-item dropdown">
 						<a class='nav-link dropdown-toggle' href='#' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='headingHelp'
-						:class="{'text-danger':sysd.versionLocal<sysd.versionRemote}"><b>System</b></a>
+						:class="{'text-danger':sysd.versionLocal<sysd.versionRemote}">System</a>
 						<div class='dropdown-menu' aria-labelledby='dropdown01' id='dropdownHelp'>
 
 							<h6 class='dropdown-header'>System settings</h6>
