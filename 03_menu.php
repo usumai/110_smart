@@ -698,8 +698,6 @@ let vm_menu = new Vue({
             payload     = {'act':'get_activities'}
             json		= fnapi(payload)
             this.actvd	= json["result"]
-            // console.log("actvd")
-			// console.log(this.actvd)
 			this.template_ass_id = template.ass_id
 			$('#modal_initiate_template').modal('show')
 		}, 

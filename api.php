@@ -3,6 +3,7 @@ include "01_dbcon.php";
 include "php/common/common.php";
 include "php/service/ActivityImport.php";
 include "php/service/ActivityExport.php";
+header("Cache-Control: no-store, max-age=0");
 
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 set_exception_handler('errorHandler');

@@ -1,4 +1,5 @@
 <?php
+header("Cache-Control: no-store, max-age=0");
 
 $sql = "SELECT * FROM smartdb.sm10_set";
 $result = $con->query($sql);

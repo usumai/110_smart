@@ -2,6 +2,7 @@
 include "01_dbcon.php"; 
 include "05_scripts.php";
 include "05_db_designer.php";
+header("Cache-Control: no-store, max-age=0");
 
 $current_row=0;
 if(array_key_exists("current_row",$_POST)){
