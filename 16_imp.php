@@ -106,8 +106,8 @@ if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
         $arrSample['rl'][] = $row;
 }}
-
-$arrSample = json_encode($arrSample);
+$arrSample = str_replace("\\","\\\\",json_encode($arrSample));
+$arrSample = str_replace("'","\\'",$arrSample);
 ?>
 
 
@@ -121,12 +121,12 @@ $arrSample = json_encode($arrSample);
 
 
 <script type="text/javascript">
-let arS = '<?=$arrSample?>'
+let arS = '<?=$arrSample?>';
     arS = JSON.parse(arS);
 let fID = arS[0]['findingID'];
 let rl  = arS['rl'];
 let milisEnabled=[<?= $milisFindingIDs ?>];
-let warningEnabled=[<?= $warningFindingIDs ?>]
+let warningEnabled=[<?= $warningFindingIDs ?>];
 // console.log(rl)
 
 //Declare other global variables
