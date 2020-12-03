@@ -185,7 +185,7 @@ if ($act=="create_ga_stocktake") {
 	$ass_id         = $_POST["ass_id"];
 	$res_reason_code= $_POST["res_reason_code"];
     $stmt   = $con->prepare("UPDATE smartdb.sm14_ass SET res_reason_code=? WHERE ass_id=?;");
-    $stmt   ->bind_pairam("ss", $res_reason_code, $ass_id);
+    $stmt   ->bind_param("ss", $res_reason_code, $ass_id);
     $stmt   ->execute();
 
 }elseif ($act=='get_is_records') {
