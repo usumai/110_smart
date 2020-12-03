@@ -354,58 +354,400 @@ let vm = new Vue({
             }else if(exportFormat=='xslx'){
             	file_name = date_name_short   + "_SMARTM" + name_suffix;
                 data = [
-                	[{
-                        value: 'type',
-                        type: 'string'
-                    },{
-                        value: 'file_version',
-                        type: 'string'
-                    },{
-                    	value: 'stk_name',
-                    	type: 'string'
-                    },{
-                    	value: 'dpn_extract_date',
-                    	type: 'string'
-                    },{
-                    	value: 'dpn_extract_user',
-                    	type: 'string'
-                    },{
-                    	value: 'smm_extract_date',
-                    	type: 'string'
-                    },{
-                    	value: 'smm_extract_user',
-                    	type: 'string'
-                    },{
-                    	value: 'unique_file_id',
-                    	type: 'string'
-                    }],
-                    [{
-                        value:  header_obj['type'],
-                        type: 'string'
-                    },{
-                        value: header_obj['file_version'],
-                        type: 'string'
-                    },{
-                    	value: header_obj['stk_name'],
-                    	type: 'string'
-                    },{
-                    	value: header_obj['dpn_extract_date'],
-                    	type: 'string'
-                    },{
-                    	value: header_obj['dpn_extract_user'],
-                    	type: 'string'
-                    },{
-                    	value: header_obj['smm_extract_date'],
-                    	type: 'string'
-                    },{
-                    	value: header_obj['smm_extract_user'],
-                    	type: 'string'
-                    },{
-                    	value:  header_obj['unique_file_id'] ,
-                    	type: 'string'
-                    }]
-                                    
+                	[
+	                	{
+	                        value: 'type',
+	                        type: 'string'
+	                    },{
+	                        value: 'file_version',
+	                        type: 'string'
+	                    },{
+	                    	value: 'stk_name',
+	                    	type: 'string'
+	                    },{
+	                    	value: 'dpn_extract_date',
+	                    	type: 'string'
+	                    },{
+	                    	value: 'dpn_extract_user',
+	                    	type: 'string'
+	                    },{
+	                    	value: 'smm_extract_date',
+	                    	type: 'string'
+	                    },{
+	                    	value: 'smm_extract_user',
+	                    	type: 'string'
+	                    },{
+	                    	value: 'unique_file_id',
+	                    	type: 'string'
+	                    }
+	                ],
+                    [
+                    	{
+	                        value:  header_obj['type'],
+	                        type: 'string'
+	                    },{
+	                        value: header_obj['file_version'],
+	                        type: 'string'
+	                    },{
+	                    	value: header_obj['stk_name'],
+	                    	type: 'string'
+	                    },{
+	                    	value: header_obj['dpn_extract_date'],
+	                    	type: 'string'
+	                    },{
+	                    	value: header_obj['dpn_extract_user'],
+	                    	type: 'string'
+	                    },{
+	                    	value: header_obj['smm_extract_date'],
+	                    	type: 'string'
+	                    },{
+	                    	value: header_obj['smm_extract_user'],
+	                    	type: 'string'
+	                    },{
+	                    	value:  header_obj['unique_file_id'] ,
+	                    	type: 'string'
+	                    }
+                    ],
+                    [
+                    	{
+                    		value: 'storage_id',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'create_date',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'create_user',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'delete_date',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'delete_user',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'isID',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'targetID',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'targetItemID',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'actType',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'DSTRCT_CODE',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'WHOUSE_ID',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'SUPPLY_CUST_ID',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'BIN_CODE',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'STOCK_CODE',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'ITEM_NAME',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'SC_ACCOUNT_TYPE',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'TRACKING_IND',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'SOH',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'TRACKING_REFERENCE',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'STK_DESC',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'INVENT_CAT',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'INVENT_CAT_DESC',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'serviceableFlag',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'last_mod_date',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'SUPPLY_ACCT_METH',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'data_source',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'isBackup',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'ExtractDate',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'sample_flag',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'finalResult',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'finalResultPath',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'findingID',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'fingerprint',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'res_create_date',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'res_create_user',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'res_comment',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'res_evidence_desc',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'res_parent_storage_id',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'res_unserv_date',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'res_update_user',
+                    		type: 'string'
+                    	},
+                    	{
+                    		value: 'checked_to_milis',
+                    		type: 'string'
+                    	}                 	
+                    ],
                 ];         
+            	var n=2;
+                for(i in header_obj.impairments){
+                	var rec = header_obj.impairments[i];
+                	var row = [
+                		{
+                			value: rec['storage_id'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['create_date'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['create_user'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['delete_date'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['delete_user'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['isID'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['targetID'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['targetItemID'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['actType'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['DSTRCT_CODE'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['WHOUSE_ID'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['SUPPLY_CUST_ID'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['BIN_CODE'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['STOCK_CODE'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['ITEM_NAME'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['SC_ACCOUNT_TYPE'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['TRACKING_IND'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['SOH'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['TRACKING_REFERENCE'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['STK_DESC'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['INVENT_CAT'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['INVENT_CAT_DESC'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['serviceableFlag'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['last_mod_date'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['SUPPLY_ACCT_METH'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['data_source'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['isBackup'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['ExtractDate'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['sample_flag'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['finalResult'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['finalResultPath'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['findingID'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['fingerprint'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['res_create_date'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['res_create_user'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['res_comment'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['res_evidence_desc'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['res_parent_storage_id'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['res_unserv_date'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['res_update_user'],
+                			type: 'string'
+                		},
+                		{
+                			value: rec['checked_to_milis'],
+                			type: 'string'
+                		}
+                	];
+
+                	data[++n]=row;
+                }
+                
                 const config = {
                 	filename: file_name, 
                 	sheet: {data}
