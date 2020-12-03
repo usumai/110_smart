@@ -162,16 +162,16 @@
                             </div>
                             <div class="form-group"><label>Latitude</label>
                                 <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
-                                column_name='res_latitude' 
-                                :bound_value='assd.res_latitude'
+                                column_name='res_loc_latitude' 
+                                :bound_value='assd.res_loc_latitude'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
                                 maxlen='255'
                                 ></textinput>
                             </div>
                             <div class="form-group"><label>Longitude</label>
                                 <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
-                                column_name='res_longitude' 
-                                :bound_value='assd.res_longitude'
+                                column_name='res_loc_longitude' 
+                                :bound_value='assd.res_loc_longitude'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
                                 maxlen='255'
                                 ></textinput>

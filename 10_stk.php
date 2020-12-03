@@ -35,7 +35,7 @@
                     <td>
                         <a :href="'11_ass.php?ass_id='+ass.ass_id" 
                         class='btn btn-outline-dark'
-                        :class="{'btn-danger':ass.ass_status!=1}"
+                        :style="{'background-color':ass.ass_status!=1?'#ffb3b3':''}"
                         ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
                     </td>
                     <td nowrap>{{ ass.res_asset_id }}<br>c{{ ass.res_class }}</td>
@@ -45,16 +45,19 @@
                     <td class="text-right">{{ ass.res_val_nbv }}</td>
                     <td>{{ ass.res_plateno }}</td>
                     <td>
-                        {{ ass.ass_status }}
+                        <!-- {{ ass.ass_status }} -->
                         <span v-if="ass.ass_status==1">FIN~</span>
                         <span v-if="ass.ass_status!=1">NYC~</span>
                         <br>{{ ass.res_reason_code }}
                     </td>
-                    <td>{{ ass.res_create_date }}</td>
+                    <td>
+                        <span v-if="ass.res_create_date!='0000-00-00 00:00:00'">{{ ass.res_create_date }}</span>
+                    
+                    </td>
                     <td>
                         <a :href="'11_ass.php?ass_id='+ass.ass_id" 
                         class='btn btn-outline-dark float-right'
-                        :class="{'btn-danger':ass.ass_status!=1}"
+                        :style="{'background-color':ass.ass_status!=1?'#ffb3b3':''}"
                         ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
                     </td>
                 </tr>

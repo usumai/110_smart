@@ -357,7 +357,7 @@ $(function(){
 				<div class="modal-body">  
 					<p class="lead">Please select a stocktake to initiate this template into</p>
 					<select name='stkm_id' class='form-control' v-if='actvd'>
-						<option v-for='(activity, index) in actvd' :value="activity.stkm_id">{{activity.stk_id}}. {{activity.stk_name}}</option>
+						<option v-for='(activity, index) in actvd' :value="activity.stkm_id">{{activity.stk_id }}. {{activity.stk_name}}</option>
 					</select>
 				</div>
 				<div class="modal-footer">
@@ -696,8 +696,10 @@ let vm_menu = new Vue({
 		}, 
 		init_template(template){
             payload     = {'act':'get_activities'}
-            this.actvd	= fnapi(payload)
-			console.log(this.actvd)
+            json		= fnapi(payload)
+            this.actvd	= json["result"]
+            // console.log("actvd")
+			// console.log(this.actvd)
 			this.template_ass_id = template.ass_id
 			$('#modal_initiate_template').modal('show')
 		}, 
