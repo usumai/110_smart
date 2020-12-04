@@ -148,11 +148,42 @@ if ($act=="create_ga_stocktake") {
 }elseif ($act=="save_activity_toggle_delete") {
 	$stkm_id        = $_POST["stkm_id"];
     $delete_status  = $_POST["delete_status"];
-    $delete_status  = $delete_status==1 ? " smm_delete_date=NOW() " :  " smm_delete_date=NULL ";
+    $delete_status  = $delete_status==1 ? " smm_delete_date=NOW(), stk_include=0 " :  " smm_delete_date=NULL ";
     $sql            = " UPDATE smartdb.sm13_stk SET $delete_status WHERE stkm_id = $stkm_id ";
     echo mysqli_multi_query($con,$sql);
 }elseif ($act=="get_stk_assets") {
-    $sql = "    SELECT ass_id, res_create_date, res_asset_id, res_class, res_loc_location, res_loc_room, res_assetdesc1, res_assetdesc2, res_inventno, res_serialno, res_plateno, res_val_nbv, res_reason_code, CASE WHEN res_reason_code<>'' THEN 1 ELSE 0 END AS ass_status FROM smartdb.sm14_ass WHERE stk_include=1 AND delete_date IS NULL AND genesis_cat <> 'ga_template'";
+    $sql = "
+    SELECT 
+    	ass.ass_id, 
+    	ass.res_create_date, 
+    	ass.res_asset_id, 
+    	ass.res_class, 
+    	ass.res_loc_location, 
+    	ass.res_loc_room, 
+    	ass.res_assetdesc1, 
+    	ass.res_assetdesc2,
+    	ass.res_inventno, 
+    	ass.res_serialno, 
+    	ass.res_plateno, 
+    	ass.res_val_nbv, 
+    	ass.res_reason_code, 
+    	(
+    		CASE WHEN ass.res_reason_code<>'' 
+    			THEN 1 
+    			ELSE 0 
+    		END
+    	) AS ass_status    	 
+    FROM 
+    	smartdb.sm14_ass ass 
+    	INNER JOIN
+    	smartdb.sm13_stk act
+    	ON ass.stkm_id=act.stkm_id   	
+    WHERE 
+    	act.stk_include=1 
+    	AND ((act.smm_delete_date IS NULL) OR (date(act.smm_delete_date)='0000-00-00')) 
+    	AND (ass.genesis_cat <> 'ga_template')";
+    
+    
     echo json_encode(qget($sql));
     
 }elseif ($act=="get_stk_assets_to_export") {
