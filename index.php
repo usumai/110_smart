@@ -580,7 +580,7 @@ let vm = new Vue({
                 	var rec = header_obj.impairments[i];
                 	var row = [
                 		{
-                			value: rec.storageID,
+                			value: (rec.data_source!='extra' ? rec.storageID : rec.res_parent_storageID),
                 			type: 'string'
                 		},
                 		{
@@ -704,7 +704,7 @@ let vm = new Vue({
                 			type: 'string'
                 		},
                 		{
-                			value: rec.findingID,
+                			value: rec.resAbbr,
                 			type: 'string'
                 		},
                 		{

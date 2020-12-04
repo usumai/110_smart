@@ -72,15 +72,15 @@
                             <a  class='btn btn-primary' v-if="rec.isType=='b2r'"
                                 :href="'17_b2r.php?stkm_id='+rec.stkm_id+'&BIN_CODE='+rec.BIN_CODE" ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
                         </td>
-                        <td>{{ rec.DSTRCT_CODE }}-{{ rec.WHOUSE_ID }}</td>
-                        <td>{{ rec.SUPPLY_CUST_ID }}</td>
-                        <td>{{ rec.BIN_CODE }}</td>
-                        <td>{{ rec.STOCK_CODE }}</td>
-                        <td>{{ rec.ITEM_NAME }}</td>
-                        <td>{{ rec.INVENT_CAT }}</td>
-                        <td>{{ rec.SOH }}</td>
-                        <td>{{ rec.TRACKING_IND }}</td>
-                        <td>{{ rec.TRACKING_REFERENCE }}</td>
+                        <td>{{rec.DSTRCT_CODE}}-{{rec.WHOUSE_ID}}</td>
+                        <td>{{rec.SUPPLY_CUST_ID}}</td>
+                        <td>{{rec.BIN_CODE}}</td>
+                        <td>{{rec.STOCK_CODE}}</td>
+                        <td>{{rec.ITEM_NAME}}</td>
+                        <td>{{rec.INVENT_CAT}}</td>
+                        <td>{{rec.isType != 'b2r'?rec.SOH:''}}</td>
+                        <td>{{rec.TRACKING_IND}}</td>
+                        <td>{{rec.TRACKING_REFERENCE}}</td>
                         <td>
                             <h4 v-if="rec.isType=='b2r'"><span class='badge badge-dark' style="color:#f7fcb9">{{ rec.isType }}</span></h4>
                             <h4 v-if="rec.isType=='impq'"><span class='badge badge-dark' style="color:#9ebcda">{{ rec.isType }}</span></h4>
