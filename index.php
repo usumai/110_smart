@@ -580,167 +580,167 @@ let vm = new Vue({
                 	var rec = header_obj.impairments[i];
                 	var row = [
                 		{
-                			value: rec['storage_id'],
+                			value: rec.storageID,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['create_date'],
+                			value: rec.create_date,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['create_user'],
+                			value: rec.create_user,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['delete_date'],
+                			value: rec.delete_date,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['delete_user'],
+                			value: rec.delete_user,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['isID'],
+                			value: rec.isID,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['targetID'],
+                			value: rec.targetID,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['targetItemID'],
+                			value: rec.targetItemID,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['actType'],
+                			value: rec.isType,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['DSTRCT_CODE'],
+                			value: rec.DSTRCT_CODE,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['WHOUSE_ID'],
+                			value: rec.WHOUSE_ID,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['SUPPLY_CUST_ID'],
+                			value: rec.SUPPLY_CUST_ID,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['BIN_CODE'],
+                			value: rec.BIN_CODE,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['STOCK_CODE'],
+                			value: rec.STOCK_CODE,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['ITEM_NAME'],
+                			value: rec.ITEM_NAME,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['SC_ACCOUNT_TYPE'],
+                			value: rec.SC_ACCOUNT_TYPE,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['TRACKING_IND'],
+                			value: rec.TRACKING_IND,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['SOH'],
+                			value: rec.SOH,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['TRACKING_REFERENCE'],
+                			value: rec.TRACKING_REFERENCE,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['STK_DESC'],
+                			value: rec.STK_DESC,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['INVENT_CAT'],
+                			value: rec.INVENT_CAT,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['INVENT_CAT_DESC'],
+                			value: rec.INVENT_CAT_DESC,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['serviceableFlag'],
+                			value: rec.serviceableFlag,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['last_mod_date'],
+                			value: rec.last_mod_date,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['SUPPLY_ACCT_METH'],
+                			value: rec.SUPPLY_ACCT_METH,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['data_source'],
+                			value: rec.data_source,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['isBackup'],
+                			value: rec.isBackup,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['ExtractDate'],
+                			value: rec.ExtractDate,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['sample_flag'],
+                			value: rec.sample_flag,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['finalResult'],
+                			value: rec.finalResult,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['finalResultPath'],
+                			value: rec.finalResultPath,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['findingID'],
+                			value: rec.findingID,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['fingerprint'],
+                			value: rec.fingerprint,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['res_create_date'],
+                			value: rec.res_create_date,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['res_create_user'],
+                			value: rec.res_create_user,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['res_comment'],
+                			value: rec.res_comment,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['res_evidence_desc'],
+                			value: rec.res_evidence_desc,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['res_parent_storage_id'],
+                			value: rec.res_parent_storageID,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['res_unserv_date'],
+                			value: rec.res_unserv_date,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['res_update_user'],
+                			value: rec.res_update_user,
                 			type: 'string'
                 		},
                 		{
-                			value: rec['checked_to_milis'],
+                			value: rec.checked_to_milis,
                 			type: 'string'
                 		}
                 	];
