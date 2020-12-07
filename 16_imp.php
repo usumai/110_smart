@@ -154,7 +154,7 @@ $(document).ready(function() {
     
     $('#splityResult').val('');
     $("#splityDate").val('');
-    $("#splityMilis").prop('checked',false);
+
     
     //Initialise the page
     setPage()
@@ -217,7 +217,7 @@ $(document).ready(function() {
 
             //Check if splity values all add up sufficient to submit.
             if(fID==11){
-
+                $('#btnSubmit').show();
 
                 let splityRows      = "";
                 let totalSplitySOH  = 0;
@@ -235,33 +235,37 @@ $(document).ready(function() {
                     	$('#comment_warn_msg').show();
                     }
                     
+                    if((arS['rl'][splityResult-1]['reqComment']==1) && (res_comment.length<=5)){
+                        $('#btnSubmit').hide();
+                    }
                     
                     let btnRemoveSplity = "<button type='button' class='btn btn-outline-dark btnRemoveSplity' value='"+key+"'><i class='fas fa-minus'></i></button>"
 
 
                     if(!splityDate){
-                        splityDate = ''
+                        splityDate = '';
                     }
                     
-                    splityRows += "<tr class='splityRow'><td>"+splityCount+"</td><td>"+arS['rl'][splityResult-1]['findingName']+"</td><td>"+splityDate+"</td><td>"+(splityMilis==1?"X":"")+"</td><td>"+btnRemoveSplity+"</td></tr>"
+                    var milisHtml="";
+                    if(milisEnabled.findIndex((value)=>(value==splityResult))>=0){
+                    	milisHtml="<input type='checkbox' class='form-control splity' id='milis_checkbox_"+key+"' onChange='onSplityMilisChanged("+key+");' "+(splityMilis==1?'checked':'')+">";      
+                    }
+                    splityRows += "<tr class='splityRow'><td>"+splityCount+"</td><td>"+arS['rl'][splityResult-1]['findingName']+"</td><td>"+splityDate+"</td><td>"+milisHtml+"</td><td>"+btnRemoveSplity+"</td></tr>"
 
                     splityHidden+="<input type='hidden' name='splityRecord[]' value='"+key+"'>"
                     splityHidden+="<input type='hidden' name='splityCount["+key+"]' value='"+splityCount+"'>"
                     splityHidden+="<input type='hidden' name='splityResult["+key+"]' value='"+splityResult+"'>"
                     splityHidden+="<input type='hidden' name='splityDate["+key+"]' value='"+splityDate+"'>"
-                    splityHidden+="<input type='hidden' name='splityMilis["+key+"]' value='"+splityMilis+"'>"
+                    splityHidden+="<input type='hidden' id='milis_input_"+key+"' name='splityMilis["+key+"]' value='"+splityMilis+"'>"
                     totalSplitySOH += Number(splityCount);
                 }
+                
                 $('#splityTable tr:last').before(splityRows)
                 $('#splityTotal').text(totalSplitySOH);
                 $('#splityLanding').html(splityHidden)
 
-                console.log('totalSplitySOH:'+totalSplitySOH);
-                console.log('SOH:'+arS[0]['SOH']);
                 if(totalSplitySOH < arS[0]['SOH']){
                     $('#btnSubmit').hide();
-                }else{
-                    $('#btnSubmit').show();
                 }
                 
             }
@@ -326,16 +330,16 @@ $(document).ready(function() {
         let splityCount     = $('#splityCount').val();
         let splityResult    = $('#splityResult').val();
         let splityDate      = $('#splityDate').val();
-        let splityMilis     = $('#splityMilis').prop('checked') ? 1 : 0;
+
         arS['splitys'][newMaxS] = {
             splityCount,
             splityResult,
             splityDate,
-            splityMilis
+            splityMilis: 0
         }
         setPage()
 
-		$('#splityMilis').prop('checked',false);
+
         $('#splityCount').val('');
         $('#splityResult').val('');
         $('#splityDate').val('');
@@ -378,40 +382,16 @@ $(document).ready(function() {
             	$("#splityDate").val('');
             	$("#splityDate").prop('disabled', true);
             }
-            if((milisEnabled.findIndex((v)=>(v==splityResult))>=0)){
-            	if(!splityMilis){
-            		$("#addSplity").prop('disabled', true);
-            	}
-            	$("#splityMilis").prop('disabled', false);
-            }else{
-            	$("#splityMilis").prop('checked', false);
-            	$("#splityMilis").prop('disabled', true);
-            }
+
         }
         
         
     }
+    
 
 
 
 
-
-//     function checkSplityAllGood(){
-//         $('#btnSubmit').show()
-
-//         if(splityTotal<SOH){
-//             $('#btnSubmit').hide();
-//         }
-//         if(isNaN(splityTotal)){
-//             $('#btnSubmit').hide();
-//             splityTotal = 0
-//         }
-//         let res_comment = $('#res_comment').val();
-//         if(resultOptions[resultSelection]['reqComment']&& res_comment.length<=5){
-//             $('#btnSubmit').hide();
-//         }
-//
-//     }
 
 
 
@@ -420,6 +400,14 @@ $(document).ready(function() {
 
 
 });
+
+function onSplityMilisChanged(key) {
+	var milisCheckbox = $('#milis_checkbox_'+key);
+	var milisHiddenInput = $('#milis_input_'+key);
+	var isChecked=milisCheckbox.prop('checked');
+	milisHiddenInput.val(isChecked ? 1 : 0);
+}
+
 </script>
 
 
@@ -547,7 +535,7 @@ $(document).ready(function() {
                             </select>
                         </td>
                         <td><input type='text' class='form-control datepicker splity' name='splityDate' id='splityDate' readonly></td>
-                        <td><input type='checkbox' class='form-control splity' name='splityMilis' id='splityMilis'></td>               
+                        <td></td>               
                         <td><button type='button' class='btn btn-outline-dark float-right' id='addSplity'><i class='fas fa-plus'></i></button></td>
                     </tr>
                     <tr><td id='splityTotal'></td><td>Total</td><td></td><td></td></tr>

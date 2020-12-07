@@ -428,8 +428,8 @@ function fnInitiateDatabase(){
     (6, 'Serial tracked - Item not sighted - Unserviceable - no date','imp','warning',0,0,1,'USND','Comments mandatory with this option. Only select this option if a date cannot be verified within MILIS. Ensure evidence has been provided to support this option.'),
     (7, 'Serial tracked - Item not found, no evidence provided','imp','danger',0,0,1,'NIC','Comments mandatory with this option. Ensure communication to EDLA and DLAP and site Point of Contact is aware of evidential requirements.'),
     (8, 'Quantity tracked - Sighted or found evidence of all items - All serviceable','imp','success',0,0,0,'SER','Also includes items currently in use.'),
-    (9, 'Quantity tracked - Sighted or found evidence of all items - None serviceable - with date','imp','success',1,0,0,'USWD','Comments and Date mandatory with this option. Date must be cross-checked with MILIS, the date refers to the date the item inventory category first changed to unserviceable.'),
-    (10, 'Quantity tracked - Sighted or found evidence of all items - None serviceable - no date','imp','success',0,0,0,'USND','Comments mandatory with this option. Only select this option if a date cannot be verified within MILIS. Ensure evidence has been provided to support this option.'),
+    (9, 'Quantity tracked - Sighted or found evidence of all items - None serviceable - with date','imp','success',1,0,1,'USWD','Comments and Date mandatory with this option. Date must be cross-checked with MILIS, the date refers to the date the item inventory category first changed to unserviceable.'),
+    (10, 'Quantity tracked - Sighted or found evidence of all items - None serviceable - no date','imp','success',0,0,1,'USND','Comments mandatory with this option. Only select this option if a date cannot be verified within MILIS. Ensure evidence has been provided to support this option.'),
 
     (11, 'Quantity tracked - Split category - One, some or all of the following:<br>+ Not all items were found<br>+ Items were in different categories<br>+ Found more than original quantity','imp','warning',0,1,1,'SPLT',''),
 
