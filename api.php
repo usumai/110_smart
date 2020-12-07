@@ -825,10 +825,21 @@ FROM
 	            				(data_source <> 'extra') AND 
 	            				((isBackup is NULL) OR (isBackup=0))           			
 	            		THEN (
-	            			CASE WHEN ((findingID=11) 
+	            			CASE WHEN (
+	            						(findingID=11) 
 	            						AND ((select sum(i.SOH) 
 	            							 from  smartdb.sm18_impairment i 
-	            							 where i.res_parent_storageID=b.storageID) < b.SOH))
+	            							 where i.res_parent_storageID=b.storageID) >= b.SOH)
+	            						AND (
+					    						(SELECT count(*) 
+					    						FROM smartdb.sm18_impairment i1 
+					    						WHERE 
+					    							i1.res_parent_storageID=b.storageID
+					    							AND i1.findingID in ($impMilisFindingIDs)
+					    							AND i1.checked_to_milis=0
+					    						) > 0
+	    								)	 
+	            				 )
 	            				 	THEN 0
 	            			     WHEN ((findingID in ($impMilisFindingIDs)) AND (checked_to_milis<>1))
 	            				 	THEN 0 
