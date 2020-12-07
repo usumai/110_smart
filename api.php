@@ -694,6 +694,9 @@ function getB2RBinRecord($stkm_id, $BIN_CODE) {
 }
 
 function getIsRecords (){
+	global $isImpAbbrsWithMilisEnabled;
+	$impMilisFindingIDs=getFindingIDsString("imp%",$isImpAbbrsWithMilisEnabled);
+
     $sqlInclude = "
     	SELECT stkm_id 
     	FROM smartdb.sm13_stk 
@@ -701,15 +704,34 @@ function getIsRecords (){
     		AND ((date(smm_delete_date) IS NULL) OR (date(smm_delete_date)='0000-00-00'))";
  
     $sqlimp  = "
-    	SELECT * 
-    	FROM smartdb.sm18_impairment  
+    	SELECT 
+    		i0.*, 
+    		(
+	    		CASE WHEN (
+	    				(i0.findingID=11) 
+	    				AND (
+	    						(   
+	    						SELECT count(*) 
+	    						FROM smartdb.sm18_impairment i1 
+	    						WHERE 
+	    							i1.res_parent_storageID=i0.storageID
+	    							AND i1.findingID in ($impMilisFindingIDs)
+	    							AND i1.checked_to_milis=0
+	    						) = 0
+	    				)
+	    			)
+	    			THEN 1
+	    			ELSE 0
+	    		END	    		
+    		) AS isComplete 
+    	FROM smartdb.sm18_impairment i0 
     	WHERE stkm_id IN ($sqlInclude ) 
-    		AND ( LEFT(isType,3) = 'imp') 
-    		AND ((isBackup IS NULL) OR (isBackup=0))
-  			AND (data_source <> 'extra')";
+    		AND ( LEFT(i0.isType,3) = 'imp') 
+    		AND ((i0.isBackup IS NULL) OR (i0.isBackup=0))
+  			AND (i0.data_source <> 'extra')";
     		
     $sqlb2r  = "
-    	SELECT * 
+    	SELECT *, 1 AS isComplete 
     	FROM smartdb.sm18_impairment
     	WHERE stkm_id IN ($sqlInclude ) 
     		AND (isType = 'b2r') 

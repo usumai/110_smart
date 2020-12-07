@@ -49,7 +49,7 @@
                         <th>Cat</th>
                         <th>SOH</th>
                         <th>Tracking</th>
-                        <th>Reference <br/> No.</th>
+                        <th>Reference <br/>No.</th>
                         <th>Type
                         	<div class="dropdown"  style="display: inline">
                                   <a class="btn-outline" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -221,7 +221,9 @@ let vm = new Vue({
             	if((rec.isType=='b2r') && (rec.data_source=='skeleton') 
                 	&& (rec.findingID==15)){
                 	return 'warning';
-                }else if((this.milisEnabled.findIndex(v=>{return v==rec.findingID;}) >= 0) && (rec.checked_to_milis==0)){
+            	} else if((rec.findingID==11) && (rec.isComplete != 1)){
+            		return 'warning';
+                } else if((this.milisEnabled.findIndex(v=>{return v==rec.findingID;}) >= 0) && (rec.checked_to_milis==0)){
                     return 'warning';
                 } else if(rec.findingID==13){
                     return 'warning';                     
@@ -238,6 +240,8 @@ let vm = new Vue({
                 if((rec.isType=='b2r') && (rec.data_source=='skeleton') 
                 	&& (rec.findingID==15)){
         			return 'NYC'; 
+            	} else if((rec.findingID==11) && (rec.isComplete != 1)){
+            		return 'NYC';	
         		} else if((this.milisEnabled.findIndex(v=>{return v==rec.findingID;}) >= 0) 
                     && (rec.checked_to_milis==0)){
                     return 'NYC'; 
