@@ -15,17 +15,18 @@ $sqlInclude = "
 
 $rws = '';
 $sql = "
-	SELECT 
+	SELECT 			
 		isType, 
 		targetID, 
 		stkm_id, 
 		DSTRCT_CODE, 
 		WHOUSE_ID, 
 		SUPPLY_CUST_ID, 
+		BIN_CODE,	
 		STOCK_CODE, 
-		ITEM_NAME, 
+		ITEM_NAME,  
 		isBackup, 
-		COUNT(*) AS targetItemCount 
+		COUNT(*) AS targetItemCount 		
 	FROM smartdb.sm18_impairment 
 	WHERE 
 		stkm_id IN ($sqlInclude) AND 
@@ -38,22 +39,25 @@ $sql = "
 		DSTRCT_CODE, 
 		WHOUSE_ID, 
 		SUPPLY_CUST_ID, 
+		BIN_CODE, 
 		STOCK_CODE, 
 		ITEM_NAME, 
 		isBackup"; 
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {   
-        $isType             = $row['isType'];
-        $targetID           = $row['targetID']; 
         $stkm_id            = $row['stkm_id'];    
         $DSTRCT_CODE        = $row['DSTRCT_CODE'];
         $WHOUSE_ID          = $row['WHOUSE_ID'];
         $SUPPLY_CUST_ID     = $row['SUPPLY_CUST_ID'];
-        $STOCK_CODE         = $row['STOCK_CODE'];
-        $ITEM_NAME          = $row['ITEM_NAME'];
+        $BIN_CODE           = $row['BIN_CODE'];
+        $isType             = $row['isType'];
+        $targetID           = $row['targetID'];
         $targetItemCount    = $row['targetItemCount'];
         $isBackup           = $row['isBackup'];
+        $STOCK_CODE         = $row['STOCK_CODE'];
+        $ITEM_NAME          = $row['ITEM_NAME'];
+        $BIN_CODE_code = str_replace("&","%26",$BIN_CODE);
 
         $btnBackup = "<a href='05_action.php?act=save_toggle_imp_backup&stkm_id=$stkm_id&targetID=$targetID&STOCK_CODE=$STOCK_CODE&isType=$isType&isBackup=1' class='btn btn-outline-dark'>Primary</a>";
         if($isBackup==1){
@@ -61,9 +65,10 @@ if ($result->num_rows > 0) {
         }
         
         $btnType = "<span class='badge badge-info'>IMP</span>";
-        
-        $rws.="<tr><td>$btnType</td><td>$targetID</td><td>$DSTRCT_CODE</td><td>$WHOUSE_ID</td><td>$SUPPLY_CUST_ID</td><td></td><td>$STOCK_CODE</td><td>$ITEM_NAME</td><td>$targetItemCount</td><td class='float-right'>$btnBackup</td></tr>";
-}}
+	    $rws.="<tr><td>$btnType</td><td>$targetID</td><td>$DSTRCT_CODE</td><td>$WHOUSE_ID</td><td>$SUPPLY_CUST_ID</td><td>$BIN_CODE</td><td>$STOCK_CODE</td><td>$ITEM_NAME</td><td>$targetItemCount</td><td class='float-right'>$btnBackup</td></tr>";
+	
+	}
+}
 
 
 $sql = "
@@ -120,7 +125,8 @@ if ($result->num_rows > 0) {
         $btnType = "<span class='badge badge-primary'>B2R</span>";
         
         $rws.="<tr><td>$btnType</td><td>$targetID</td><td>$DSTRCT_CODE</td><td>$WHOUSE_ID</td><td>$SUPPLY_CUST_ID</td><td>$BIN_CODE</td><td>$STOCK_CODE</td><td>$ITEM_NAME</td><td>$targetItemCount</td><td class='float-right'>$btnBackup</td></tr>";
-}}
+	}
+}
 
 $impMilisFindingIDs = getFindingIDsString("imp%",  $isImpAbbrsWithMilisEnabled);
 $impCompletedFindingIDs = getFindingIDsString("imp%", $isImpAbbrsCompletedStatus);	
