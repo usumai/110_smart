@@ -193,8 +193,12 @@ if ($act=="create_ga_stocktake") {
     
 }elseif ($act=="export_is") {
 	$stkm_id = $_POST["stkm_id"];
-	$activity= exportISActivity($stkm_id);
-    echo json_encode($activity);	   
+	$activity= exportIsActivity($stkm_id);
+    echo json_encode($activity);	
+}elseif ($act=="export_ga") {
+    $stkm_id    = $_POST["stkm_id"];  
+ 	$activity= exportGaActivity($stkm_id);
+    echo json_encode($activity);       
 }elseif ($act=="get_stk_progress") {
     $sql = "    SELECT COUNT(*) as count_total, SUM(CASE WHEN res_reason_code<>'' THEN 1 ELSE 0 END) AS count_complete   FROM smartdb.sm14_ass WHERE stk_include = 1 AND delete_date IS NULL AND genesis_cat <> 'template'";
     echo json_encode(qget($sql));
@@ -433,13 +437,6 @@ if ($act=="create_ga_stocktake") {
     }
     echo json_encode($filearr);
     
-}elseif ($act=="get_stk_assets_export") {
-    $stkm_id    = $_POST["stkm_id"];  
-    $sql        = " SELECT ass_id, stkm_id, 0 AS stk_include, rr_id, ledger_id, create_date, create_user, delete_date, sto_asset_id, sto_assetdesc1,  sto_assetdesc2, sto_assettext, sto_class, sto_class_ga_cat, sto_loc_location, sto_loc_room, sto_loc_state, sto_quantity,sto_val_nbv,sto_val_acq,sto_val_orig,sto_val_scrap,sto_valuation_method,sto_ccc,sto_ccc_name,sto_ccc_parent,sto_ccc_parent_name,sto_wbs,sto_fund,sto_responsible_ccc,sto_mfr,sto_inventory,sto_inventno,sto_serialno,sto_site_no,sto_grpcustod,sto_plateno,sto_revodep,sto_date_lastinv,sto_date_cap,sto_date_pl_ret,sto_date_deact,sto_loc_latitude,sto_loc_longitude,genesis_cat,res_create_date,res_create_user,res_fingerprint,res_reason_code,res_rc_desc,res_comment,res_asset_id,res_assetdesc1,res_assetdesc2,res_assettext,res_class,res_class_ga_cat,res_loc_location,res_loc_room,res_loc_state,res_quantity,res_val_nbv,res_val_acq,res_val_orig,res_val_scrap,res_valuation_method,res_ccc,res_ccc_name,res_ccc_parent,res_ccc_parent_name,res_wbs,res_fund,res_responsible_ccc,res_mfr,res_inventory,res_inventno,res_serialno,res_site_no,res_grpcustod,res_plateno,res_revodep,res_date_lastinv,res_date_cap,res_date_pl_ret,res_date_deact,res_loc_latitude,res_loc_longitude
-    FROM smartdb.sm14_ass WHERE stkm_id = $stkm_id ";
-    // echo $sql;
-    echo json_encode(qget($sql));
-
 }elseif ($act=='save_create_template') {
     $ass_id        = $_POST["ass_id"];
 

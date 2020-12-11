@@ -458,3 +458,564 @@ function apiRequestParallel(apiName, records, params, chunkSize, progressMessage
 
 	}
 }
+
+const XSLX_ACTIVITY_COL_HEADER = [
+	{
+        value: 'type',
+        type: 'string'
+    },{
+        value: 'file_version',
+        type: 'string'
+    },{
+    	value: 'stk_name',
+    	type: 'string'
+    },{
+    	value: 'dpn_extract_date',
+    	type: 'string'
+    },{
+    	value: 'dpn_extract_user',
+    	type: 'string'
+    },{
+    	value: 'smm_extract_date',
+    	type: 'string'
+    },{
+    	value: 'smm_extract_user',
+    	type: 'string'
+    },{
+    	value: 'unique_file_id',
+    	type: 'string'
+    }
+];
+
+const XSLX_GA_ASSET_COL_HEADER = [ 
+	{
+		value: 'ass_id',
+		type: 'string'
+	},
+	{
+		value: 'stkm_id',
+		type: 'string'
+	},
+	{
+		value: 'stk_include',
+		type: 'string'
+	},
+	{
+		value: 'rr_id',
+		type: 'string'
+	},
+	{
+		value: 'ledger_id',
+		type: 'string'
+	},
+	{
+		value: 'create_date',
+		type: 'string'
+	},
+	{
+		value: 'create_user',
+		type: 'string'
+	},
+	{
+		value: 'delete_date',
+		type: 'string'
+	},
+	{
+		value: 'sto_asset_id',
+		type: 'string'
+	},
+	{
+		value: 'sto_assetdesc1',
+		type: 'string'
+	},
+	{
+		value: 'sto_assetdesc2',
+		type: 'string'
+	},
+	{
+		value: 'sto_assettext',
+		type: 'string'
+	},
+	{
+		value: 'sto_class',
+		type: 'string'
+	},
+	{
+		value: 'sto_class_ga_cat',
+		type: 'string'
+	},
+	{
+		value: 'sto_loc_location',
+		type: 'string'
+	},
+	{
+		value: 'sto_loc_room',
+		type: 'string'
+	},
+	{
+		value: 'sto_loc_state',
+		type: 'string'
+	},
+	{
+		value: 'sto_quantity',
+		type: 'string'
+	},
+	{
+		value: 'sto_val_nbv',
+		type: 'string'
+	},
+	{
+		value: 'sto_val_acq',
+		type: 'string'
+	},
+	{
+		value: 'sto_val_orig',
+		type: 'string'
+	},
+	{
+		value: 'sto_val_scrap',
+		type: 'string'
+	},
+	{
+		value: 'sto_valuation_method',
+		type: 'string'
+	},
+	{
+		value: 'sto_ccc',
+		type: 'string'
+	},
+	{
+		value: 'sto_ccc_name',
+		type: 'string'
+	},
+	{
+		value: 'sto_ccc_parent',
+		type: 'string'
+	},
+	{
+		value: 'sto_ccc_parent_name',
+		type: 'string'
+	},
+	{
+		value: 'sto_wbs',
+		type: 'string'
+	},
+	{
+		value: 'sto_fund',
+		type: 'string'
+	},
+	{
+		value: 'sto_responsible_ccc',
+		type: 'string'
+	},
+	{
+		value: 'sto_mfr',
+		type: 'string'
+	},
+	{
+		value: 'sto_inventory',
+		type: 'string'
+	},
+	{
+		value: 'sto_inventno',
+		type: 'string'
+	},
+	{
+		value: 'sto_serialno',
+		type: 'string'
+	},
+	{
+		value: 'sto_site_no',
+		type: 'string'
+	},
+	{
+		value: 'sto_grpcustod',
+		type: 'string'
+	},
+	{
+		value: 'sto_plateno',
+		type: 'string'
+	},
+	{
+		value: 'sto_revodep',
+		type: 'string'
+	},
+	{
+		value: 'sto_date_lastinv',
+		type: 'string'
+	},
+	{
+		value: 'sto_date_cap',
+		type: 'string'
+	},
+	{
+		value: 'sto_date_pl_ret',
+		type: 'string'
+	},
+	{
+		value: 'sto_date_deact',
+		type: 'string'
+	},
+	{
+		value: 'sto_loc_latitude',
+		type: 'string'
+	},
+	{
+		value: 'sto_loc_longitude',
+		type: 'string'
+	},
+	{
+		value: 'genesis_cat',
+		type: 'string'
+	},
+	{
+		value: 'res_create_date',
+		type: 'string'
+	},
+	{
+		value: 'res_create_user',
+		type: 'string'
+	},
+	{
+		value: 'res_fingerprint',
+		type: 'string'
+	},
+	{
+		value: 'res_reason_code',
+		type: 'string'
+	},
+	{
+		value: 'res_rc_desc',
+		type: 'string'
+	},
+	{
+		value: 'res_comment',
+		type: 'string'
+	},
+	{
+		value: 'res_asset_id',
+		type: 'string'
+	},
+	{
+		value: 'res_assetdesc1',
+		type: 'string'
+	},
+	{
+		value: 'res_assetdesc2',
+		type: 'string'
+	},
+	{
+		value: 'res_assettext',
+		type: 'string'
+	},
+	{
+		value: 'res_class',
+		type: 'string'
+	},
+	{
+		value: 'res_class_ga_cat',
+		type: 'string'
+	},
+	{
+		value: 'res_loc_location',
+		type: 'string'
+	},
+	{
+		value: 'res_loc_room',
+		type: 'string'
+	},
+	{
+		value: 'res_loc_state',
+		type: 'string'
+	},
+	{
+		value: 'res_quantity',
+		type: 'string'
+	},
+	{
+		value: 'res_val_nbv',
+		type: 'string'
+	},
+	{
+		value: 'res_val_acq',
+		type: 'string'
+	},
+	{
+		value: 'res_val_orig',
+		type: 'string'
+	},
+	{
+		value: 'res_val_scrap',
+		type: 'string'
+	},
+	{
+		value: 'res_valuation_method',
+		type: 'string'
+	},
+	{
+		value: 'res_ccc',
+		type: 'string'
+	},
+	{
+		value: 'res_ccc_name',
+		type: 'string'
+	},
+	{
+		value: 'res_ccc_parent',
+		type: 'string'
+	},
+	{
+		value: 'res_ccc_parent_name',
+		type: 'string'
+	},
+	{
+		value: 'res_wbs',
+		type: 'string'
+	},
+	{
+		value: 'res_fund',
+		type: 'string'
+	},
+	{
+		value: 'res_responsible_ccc',
+		type: 'string'
+	},
+	{
+		value: 'res_mfr',
+		type: 'string'
+	},
+	{
+		value: 'res_inventory',
+		type: 'string'
+	},
+	{
+		value: 'res_inventno',
+		type: 'string'
+	},
+	{
+		value: 'res_serialno',
+		type: 'string'
+	},
+	{
+		value: 'res_site_no',
+		type: 'string'
+	},
+	{
+		value: 'res_grpcustod',
+		type: 'string'
+	},
+	{
+		value: 'res_plateno',
+		type: 'string'
+	},
+	{
+		value: 'res_revodep',
+		type: 'string'
+	},
+	{
+		value: 'res_date_lastinv',
+		type: 'string'
+	},
+	{
+		value: 'res_date_cap',
+		type: 'string'
+	},
+	{
+		value: 'res_date_pl_ret',
+		type: 'string'
+	},
+	{
+		value: 'res_date_deact',
+		type: 'string'
+	},
+	{
+		value: 'res_loc_latitude',
+		type: 'string'
+	},
+	{
+		value: 'res_loc_longitude',
+		type: 'string'
+	}
+];
+
+const XSLX_IS_IMPAIRMENT_COL_HEADER = [
+	{
+		value: 'storage_id',
+		type: 'string'
+	},
+	{
+		value: 'res_parent_storage_id',
+		type: 'string'
+	},	
+	{
+		value: 'actType',
+		type: 'string'
+	},		
+	{
+		value: 'targetID',
+		type: 'string'
+	},
+	{
+		value: 'DSTRCT_CODE',
+		type: 'string'
+	},
+	{
+		value: 'WHOUSE_ID',
+		type: 'string'
+	},	
+	{
+		value: 'BIN_CODE',
+		type: 'string'
+	},
+	{
+		value: 'STOCK_CODE',
+		type: 'string'
+	},
+	{
+		value: 'TRACKING_REFERENCE',
+		type: 'string'
+	},	
+	{
+		value: 'ITEM_NAME',
+		type: 'string'
+	},	
+	{
+		value: 'data_source',
+		type: 'string'
+	},
+	{
+		value: 'SOH',
+		type: 'string'
+	},	
+	{
+		value: 'findingID',
+		type: 'string'
+	},
+	{
+		value: 'finalResult',
+		type: 'string'
+	},
+	{
+		value: 'finalResultPath',
+		type: 'string'
+	},	
+	{
+		value: 'res_comment',
+		type: 'string'
+	},
+	{
+		value: 'res_evidence_desc',
+		type: 'string'
+	},
+	{
+		value: 'res_unserv_date',
+		type: 'string'
+	},
+	{
+		value: 'checked_to_milis',
+		type: 'string'
+	}, 		
+	{
+		value: 'isID',
+		type: 'string'
+	},
+	{
+		value: 'targetItemID',
+		type: 'string'
+	},
+	{
+		value: 'SUPPLY_CUST_ID',
+		type: 'string'
+	},
+
+	{
+		value: 'SC_ACCOUNT_TYPE',
+		type: 'string'
+	},
+	{
+		value: 'TRACKING_IND',
+		type: 'string'
+	},
+	{
+		value: 'STK_DESC',
+		type: 'string'
+	},
+	{
+		value: 'INVENT_CAT',
+		type: 'string'
+	},
+	{
+		value: 'INVENT_CAT_DESC',
+		type: 'string'
+	},
+
+	{
+		value: 'SUPPLY_ACCT_METH',
+		type: 'string'
+	},
+
+	{
+		value: 'isBackup',
+		type: 'string'
+	},
+	{
+		value: 'serviceableFlag',
+		type: 'string'
+	},	
+	{
+		value: 'sample_flag',
+		type: 'string'
+	},
+	{
+		value: 'ExtractDate',
+		type: 'string'
+	},	
+	{
+		value: 'last_mod_date',
+		type: 'string'
+	},	
+	{
+		value: 'res_update_user',
+		type: 'string'
+	},		    
+	{
+		value: 'res_create_date',
+		type: 'string'
+	},
+	{
+		value: 'res_create_user',
+		type: 'string'
+	},	     
+	{
+		value: 'create_date',
+		type: 'string'
+	},
+	{
+		value: 'create_user',
+		type: 'string'
+	},
+	{
+		value: 'delete_date',
+		type: 'string'
+	},
+	{
+		value: 'delete_user',
+		type: 'string'
+	},
+	{
+		value: 'fingerprint',
+		type: 'string'
+	}		
+];
+
+function createExcelRow(headers, rec){
+	var row=[];
+	
+	var i=0;
+	headers.forEach(
+		(col, index)=>{
+			row[i++]={value: rec[col.value], type: col.type};
+		}
+	);
+	return row;
+}
