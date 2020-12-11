@@ -347,12 +347,12 @@ let vm = new Vue({
 	                    	value:  header_obj['unique_file_id'] ,
 	                    	type: 'string'
 	                    }
-                    ]
-
+                    ],
+                    []
                 ];
-                n=2;
-                data[++n]=[];
+                n=3;
                 if(actv.stk_type=="ga_stk"){
+                    
                 	data[++n]=XSLX_GA_ASSET_COL_HEADER;  
                 	data[++n]=[];                
 	                for(i in header_obj.assetlist){
@@ -360,7 +360,7 @@ let vm = new Vue({
 	                	data[++n]= createExcelRow(XSLX_GA_ASSET_COL_HEADER, rec);
 	                }   	
                 }else if(actv.stk_type=="is_audit"){
-                    //Add column headers.
+
                 	data[++n]=XSLX_IS_IMPAIRMENT_COL_HEADER;  
                 	data[++n]=[];   	
 	                for(i in header_obj.impairments) {
