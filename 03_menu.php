@@ -635,7 +635,7 @@ let vm_menu = new Vue({
 							this.setCurrentUserProfile(profiles[idx], idx);
 						}
 					}
-					this.userProfiles=result;
+					this.userProfiles=profiles;
 				}, 
 				errors=>{
 					
