@@ -102,6 +102,11 @@ if ($act=="create_ga_stocktake") {
         
         echo json_encode(new ResponseMessage("OK",$result));
     });
+}elseif($act=="update_software") {
+    execWithErrorHandler(function() { 
+        $result = updateSoftware();
+        echo json_encode(new ResponseMessage("OK",$result));
+    });         
 }elseif($act=="get_is_impairments") {
     execWithErrorHandler(function() { 
         $result = getIsImpairments();
@@ -264,11 +269,10 @@ if ($act=="create_ga_stocktake") {
 }elseif ($act=='get_b2r_skeleton') {
     echo json_encode(getB2RBinRecord($_POST["stkm_id"],$_POST["BIN_CODE"]));
 }elseif ($act=='get_b2r_bin') {
+
     $auto_storageID    = $_POST["auto_storageID"];
     $sql        = " SELECT * FROM smartdb.sm18_impairment  WHERE auto_storageID = $auto_storageID";
     echo json_encode(qget($sql));
-
-
 }elseif ($act=='save_final_b2r_extra_result') {
     $auto_storageID     = $_POST["auto_storageID"];
     $finalResult        = $_POST["finalResult"];
@@ -855,5 +859,33 @@ FROM
     ) as asset
     ON act.stkm_id=asset.stkm_id;";
     echo json_encode(new ResponseMessage("OK", qget($sql)));
+}
+
+function updateSoftware() {
+   
+	$servername = "";
+	$username   = "root";
+	$password   = "";
+
+	$con = new mysqli($servername, $username, $password);
+	
+	// Check connection
+	if ($con->connect_error) {
+	    throw new Exception("Connection failed: " . $con->connect_error);
+	} 
+
+	
+	
+	$sql_save = "DROP DATABASE smartdb;";
+	mysqli_multi_query($con,$sql_save); 
+	
+	$addr_git= ' "\Program Files\Git\bin\git"  ';
+	$output[]  = shell_exec($addr_git.' init 2>&1'); 
+	$output[]  = shell_exec($addr_git.' remote set-url https://github.com/usumai/110_smart.git'); 
+	$output[]= shell_exec($addr_git.' clean  -d  -f .');
+	$output[]= shell_exec($addr_git.' reset --hard');  
+	$output[]= shell_exec($addr_git.' pull https://github.com/usumai/110_smart.git');
+	$result = ["info" => $output];
+	return $result;
 }
 ?>

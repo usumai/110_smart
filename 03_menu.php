@@ -20,7 +20,7 @@ if ($result->num_rows > 0) {
 
 ?>
 
-<script src="includes/test/axios.min.js" ></script>     
+<script src="includes/axios/axios.min.js" ></script>     
 <script>
   
 $(function(){
@@ -627,19 +627,22 @@ let vm_menu = new Vue({
 	},
     methods:{
 		setUserProfiles(){
-			getUserProfiles(result=>{
-
-				for(profile in result){
-					if(result[profile].profile_id==this.sysd.active_profile_id){
-						result[profile].current=true;
-						this.setCurrentUserProfile(result[profile], profile);
+			getUserProfiles(
+				profiles=>{
+					for(idx in profiles){
+						if(profiles[idx].profile_id==this.sysd.active_profile_id){
+							profiles[idx].current=true;
+							this.setCurrentUserProfile(profiles[idx], idx);
+						}
 					}
+					this.userProfiles=result;
+				}, 
+				errors=>{
+					
 				}
-				this.userProfiles=result;
-			}, errors=>{});
+			);
 		},
 		setCurrentUserProfile(profile, index){
-			console.log('**** setCurrentProfile **************');
 			console.log(profile);
 			this.user.index=index;
 			this.user.id=profile.profile_id;
@@ -726,16 +729,17 @@ let vm_menu = new Vue({
 		forceUpdateToLatest(){
 			this.$refs.update_ok.hidden=true;
 			this.$refs.update_spinner.hidden=false;
-			axios.get('00_fixme.php',{params:{}})				
-				.then(response=>{
+			updateSoftware(
+				success=>{
 					this.$refs.update_spinner.hidden=true;
-					if(response.data.status == 'OK'){
-						this.updateResponse=response.data.result.info;
-					}else if(response.data.status =='ERROR'){
-						this.updateError=true;
-						this.updateResponse=response.data.errors;
-					}
-				});
+					this.updateResponse=success.info;
+				},
+				errors=>{
+					this.$refs.update_spinner.hidden=true;
+					this.updateError=true;
+					this.updateResponse=errors;
+				}
+			);
 		},
 		get_search_results() {
 			if (this.menu_search.length>3){

@@ -83,6 +83,11 @@ function getFindingIDsString($isType, $findingCodes){
 	return $findingIDsString;
 }
 
+function template($filename){
+	$content = file_get_contents($filename.".vue");
+	$content = str_replace("\r\n","",$content);
+	return $content;
+}
 function execWithErrorHandler($callback){
     try {
         $callback();

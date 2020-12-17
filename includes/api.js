@@ -1,8 +1,8 @@
-let STATUS_ERROR='Error';
-let STATUS_PROCESS='Processing';
-let STATUS_COMPLETE='Completed';
-let API_ENDPOINT='api.php';
-let pendingTasks=[];
+const STATUS_ERROR='Error';
+const STATUS_PROCESS='Processing';
+const STATUS_COMPLETE='Completed';
+const API_ENDPOINT='api.php';
+pendingTasks=[];
 
 
 function upload(uploadData, progressCallback, completeCallback, errorCallback) {
@@ -80,7 +80,7 @@ function uploadGaStocktake(uploadData, progressCallback, completeCallback, error
 
 }
 
-function uploadIsAudit(uploadData, progressCallback, completeCallback, errorCallback){
+function uploadIsAudit(uploadData, progressCallback, completeCallback, errorCallback) {
 	
 	let impairmentList=[];
 	if(!uploadData.impairments){
@@ -244,6 +244,20 @@ function saveUserProfile(profileId, userName, userPhone, completeCallback, error
 	.then(response=> {
 		processResponse(response,completeCallback, errorCallback);
 	});
+}
+function updateSoftware(completeCallback, errorCallback){
+	axios.post(API_ENDPOINT, 
+		{
+			action: 'update_software',
+			data: {
+			}
+		}
+	)
+	.then(
+		response=> {
+			processResponse(response,completeCallback, errorCallback);
+		}
+	);
 }
 
 function deleteUserProfile(profileId, completeCallback, errorCallback){
