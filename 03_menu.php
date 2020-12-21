@@ -405,7 +405,7 @@ $(function(){
 				<td v-if="(updateResponse) && (updateResponse.length>0) && (updateError)">
 					<div class="alert alert-danger">
 						<strong>Update Failed!</strong>
-						<div v-for='error in updateResponse'><i >{{error.info}}</i></div>
+						<div v-for='error in updateResponse'><i>{{error.info}}</i></div>
 					</div>    
 				</td>				
 			</tr>
@@ -487,22 +487,22 @@ $(function(){
 
 	<!-- Modal -->
 	<div class="modal fade" id="modal_confirm_reset_minus_rr" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-		<div class="modal-header" style="background-color: #5a95ca;">
-			<h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke">Delete all data except for raw remainder data</h5>
-			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-			<span aria-hidden="true">&times;</span>
-			</button>
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header" style="background-color: #5a95ca;">
+					<h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke">Delete all data except for raw remainder data</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">  
+					<p class="lead">Reseting SMARTm will delete all data on this device.<br><br>Are you sure you want to proceed?</p>  
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>	
+				</div>
+			</div>
 		</div>
-		<div class="modal-body">  
-			<p class="lead">Reseting SMARTm will delete all data on this device.<br><br>Are you sure you want to proceed?</p>  
-		</div>
-		<div class="modal-footer">
-			<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>	
-		</div>
-		</div>
-	</div>
 	</div>
 
 
@@ -732,7 +732,8 @@ let vm_menu = new Vue({
 			updateSoftware(
 				success=>{
 					this.$refs.update_spinner.hidden=true;
-					this.updateResponse=success.info;
+					this.updateResponse=success.info; 
+					window.location.reload();
 				},
 				errors=>{
 					this.$refs.update_spinner.hidden=true;
@@ -756,8 +757,6 @@ let vm_menu = new Vue({
 			}else{
 				this.show_search_prompt = true
 			}
-
-			
 		},
 		
     }

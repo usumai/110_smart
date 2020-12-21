@@ -19,7 +19,7 @@
 
 
 
-
+<!-- 
 
 <div class="modal fade" id="helpModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
@@ -38,7 +38,9 @@
       </div>
     </div>
   </div>
-</div>
+</div> 
+-->
+
 <script>
 $(document).ready(function() {
     $(document).on('click', '.helpBtn', function(){
