@@ -880,22 +880,17 @@ function updateSoftware() {
 	mysqli_multi_query($con,$sql_save); 
 	
 	$addr_git= ' "\Program Files\Git\bin\git"  ';
-	echo $output;
 	splitLines($output, shell_exec($addr_git.' init 2>&1')); 
-	echo $output;
 	splitLines($output, shell_exec($addr_git.' remote set-url https://github.com/usumai/110_smart.git')); 
-	echo $output;
 	splitLines($output, shell_exec($addr_git.' clean  -d  -f .'));
 	splitLines($output, shell_exec($addr_git.' reset --hard'));  
 	splitLines($output, shell_exec($addr_git.' pull https://github.com/usumai/110_smart.git'));
-	echo $output;
 	splitLines($output, shell_exec($addr_git.' git rev-parse HEAD'));
-	echo $output;
 	$result = ["info" => $output];
 	return $result;
 }
 
-function splitLines($entries, $outputText){
+function splitLines(&$entries, $outputText){
 	foreach(explode("\n",$outputText) as $line){
 		$entries[]=$line;
 	}
