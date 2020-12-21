@@ -412,8 +412,8 @@ $(function(){
 		</table>
       </div>
       <div class="modal-footer">
-      	<button type="button" ref="update_ok" class="btn btn-outline-dark" v-on:click="forceUpdateToLatest()">Update</button>
-        <button type="button" ref="update_close" class="btn btn-outline-dark" data-dismiss="modal">Close</button>       
+      	<button type="button" ref="update_ok" class="btn btn-outline-dark" @click="forceUpdateToLatest()">Update</button>
+        <button type="button" ref="update_close" class="btn btn-outline-dark" data-dismiss="modal" @click="window.location.reload();">Close</button>       
       </div>
     </div>
   </div>
@@ -732,8 +732,7 @@ let vm_menu = new Vue({
 			updateSoftware(
 				success=>{
 					this.$refs.update_spinner.hidden=true;
-					this.updateResponse=success.info; 
-					window.location.reload();
+					this.updateResponse=success.info; 					
 				},
 				errors=>{
 					this.$refs.update_spinner.hidden=true;
