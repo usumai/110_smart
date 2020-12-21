@@ -413,7 +413,7 @@ $(function(){
       </div>
       <div class="modal-footer">
       	<button type="button" ref="update_ok" class="btn btn-outline-dark" @click="forceUpdateToLatest()">Update</button>
-        <button type="button" ref="update_close" class="btn btn-outline-dark" data-dismiss="modal" @click="window.location.reload();">Close</button>       
+        <button type="button" ref="update_close" class="btn btn-outline-dark" data-dismiss="modal" @click="refreshPage()">Close</button>       
       </div>
     </div>
   </div>
@@ -626,6 +626,9 @@ let vm_menu = new Vue({
 		this.setUserProfiles();
 	},
     methods:{
+    	refreshPage(){
+    		window.location.reload();
+    	},
 		setUserProfiles(){
 			getUserProfiles(
 				profiles=>{
