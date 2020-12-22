@@ -862,6 +862,8 @@ FROM
 }
 
 function updateSoftware() {
+
+
 /*
           $URL = 'https://raw.githubusercontent.com/usumai/110_smart/master/08_version.json';
           $ch = curl_init();
