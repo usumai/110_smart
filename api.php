@@ -862,12 +862,26 @@ FROM
 }
 
 function updateSoftware() {
+          $URL = 'https://raw.githubusercontent.com/usumai/110_smart/master/08_version.json';
+          $ch = curl_init();
+          curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+          curl_setopt($ch, CURLOPT_URL, $URL);
+          curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+          curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+          $data = curl_exec($ch);
+          curl_close($ch);
+          $json = json_decode($data, true);
+          if(!$data){
+          		throw new Exception("Device is not connected to internet");
+          }
+/*
     $errCode=0;
     $errMsg="";
    	$fp = @fsockopen("www.example.com", 80, $errCode, $errMsg, 30 ); //website, port  (try 80 or 443)
     if (!$fp){
 		throw new Exception("Device required to be connected to internet ($errMsg)", $errCode);
 	}	
+*/	
 	$servername = "";
 	$username   = "root";
 	$password   = "";
