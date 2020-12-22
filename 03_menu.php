@@ -278,10 +278,10 @@ $(function(){
 							<!-- <a class='dropdown-item' href='05_action.php?act=sys_open_image_folder'>Image folder</a> -->
 
 							<div class='dropdown-divider'></div>
-							<h6 class='dropdown-header'>Installed software version<span class='float-right'>v{{ sysd.versionLocal }}</span></h6>
-							<h6 class='dropdown-header'>Newest available version<span class='float-right'>v{{ sysd.versionRemote }}</span></h6>
+							<h6 class='dropdown-header'>Installed Version<span class='float-right'>v{{ sysd.versionLocal }}</span></h6>
+							<h6 class='dropdown-header'>Available Version<span class='float-right'>v{{ sysd.versionRemote }}</span></h6>
 							<h6 class='dropdown-header'>Last checked<span class='float-right'>{{ sysd.date_last_update_check }}</span></h6>
-							<button type='button' v-if="sysd.versionLocal==sysd.versionRemote" class='dropdown-item btn' v-on:click='save_check_version()'>Check for new version</button>
+							<button type='button' v-if="sysd.versionLocal!=sysd.versionRemote" class='dropdown-item btn' v-on:click='save_check_version()'>Check for new version</button>
 							<button type='button' class='dropdown-item btn' data-toggle="modal" v-on:click="initSoftwareUpdate()" data-target="#update_confirm_dlg"><i class="fas fa-cloud-download-alt ml-2"></i> Force Software Update</button>
 
 							<span v-if="vcheck==2" class='dropdown-item'>You need to be connected to the internet to check for a new version</span>

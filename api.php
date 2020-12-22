@@ -886,7 +886,7 @@ function updateSoftware() {
 	splitLines($output, shell_exec($addr_git.' reset --hard'));  
 	splitLines($output, shell_exec($addr_git.' pull https://github.com/usumai/110_smart.git'));
 	$revision=shell_exec($addr_git.' rev-parse --short HEAD');
-	$result = ["info" => $output, "revision"=>$revision];
+	$result = ["info" => $output, "revision" => $revision];
 	return $result;
 }
 
