@@ -215,7 +215,7 @@ if(array_key_exists("current_row",$_POST)){
 				<td v-if="(updateResponse) && (updateResponse.length>0) && (updateError)">
 					<div class="alert alert-danger">
 						<strong>Update Failed!</strong>
-						<div v-for='error in updateResponse'><i>{{error.info}}</i></div>
+						<div v-for='error in updateResponse'><i>{{error.code}}-{{error.info}}</i></div>
 					</div>    
 				</td>				
 			</tr>
