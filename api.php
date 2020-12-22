@@ -863,6 +863,10 @@ FROM
 
 function updateSoftware() {
    
+   	$test_internet = @fsockopen("www.example.com", 80); //website, port  (try 80 or 443)
+    if (! $test_internet){
+    	throw new Exception("Device required to be connected to internet");
+    }
 	$servername = "";
 	$username   = "root";
 	$password   = "";
@@ -874,7 +878,7 @@ function updateSoftware() {
 	    throw new Exception("Connection failed: " . $con->connect_error);
 	} 
 
-	
+
 	
 	$sql_save = "DROP DATABASE smartdb;";
 	mysqli_multi_query($con,$sql_save); 
