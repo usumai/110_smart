@@ -881,7 +881,7 @@ function updateSoftware() {
     $errMsg="";
    	$fp = @fsockopen("www.example.com", 80, $errCode, $errMsg, 30 ); 
     if (!$fp){
-		throw new Exception("Device is not connected to internet or your network proxy server blocked connection to software repository server ($errMsg)", $errCode);
+		throw new Exception("Device is not connected to internet or your network proxy server blocked connection to software update server ($errMsg)", $errCode);
 	}	
 
 	$servername = "";
