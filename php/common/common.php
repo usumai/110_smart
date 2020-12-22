@@ -93,7 +93,7 @@ function execWithErrorHandler($callback){
         $callback();
     }catch(Throwable $e){
 		$response = new ResponseMessage("ERROR", null);
-	    $response->errors[0]=new ErrorInfo(0,$e->getMessage());
+	    $response->errors[0]=new ErrorInfo($e->getCode(),$e->getMessage());
 	    echo json_encode($response);
     }    
 }

@@ -424,7 +424,7 @@ let vm_menu = new Vue({
 			phone:'',
 			error:''		
 		},
-		updateResponse:'',
+		updateResponse:[],
 		updateError: false
 		
     },
@@ -548,6 +548,7 @@ let vm_menu = new Vue({
 					this.updateResponse=success.info; 					
 				},
 				errors=>{
+					console.log(errors);
 					this.$refs.update_spinner.hidden=true;
 					this.updateError=true;
 					this.updateResponse=errors;
