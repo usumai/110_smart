@@ -6,216 +6,26 @@ if(array_key_exists("current_row",$_POST)){
 	$current_row=$_GET["current_row"];
 }
 
-
-$opt_stk = '';
-$sql = "SELECT stkm_id, stk_id, stk_name FROM smartdb.sm13_stk WHERE stk_include=1";
-$result = $con->query($sql);
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        $stkm_id	= $row["stkm_id"];
-        $stk_id		= $row["stk_id"];
-		$stk_name	= $row["stk_name"];
-		$opt_stk   .= "<option value='".$stkm_id."'>".$stk_id.". ".$stk_name."</option>";
-}}
-
 ?>
 
 <script src="includes/axios/axios.min.js" ></script>     
 <script>
   
-$(function(){
-    $(document).on('click', '.btnHelp', function(){ 
-		let helpWords = $(this).val();
-		$('#areaHelpModal').html(helpWords)
-	})
-});
+	$(function(){
+	    $(document).on('click', '.btnHelp', function(){ 
+			let helpWords = $(this).val();
+			$('#areaHelpModal').html(helpWords)
+		})
+	});
 
-
-
-//This is where you left off: use this to move all of these options into the menu as required and set their vis using v-if
-
-// menuRR  = "<div class='dropdown-divider'></div><h6 class='dropdown-header'>Raw Remainder</h6><span class='dropdown-item'>Assets loaded: "+sys["sett"][0]["rr_count"]+"</span>"
-// // console.log("sys")
-// // console.log(sys)
-// helpContents=btnArchives+btnReset+btnInverColor
-// btnVAction  = "<div id='areaVersionAction'><button type='button' class='dropdown-item btn' id='btnCheckForUpdates'>Check for updates</button></div>"
-// styleUpdateAvailable =""
-// if (sys["sett"][0]["versionLocal"]<sys["sett"][0]["versionRemote"]){
-//     btnVAction  = "<button type='button' class='dropdown-item btn text-danger' data-toggle='modal' data-target='#modal_confirm_update'>Update available</button>"
-//     styleUpdateAvailable = " text-danger "
-// }
-// menuUpdate  = "<div class='dropdown-divider'></div><h6 class='dropdown-header'>Software version<span class='float-right'>v"+sys["sett"][0]["versionLocal"]+"</span></h6>"+btnVAction
-
-
-// menuAdd = ""
-// $("#menuSearch").hide();
-// if(system_stk_type=="stocktake"){
-//     $(".initiateBTN").html("<a href='10_stk.php' class='nav-link text-success' >Summary</a>");
-//     $("#menuSearch").show();
-//     $("#tags").focus();
-//     helpContents += btnImages+btnCreateTemplate
-//     menuAdd = "<a class='nav-link dropdown-toggle' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='menuFF'>First found</a><div class='dropdown-menu' aria-labelledby='dropdown01' id='dropdown_adds'>"+btnFF+"<div class='dropdown-divider'></div><h6 class='dropdown-header'>Templates <a href='21_templates.php' class='float-right'>Edit</a></h6><div id='areaTemplates'></div></div>"
-// }else if(system_stk_type=="impairment"){
-//     $(".initiateBTN").html("<a href='15_impairment.php' class='nav-link text-success' >Summary</a>");
-//     helpContents += btnBackups
-// }else{
-//     $(".initiateBTN").html("");
-// }
-
-
-
-
-
-// users               = sys["pro"];
-// active_profile_id   = sys["sett"][0]["active_profile_id"];
-// btnUser = "";
-// if (Object.entries(users).length === 0){
-//     console.log("No users exist")
-// }else{
-//     // users       = ["Lucas","Sam","Max"];
-//     activeUser  = 1;
-//     for (let user in users){
-
-	
-//         // console.log("active_profile_id:"+active_profile_id)
-//         // console.log("profile_id:"+profile_id)
-//         if (active_profile_id==profile_id){
-//             btnUser  += "<button type='button' class='dropdown-item btn text-success btnUser' data-toggle='modal' data-target='#modal_add_user' data-profile_id='"+profile_id+"' data-profile_name='"+profile_name+"' data-profile_phone_number='"+profile_phone_number+"'>"+profile_name+"</button>";
-//         }else{
-//             btnUser  += "<button type='button' class='dropdown-item btn btnUser' data-toggle='modal' data-target='#modal_add_user' data-profile_id='"+profile_id+"' data-profile_name='"+profile_name+"' data-profile_phone_number='"+profile_phone_number+"'>"+profile_name+"</button>";
-//         }
-//     }
-// }
-// btnAddUser  = "<button type='button' class='btn btnUser' data-toggle='modal' data-target='#modal_add_user' data-profile_id='0'>+ Add new user</button>"
-// menuUser    = "<div class='dropdown-divider'></div><h6 class='dropdown-header'>User management</span></h6>"+btnUser+btnAddUser
-
-// menuHelp    = "<a class='nav-link dropdown-toggle "+styleUpdateAvailable+"' href='#'data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='headingHelp'>Help</a><div class='dropdown-menu' aria-labelledby='dropdown01' id='dropdownHelp' >"+helpContents+menuRR+menuUpdate+menuUser+"</div>"
-// $("#menuHelp").html(menuHelp);
-// $("#menuAdd").html(menuAdd);
-
-
-
-
-
-
-
-// 	// fnDo("get_templates","LoadTemplates",0)
 
   	$(document).on('click', '.btnInitTemplate', function(){ 
 		let ass_id = $(this).val();
 		$("#ass_id").val(ass_id);
-		// console.log(ass_id)
 	})
 
 
-	
-//   	$(document).on('click', '.btnUser', function(){ 
-// 		// let profile_id        	= $('#profile_id').val();
-// 		profile_id			= $(this).data("profile_id");
-// 		profile_name		= $(this).data("profile_name");
-// 		profile_phone_number= $(this).data("profile_phone_number");
-// 		if(profile_id==0){
-// 			$("#btnDeleteUser").hide();
-// 		}else{
-// 			$("#btnDeleteUser").show();
-// 		}
-// 		edit_profile_id = profile_id;
-// 		$("#profile_name").val(profile_name);
-// 		$("#profile_phone_number").val(profile_phone_number);
-// 	})	
 
-
-// 	$(document).on('click', '#btnDeleteUser', function(){ 
-// 		$.post( {
-// 			url: "05_action.php",
-// 			data: {
-// 				act: "save_delete_user_profile",
-// 				edit_profile_id
-// 			},
-// 			success: function( data ) {
-// 				// console.log(data)
-// 				// Refresh menu
-// 				fnDo("get_system","SetMenu",1)
-// 				// Dismiss modal
-// 				$('#modal_add_user').modal('toggle')
-// 			}
-// 		});
-// 	})
-
-	
-//   	$(document).on('click', '#btnSaveUser', function(){ 
-// 		let profile_name        = $('#profile_name').val();
-// 		let profile_phone_number= $('#profile_phone_number').val();
-
-// 		// Save details
-// 		$.post( {
-// 			url: "05_action.php",
-// 			data: {
-// 				act: "save_edit_user_profile",
-// 				edit_profile_id,
-// 				profile_name,
-// 				profile_phone_number,
-// 			},
-// 			success: function( data ) {
-// 				// console.log(data)
-// 				// Refresh menu
-// 				fnDo("get_system","SetMenu",1)
-// 				// Dismiss modal
-// 				$('#modal_add_user').modal('toggle')
-// 			}
-// 		});
-// 		// Set active_profile_id as new user
-
-// 	})	
-
-  
-	
-
-//     $(document).on('click', '#btnCheckForUpdates', function(e){ 
-// 		e.stopPropagation();
-// 		if ($('.dropdown').find('#dropdownHelp').is(":hidden")){
-// 			$('#dropdownHelp').dropdown('toggle');
-// 		}
-// 		$('#areaVersionAction').html("<span class='dropdown-item text-warning'>Checking server version<br><div class='spinner-border text-center' role='status'><span class='sr-only'>Loading...</span></div></span>");
-// 		let nextAction = fnDo("save_check_version","CheckUpdates",0)
-//     })
-
-//     $( "#tags" ).autocomplete({
-//         source: function( request, response ) {
-//             search_term = request.term;
-//             $.ajax( {
-//                 url: "05_action.php",
-//                 data: {
-//                     act: "get_asset_list",
-//                     search_term: request.term
-//                 },
-//                 success: function( data ) {
-//                     json = JSON.parse(data)
-//                     response(json);
-//                 }
-//             });
-//         },
-//         select: function( event, ui ) {
-//             // console.log("Selected: " + ui.item.value + " aka " + ui.item )
-//             if(ui.item.Asset=="Raw remainder results"){
-//               window.location.href = "14_rr.php?search_term="+search_term;
-//             }else{
-//               window.location.href = "11_ass.php?ass_id="+ui.item.value;
-//             }
-//         }
-//     })
-//     .autocomplete( "instance" )._renderItem = function( ul, item ) {
-//       if (item.Asset == "Raw remainder results"){
-//         row = "<div><h3>Raw remainder count:</h3>"+item.Subnumber+"</div>" 
-//       }else{
-//         row = "<div><b>"+item.Asset+"-"+item.Subnumber+"</b>:"+item.AssetDesc1+"<br>"+item.status_compl+" InventNo["+item.InventNo+"] Serial["+item.SNo+"] Location["+item.Location+""+item.Room+"]</div>"
-//       }
-//       return $( "<li>" )
-//         .append(row)
-//         .appendTo( ul );
-//     };
-
-// });
 </script>
 
 
