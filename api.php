@@ -864,34 +864,36 @@ FROM
 function updateSoftware() {
    
    	$test_internet = @fsockopen("www.example.com", 80); //website, port  (try 80 or 443)
-    if (! $test_internet){
-    	throw new Exception("Device required to be connected to internet");
+    if ($test_internet){
+	
+		$servername = "";
+		$username   = "root";
+		$password   = "";
+		$output=[];
+		$con = new mysqli($servername, $username, $password);
+		
+		// Check connection
+		if ($con->connect_error) {
+		    throw new Exception("Connection failed: " . $con->connect_error);
+		} 
+	
+	
+		
+		$sql_save = "DROP DATABASE smartdb;";
+		mysqli_multi_query($con,$sql_save); 
+		
+		$addr_git= ' "\Program Files\Git\bin\git"  ';
+		splitLines($output, shell_exec($addr_git.' init 2>&1')); 
+		splitLines($output, shell_exec($addr_git.' remote set-url https://github.com/usumai/110_smart.git')); 
+		splitLines($output, shell_exec($addr_git.' clean  -d  -f .'));
+		splitLines($output, shell_exec($addr_git.' reset --hard'));  
+		splitLines($output, shell_exec($addr_git.' pull https://github.com/usumai/110_smart.git'));
+		$revision=shell_exec($addr_git.' rev-parse --short HEAD');
+		$result = ["info" => $output, "revision" => $revision];
+		return $result;
+	}else{
+	    throw new Exception("Device required to be connected to internet");
     }
-	$servername = "";
-	$username   = "root";
-	$password   = "";
-	$output=[];
-	$con = new mysqli($servername, $username, $password);
-	
-	// Check connection
-	if ($con->connect_error) {
-	    throw new Exception("Connection failed: " . $con->connect_error);
-	} 
-
-
-	
-	$sql_save = "DROP DATABASE smartdb;";
-	mysqli_multi_query($con,$sql_save); 
-	
-	$addr_git= ' "\Program Files\Git\bin\git"  ';
-	splitLines($output, shell_exec($addr_git.' init 2>&1')); 
-	splitLines($output, shell_exec($addr_git.' remote set-url https://github.com/usumai/110_smart.git')); 
-	splitLines($output, shell_exec($addr_git.' clean  -d  -f .'));
-	splitLines($output, shell_exec($addr_git.' reset --hard'));  
-	splitLines($output, shell_exec($addr_git.' pull https://github.com/usumai/110_smart.git'));
-	$revision=shell_exec($addr_git.' rev-parse --short HEAD');
-	$result = ["info" => $output, "revision" => $revision];
-	return $result;
 }
 
 function splitLines(&$entries, $outputText){
