@@ -862,6 +862,7 @@ FROM
 }
 
 function updateSoftware() {
+/*
           $URL = 'https://raw.githubusercontent.com/usumai/110_smart/master/08_version.json';
           $ch = curl_init();
           curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -874,14 +875,15 @@ function updateSoftware() {
           if(!$data){
           		throw new Exception("Device is not connected to internet");
           }
-/*
+*/          
+
     $errCode=0;
     $errMsg="";
-   	$fp = @fsockopen("www.example.com", 80, $errCode, $errMsg, 30 ); //website, port  (try 80 or 443)
+   	$fp = @fsockopen("www.example.com", 80, $errCode, $errMsg, 30 ); 
     if (!$fp){
-		throw new Exception("Device required to be connected to internet ($errMsg)", $errCode);
+		throw new Exception("Device is not connected to internet or your network proxy blocked connection to software repository server ($errMsg)", $errCode);
 	}	
-*/	
+
 	$servername = "";
 	$username   = "root";
 	$password   = "";
