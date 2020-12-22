@@ -864,7 +864,7 @@ FROM
 function updateSoftware() {
     $errCode=0;
     $errMsg="";
-   	$fp = fsockopen("www.example.com", 80, $errCode, $errMsg, 30 ); //website, port  (try 80 or 443)
+   	$fp = @fsockopen("www.example.com", 80, $errCode, $errMsg, 30 ); //website, port  (try 80 or 443)
     if (!$fp){
 		throw new Exception("Device required to be connected to internet ($errMsg)", $errCode);
 	}	
