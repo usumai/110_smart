@@ -884,9 +884,9 @@ function updateSoftware() {
     $addr_git= ' "\Program Files\Git\bin\git"  ';
     $versions=shell_exec($addr_git.' fetch --dry-run');
     if($versions==""){
-    	throw new Exception("No change: Version=$version");
+    	throw new Exception("No change: Version=$versions");
     }else{
-    	throw new Exception("Changed: Version=$version");
+    	throw new Exception("Changed: Version=$versions");
     }
 /*    
    	$fp = @fsockopen("www.example.com", 80, $errCode, $errMsg, 30 ); 
