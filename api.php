@@ -903,6 +903,7 @@ function updateSoftware() {
 	mysqli_multi_query($con,$sql_save); 
 	
 	$addr_git= ' "\Program Files\Git\bin\git"  ';
+	
 	splitLines($output, shell_exec($addr_git.' init 2>&1')); 
 	splitLines($output, shell_exec($addr_git.' remote set-url https://github.com/usumai/110_smart.git')); 
 	splitLines($output, shell_exec($addr_git.' clean  -d  -f .'));
