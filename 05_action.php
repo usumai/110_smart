@@ -33,56 +33,12 @@ $addr_git      = ' "\Program Files\Git\bin\git"  ';
 $log           = "<br>"."Initialising action file";
 $active_user   = "";
 // mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-//CRUD
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 // ####################################################################################
 // System actions
 // ####################################################################################
 if ($act=='sys_pull_master') {
-     // $sql_save = "DROP DATABASE $dbname;";
-     // mysqli_multi_query($con,$sql_save); 
 	//This file updates the local software with the currently published software
 	$output  = shell_exec($addr_git.' init 2>&1'); 
 	$output  = shell_exec($addr_git.' remote set-url https://github.com/usumai/110_smart.git'); 
@@ -90,7 +46,6 @@ if ($act=='sys_pull_master') {
 	$output .= shell_exec($addr_git.' reset --hard');  
 	$output .= shell_exec($addr_git.' pull https://github.com/usumai/110_smart.git');
 	echo "<pre>$output</pre>";
-     mysqli_multi_query($con,$sql_save);
 	header("Location: 05_action.php?act=sys_reset_data");
 
 }elseif ($act=='sys_initialise') {
