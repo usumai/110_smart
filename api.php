@@ -881,11 +881,19 @@ function updateSoftware() {
 
     $errCode=0;
     $errMsg="";
+    $addr_git= ' "\Program Files\Git\bin\git"  ';
+    $versions=shell_exec($addr_git.' fetch --dry-run');
+    if($versions==""){
+    	throw new Exception("No change: Version=$version");
+    }else{
+    	throw new Exception("Changed: Version=$version");
+    }
+/*    
    	$fp = @fsockopen("www.example.com", 80, $errCode, $errMsg, 30 ); 
     if (!$fp){
 		throw new Exception("Device is not connected to internet or your network proxy server blocked connection to software update server ($errMsg)", $errCode);
 	}	
-
+*/
 	$servername = "";
 	$username   = "root";
 	$password   = "";
@@ -902,7 +910,7 @@ function updateSoftware() {
 	$sql_save = "DROP DATABASE smartdb;";
 	mysqli_multi_query($con,$sql_save); 
 	
-	$addr_git= ' "\Program Files\Git\bin\git"  ';
+	
 	
 	splitLines($output, shell_exec($addr_git.' init 2>&1')); 
 	splitLines($output, shell_exec($addr_git.' remote set-url https://github.com/usumai/110_smart.git')); 
