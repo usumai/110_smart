@@ -896,7 +896,8 @@ function updateSoftware() {
 
 	splitLines($output, shell_exec($addr_git.' pull https://github.com/usumai/110_smart.git'));
 	$revision=shell_exec($addr_git.' rev-parse --short HEAD');
-	mysqli_multi_query($con,"update smartdb.sm10_set set versionLocalRevision='$revision';");
+	mysqli_multi_query($con,"UPDATE smartdb.sm10_set SET versionLocalRevision='$revision';");
+
 	$result = ["info" => $output, "revision" => $revision];
 
 	if($networkStatus == NET_HTTP_PROXY){
