@@ -475,38 +475,7 @@ if ($act=="create_ga_stocktake") {
     echo json_encode(qget($sql));
 
 }elseif ($act=='save_check_version'){
-/*
-	 $URL = 'https://raw.githubusercontent.com/usumai/110_smart/master/08_version.json';
-	 $ch = curl_init();
-	 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	 curl_setopt($ch, CURLOPT_URL, $URL);
-	 curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-	 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-	 curl_setopt($ch, CURLOPT_FRESH_CONNECT, TRUE);
-	 $data = curl_exec($ch);
-	 if($data==null){
-	
-		//Try with proxy server setting
-	 	curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, 0);
-	 	curl_setopt($ch, CURLOPT_PROXY, HTTP_PROXY);
-	 	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-	 	$data = curl_exec($ch);
-	 }        
-	 curl_close($ch);
-	
-	 if($data!=null){
-	
-	 	$json = json_decode($data, true);
-	 	$latest_version_no       = $json["latest_version_no"];
-	 	$version_publish_date    = $json["version_publish_date"];
-	
-	 	$sql_save = "UPDATE smartdb.sm10_set SET date_last_update_check=NOW(), versionRemote=$latest_version_no; ";
-	 	mysqli_multi_query($con,$sql_save);
-		$test_results = 1 ; //"Check performed and updated";
-	 }elseif(!@fsockopen("www.example.com", 80)){
-	 	$test_results = 2 ; //"Internet is required to check the version";
-	 }
- */
+
 	$versionInfo=getSoftwareVersion();
 
 	$softwareLocalVersion=$versionInfo['localVersion'];	
