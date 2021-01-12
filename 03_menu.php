@@ -426,7 +426,7 @@ let vm_menu = new Vue({
 			error:''		
 		},
 		updateResponse:[],
-		updateRevision:'';
+		updateRevision:'',
 		updateError: false
 		
     },
