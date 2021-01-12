@@ -5,6 +5,12 @@ $isImpAbbrsWithMilisEnabled = ["USWD","USND"];
 $isImpAbbrsCompletedStatus = ["SER","USWD","USND","NIC","SPLT"];
 $isB2rAbbrsCompletedStatus = ["INV","NSTR"];
 
+define ('HTTP_PROXY',"10.3.135.2:80");
+define ('SMART_VERSION_URL',"https://raw.githubusercontent.com/usumai/110_smart/master/08_version.json");
+define ('NET_OK','1');
+define ('NET_NO_INTERNET','2');
+define ('NET_HTTP_PROXY','3');
+define ('NET_NO_SERVICE','4');
 
 function getAPIAction() {
     if(!array_key_exists("CONTENT_TYPE",$_SERVER))
@@ -102,6 +108,39 @@ function errorHandler($error){
 	$response = new ResponseMessage("ERROR", null);
     $response->errors[0]=new ErrorInfo(0, $error ? $error->getMessage() : "Unknown system exception occured");
     echo json_encode($response);
+}
+
+function getNetworkStatus(){
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($ch, CURLOPT_URL, SMART_VERSION_URL);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+	curl_setopt($ch, CURLOPT_FRESH_CONNECT, TRUE);
+
+	$data = curl_exec($ch);
+
+	if($data != null){
+		curl_close($ch);
+		return NET_OK;
+	}
+	//Try with proxy server setting
+	curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, 0);
+	curl_setopt($ch, CURLOPT_PROXY, HTTP_PROXY);
+	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+	$data = curl_exec($ch);        
+	
+	if($data!=null){
+		curl_close($ch);
+		return NET_HTTP_PROXY;
+	}	
+
+	if(!@fsockopen("www.example.com", 80)){
+		curl_close($ch);
+		return NET_NO_INTERNET;
+	}
+	
+	return NET_NO_SERVICE;
 }
 
 class ResponseMessage {

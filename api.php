@@ -480,47 +480,43 @@ if ($act=="create_ga_stocktake") {
     // 2. Update the 08_version.json as per above details
     // 3. Delete json and xls files from directory to stop any leaks
     // 4. Push local to master using toolshelf
-    $test_internet = @fsockopen("www.example.com", 80); //website, port  (try 80 or 443)
-    if ($test_internet){
-         $URL = 'https://raw.githubusercontent.com/usumai/110_smart/master/08_version.json';
-         $ch = curl_init();
-         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-         curl_setopt($ch, CURLOPT_URL, $URL);
-         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-         curl_setopt($ch, CURLOPT_FRESH_CONNECT, TRUE);
-         $data = curl_exec($ch);
-         curl_close($ch);
-         $json = json_decode($data, true);
-         $latest_version_no       = $json["latest_version_no"];
-         $version_publish_date    = $json["version_publish_date"];
 
-         $sql_save = "UPDATE smartdb.sm10_set SET date_last_update_check=NOW(), versionRemote=$latest_version_no; ";
-         mysqli_multi_query($con,$sql_save);
-         $test_results = 1 ;//"Check performed and updated";
+	 $URL = 'https://raw.githubusercontent.com/usumai/110_smart/master/08_version.json';
+	 $ch = curl_init();
+	 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	 curl_setopt($ch, CURLOPT_URL, $URL);
+	 curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+	 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+	 curl_setopt($ch, CURLOPT_FRESH_CONNECT, TRUE);
+	 $data = curl_exec($ch);
+	 if($data==null){
+	
+		//Try with proxy server setting
+	 	curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, 0);
+	 	curl_setopt($ch, CURLOPT_PROXY, HTTP_PROXY);
+	 	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+	 	$data = curl_exec($ch);
+	 }        
+	 curl_close($ch);
+	
+	 if($data!=null){
+	
+	 	$json = json_decode($data, true);
+	 	$latest_version_no       = $json["latest_version_no"];
+	 	$version_publish_date    = $json["version_publish_date"];
+	
+	 	$sql_save = "UPDATE smartdb.sm10_set SET date_last_update_check=NOW(), versionRemote=$latest_version_no; ";
+	 	mysqli_multi_query($con,$sql_save);
+		$test_results = 1 ; //"Check performed and updated";
+	 }elseif(!@fsockopen("www.example.com", 80)){
+	 	$test_results = 2 ; //"Internet is required to check the version";
+	 }
+ 
 
-    }else{
-         $test_results = 2 ;//"Internet is required to check the version";
-    }
 
     // Compare remote to local and advise if update button should be displayed
     $sql = "SELECT '$test_results' AS test_results ";
-    echo json_encode(qget($sql));
-
-    // $result = $con->query($sql);
-    // if ($result->num_rows > 0) {
-    //      while($row = $result->fetch_assoc()) {
-    //      $versionLocal	= $row["versionLocal"];
-    //      $versionRemote	= $row["versionRemote"];
-    // }}
-    // $data  = [];
-    // $data["versionLocal"]    = $versionLocal;
-    // $data["versionRemote"]   = $versionRemote;
-    // $data["test_results"]    = $test_results;
-    // $data = json_encode($data);
-    // echo $data;
-    
-    
+    echo json_encode(qget($sql));      
 }
 
 
@@ -862,30 +858,19 @@ FROM
 }
 
 function updateSoftware() {
-
-
-/*
-          $URL = 'https://raw.githubusercontent.com/usumai/110_smart/master/08_version.json';
-          $ch = curl_init();
-          curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-          curl_setopt($ch, CURLOPT_URL, $URL);
-          curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-          curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-          $data = curl_exec($ch);
-          curl_close($ch);
-          $json = json_decode($data, true);
-          if(!$data){
-          		throw new Exception("Device is not connected to internet");
-          }
-*/          
+	$networkStatus=getNetworkStatus();  
 
     $errCode=0;
     $errMsg="";
-   	$fp = @fsockopen("www.example.com", 80, $errCode, $errMsg, 30 ); 
-    if (!$fp){
-		throw new Exception("Device is not connected to internet or your network proxy server blocked connection to software update server ($errMsg)", $errCode);
+
+    if ($networkStatus != NET_NO_INTERNET){
+		throw new Exception("Device is not connected to internet", $networkStatus);
 	}	
 
+    if ($networkStatus != NET_NO_SERVICE){
+		throw new Exception("Software update repository is not available", $networkStatus);
+	}
+	
 	$servername = "";
 	$username   = "root";
 	$password   = "";
@@ -894,11 +879,9 @@ function updateSoftware() {
 	
 	// Check connection
 	if ($con->connect_error) {
-	    throw new Exception("Connection failed: " . $con->connect_error);
+	    throw new Exception("Database server error: " . $con->connect_error);
 	} 
 
-
-	
 	$sql_save = "DROP DATABASE smartdb;";
 	mysqli_multi_query($con,$sql_save); 
 	
@@ -906,10 +889,18 @@ function updateSoftware() {
 	splitLines($output, shell_exec($addr_git.' init 2>&1')); 
 	splitLines($output, shell_exec($addr_git.' remote set-url https://github.com/usumai/110_smart.git')); 
 	splitLines($output, shell_exec($addr_git.' clean  -d  -f .'));
-	splitLines($output, shell_exec($addr_git.' reset --hard'));  
+	splitLines($output, shell_exec($addr_git.' reset --hard'));
+	if($networkStatus == NET_HTTP_PROXY){
+  		splitLines($output, shell_exec($addr_git.' config http.proxy http://' . HTTP_PROXY));
+	}
+
 	splitLines($output, shell_exec($addr_git.' pull https://github.com/usumai/110_smart.git'));
 	$revision=shell_exec($addr_git.' rev-parse --short HEAD');
 	$result = ["info" => $output, "revision" => $revision];
+
+	if($networkStatus == NET_HTTP_PROXY){
+  		splitLines($output, shell_exec($addr_git.' config unset http.proxy'));
+	}
 	return $result;
 }
 

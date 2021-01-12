@@ -209,6 +209,7 @@ if(array_key_exists("current_row",$_POST)){
 				</td>
 				<td v-if="(updateResponse) && (updateResponse.length>0) && (!updateError)">
 					<div  class="alert alert-info"><strong>Update Completed!</strong>
+						<div v-if="updateRevision != ''"><strong>revision: </strong>{{updateRevision}}</div>
 						<div v-for='info in updateResponse'><i>{{info}}</i></div>
 					</div>   
 				</td>
@@ -425,6 +426,7 @@ let vm_menu = new Vue({
 			error:''		
 		},
 		updateResponse:[],
+		updateRevision:'';
 		updateError: false
 		
     },
