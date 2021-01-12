@@ -2,7 +2,7 @@
 include "php/common/common.php";
 
 function fnInitiateDatabase(){
-    global $con, $dbname,$this_version_no,$date_version_published,$addr_git,$log;
+    global $con, $dbname,$this_version_no,$date_version_published,$log;
 	$softwareRevision=shell_exec(GIT_CMD .' rev-parse --short HEAD');
 
     $sql_save = "CREATE TABLE $dbname.sm10_set (
