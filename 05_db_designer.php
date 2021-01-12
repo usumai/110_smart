@@ -19,6 +19,7 @@ function fnInitiateDatabase(){
          `help_shown` INT(11) NULL,
          `theme_type` INT(11) NULL,
          `versionLocal` INT(11) NULL,
+         `versionLocalRevision` VARCHAR(25) NULL,
          `versionRemote` INT(11) NULL,
          `date_last_update_check` DATETIME NULL, 
          PRIMARY KEY (`smartm_id`),UNIQUE INDEX `smartm_id_UNIQUE` (`smartm_id` ASC));";
