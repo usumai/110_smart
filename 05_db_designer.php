@@ -35,7 +35,7 @@ function fnInitiateDatabase(){
     $sql_save = "INSERT INTO $dbname.sm10_set (create_date, update_date, last_access_date, journal_id, help_shown, theme_type, versionLocal, versionLocalRevision, versionRemote, versionRemoteRevision, date_last_update_check) 
     					VALUES (NOW(), NOW(), NOW(),1,0,0, 
     						$softwareLocalVersion,'$softwareLocalRevision', 
-    						$softwareRemoteVersion,'$softwareRemoteRevision', '$date_version_published'); ";
+    						$softwareRemoteVersion,'$softwareRemoteRevision', NOW()); ";
     mysqli_multi_query($con,$sql_save);
 
     $sql_save = "CREATE TABLE $dbname.sm11_pro (`profile_id` INT(11) NOT NULL AUTO_INCREMENT,`create_date` DATETIME NULL DEFAULT NULL,`delete_date` DATETIME NULL DEFAULT NULL,`update_date` DATETIME NULL DEFAULT NULL,`profile_name` VARCHAR(255) NULL DEFAULT NULL,`profile_drn` VARCHAR(255) NULL DEFAULT NULL,`profile_phone_number` VARCHAR(255) NULL DEFAULT NULL,`profile_pic` LONGTEXT NULL DEFAULT NULL,`profile_color_a` VARCHAR(255) NULL DEFAULT NULL,`profile_color_b` VARCHAR(255) NULL DEFAULT NULL,PRIMARY KEY (`profile_id`),UNIQUE INDEX `profile_id_UNIQUE` (`profile_id` ASC));";
