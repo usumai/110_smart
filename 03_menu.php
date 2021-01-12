@@ -547,7 +547,8 @@ let vm_menu = new Vue({
 			updateSoftware(
 				success=>{
 					this.$refs.update_spinner.hidden=true;
-					this.updateResponse=success.info; 					
+					this.updateResponse=success.info; 
+					this.updateRevision=success.revision;
 				},
 				errors=>{
 					console.log(errors);
