@@ -1,8 +1,9 @@
 <?php
+include "php/common/common.php";
 
 function fnInitiateDatabase(){
     global $con, $dbname,$this_version_no,$date_version_published,$addr_git,$log;
-
+	$softwareRevision=shell_exec(GIT_CMD .' rev-parse --short HEAD');
 
     $sql_save = "CREATE TABLE $dbname.sm10_set (
          `smartm_id` INT(11) NOT NULL AUTO_INCREMENT,
@@ -25,7 +26,7 @@ function fnInitiateDatabase(){
          PRIMARY KEY (`smartm_id`),UNIQUE INDEX `smartm_id_UNIQUE` (`smartm_id` ASC));";
     mysqli_multi_query($con,$sql_save);
 
-    $sql_save = "INSERT INTO $dbname.sm10_set (create_date, update_date, last_access_date, journal_id, help_shown, theme_type, versionLocal, versionRemote, date_last_update_check) VALUES (NOW(), NOW(), NOW(),1,0,0, $this_version_no, $this_version_no, '$date_version_published'); ";
+    $sql_save = "INSERT INTO $dbname.sm10_set (create_date, update_date, last_access_date, journal_id, help_shown, theme_type, versionLocal, versionLocalRevision, versionRemote, date_last_update_check) VALUES (NOW(), NOW(), NOW(),1,0,0, $this_version_no,'$softwareRevision', $this_version_no, '$date_version_published'); ";
     mysqli_multi_query($con,$sql_save);
 
     $sql_save = "CREATE TABLE $dbname.sm11_pro (`profile_id` INT(11) NOT NULL AUTO_INCREMENT,`create_date` DATETIME NULL DEFAULT NULL,`delete_date` DATETIME NULL DEFAULT NULL,`update_date` DATETIME NULL DEFAULT NULL,`profile_name` VARCHAR(255) NULL DEFAULT NULL,`profile_drn` VARCHAR(255) NULL DEFAULT NULL,`profile_phone_number` VARCHAR(255) NULL DEFAULT NULL,`profile_pic` LONGTEXT NULL DEFAULT NULL,`profile_color_a` VARCHAR(255) NULL DEFAULT NULL,`profile_color_b` VARCHAR(255) NULL DEFAULT NULL,PRIMARY KEY (`profile_id`),UNIQUE INDEX `profile_id_UNIQUE` (`profile_id` ASC));";

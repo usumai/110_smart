@@ -885,23 +885,21 @@ function updateSoftware() {
 	$sql_save = "DROP DATABASE smartdb;";
 	mysqli_multi_query($con,$sql_save); 
 	
-	$addr_git= ' "\Program Files\Git\bin\git"  ';
-	splitLines($output, shell_exec($addr_git.' init 2>&1')); 
-	splitLines($output, shell_exec($addr_git.' remote set-url https://github.com/usumai/110_smart.git')); 
-	splitLines($output, shell_exec($addr_git.' clean  -d  -f .'));
-	splitLines($output, shell_exec($addr_git.' reset --hard'));
+	splitLines($output, shell_exec(GIT_CMD .' init 2>&1')); 
+	splitLines($output, shell_exec(GIT_CMD .' remote set-url https://github.com/usumai/110_smart.git')); 
+	splitLines($output, shell_exec(GIT_CMD .' clean  -d  -f .'));
+	splitLines($output, shell_exec(GIT_CMD .' reset --hard'));
 	if($networkStatus == NET_HTTP_PROXY){
-  		splitLines($output, shell_exec($addr_git.' config http.proxy http://' . HTTP_PROXY));
+  		splitLines($output, shell_exec(GIT_CMD .' config http.proxy http://' . HTTP_PROXY));
 	}
 
-	splitLines($output, shell_exec($addr_git.' pull https://github.com/usumai/110_smart.git'));
-	$revision=shell_exec($addr_git.' rev-parse --short HEAD');
-	mysqli_multi_query($con,"UPDATE smartdb.sm10_set SET versionLocalRevision='$revision';");
+	splitLines($output, shell_exec(GIT_CMD .' pull https://github.com/usumai/110_smart.git'));
+	$revision=shell_exec(GIT_CMD .' rev-parse --short HEAD');
 
 	$result = ["info" => $output, "revision" => $revision];
 
 	if($networkStatus == NET_HTTP_PROXY){
-  		splitLines($output, shell_exec($addr_git.' config unset http.proxy'));
+  		splitLines($output, shell_exec(GIT_CMD .' config unset http.proxy'));
 	}
 	return $result;
 }
