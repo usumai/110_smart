@@ -516,7 +516,7 @@ if ($act=="create_ga_stocktake") {
 
 	$sql_save = "UPDATE smartdb.sm10_set SET date_last_update_check=NOW(), versionRemote=$softwareRemoteVersion, versionRemoteRevision='$softwareRemoteRevision'; ";
 	mysqli_multi_query($con,$sql_save);
-	test_results=1;
+	$test_results=1;
 
     // Compare remote to local and advise if update button should be displayed
     $sql = "SELECT '$test_results' AS test_results ";
