@@ -475,12 +475,7 @@ if ($act=="create_ga_stocktake") {
     echo json_encode(qget($sql));
 
 }elseif ($act=='save_check_version'){
-    // Steps for relesing a new version:
-    // 1. Update the version info above with version number one more than current
-    // 2. Update the 08_version.json as per above details
-    // 3. Delete json and xls files from directory to stop any leaks
-    // 4. Push local to master using toolshelf
-
+/*
 	 $URL = 'https://raw.githubusercontent.com/usumai/110_smart/master/08_version.json';
 	 $ch = curl_init();
 	 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -511,8 +506,17 @@ if ($act=="create_ga_stocktake") {
 	 }elseif(!@fsockopen("www.example.com", 80)){
 	 	$test_results = 2 ; //"Internet is required to check the version";
 	 }
- 
+ */
+	$versionInfo=getSoftwareVersion();
 
+	$softwareLocalVersion=$versionInfo['localVersion'];	
+	$softwareLocalRevision=$versionInfo['localRevision'];
+	$softwareRemoteVersion=$versionInfo['remoteVersion'];
+	$softwareRemoteRevision=$versionInfo['remoteRevision'];
+
+	$sql_save = "UPDATE smartdb.sm10_set SET date_last_update_check=NOW(), versionRemote=$softwareRemoteVersion, versionRemoteRevision='$softwareRemoteRevision'; ";
+	mysqli_multi_query($con,$sql_save);
+	test_results=1;
 
     // Compare remote to local and advise if update button should be displayed
     $sql = "SELECT '$test_results' AS test_results ";
