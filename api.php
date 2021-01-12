@@ -863,11 +863,11 @@ function updateSoftware() {
     $errCode=0;
     $errMsg="";
 
-    if ($networkStatus != NET_NO_INTERNET){
+    if ($networkStatus == NET_NO_INTERNET){
 		throw new Exception("Device is not connected to internet", $networkStatus);
 	}	
 
-    if ($networkStatus != NET_NO_SERVICE){
+    if ($networkStatus == NET_NO_SERVICE){
 		throw new Exception("Software update repository is not available", $networkStatus);
 	}
 	
