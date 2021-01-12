@@ -8,6 +8,7 @@ $isB2rAbbrsCompletedStatus = ["INV","NSTR"];
 define ('GIT_CMD','"\Program Files\Git\bin\git"');
 define ('HTTP_PROXY',"10.3.135.2:80");
 define ('SMART_VERSION_URL',"https://raw.githubusercontent.com/usumai/110_smart/master/08_version.json");
+
 define ('NET_OK','1');
 define ('NET_NO_INTERNET','2');
 define ('NET_HTTP_PROXY','3');
@@ -111,6 +112,48 @@ function errorHandler($error){
     echo json_encode($response);
 }
 
+function getSoftwareVersion(){
+	global $this_version_no;
+
+	$networkStatus=getNetworkStatus();
+	
+	$result['localVersion']=$this_version_no;
+	$result['localRevision']=shell_exec(GIT_CMD .' rev-parse --short HEAD');	
+	$result['remoteVersion']='';
+	$result['remoteRevision']='';
+
+	if(($networkStatus == NET_NO_INTERNET)||
+		($networkStatus == NET_NO_SERVICE)){
+		return $result;
+	}
+	
+	$URL = 'https://raw.githubusercontent.com/usumai/110_smart/master/08_version.json';
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($ch, CURLOPT_URL, $URL);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+	curl_setopt($ch, CURLOPT_FRESH_CONNECT, TRUE);
+
+	if($networkStatus == NET_HTTP_PROXY){
+		curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, 0);
+	 	curl_setopt($ch, CURLOPT_PROXY, HTTP_PROXY);
+	 	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+		shell_exec(GIT_CMD .' config http.proxy http://' . HTTP_PROXY);
+		$result['remoteRevision']=shell_exec(GIT_CMD .' ls-remote https://github.com/usumai/110_smart.git HEAD');
+		shell_exec(GIT_CMD .' config unset http.proxy');
+	}else{
+		$result['remoteRevision']=shell_exec(GIT_CMD .' ls-remote https://github.com/usumai/110_smart.git HEAD');
+	}
+
+	$data = curl_exec($ch);
+	if($data!=null){
+	 	$json = json_decode($data, true);
+	 	$result['remoteVersion']= $json["latest_version_no"];
+	 	$result['remoteVersionDate'] = $json["version_publish_date"];
+	}
+	return $result;
+}
 function getNetworkStatus(){
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);

@@ -2,8 +2,7 @@
 include "php/common/common.php";
 
 function fnInitiateDatabase(){
-    global $con, $dbname,$this_version_no,$date_version_published,$log;
-	$softwareRevision=shell_exec(GIT_CMD .' rev-parse --short HEAD');
+    global $con, $dbname,$date_version_published,$log;
 
     $sql_save = "CREATE TABLE $dbname.sm10_set (
          `smartm_id` INT(11) NOT NULL AUTO_INCREMENT,
@@ -22,11 +21,21 @@ function fnInitiateDatabase(){
          `versionLocal` INT(11) NULL,
          `versionLocalRevision` VARCHAR(25) NULL,
          `versionRemote` INT(11) NULL,
+         `versionRemoteRevision` VARCHAR(25) NULL,
          `date_last_update_check` DATETIME NULL, 
          PRIMARY KEY (`smartm_id`),UNIQUE INDEX `smartm_id_UNIQUE` (`smartm_id` ASC));";
     mysqli_multi_query($con,$sql_save);
+	$versionInfo=getSoftwareVersion();
 
-    $sql_save = "INSERT INTO $dbname.sm10_set (create_date, update_date, last_access_date, journal_id, help_shown, theme_type, versionLocal, versionLocalRevision, versionRemote, date_last_update_check) VALUES (NOW(), NOW(), NOW(),1,0,0, $this_version_no,'$softwareRevision', $this_version_no, '$date_version_published'); ";
+	$softwareLocalVersion=$versionInfo['localVersion'];	
+	$softwareLocalRevision=$versionInfo['localRevision'];
+	$softwareRemoteVersion=$versionInfo['remoteVersion'];
+	$softwareRemoteRevision=$versionInfo['remoteRevision'];
+	
+    $sql_save = "INSERT INTO $dbname.sm10_set (create_date, update_date, last_access_date, journal_id, help_shown, theme_type, versionLocal, versionLocalRevision, versionRemote, versionRemoteRevision, date_last_update_check) 
+    					VALUES (NOW(), NOW(), NOW(),1,0,0, 
+    						$softwareLocalVersion,'$softwareLocalRevision', 
+    						$softwareRemoteVersion,'$softwareRemoteRevision', '$date_version_published'); ";
     mysqli_multi_query($con,$sql_save);
 
     $sql_save = "CREATE TABLE $dbname.sm11_pro (`profile_id` INT(11) NOT NULL AUTO_INCREMENT,`create_date` DATETIME NULL DEFAULT NULL,`delete_date` DATETIME NULL DEFAULT NULL,`update_date` DATETIME NULL DEFAULT NULL,`profile_name` VARCHAR(255) NULL DEFAULT NULL,`profile_drn` VARCHAR(255) NULL DEFAULT NULL,`profile_phone_number` VARCHAR(255) NULL DEFAULT NULL,`profile_pic` LONGTEXT NULL DEFAULT NULL,`profile_color_a` VARCHAR(255) NULL DEFAULT NULL,`profile_color_b` VARCHAR(255) NULL DEFAULT NULL,PRIMARY KEY (`profile_id`),UNIQUE INDEX `profile_id_UNIQUE` (`profile_id` ASC));";
