@@ -89,7 +89,7 @@ if(array_key_exists("current_row",$_POST)){
 
 							<div class='dropdown-divider'></div>
 							<h6 class='dropdown-header'>Installed Version<span class='float-right'>v{{ sysd.versionLocal }}{{sysd.versionLocalRevision? ('.'+sysd.versionLocalRevision) : ''}}</span></h6>
-							<h6 class='dropdown-header'>Available Version<span class='float-right'>v{{ sysd.versionRemote }}</span></h6>
+							<h6 class='dropdown-header'>Available Version<span class='float-right'>v{{ sysd.versionRemote }}{{sysd.versionRemoteRevision? ('.'+sysd.versionRemoteRevision.substring(0,7)) : ''}}</span></h6>
 							<h6 class='dropdown-header'>Last checked<span class='float-right'>{{ sysd.date_last_update_check }}</span></h6>
 							<button type='button' v-if="sysd.versionLocal==sysd.versionRemote" class='dropdown-item btn' @click='save_check_version()'>Check for new version</button>
 							<button type='button' class='dropdown-item btn' data-toggle="modal" v-on:click="initSoftwareUpdate()" data-target="#update_confirm_dlg"><i class="fas fa-cloud-download-alt ml-2"></i> Force Software Update</button>
