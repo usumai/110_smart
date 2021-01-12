@@ -276,6 +276,8 @@ function fnInitiateDatabase(){
               `res_date_deact` datetime DEFAULT NULL,
               `res_loc_latitude` varchar(10) DEFAULT NULL,
               `res_loc_longitude` varchar(10) DEFAULT NULL,
+              `modify_date` datetime DEFAULT NULL,
+              `version` int(11) NOT NULL,
               PRIMARY KEY (`ass_id`),
               UNIQUE KEY `ass_id_UNIQUE` (`ass_id`)
               ) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
