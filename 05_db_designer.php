@@ -296,8 +296,7 @@ function fnInitiateDatabase(){
 		    IF (new.create_date is null) THEN
 		    	set new.create_date=now();
 		    END IF;
-		END;
-		@		
+		END@		
 		CREATE TRIGGER `asset_update` 
 		BEFORE UPDATE ON `sm14_ass`
 		FOR EACH ROW BEGIN
@@ -307,8 +306,7 @@ function fnInitiateDatabase(){
 		    	set new.version = old.version + 1,
 		            new.modify_date=now();
 			END IF;
-		END;
-		@
+		END@
 	"
 	); 
     $sql_save = "CREATE TABLE $dbname.sm15_rc (
