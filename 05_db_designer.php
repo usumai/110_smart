@@ -283,8 +283,32 @@ function fnInitiateDatabase(){
               ) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
     //  echo "<br><br>".$sql_save;
     mysqli_multi_query($con,$sql_save); 
-
-
+	mysqli_multi_query($con,"
+		CREATE TRIGGER `asset_insert` 
+		BEFORE INSERT ON `sm14_ass`
+		FOR EACH ROW BEGIN		
+			IF(new.version is null) THEN
+				set new.version=0;
+			END IF;
+		    
+		    IF (new.create_date is null) THEN
+		    	set new.create_date=now();
+		    END IF;
+		END"
+	); 
+	mysqli_multi_query($con,"
+		CREATE TRIGGER `asset_update` 
+		BEFORE UPDATE ON `sm14_ass`
+		FOR EACH ROW BEGIN
+			IF (new.version is null) THEN 
+				set new.version=0;
+		    ELSE
+		    	set new.version = old.version + 1,
+		            new.modify_date=now();
+			END IF;
+		END
+	"
+	); 
     $sql_save = "CREATE TABLE $dbname.sm15_rc (
         `reason_code_id` INT(11) NOT NULL AUTO_INCREMENT,
         `create_date` datetime DEFAULT NULL,
