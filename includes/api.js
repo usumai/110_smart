@@ -603,11 +603,11 @@ const XSLX_GA_ASSET_COL_HEADER = [
 		type: 'string'
 	},
 	{
-		value: 'sto_ccc_parent',
+		value: 'sto_ccc_grandparent',
 		type: 'string'
 	},
 	{
-		value: 'sto_ccc_parent_name',
+		value: 'sto_ccc_grandparentname',
 		type: 'string'
 	},
 	{
@@ -775,11 +775,11 @@ const XSLX_GA_ASSET_COL_HEADER = [
 		type: 'string'
 	},
 	{
-		value: 'res_ccc_parent',
+		value: 'res_ccc_grandparent',
 		type: 'string'
 	},
 	{
-		value: 'res_ccc_parent_name',
+		value: 'res_ccc_grandparent_name',
 		type: 'string'
 	},
 	{
