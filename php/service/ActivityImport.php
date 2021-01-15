@@ -302,7 +302,13 @@ function updateSettings($connection, $record){
 }
 
 function createGaStocktake($connection, $record) {
+    $stk_id=$record->stk_id;
 
+    $results=qget("SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_id= $stk_id");
+    if(count($results)>0){
+        return $result[0];
+    }
+    
     $stmt   = $connection->prepare(
         "INSERT INTO smartdb.sm13_stk (
 			stk_id, 
@@ -427,11 +433,13 @@ function createGaAssets($connection, $stocktakeId, $assets) {
 			res_date_lastinv, 
 			res_date_cap, 
 			res_loc_latitude, 
-			res_loc_longitude
-		) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+			res_loc_longitude,
+            modify_date,
+            version
+		) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
 	
 	foreach ($assets as $row) {
-		$stmt->bind_param("ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss", 
+		$stmt->bind_param("ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss", 
 			$row->create_date,
 			$row->create_user,
 			$stocktakeId, 
@@ -509,7 +517,9 @@ function createGaAssets($connection, $stocktakeId, $assets) {
 			$row->res_date_lastinv, 
 			$row->res_date_cap, 
 			$row->res_loc_latitude, 
-			$row->res_loc_longitude);
+			$row->res_loc_longitude,
+		    $row->modify_date,
+		    $row->version);
 
 		$stmt->execute();
 		if($stmt->error){
@@ -518,6 +528,7 @@ function createGaAssets($connection, $stocktakeId, $assets) {
 			throw new Exception($errorMsg);
 		}	
 	}
+	qget("DELETE FROM smartdb.sm14_ass WHERE version=-1");
 	$stmt->close();
 }
 ?>
