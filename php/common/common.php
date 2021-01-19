@@ -14,6 +14,9 @@ define ('NET_NO_INTERNET','2');
 define ('NET_HTTP_PROXY','3');
 define ('NET_NO_SERVICE','4');
 
+define ('DB_ERR_RECORD_EXIST',20000);
+define ('DB_ERR_STATE','45000');
+
 function getAPIAction() {
     if(!array_key_exists("CONTENT_TYPE",$_SERVER))
         return null;
@@ -38,10 +41,14 @@ function qget($sql){
     global $con;
     $res = [];
     $result = $con->query($sql);
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $res[] = $row;
-    }}
+
+    if (is_a($result,'mysqli_result')){
+		if($result->num_rows > 0) {
+        	while($row = $result->fetch_assoc()) {
+           		$res[] = $row;
+    		}
+		}
+	}
     return $res;
 }
 

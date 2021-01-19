@@ -306,44 +306,46 @@ function createGaStocktake($connection, $record) {
 
     $results=qget("SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_id= $stk_id");
     if(count($results)>0){
-        return $result[0];
+        $id=$results[0]['stkm_id'];
+    }else{
+    
+        $stmt   = $connection->prepare(
+            "INSERT INTO smartdb.sm13_stk (
+    			stk_id, 
+    			stk_name, 
+    			stk_type, 
+    			dpn_extract_date, 
+    			dpn_extract_user, 
+    			smm_extract_date, 
+    			smm_extract_user, 
+    			rc_orig, 
+    			rc_orig_complete, 
+    			rc_extras) 
+    		VALUES(?,?,?,?,?,?,?,?,?,?);");
+        
+        $stmt->bind_param("ssssssssss", 
+    		$record->stk_id, 
+    		$record->stk_name, 
+    		$record->type, 
+    		$record->dpn_extract_date, 
+    		$record->dpn_extract_user, 
+    		$record->smm_extract_date, 
+    		$record->smm_extract_user, 
+    		$record->rc_orig, 
+    		$record->rc_orig_complete, 
+    		$record->rc_extras);
+        
+        $stmt->execute();
+        
+        if($stmt->error){
+    		$errorMsg = $stmt->error;
+    		$stmt->close();
+    		throw new Exception($errorMsg);
+    	}    
+        $id=$stmt->insert_id;
+	
+        $stmt->close();
     }
-    
-    $stmt   = $connection->prepare(
-        "INSERT INTO smartdb.sm13_stk (
-			stk_id, 
-			stk_name, 
-			stk_type, 
-			dpn_extract_date, 
-			dpn_extract_user, 
-			smm_extract_date, 
-			smm_extract_user, 
-			rc_orig, 
-			rc_orig_complete, 
-			rc_extras) 
-		VALUES(?,?,?,?,?,?,?,?,?,?);");
-    
-    $stmt->bind_param("ssssssssss", 
-		$record->stk_id, 
-		$record->stk_name, 
-		$record->type, 
-		$record->dpn_extract_date, 
-		$record->dpn_extract_user, 
-		$record->smm_extract_date, 
-		$record->smm_extract_user, 
-		$record->rc_orig, 
-		$record->rc_orig_complete, 
-		$record->rc_extras);
-    
-    $stmt->execute();
-    
-    if($stmt->error){
-		$errorMsg = $stmt->error;
-		$stmt->close();
-		throw new Exception($errorMsg);
-	}    
-    $id=$stmt->insert_id;
-    $stmt->close();
     return $id;
 }
 
@@ -520,15 +522,20 @@ function createGaAssets($connection, $stocktakeId, $assets) {
 			$row->res_loc_longitude,
 		    $row->modify_date,
 		    $row->version);
+		try{
+		    $stmt->execute();
+		}catch(Exception $e){
 
-		$stmt->execute();
-		if($stmt->error){
-			$errorMsg = $stmt->error;
-			$stmt->close();
-			throw new Exception($errorMsg);
-		}	
+	        if(($stmt->sqlstate == DB_ERR_STATE) 
+	            && ($stmt->errno == DB_ERR_RECORD_EXIST)){
+                    ;
+	        }else{
+	            $stmt->close();
+	            throw $e;
+	        }	    
+		}
 	}
-	qget("DELETE FROM smartdb.sm14_ass WHERE version=-1");
+	qget("DELETE FROM smartdb.sm14_ass WHERE ass_id in (select distinct duplicate from smartdb.sm14_ass WHERE duplicate>=0)");
 	$stmt->close();
 }
 ?>

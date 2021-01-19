@@ -6,7 +6,7 @@ ini_set('max_execution_time', 0);
 $hostname = "localhost";
 $username = "root";
 $password = "";
-
+$dbname="smartdb";
 
 // max_execution_time=3000000
 // memory_limit=3000000M
@@ -23,6 +23,40 @@ if ($con->connect_error) {
 
 // Test if the device is connected to the internet
 
+
+//$is_conn = is_connected();
+
+
+$sql = "SELECT count(*) as dbexists FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'smartdb'";
+
+$result = $con->query($sql);
+
+if ($result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+        $dbexists = $row["dbexists"];
+	}
+}
+
+if ($dbexists==0) {
+     
+    $con->query("CREATE DATABASE $dbname;"); 
+
+	if(!$con->error){
+     	$con=new mysqli($hostname, $username, $password, $dbname);
+		if ($con->connect_error) {
+	    	die("Connection failed: " . $con->connect_error);
+		} 
+	}
+
+	header("Location: 05_action.php?act=sys_initialise");
+}else{
+	$con=new mysqli($hostname, $username, $password, $dbname);
+	if ($con->connect_error) {
+    	die("Connection failed: " . $con->connect_error);
+	} 
+}
+
+
 function is_connected()
 {
     $connected = @fsockopen("www.example.com", 80);//website, port  (try 80 or 443)
@@ -36,22 +70,6 @@ function is_connected()
     }
     return $is_conn;
 }
-//$is_conn = is_connected();
-
-
-
-
-$sql = "SELECT count(*) as dbexists FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'smartdb'";
-$result = $con->query($sql);
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        $dbexists    = $row["dbexists"];
-}}
-
-if ($dbexists==0) {
-    header("Location: 05_action.php?act=sys_initialise");
-}
-
 
 
 ?>
