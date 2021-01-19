@@ -172,61 +172,50 @@ function fnInitiateDatabase(){
     mysqli_multi_query($con,$sql_save); 
     try{
 	   $con->query(
-"CREATE TRIGGER asset_insert
-BEFORE INSERT
+"CREATE TRIGGER asset_insert 
+BEFORE INSERT 
 ON sm14_ass
-FOR EACH ROW
-BEGIN
+FOR EACH ROW 
+BEGIN		
 	IF(new.version is null) THEN
 		set new.version=0;
 	END IF;
-            
+    
     IF (new.create_date is null) THEN
     	set new.create_date=now();
     END IF;
-            
-	SELECT
-    	stk_id
-    into @new_stk_id
+    
+	SELECT 
+    	stk_id 
+    into @new_stocktake_id
     FROM sm13_stk
     WHERE
     	stkm_id=new.stkm_id;
-            
-            
-	SELECT
+            	
+	SELECT 
 		(
-			CASE
-			WHEN (new.version > a.version) THEN 'NEW'
+			CASE 
+			WHEN (new.version > a.version) THEN 'NEW' 	
 			WHEN (new.version = a.version) THEN 'DUP'
-			WHEN (new.version < a.version) THEN 'OLD'
-			END
-		)
-		INTO @edit_status
-	FROM
-		sm14_ass as a inner join
-		sm13_stk as t on (a.stkm_id=t.stkm_id and
-                          t.stk_id = @new_stk_id)
+			WHEN (new.version < a.version) THEN 'OLD'	
+			END       		
+		), ass_id, ledger_id, modify_date, version
+		INTO @edit_status, @old_ass_id, @old_ledger_id, @old_modify_date, @old_version
+	FROM 
+		sm14_ass as a inner join 
+		sm13_stk as t on (a.stkm_id=t.stkm_id and 
+                          t.stk_id = @new_stocktake_id)
 	WHERE
-		a.ledger_id=new.ledger_id;
-            
-	SET new.res_comment=@edit_status;
-            
-            
-	IF (@edit_status='DUP') THEN
-            
-    	SELECT ass_id, modify_date, version
-        INTO @old_ass_id, @old_modify_date, @old_version
-		FROM sm14_ass as a inner join
-			 sm13_stk as t on (a.stkm_id=t.stkm_id and
-                          t.stk_id = @new_stk_id)
-        WHERE
-        	ledger_id=new.ledger_id;
-            
+		a.ledger_id=new.ledger_id; 
+		
+	IF ((@edit_status='NEW') AND (@old_ledger_id IS NOT NULL)) THEN
+		SET new.duplicate=@old_ass_id;
+	ELSEIF (@edit_status='DUP') THEN
     	IF((@old_modify_date IS NULL AND new.modify_date IS NOT NULL) OR (new.modify_date > @old_modify_date)) THEN
         	SET new.version=new.version+1;
             SET new.duplicate=@old_ass_id;
-        ELSE
-			SIGNAL SQLSTATE '45000'
+        ELSE    
+			SIGNAL SQLSTATE '45000' 
             SET MESSAGE_TEXT='Asset record already exist',
             MYSQL_ERRNO=20000;
         END IF;
