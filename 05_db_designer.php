@@ -185,40 +185,65 @@ BEGIN
     	set new.create_date=now();
     END IF;
     
+    IF((new.ledger_id IS NULL) AND (new.res_fingerprint IS NULL)) THEN
+    	set new.res_fingerprint=UUID();
+    END IF;
+    
 	SELECT 
     	stk_id 
     into @new_stocktake_id
     FROM sm13_stk
     WHERE
     	stkm_id=new.stkm_id;
-            	
-	SELECT 
-		(
-			CASE 
-			WHEN (new.version > a.version) THEN 'NEW' 	
-			WHEN (new.version = a.version) THEN 'DUP'
-			WHEN (new.version < a.version) THEN 'OLD'	
-			END       		
-		), ass_id, ledger_id, modify_date, version
-		INTO @edit_status, @old_ass_id, @old_ledger_id, @old_modify_date, @old_version
-	FROM 
-		sm14_ass as a inner join 
-		sm13_stk as t on (a.stkm_id=t.stkm_id and 
-                          t.stk_id = @new_stocktake_id)
-	WHERE
-		a.ledger_id=new.ledger_id; 
-		
-	IF ((@edit_status='NEW') AND (@old_ledger_id IS NOT NULL)) THEN
+           
+    IF(new.ledger_id IS NULL) THEN    	
+		SELECT 
+			(
+				CASE 
+				WHEN (new.version > a.version) THEN 'NEW' 	
+				WHEN (new.version = a.version) THEN 'DUP'
+				WHEN (new.version < a.version) THEN 'OLD'	
+				END       		
+			), ass_id, modify_date, version
+			INTO @edit_status, @old_ass_id, @old_modify_date, @old_version
+		FROM 
+			sm14_ass as a inner join 
+			sm13_stk as t on (a.stkm_id=t.stkm_id and 
+	                          t.stk_id = @new_stocktake_id)
+		WHERE
+			a.res_fingerprint=new.res_fingerprint;     					
+    ELSE
+		SELECT 
+			(
+				CASE 
+				WHEN (new.version > a.version) THEN 'NEW' 	
+				WHEN (new.version = a.version) THEN 'DUP'
+				WHEN (new.version < a.version) THEN 'OLD'	
+				END       		
+			), ass_id, modify_date, version
+			INTO @edit_status, @old_ass_id, @old_modify_date, @old_version
+		FROM 
+			sm14_ass as a inner join 
+			sm13_stk as t on (a.stkm_id=t.stkm_id and 
+	                          t.stk_id = @new_stocktake_id)
+		WHERE
+			a.ledger_id=new.ledger_id; 
+	END IF;		
+
+	IF (@edit_status='NEW')  THEN
 		SET new.duplicate=@old_ass_id;
 	ELSEIF (@edit_status='DUP') THEN
     	IF((@old_modify_date IS NULL AND new.modify_date IS NOT NULL) OR (new.modify_date > @old_modify_date)) THEN
-        	SET new.version=new.version+1;
             SET new.duplicate=@old_ass_id;
         ELSE    
 			SIGNAL SQLSTATE '45000' 
             SET MESSAGE_TEXT='Asset record already exist',
             MYSQL_ERRNO=20000;
-        END IF;
+        END IF;       
+    ELSEIF (@edit_status='OLD') THEN
+		SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT='Asset record is older',
+        MYSQL_ERRNO=20000;    
 	END IF;
 END"
 	    );
@@ -230,11 +255,13 @@ BEFORE UPDATE
 ON sm14_ass
 FOR EACH ROW 
 BEGIN
-	IF((select smm_delete_date 
+	 IF((select smm_delete_date 
         from sm13_stk 
         WHERE 
         	stkm_id=old.stkm_id) is NULL) THEN
-		IF(new.stk_include=old.stk_include) THEN    
+		IF((new.stk_include=old.stk_include) 
+			AND(new.duplicate=old.duplicate)) THEN
+			set new.version = old.version + 1;
             set new.modify_date = now();
     	END IF;
     END IF;
