@@ -535,7 +535,14 @@ function createGaAssets($connection, $stocktakeId, $assets) {
 	        }	    
 		}
 	}
-	qget("DELETE FROM smartdb.sm14_ass WHERE ass_id in (select distinct duplicate from smartdb.sm14_ass WHERE duplicate>=0)");
+	qget("DELETE FROM smartdb.sm14_ass 
+          WHERE ass_id in (
+            SELECT duplicate 
+            FROM smartdb.sm14_ass 
+            WHERE stkm_id=$stocktakeId AND duplicate <> -1)");
+	qget("UPDATE smartdb.sm14_ass 
+          SET duplicate = -1
+          WHERE duplicate >= 0");
 	$stmt->close();
 }
 ?>

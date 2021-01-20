@@ -85,7 +85,9 @@ function exportGaActivity($activityID){
    			res_date_pl_ret,
    			res_date_deact,
    			res_loc_latitude,
-   			res_loc_longitude
+   			res_loc_longitude,
+			modify_date,
+			version
     FROM 	smartdb.sm14_ass 
     WHERE 	stkm_id = $activityID";
     return qget($sql);
