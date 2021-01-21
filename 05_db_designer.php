@@ -69,15 +69,10 @@ function fnInitiateDatabase(){
     $log .= "<br>"."creating $dbname.sm14_ass_old ";
     $sql_save = "CREATE TABLE `$dbname`.`sm14_ass` (
               `ass_id` int(11) NOT NULL AUTO_INCREMENT,
-              `create_date` datetime DEFAULT NULL,
-              `create_user` varchar(255) DEFAULT NULL,
-              `delete_date` datetime DEFAULT NULL,
-              `delete_user` varchar(255) DEFAULT NULL,
               `stkm_id` int(11) DEFAULT NULL,
               `ledger_id` int(11) DEFAULT NULL,
               `stk_include` int(11) DEFAULT NULL,
               `rr_id` int(11) DEFAULT NULL,
-
               `sto_asset_id` varchar(20) DEFAULT NULL,
               `sto_assetdesc1` varchar(100) DEFAULT NULL,
               `sto_assetdesc2` varchar(100) DEFAULT NULL,
@@ -116,7 +111,6 @@ function fnInitiateDatabase(){
               `sto_date_deact` datetime DEFAULT NULL,
               `sto_loc_latitude` varchar(10) DEFAULT NULL,
               `sto_loc_longitude` varchar(10) DEFAULT NULL,
-
               `genesis_cat` varchar(255) DEFAULT NULL,
               `res_create_date` datetime DEFAULT NULL,
               `res_create_user` varchar(255) DEFAULT NULL,
@@ -124,7 +118,6 @@ function fnInitiateDatabase(){
               `res_reason_code` varchar(255) DEFAULT NULL,
               `res_rc_desc` varchar(255) DEFAULT NULL,
               `res_comment` varchar(2000) DEFAULT NULL,
-
               `res_asset_id` varchar(20) DEFAULT NULL,
               `res_assetdesc1` varchar(100) DEFAULT NULL,
               `res_assetdesc2` varchar(100) DEFAULT NULL,
@@ -163,12 +156,17 @@ function fnInitiateDatabase(){
               `res_loc_latitude` varchar(10) DEFAULT NULL,
               `res_loc_longitude` varchar(10) DEFAULT NULL,
               `duplicate` int(11) DEFAULT -1,
+              `create_user` varchar(255) DEFAULT NULL,
+              `create_date` datetime DEFAULT NULL,
+              `delete_user` varchar(255) DEFAULT NULL,
+              `delete_date` datetime DEFAULT NULL,
+              `modify_user` varchar(255) DEFAULT NULL,              
               `modify_date` datetime DEFAULT NULL,
               `version` int(11) NOT NULL,
               PRIMARY KEY (`ass_id`),
               UNIQUE KEY `ass_id_UNIQUE` (`ass_id`)
               ) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
-    //  echo "<br><br>".$sql_save;
+
     mysqli_multi_query($con,$sql_save); 
     try{
 	   $con->query(
@@ -182,7 +180,8 @@ BEGIN
 	END IF;
     
     IF (new.create_date is null) THEN
-    	set new.create_date=now();
+    	set new.create_date=now(), 
+            new.create_user=getCurrentProfileName();
     END IF;
     
     IF((new.ledger_id IS NULL) AND (new.res_fingerprint IS NULL)) THEN
@@ -249,8 +248,8 @@ END"
 	    );
 	   
 	   
-        $con->query(
-"CREATE TRIGGER asset_update 
+        $con->query("
+CREATE TRIGGER asset_update 
 BEFORE UPDATE 
 ON sm14_ass
 FOR EACH ROW 
@@ -261,13 +260,34 @@ BEGIN
         	stkm_id=old.stkm_id) is NULL) THEN
 		IF((new.stk_include=old.stk_include) 
 			AND(new.duplicate=old.duplicate)) THEN
-			set new.version = old.version + 1;
-            set new.modify_date = now();
+			set new.version = old.version + 1,
+                new.modify_date = now(),
+                new.modify_user=getCurrentProfileName();
     	END IF;
     END IF;
 END"
        );
         
+        $con->query("
+CREATE DEFINER=root@localhost 
+FUNCTION getCurrentProfileName() 
+RETURNS varchar(100) CHARSET utf8mb4
+NO SQL
+SQL SECURITY INVOKER
+BEGIN
+    SELECT profile_name
+    INTO @currentProfileName
+    FROM sm11_pro
+    WHERE profile_id=(
+        SELECT active_profile_id
+        FROM sm10_set
+        LIMIT 1
+        );
+    RETURN @currentProfileName;
+END"
+    );        
+        
+
         
     }catch(Throwable $e){
 
@@ -422,8 +442,9 @@ END"
         UNIQUE KEY `index_single_storage_candidate` (`stkm_id_new`, `stID1`));";
 
     mysqli_multi_query($con,$sql_save);
-
-    $sql_save = "UPDATE smartdb.sm10_set SET rr_count = (SELECT COUNT(*) AS rr_count FROM smartdb.sm12_rwr) WHERE smartm_id =1";
+    $con->query("INSERT INTO $dbName.sm11_pro(profile_name,create_date) VALUES ('Haibang.Mai', now());");    
+    
+    $sql_save = "UPDATE smartdb.sm10_set SET active_profile_id=1,rr_count = (SELECT COUNT(*) AS rr_count FROM smartdb.sm12_rwr) WHERE smartm_id =1";
     mysqli_multi_query($con,$sql_save);
 
 

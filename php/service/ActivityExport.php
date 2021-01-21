@@ -2,14 +2,11 @@
 function exportGaActivity($activityID){
    	$sql = " 
    		SELECT 
+            stkm_id,
    			ass_id, 
-   			stkm_id, 
+   			ledger_id,  
    			0 AS stk_include, 
    			rr_id, 
-   			ledger_id, 
-   			create_date, 
-   			create_user, 
-   			delete_date, 
    			sto_asset_id, 
    			sto_assetdesc1, 
    			sto_assetdesc2,
@@ -86,6 +83,11 @@ function exportGaActivity($activityID){
    			res_date_deact,
    			res_loc_latitude,
    			res_loc_longitude,
+   			create_user, 
+   			create_date, 
+            delete_user,
+   			delete_date,
+            modify_user, 
 			modify_date,
 			version
     FROM 	smartdb.sm14_ass 

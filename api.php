@@ -446,12 +446,7 @@ if ($act=="create_ga_stocktake") {
 
     $sql = "
     INSERT INTO smartdb.sm14_ass (
-        create_date,
-        create_user,
-        delete_date,
-        delete_user,
         stkm_id,
-        ledger_id,
         stk_include,
         rr_id,
         sto_asset_id,
@@ -536,12 +531,7 @@ if ($act=="create_ga_stocktake") {
         res_loc_longitude
     )
     SELECT 
-        NOW(),
-        create_user,
-        delete_date,
-        delete_user,
         stkm_id,
-        ledger_id,
         stk_include,
         rr_id,
         sto_asset_id,
@@ -627,12 +617,12 @@ if ($act=="create_ga_stocktake") {
     FROM smartdb.sm14_ass
     WHERE ass_id =$ass_id ;";
 
-
-    mysqli_multi_query($con,$sql);
-    
-    $sql = "SELECT ass_id FROM smartdb.sm14_ass ORDER BY ass_id DESC LIMIT 1;";
-    echo json_encode(qget($sql));
-    
+    $con->query($sql);
+    if(! $con->error){
+        
+        $result = ["ass_id" => $con->insert_id]; 
+        echo json_encode($result);
+    }    
 }elseif ($act=="get_rr_stats") {
     $sql        = " SELECT COUNT(*) AS rr_rowcount FROM smartdb.sm12_rwr ";
     echo json_encode(qget($sql));

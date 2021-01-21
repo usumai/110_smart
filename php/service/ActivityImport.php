@@ -358,8 +358,6 @@ function createGaAssets($connection, $stocktakeId, $assets) {
 	}
 	$stmt   = $connection->prepare(
 		"INSERT INTO smartdb.sm14_ass (
-			create_date,
-			create_user,
 			stkm_id,
 			ledger_id,
 			rr_id,
@@ -436,14 +434,17 @@ function createGaAssets($connection, $stocktakeId, $assets) {
 			res_date_cap, 
 			res_loc_latitude, 
 			res_loc_longitude,
+			create_user,
+			create_date,
+            delete_user,
+            delete_date,
+            modify_user,
             modify_date,
             version
-		) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+		) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
 	
 	foreach ($assets as $row) {
-		$stmt->bind_param("ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss", 
-			$row->create_date,
-			$row->create_user,
+		$stmt->bind_param("sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss", 
 			$stocktakeId, 
 			$row->ledger_id,
 			$row->rr_id,
@@ -519,7 +520,12 @@ function createGaAssets($connection, $stocktakeId, $assets) {
 			$row->res_date_lastinv, 
 			$row->res_date_cap, 
 			$row->res_loc_latitude, 
-			$row->res_loc_longitude,
+		    $row->res_loc_longitude,   				    
+		    $row->create_user,
+		    $row->create_date,
+		    $row->delete_user,
+		    $row->delete_date,
+		    $row->modify_user,
 		    $row->modify_date,
 		    $row->version);
 		try{
