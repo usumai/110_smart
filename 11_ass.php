@@ -467,7 +467,7 @@ let vm = new Vue({
         rcsd:{},
         imgsd:{},
         show_clear_rc_options:false,
-        show_delete_options:false,
+        show_delete_options:false
     },
     created() {
         this.get_stk_asset()
