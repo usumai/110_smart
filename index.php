@@ -141,7 +141,6 @@
 
 
 function makeFileAndDL(filename, text) {
-    // makeFileAndDL("lucas.txt", "All your base are belong to us") //Simple usage
     var element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
     element.setAttribute('download', filename);
@@ -189,20 +188,25 @@ let vm = new Vue({
 
             };
             reader.onload = event => {
-
-                let uploadData=JSON.parse(event.target.result);
-                upload( uploadData, this.onUploadProgress,				
-                    (result)=>{
-                        this.get_activities();
-				    },
-                    (errors)=>{
-                        this.upload.status='Error';
-                        for( i in errors) {                            
-                            this.upload.message=errors[i].code + ' - ' + errors[i].info;
-                        }
-                        console.log(this.message);
-                    }
-                )
+				try{
+	                let uploadData=JSON.parse(event.target.result);
+	                upload( uploadData, this.onUploadProgress,				
+	                    (result)=>{
+	                        this.get_activities();
+					    },
+	                    (errors)=>{
+	                        this.upload.status='Error';
+	                        for( i in errors) {                            
+	                            this.upload.message=errors[i].code + ' - ' + errors[i].info;
+	                        }
+	                        console.log(this.message);
+	                    }
+	                );
+				}catch(ex){		
+					this.upload.status='Error';
+					this.upload.message="Invalid file format. Make sure only upload SMARTM JSON file downloaded from DPN SMART";
+					console.log(ex);
+				}
             };
             reader.readAsText(file);
         },
