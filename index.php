@@ -204,7 +204,7 @@ let vm = new Vue({
 	                );
 				}catch(ex){		
 					this.upload.status='Error';
-					this.upload.message="Invalid file format. Make sure only upload SMARTM JSON file downloaded from DPN SMART";
+					this.upload.message="Invalid file format. Make sure only uploading SMARTM JSON file created by DPN SMART";
 					console.log(ex);
 				}
             };

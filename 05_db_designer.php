@@ -178,7 +178,7 @@ BEGIN
 	IF(new.version is null) THEN
 		set new.version=0;
 	END IF;
-    
+    set new.delete_date=null;
     IF (new.create_date is null) THEN
     	set new.create_date=now(), 
             new.create_user=getCurrentProfileName();
