@@ -32,7 +32,7 @@
                         <th style="width: 70px">Extra</th>
                         <th style="width: 70px">Status</th>
                         <th style="width: 12px">Included</th>
-                        <th style="width: 12px">Archive</th>
+                        <th style="width: 12px">Deleted</th>
                         <th style="width: 12px">Excel</th>
                         <th style="width: 12px">Export</th>
                     </tr>
@@ -50,12 +50,12 @@
                     <td >{{ actv.rc_extras }}</td>
                     <td >{{ ((actv.rc_orig_complete/actv.rc_orig)*100).toFixed(1) +'%' }}</td>
                     <td>
-                        <button v-if='actv.stk_include==1' 
+                        <button v-if='(actv.stk_include==1) && (!actv.smm_delete_date)' 
                             v-on:click='save_activity_toggle_include(actv.stkm_id,0,actv.stk_type)' 
                             class='btn btn-dark float-left'>
                             <i class="fa fa-folder-minus ml-2"></i>
                         </button>
-                        <button v-if='actv.stk_include!=1' 
+                        <button v-if='(actv.stk_include!=1) && (!actv.smm_delete_date)' 
                             v-on:click='save_activity_toggle_include(actv.stkm_id,1,actv.stk_type)' 
                             class='btn btn-outline-dark float-left'>
                             <i class="fa fa-folder-plus ml-2"></i>
@@ -63,11 +63,15 @@
                     </td>
                     <td>
                         <button v-if='!actv.smm_delete_date'  
-                            v-on:click='save_activity_toggle_delete(actv.stkm_id,1)' 
+                            v-on:click='save_activity_toggle_delete(actv.stkm_id,actv.stk_id,1)' 
                             class='btn btn-outline-danger float-left'>
                             <i class="fas fa-trash-alt ml-2"></i>
                         </button>
-                        <button v-if='actv.smm_delete_date' v-on:click='save_activity_toggle_delete(actv.stkm_id,0)' class='btn btn-outline-secondary float-left'>Restore</button>
+                        <button v-if='actv.smm_delete_date' 
+                        	v-on:click='save_activity_toggle_delete(actv.stkm_id,actv.stk_id,0)' 
+                        	class='btn btn-outline-secondary float-left'>
+                        	<i class="fas fa-check ml-2"></i>
+                        </button>
                     </td>
                     <td>
                         <button class='btn btn-outline-dark float-left' v-on:click="export_activity(actvidx,'xslx')">Excel</button>
@@ -260,12 +264,22 @@ let vm = new Vue({
                 vm_menu.refresh_sys();
             }
         }, 
-        save_activity_toggle_delete(stkm_id, delete_status){
+        save_activity_toggle_delete(stkm_id,stk_id, delete_status){
+            if((delete_status==0)&&(this.isActivityActive(stk_id))){
+                return;
+            }
             payload     = {'act':'save_activity_toggle_delete', stkm_id, delete_status};
             res         = fnapi(payload);
             this.get_activities();
         }, 
-
+		isActivityActive(stk_id){
+    		for (i in this.actvd){
+        		if((this.actvd[i].stk_id == stk_id) && (!this.actvd[i].smm_delete_date)){
+					return true;
+            	}
+        	}
+        	return false;
+    	},
         export_activity(activity_id, exportFormat){
             actv = this.actvd[activity_id]
             console.log(actv);

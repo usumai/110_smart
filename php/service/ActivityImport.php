@@ -304,7 +304,7 @@ function updateSettings($connection, $record){
 function createGaStocktake($connection, $record) {
     $stk_id=$record->stk_id;
 
-    $results=qget("SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_id= $stk_id");
+    $results=qget("SELECT stkm_id FROM smartdb.sm13_stk WHERE (stk_id= $stk_id) and ((smm_delete_date is null) || (date(smm_delete_date)='0000-00-00'))");
     if(count($results)>0){
         $id=$results[0]['stkm_id'];
     }else{
@@ -541,11 +541,20 @@ function createGaAssets($connection, $stocktakeId, $assets) {
 	        }	    
 		}
 	}
+	qget("
+        DELETE  d1 
+        FROM    smartdb.sm14_ass d1 
+            JOIN smartdb.sm14_ass d2 
+            ON  (d1.ass_id = d2.duplicate) 
+                AND (d2.stkm_id=$stocktakeId) 
+                AND (d2.duplicate <> -1)");
+/*	    
 	qget("DELETE FROM smartdb.sm14_ass 
           WHERE ass_id in (
             SELECT duplicate 
             FROM smartdb.sm14_ass 
             WHERE stkm_id=$stocktakeId AND duplicate <> -1)");
+*/	
 	qget("UPDATE smartdb.sm14_ass 
           SET duplicate = -1
           WHERE duplicate >= 0");

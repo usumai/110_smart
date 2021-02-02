@@ -194,7 +194,9 @@ BEGIN
     FROM sm13_stk
     WHERE
     	stkm_id=new.stkm_id;
-           
+    
+    SET @edit_status='NEW', @old_ass_id=NULL;
+    
     IF(new.ledger_id IS NULL) THEN    	
 		SELECT 
 			(
@@ -207,11 +209,13 @@ BEGIN
 			INTO @edit_status, @old_ass_id, @old_modify_date, @old_version
 		FROM 
 			sm14_ass as a inner join 
-			sm13_stk as t on (a.stkm_id=t.stkm_id and 
-	                          t.stk_id = @new_stocktake_id)
+			sm13_stk as t on ((a.stkm_id=t.stkm_id) and 
+	                          (t.stk_id = @new_stocktake_id) and 
+	                          (t.smm_delete_date is null))
 		WHERE
 			a.res_fingerprint=new.res_fingerprint;     					
     ELSE
+    	
 		SELECT 
 			(
 				CASE 
@@ -223,13 +227,14 @@ BEGIN
 			INTO @edit_status, @old_ass_id, @old_modify_date, @old_version
 		FROM 
 			sm14_ass as a inner join 
-			sm13_stk as t on (a.stkm_id=t.stkm_id and 
-	                          t.stk_id = @new_stocktake_id)
+			sm13_stk as t on ((a.stkm_id=t.stkm_id) and 
+	                          (t.stk_id = @new_stocktake_id) and 
+	                          (t.smm_delete_date is null))
 		WHERE
 			a.ledger_id=new.ledger_id; 
 	END IF;		
 
-	IF (@edit_status='NEW')  THEN
+	IF ((@edit_status='NEW') AND (@old_ass_id is not null))  THEN
 		SET new.duplicate=@old_ass_id;
 	ELSEIF (@edit_status='DUP') THEN
     	IF((@old_modify_date IS NULL AND new.modify_date IS NOT NULL) OR (new.modify_date > @old_modify_date)) THEN
