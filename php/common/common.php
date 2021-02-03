@@ -120,18 +120,16 @@ function errorHandler($error){
 }
 
 function getSoftwareVersion(){
-	global $this_version_no;
-
 	$networkStatus=getNetworkStatus();
 	
-	$result['localVersion']=$this_version_no;
-	$result['localRevision']=shell_exec(GIT_CMD .' rev-parse --short HEAD');	
-	$result['remoteVersion']='';
+	$result['localVersion']=12;
+	$result['localRevision']=str_replace("\n", "", shell_exec(GIT_CMD .' rev-parse --short HEAD'));	
+	$result['remoteVersion']=12;
 	$result['remoteRevision']='';
 
 	if(($networkStatus == NET_NO_INTERNET)||
 		($networkStatus == NET_NO_SERVICE)){
-		return $result;
+		Throw new Exception("No Network connection detected");
 	}
 	
 	$URL = 'https://raw.githubusercontent.com/usumai/110_smart/master/08_version.json';

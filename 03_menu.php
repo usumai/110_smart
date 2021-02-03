@@ -531,13 +531,14 @@ let vm_menu = new Vue({
 		},
 
 		checkAvailableSoftwareVersion(){
-            payload     = {'act':'check_available_software_version'}
-			json		= fnapi(payload)
-			this.vcheck	= json[0]['test_results']
-			console.log(this.vcheck)
-			if(this.vcheck==1){
-				this.get_system()
-			}
+			apiRequest('check_available_software_version', null, null, null, 
+				ok=>{
+					this.get_system();
+				}, 
+				errors=>{
+					this.errorInfo=errors[0].info;
+				});
+			
 		},
 		initSoftwareUpdate(){
 			this.updateResponse=[];

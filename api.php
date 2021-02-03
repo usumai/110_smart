@@ -643,13 +643,11 @@ if ($act=="create_ga_stocktake") {
     echo json_encode(qget($sql));
 
 }elseif ($act=='check_available_software_version'){
-
-    checkAvailableSoftwareVersion();
-	$test_results=1;
-
-    // Compare remote to local and advise if update button should be displayed
-    $sql = "SELECT '$test_results' AS test_results ";
-    echo json_encode(qget($sql));      
+    execWithErrorHandler(function() use ($con, $request){
+        checkAvailableSoftwareVersion();       
+        $result = ["test_results" => 1];
+        echo json_encode(new ResponseMessage("OK", $result));
+    });    
 }
 
 
@@ -992,13 +990,17 @@ FROM
 
 function checkAvailableSoftwareVersion(){
     $versionInfo=getSoftwareVersion();
-    
     $softwareLocalVersion=$versionInfo['localVersion'];
     $softwareLocalRevision=$versionInfo['localRevision'];
     $softwareRemoteVersion=$versionInfo['remoteVersion'];
     $softwareRemoteRevision=$versionInfo['remoteRevision'];
     
-    $sql_save = "UPDATE smartdb.sm10_set SET date_last_update_check=NOW(), versionLocal=$softwareLocalVersion, versionLocalRevision=$softwareLocalRevision, versionRemote=$softwareRemoteVersion, versionRemoteRevision='$softwareRemoteRevision'; ";
+    $sql_save = "UPDATE smartdb.sm10_set 
+                 SET date_last_update_check=NOW(), versionLocal=$softwareLocalVersion,
+                     versionLocalRevision='$softwareLocalRevision',
+                     versionRemote=$softwareRemoteVersion,
+                     versionRemoteRevision='$softwareRemoteRevision'
+                WHERE smartm_id=1; ";
     qget($sql_save);
 }
 
