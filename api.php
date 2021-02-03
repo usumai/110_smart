@@ -1032,6 +1032,8 @@ function updateSoftware() {
 	splitLines($output, shell_exec(GIT_CMD .' reset --hard'));
 	if($networkStatus == NET_HTTP_PROXY){
   		splitLines($output, shell_exec(GIT_CMD .' config http.proxy http://' . HTTP_PROXY));
+	}else{
+	    splitLines($output, shell_exec(GIT_CMD .' config --unset http.proxy'));
 	}
 
 	splitLines($output, shell_exec(GIT_CMD .' pull https://github.com/usumai/110_smart.git'));
