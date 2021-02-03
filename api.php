@@ -1022,15 +1022,7 @@ function updateSoftware() {
 	$username   = "root";
 	$password   = "";
 	$output=[];
-	$con = new mysqli($servername, $username, $password);
-	
-	// Check connection
-	if ($con->connect_error) {
-	    throw new Exception("Database server error: " . $con->connect_error);
-	} 
 
-	$sql_save = "DROP DATABASE smartdb;";
-	mysqli_multi_query($con,$sql_save); 
 	
 	splitLines($output, shell_exec(GIT_CMD .' init 2>&1')); 
 	splitLines($output, shell_exec(GIT_CMD .' remote set-url https://github.com/usumai/110_smart.git')); 
@@ -1047,6 +1039,8 @@ function updateSoftware() {
 
 	$result = ["info" => $output, "revision" => $revision];
 
+	qget("DROP DATABASE smartdb");
+	
 	return $result;
 }
 
