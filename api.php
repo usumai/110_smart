@@ -642,17 +642,9 @@ if ($act=="create_ga_stocktake") {
                         OR InventNo LIKE '%$search_term%'  ";
     echo json_encode(qget($sql));
 
-}elseif ($act=='save_check_version'){
+}elseif ($act=='check_available_software_version'){
 
-	$versionInfo=getSoftwareVersion();
-
-	$softwareLocalVersion=$versionInfo['localVersion'];	
-	$softwareLocalRevision=$versionInfo['localRevision'];
-	$softwareRemoteVersion=$versionInfo['remoteVersion'];
-	$softwareRemoteRevision=$versionInfo['remoteRevision'];
-
-	$sql_save = "UPDATE smartdb.sm10_set SET date_last_update_check=NOW(), versionRemote=$softwareRemoteVersion, versionRemoteRevision='$softwareRemoteRevision'; ";
-	mysqli_multi_query($con,$sql_save);
+    checkAvailableSoftwareVersion();
 	$test_results=1;
 
     // Compare remote to local and advise if update button should be displayed
@@ -998,6 +990,18 @@ FROM
     echo json_encode(new ResponseMessage("OK", qget($sql)));
 }
 
+function checkAvailableSoftwareVersion(){
+    $versionInfo=getSoftwareVersion();
+    
+    $softwareLocalVersion=$versionInfo['localVersion'];
+    $softwareLocalRevision=$versionInfo['localRevision'];
+    $softwareRemoteVersion=$versionInfo['remoteVersion'];
+    $softwareRemoteRevision=$versionInfo['remoteRevision'];
+    
+    $sql_save = "UPDATE smartdb.sm10_set SET date_last_update_check=NOW(), versionLocal=$softwareLocalVersion, versionLocalRevision=$softwareLocalRevision, versionRemote=$softwareRemoteVersion, versionRemoteRevision='$softwareRemoteRevision'; ";
+    qget($sql_save);
+}
+
 function updateSoftware() {
 	$networkStatus=getNetworkStatus();  
 
@@ -1041,9 +1045,6 @@ function updateSoftware() {
 
 	$result = ["info" => $output, "revision" => $revision];
 
-	if($networkStatus == NET_HTTP_PROXY){
-  		splitLines($output, shell_exec(GIT_CMD .' config unset http.proxy'));
-	}
 	return $result;
 }
 

@@ -91,7 +91,7 @@ if(array_key_exists("current_row",$_POST)){
 							<h6 class='dropdown-header'>Installed Version<span class='float-right'>v{{ sysd.versionLocal }}{{sysd.versionLocalRevision? ('.'+sysd.versionLocalRevision) : ''}}</span></h6>
 							<h6 class='dropdown-header'>Available Version<span class='float-right'>v{{ sysd.versionRemote }}{{sysd.versionRemoteRevision? ('.'+sysd.versionRemoteRevision.substring(0,7)) : ''}}</span></h6>
 							<h6 class='dropdown-header'>Last checked<span class='float-right'>{{ sysd.date_last_update_check }}</span></h6>
-							<button type='button' v-if="sysd.versionLocal==sysd.versionRemote" class='dropdown-item btn' @click='save_check_version()'>Check for new version</button>
+							<button type='button' v-if="sysd.versionLocal==sysd.versionRemote" class='dropdown-item btn' @click='checkAvailableSoftwareVersion()'>Check for new version</button>
 							<button type='button' class='dropdown-item btn' data-toggle="modal" v-on:click="initSoftwareUpdate()" data-target="#update_confirm_dlg"><i class="fas fa-cloud-download-alt ml-2"></i> Force Software Update</button>
 
 							<span v-if="vcheck==2" class='dropdown-item'>You need to be connected to the internet to check for a new version</span>
@@ -530,8 +530,8 @@ let vm_menu = new Vue({
 			console.log(this.rwrd)
 		},
 
-		save_check_version(){
-            payload     = {'act':'save_check_version'}
+		checkAvailableSoftwareVersion(){
+            payload     = {'act':'check_available_software_version'}
 			json		= fnapi(payload)
 			this.vcheck	= json[0]['test_results']
 			console.log(this.vcheck)

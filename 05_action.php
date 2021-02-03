@@ -156,46 +156,6 @@ if ($act=='sys_pull_master') {
      mysqli_multi_query($con,$sql_save);
      header("Location: ".$_SERVER['HTTP_REFERER']);
 
-
-}elseif ($act=='save_check_version'){
-     $test_internet = @fsockopen("www.example.com", 80); //website, port  (try 80 or 443)
-     if ($test_internet){
-          $URL = 'https://raw.githubusercontent.com/usumai/110_smart/master/08_version.json';
-          $ch = curl_init();
-          curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-          curl_setopt($ch, CURLOPT_URL, $URL);
-          curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-          curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-          $data = curl_exec($ch);
-          curl_close($ch);
-          $json = json_decode($data, true);
-          $latest_version_no       = $json["latest_version_no"];
-          $version_publish_date    = $json["version_publish_date"];
-
-          $sql_save = "UPDATE smartdb.sm10_set SET date_last_update_check=NOW(), versionRemote=$latest_version_no; ";
-          mysqli_multi_query($con,$sql_save);
-          $test_results = "Check performed";
-
-     }else{
-          $test_results = "Internet is required to check the version";
-     }
-
-     // Compare remote to local and advise if update button should be displayed
-     $sql = "SELECT versionLocal, versionRemote FROM smartdb.sm10_set";
-     $result = $con->query($sql);
-     if ($result->num_rows > 0) {
-          while($row = $result->fetch_assoc()) {
-          $versionLocal	= $row["versionLocal"];
-          $versionRemote	= $row["versionRemote"];
-     }}
-     $data  = [];
-     $data["versionLocal"]    = $versionLocal;
-     $data["versionRemote"]   = $versionRemote;
-     $data["test_results"]    = $test_results;
-     $data = json_encode($data);
-     echo $data;
-
-
 }elseif ($act=='get_excel'){
      $stkm_id = $_GET["stkm_id"];
 

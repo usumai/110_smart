@@ -148,8 +148,9 @@ function getSoftwareVersion(){
 	 	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
 		shell_exec(GIT_CMD .' config http.proxy http://' . HTTP_PROXY);
 		$result['remoteRevision']=shell_exec(GIT_CMD .' ls-remote https://github.com/usumai/110_smart.git HEAD');
-		shell_exec(GIT_CMD .' config unset http.proxy');
+		shell_exec(GIT_CMD .' config --unset http.proxy');
 	}else{
+	    shell_exec(GIT_CMD .' config --unset http.proxy');
 		$result['remoteRevision']=shell_exec(GIT_CMD .' ls-remote https://github.com/usumai/110_smart.git HEAD');
 	}
 
