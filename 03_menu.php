@@ -276,8 +276,8 @@ if(array_key_exists("current_row",$_POST)){
 	</div>
 	</div>
 
-	<!-- System Reset Dialog -->
-	<div class="modal fade" id="modal_confirm_reset" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<!-- Reset Data Dialog -->
+<div class="modal fade" id="modal_confirm_reset" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 		<div class="modal-header" style="background-color: #5a95ca;">
@@ -287,11 +287,23 @@ if(array_key_exists("current_row",$_POST)){
 			</button>
 		</div>
 		<div class="modal-body">  
-			<p class="lead">Reseting SMARTm will delete all data on this device.<br><br>Are you sure you want to proceed?</p>  
+			<p class="lead">Reseting SMARTm will delete all data on this device.<br><br>Are you sure you want to proceed?</p>
+			<div ref="elResetDataSpinner" hidden class="spinner-border text-info" role="status" style="text-align: center">
+			  <span class="sr-only">SMARTM data resetting...</span>
+			</div>
+			<div ref="elResetDataStatus" hidden>
+				<div  v-if="resetDataError==''" class="alert alert-info">
+					<i>Data reset completed</strong>
+				</div>  
+				<div  v-if="resetDataError!=''" class="alert alert-danger">
+					<strong>Error!</strong>
+					<i>{{resetDataError}}</i>
+				</div> 	 
+			</div>	  
 		</div>
 		<div class="modal-footer">
 			<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-			<a class="btn btn-danger" href='05_action.php?act=sys_reset_data'>Reset</a>
+			<a class="btn btn-danger" @click="resetData()">Reset</a>
 			<a class="btn btn-danger" href='05_action.php?act=sys_reset_data_minus_rr'>Reset excluding RR</a>
 		</div>
 		</div>
@@ -431,8 +443,8 @@ let vm_menu = new Vue({
 		},
 		updateResponse:[],
 		updateRevision:'',
-		updateError: false
-		
+		updateError: false,
+		resetDataError:''
     },
     created() {
 		this.refresh_sys()
@@ -529,7 +541,20 @@ let vm_menu = new Vue({
 			this.rwrd 	= json[0]
 			console.log(this.rwrd)
 		},
-
+		resetData(){
+			this.$refs.elResetDataSpinner.hidden=false;
+			apiRequest('reset_data', null, null, null, 
+					ok=>{
+						this.get_system();
+						this.$refs.elResetDataSpinner.hidden=true;
+						this.$refs.elResetDataStatus.hidden=false;
+					}, 
+					errors=>{
+						this.resetDataError=errors[0].info;
+						this.$refs.elResetDataSpinner.hidden=true;
+						this.$refs.elResetDataStatus.hidden=false;
+					});			
+		},
 		checkAvailableSoftwareVersion(){
 			apiRequest('check_available_software_version', null, null, null, 
 				ok=>{
@@ -549,6 +574,7 @@ let vm_menu = new Vue({
 		forceUpdateToLatest(){
 			this.$refs.update_ok.hidden=true;
 			this.$refs.update_spinner.hidden=false;
+			
 			updateSoftware(
 				success=>{
 					this.$refs.update_spinner.hidden=true;

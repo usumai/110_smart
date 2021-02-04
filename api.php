@@ -1,6 +1,6 @@
 <?php 
 include "01_dbcon.php"; 
-include "php/common/common.php";
+include "05_db_designer.php";
 include "php/service/ActivityImport.php";
 include "php/service/ActivityExport.php";
 header("Cache-Control: no-store, max-age=0");
@@ -102,6 +102,11 @@ if ($act=="create_ga_stocktake") {
         
         echo json_encode(new ResponseMessage("OK",$result));
     });
+}elseif ($act=='reset_data') {
+    execWithErrorHandler(function() {
+        $result = resetData();
+        echo json_encode(new ResponseMessage("OK",$result));
+    });   
 }elseif($act=="update_software") {
     execWithErrorHandler(function() { 
         $result = updateSoftware();
@@ -986,6 +991,26 @@ FROM
     ) as asset
     ON act.stkm_id=asset.stkm_id;";
     echo json_encode(new ResponseMessage("OK", qget($sql)));
+}
+
+function resetData(){
+    global $con, $dbname, $hostname, $username, $password;
+	$con->query("DROP DATABASE $dbname;"); 
+	if($con->error){
+	 	throw new Exception($con->error);
+	}
+	 
+	$con->query("CREATE DATABASE $dbname;");
+	if($con->error){
+	 	throw new Exception($con->error);
+	}
+
+	$con=new mysqli($hostname, $username, $password, $dbname);
+	if ($con->connect_error) {
+		throw new Exception($con->connect_error);
+	} 
+	
+ 	fnInitiateDatabase(true);
 }
 
 function checkAvailableSoftwareVersion(){

@@ -339,8 +339,8 @@ function apiRequest(apiName, requestData, progressMessage, progressCallback, com
 				}
 			}
 		}else{
-			if(completeCallback) {
-				completeCallback(httpResponse.data ? httpResponse.data : {});
+			if(errorCallback) {
+				errorCallback([{code: -1, info: httpResponse.data}]);
 			}
 		}
 	});
