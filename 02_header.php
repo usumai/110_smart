@@ -1,13 +1,16 @@
 <?php
 header("Cache-Control: no-store, max-age=0");
+$theme_type=0;
 
 $sql = "SELECT * FROM smartdb.sm10_set";
 $result = $con->query($sql);
-if ($result->num_rows > 0) {
+if ((! $con->error) &&($result->num_rows > 0)) {
     while($row = $result->fetch_assoc()) {
         $theme_type    = $row["theme_type"];
-}}
+    }
+}
 $scheme_color="";
+
 if ($theme_type==1) {
     $scheme_color = "
     body{
