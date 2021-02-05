@@ -72,7 +72,7 @@ $icon_spot_grey     = "<span class='octicon octicon-primitive-dot text-secondary
         <script src="includes/jquery-ui.js"></script>  
         <script src="includes/vue.js"></script>
         <script src="includes/axios/axios.min.js" ></script>            
-        <script src="includes/api.js" > </script>
+        <script src="app/ui/api/api.js" > </script>
         <script src="09_scripts.js"></script> 
         <style type="text/css">
             body {

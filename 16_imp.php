@@ -4,7 +4,7 @@
 
 <?php
 
-include "php/common/common.php";
+include "app/php/common/common.php";
 
 // apply ajax calls to update db
 // create split cats

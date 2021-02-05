@@ -3,7 +3,7 @@
 <?php include "03_menu.php"; ?>
 
 <?php
-include "php/common/common.php";
+include "app/php/common/common.php";
 
 $sqlInclude = "
 	SELECT stkm_id 

@@ -1,8 +1,8 @@
 <?php 
-include "01_dbcon.php"; 
-include "05_db_designer.php";
-include "php/service/ActivityImport.php";
-include "php/service/ActivityExport.php";
+include "../../../01_dbcon.php"; 
+include "../../../05_db_designer.php";
+include "../service/ActivityImport.php";
+include "../service/ActivityExport.php";
 header("Cache-Control: no-store, max-age=0");
 
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
@@ -1050,7 +1050,6 @@ function updateSoftware() {
 
 	
 	splitLines($output, shell_exec(GIT_CMD .' init 2>&1')); 
-	splitLines($output, shell_exec(GIT_CMD .' remote set-url https://github.com/usumai/110_smart.git')); 
 	splitLines($output, shell_exec(GIT_CMD .' clean  -d  -f .'));
 	splitLines($output, shell_exec(GIT_CMD .' reset --hard'));
 	if($networkStatus == NET_HTTP_PROXY){

@@ -5,7 +5,7 @@
 
 
 <script src="includes/standalone.js"></script>
-
+<script src="app/ui/component/vue/fileupload.js"></script>
 
 <div id="app">
     <div class='container-fluid'>
@@ -19,7 +19,7 @@
         <div class="table-responsive-sm">
             <table id="tbl_stk" class="table table-sm table-striped table-hover" >
                 <caption>
-                    <button type="button" class='btn btn-primary float-right' v-on:click="openUploadDlg">Upload<i class="fa fa-upload ml-2"></i></button>
+                	<fileupload :completed="get_activities" class="float-right"></fileupload>
                 </caption>
                 <thead class="table-dark">
                     <tr>
@@ -84,60 +84,7 @@
             </table>
         </div>
         <button class='btn btn-primary float-right' 
-            v-on:click='show_deleted=!show_deleted'>Show deleted</button>
-    </div>
-
-
-<!-- upload progress dialog  -->
-<div class="container">
-    <button ref="btn_open_progress" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#dlg_progress" style="visibility:hidden;">Open Progress Dlg</button>
-
-    <!-- Modal -->
-    <div class="modal fade" id="dlg_progress" role="dialog">
-        <div class="modal-dialog">
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header" style="background-color: #5a95ca;">                       
-                    <h5 class="modal-title" style="color: whitesmoke">File Upload</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="container" style="width:100%">
-
-                        <div v-if="upload.status == 'Processing'" class="alert alert-info"><strong>{{upload.status}}!</strong> {{upload.message}}</div>     
-                        <div v-if="upload.status == 'Completed'" class="alert alert-success"><strong>{{upload.status}}!</strong> {{upload.message}}</div>     
-                        <div v-if="upload.status == 'Error'" class="alert alert-danger"><strong>{{upload.status}}!</strong> {{upload.message}}</div>     
-                        <div class="progress">
-                            <div id="progress_bar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%">
-                                <span id="progress_value">0%</span>
-                            </div>
-                        </div>
-                        <div></div>
-                        <div style="width: 100%; padding-top: 10px; display: flex;">
-                            <span style="width: 50%">Current: {{upload.current}}</span>
-                            <span style="width: 50%">Total: {{upload.total}}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class='btn btn-outline-dark' data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-						
-    
-    
-<!--     
-    <div class='row'>
-        <div class='col'>
-            <a href='00_status.html' class='btn btn-danger'>Fix me</a>
-        </div>
-    </div>    
--->    
-    <div hidden>
-        <input hidden type="file" ref="upload_file" v-on:change="uploadData" class="form-control-file">
+           @click='show_deleted=!show_deleted'>Show deleted</button>
     </div>
 </div>
 
@@ -159,14 +106,7 @@ let vm = new Vue({
     data: {
         message: '',
         actvd:{},
-        show_deleted:false,
-
-        upload: {
-            current: 0,
-            total: 0,
-            status: '',
-            message: ''
-        }
+        show_deleted:false
     },
     created() {
 
@@ -175,60 +115,8 @@ let vm = new Vue({
     	 this.get_activities();
     } ,
     methods:{
-        openUploadDlg(){
-
-        	this.$refs.upload_file.value='';
-            this.$refs.upload_file.click();
-
-        },
-        uploadData(){
-
-            this.$refs.btn_open_progress.click();
-
-            let file=this.$refs.upload_file.files[0]
-
-            let reader = new FileReader();
-            reader.onprogress = event => {
-
-            };
-            reader.onload = event => {
-				try{
-	                let uploadData=JSON.parse(event.target.result);
-	                upload( uploadData, this.onUploadProgress,				
-	                    (result)=>{
-	                        this.get_activities();
-					    },
-	                    (errors)=>{
-	                        this.upload.status='Error';
-	                        for( i in errors) {                            
-	                            this.upload.message=errors[i].code + ' - ' + errors[i].info;
-	                        }
-	                        console.log(this.message);
-	                    }
-	                );
-				}catch(ex){		
-					this.upload.status='Error';
-					this.upload.message="Invalid file format. Make sure only uploading SMARTM JSON file created by DPN SMART";
-					console.log(ex);
-				}
-            };
-            reader.readAsText(file);
-        },
-        onUploadProgress (current, total, status, message){
-            this.upload.current=current;
-            this.upload.total=total;
-            this.upload.status=status;
-            this.upload.message=message;
-            var percentage=(current/total)*100;
-            $('#progress_value')
-            .text(percentage.toFixed(1)+'%');                     
-            
-            $('#progress_bar')
-            .width(percentage.toFixed(1)+'%')
-            .attr('aria-valuenow',percentage.toFixed(1)); 
-        },
         get_activities(){
-            axios.get('api.php', {params: {act:'get_activities'}})
+            axios.get( API_ENDPOINT, {params: {act:'get_activities'}})
             .then(response => {
             	console.log(response);
             	processResponse(response,

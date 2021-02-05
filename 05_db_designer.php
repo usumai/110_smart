@@ -1,5 +1,5 @@
 <?php
-include "php/common/common.php";
+include "app/php/common/common.php";
 
 function fnInitiateDatabase($noRedirect){
     global $con, $dbname, $date_version_published, $log;
@@ -464,7 +464,7 @@ END"
 
 
 function get_file(){
-    foreach(glob('config/*.*') as $filename) {//find the filename in the config folder
+    foreach(glob('../../../config/*.*') as $filename) {//find the filename in the config folder
         if (strpos($filename, 'reason_codes') !== false) {
             return $filename;
         }
@@ -475,7 +475,7 @@ function upload_reason_codes(){
     global $con;
     $sql            = "TRUNCATE TABLE smartdb.sm15_rc;";
     $res_truncate   = mysqli_multi_query($con,$sql);
-    $filename       = get_file('reason_codes');
+    $filename       = get_file();
     $file_contents  = file_get_contents($filename);
     $string         = "[" . trim($file_contents) . "]";
     $json           = json_decode($string, true);

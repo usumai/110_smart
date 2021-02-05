@@ -109,7 +109,7 @@ function IsJsonString(str) {
 function fnapi(data){
     payload_res = $.ajax({
         type: "POST",
-        url: "api.php",
+        url: "app/php/api/api.php",
         dataType: "json",
         data,
         async:false,

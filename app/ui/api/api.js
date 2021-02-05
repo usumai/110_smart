@@ -1,7 +1,7 @@
 const STATUS_ERROR='Error';
 const STATUS_PROCESS='Processing';
 const STATUS_COMPLETE='Completed';
-const API_ENDPOINT='api.php';
+const API_ENDPOINT='app/php/api/api.php';
 pendingTasks=[];
 
 
