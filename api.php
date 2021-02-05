@@ -1025,7 +1025,6 @@ function updateSoftware() {
 
 	
 	splitLines($output, shell_exec(GIT_CMD .' init 2>&1')); 
-	splitLines($output, shell_exec(GIT_CMD .' remote set-url https://github.com/usumai/110_smart.git')); 
 	splitLines($output, shell_exec(GIT_CMD .' clean  -d  -f .'));
 	splitLines($output, shell_exec(GIT_CMD .' reset --hard'));
 	if($networkStatus == NET_HTTP_PROXY){
