@@ -428,7 +428,7 @@ if ($act=="create_ga_stocktake") {
             $res_asset_id       = $row["res_asset_id"];
             $res_fingerprint    = $row["res_fingerprint"];
     }}
-    $a          = scandir("images/");
+    $a          = scandir("../../../images/");
     $img_list   = "";
     $images     = "";
     if ($genesis_cat=="nonoriginal") {
