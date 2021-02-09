@@ -281,12 +281,14 @@
                                 <h2>Images</h2>
                                 <div id='areaImgGallery'></div>
                                 <span v-for='(img, imgidx) in imgsd'>
-                                    <!-- <img :src="'images/'+img"> -->
+                                   
+                                    
                                     <button type='button' class='btn thumb_photo' 
                                             data-toggle='modal' data-target='#modal_show_pic'
-                                            v-on:click='zoom_pic=img'>
-                                            <img :src="'images/'+img+'?<?=time()?>'" width='200px'>
+                                            @click='zoom_pic=img'>
+                                            <img :src="'images/'+img" width='200px'>
                                     </button>
+                                    
                                 </span>
                             </div>
                         </div>
@@ -428,7 +430,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Photo</h5>
+                <h5 class="modal-title" id="exampleModalLabel">{{zoom_pic}}</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -502,7 +504,7 @@ let vm = new Vue({
         get_images(){
             payload     = {'act':'get_images', 'ass_id':this.ass_id}
             this.imgsd    = fnapi(payload)
-            // console.log(this.imgsd)
+            console.log(this.imgsd)
         }, 
         delete_stk_asset(direction){
             payload     = {'act':'save_stk_delete_no_ass', 'ass_id':this.ass_id, direction}
