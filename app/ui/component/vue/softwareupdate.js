@@ -4,7 +4,7 @@ Vue.component('softwareupdate',
 		return {
 			updateResponse:[],
 			updateRevision:'',
-			updateError: false,
+			status: '',
 		}
 	},
 	props: ['completed'],
@@ -21,12 +21,13 @@ Vue.component('softwareupdate',
 			this.$refs.update_ok.hidden=false;
 			this.$refs.update_spinner.hidden=true;
 		},	
-		updateLatest(){
+		update(){
 			this.$refs.update_ok.hidden=true;
 			this.$refs.update_spinner.hidden=false;
 			
 			updateSoftware(
 				success=>{
+					this.status='OK';
 					this.$refs.update_spinner.hidden=true;
 					this.updateResponse=success.info; 
 					this.updateRevision=success.revision;
@@ -34,7 +35,7 @@ Vue.component('softwareupdate',
 				errors=>{
 					console.log(errors);
 					this.$refs.update_spinner.hidden=true;
-					this.updateError=true;
+					this.status='ERROR';
 					this.updateResponse=errors;
 				}
 			);
@@ -65,23 +66,21 @@ Vue.component('softwareupdate',
 						  <span class="sr-only">Updating...</span>\
 						</div>\
 					</td>\
-					<td v-if="(updateResponse) && (updateResponse.length>0) && (!updateError)">\
-						<div  class="alert alert-info"><strong>Update Completed!</strong>\
-							<div v-if="updateRevision != \'\'"><strong>revision: </strong>{{updateRevision}}</div>\
-							<div v-for="info in updateResponse"><i>{{info}}</i></div>\
+					<td v-if="status != \'\'">\
+						<div v-if="updateRevision != \'OK\'" class="alert alert-info"><strong>Update Completed!</strong>\
+							<div ><strong>revision: </strong>{{updateRevision}}</div>\
+							<div v-if="(updateResponse) && (updateResponse.length>0)" v-for="info in updateResponse"><i>{{info}}</i></div>\
 						</div>\
-					</td>\
-					<td v-if="(updateResponse) && (updateResponse.length>0) && (updateError)">\
-						<div class="alert alert-danger">\
-							<strong>Update Failed!</strong>\
-							<div v-for="error in updateResponse"><i>{{error.code}}-{{error.info}}</i></div>\
+						<div v-if="status==\'ERROR\'" class="alert alert-danger">\
+							<strong >Update Failed!</strong>\
+							<div v-if="(updateResponse) && (updateResponse.length>0)" v-for="error in updateResponse"><i>{{error.code}}-{{error.info}}</i></div>\
 						</div>\
 					</td>\
 				</tr>\
 			</table>\
 	      </div>\
 	      <div class="modal-footer">\
-	      	<button type="button" ref="update_ok" class="btn btn-outline-dark" @click="updateLatest()">Update</button>\
+	      	<button type="button" ref="update_ok" class="btn btn-outline-dark" @click="update()">Update</button>\
 	        <button type="button" ref="update_close" class="btn btn-outline-dark" data-dismiss="modal" @click="refreshPage()">Close</button>\
 	      </div>\
 	    </div>\

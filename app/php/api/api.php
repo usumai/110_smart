@@ -1048,7 +1048,7 @@ function updateSoftware() {
 	$password   = "";
 	$output=[];
 
-	
+/*
 	splitLines($output, shell_exec(GIT_CMD .' init 2>&1')); 
 	splitLines($output, shell_exec(GIT_CMD .' clean  -d  -f .'));
 	splitLines($output, shell_exec(GIT_CMD .' reset --hard'));
@@ -1059,6 +1059,7 @@ function updateSoftware() {
 	}
 
 	splitLines($output, shell_exec(GIT_CMD .' pull https://github.com/usumai/110_smart.git'));
+*/
 	$revision=shell_exec(GIT_CMD .' rev-parse --short HEAD');
 
 	$result = ["info" => $output, "revision" => $revision];
