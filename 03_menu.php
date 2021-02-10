@@ -7,8 +7,9 @@ if(array_key_exists("current_row",$_POST)){
 }
 
 ?>
-
-<script src="includes/axios/axios.min.js" ></script>     
+<script src="includes/axios/axios.min.js" ></script>
+<script src="app/ui/component/vue/softwareupdate.js"></script>
+     
 <script>
   
 	$(function(){
@@ -92,9 +93,7 @@ if(array_key_exists("current_row",$_POST)){
 							<h6 class='dropdown-header'>Available Version<span class='float-right'>v{{ sysd.versionRemote }}{{sysd.versionRemoteRevision? ('.'+sysd.versionRemoteRevision.substring(0,7)) : ''}}</span></h6>
 							<h6 class='dropdown-header'>Last checked<span class='float-right'>{{ sysd.date_last_update_check }}</span></h6>
 							<button type='button' v-if="sysd.versionLocal==sysd.versionRemote" class='dropdown-item btn' @click='checkAvailableSoftwareVersion()'>Check for new version</button>
-							<button type='button' class='dropdown-item btn' data-toggle="modal" @click="initSoftwareUpdate()" data-target="#update_confirm_dlg"><i class="fas fa-cloud-download-alt ml-2"></i> Force Software Update</button>
-
-							<span v-if="vcheck==2" class='dropdown-item'>You need to be connected to the internet to check for a new version</span>
+							<button type="button" class="dropdown-item btn" data-toggle="modal" data-target="#update_confirm_dlg"><i class="fas fa-cloud-download-alt ml-2"></i> Force Software Update</button>
 
 							<button type='button' v-if="sysd.versionLocal<sysd.versionRemote" class='dropdown-item btn text-danger' data-toggle='modal' data-target='#modal_confirm_update'>Update available v{{ sysd.versionRemote }}</button>
 							
@@ -154,6 +153,7 @@ if(array_key_exists("current_row",$_POST)){
 		
 	</header>
 
+<softwareupdate id="update_confirm_dlg"></softwareupdate>
 
 <!-- Initiate Asset Template Dialog -->
 <div class="modal fade" id="modal_initiate_template" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -182,55 +182,6 @@ if(array_key_exists("current_row",$_POST)){
 			</form>
 		</div>
 	</div>
-</div>
-
-
-<!-- Force Update Modal dialog -->
-<div width='500px' height='300px' class="modal fade" id="update_confirm_dlg" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header" style="background-color: #5a95ca;">
-        <h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke">Software Update</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-		<table width='100%' height='100%'>
-			<tr>
-			  <td align='center'>
-			      <p style="text-align: left;"><strong>Warning:</strong></p>
-			      <p style="text-align: justify;"><i style="color: red">SmartM Software update and data reset. This will delete all application data stored on this device, so make sure you backup everything before attempting this.</i></p>
-			      <p style="text-align: left;">Please make sure you are connected to the internet.</p>
-			  </td>
-			</tr>
-			<tr>
-				<td ref="update_spinner" style="text-align: center">
-					<div class="spinner-border text-info" role="status">
-					  <span class="sr-only">Updating...</span>
-					</div>				
-				</td>
-				<td v-if="(updateResponse) && (updateResponse.length>0) && (!updateError)">
-					<div  class="alert alert-info"><strong>Update Completed!</strong>
-						<div v-if="updateRevision != ''"><strong>revision: </strong>{{updateRevision}}</div>
-						<div v-for='info in updateResponse'><i>{{info}}</i></div>
-					</div>   
-				</td>
-				<td v-if="(updateResponse) && (updateResponse.length>0) && (updateError)">
-					<div class="alert alert-danger">
-						<strong>Update Failed!</strong>
-						<div v-for='error in updateResponse'><i>{{error.code}}-{{error.info}}</i></div>
-					</div>    
-				</td>				
-			</tr>
-		</table>
-      </div>
-      <div class="modal-footer">
-      	<button type="button" ref="update_ok" class="btn btn-outline-dark" @click="forceUpdateToLatest()">Update</button>
-        <button type="button" ref="update_close" class="btn btn-outline-dark" data-dismiss="modal" @click="refreshPage()">Close</button>       
-      </div>
-    </div>
-  </div>
 </div>
 
 

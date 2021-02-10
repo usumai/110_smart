@@ -515,9 +515,9 @@ let vm = new Vue({
         save_create_template(direction){
             payload     = {'act':'save_create_template', 'ass_id':this.ass_id}
             json        = fnapi(payload)
-            console.log(json[0]['ass_id'])
-            this.template_ass_id = json[0]['ass_id']
-            // this.get_stk_asset()
+          
+            this.template_ass_id = json.ass_id;
+            this.get_stk_asset();
         }, 
     }
 })
