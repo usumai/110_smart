@@ -304,9 +304,9 @@ if(array_key_exists("current_row",$_POST)){
 				</div>	  
 			</div>
 			<div class="modal-footer">
-				<button ref="elCancel" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-				<a ref="elReset" class="btn btn-danger" @click="resetData()">Reset</a>
-				<a ref="elResetXrr" class="btn btn-danger" href='05_action.php?act=sys_reset_data_minus_rr'>Reset excluding RR</a>
+				<button ref="elReset" 			type="button" class="btn btn-danger" @click="resetData(false)">Reset</a>
+				<button ref="elResetExcludedRR" type="button" class="btn btn-danger" @click="resetData(true)">Reset excluding RR</a>
+				<button ref="elResetClose" 		type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>			
 			</div>
 		</div>
 	</div>
@@ -546,26 +546,28 @@ let vm_menu = new Vue({
 		initResetData(){
 			this.resetDataError='';
 			this.$refs.elReset.hidden=false;
-			this.$refs.elCancel.hidden=false;
-			this.$refs.elResetXrr.hidden=false;
+			this.$refs.elResetExcludedRR.hidden=false;
+			this.$refs.elResetClose.hidden=false;	
 			this.$refs.elResetDataStatus.hidden=true
 			this.$refs.elResetDataSpinner.hidden=true;
 		},
-		resetData(){
+		resetData(excludeRawRemainder){
 			this.$refs.elResetDataSpinner.hidden=false;
 			this.$refs.elReset.hidden=true;
-			this.$refs.elCancel.hidden=true;
-			this.$refs.elResetXrr.hidden=true;
-			apiRequest('reset_data', null, null, null, 
+			this.$refs.elResetExcludedRR.hidden=true;
+			this.$refs.elResetClose.hidden=true;
+			apiRequest('reset_data', {excludedRawRemainder: excludeRawRemainder}, null, null, 
 					ok=>{
 						this.get_system();
 						this.$refs.elResetDataSpinner.hidden=true;
-						this.$refs.elResetDataStatus.hidden=false;
+						this.$refs.elResetDataStatus.hidden=false;						
+						this.refreshPage();
 					}, 
 					errors=>{
 						this.resetDataError=errors[0].info;
 						this.$refs.elResetDataSpinner.hidden=true;
 						this.$refs.elResetDataStatus.hidden=false;
+						this.$refs.elResetClose.hidden=false;
 					});			
 		},
 		checkAvailableSoftwareVersion(){

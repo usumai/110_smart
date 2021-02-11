@@ -49,17 +49,7 @@ if ($act=='sys_pull_master') {
 	header("Location: 05_action.php?act=sys_reset_data");
 
 }elseif ($act=='sys_initialise') {
-	fnInitiateDatabase(false);
-}elseif ($act=='sys_reset_data_minus_rr') {
-     //Delete all tables except for RR
-     $sql_save = "DROP TABLE $dbname.sm10_set, $dbname.sm11_pro, $dbname.sm13_stk, $dbname.sm14_ass, $dbname.sm15_rc, $dbname.sm16_file, $dbname.sm17_history, $dbname.sm18_impairment, $dbname.sm19_result_cats, $dbname.sm20_quarantine;";
-     mysqli_multi_query($con,$sql_save); 
-     fnInitiateDatabase();
-
-// ####################################################################################
-// Menu actions
-// ####################################################################################
-
+	fnInitiateDatabase(false, false);
 
 }elseif ($act=='get_system'){
      $stks = $sett = $pro = [];

@@ -1,7 +1,7 @@
 <?php
 include "php/common/common.php";
 
-function fnInitiateDatabase($noRedirect){
+function fnInitiateDatabase($noRedirect, $noCreateRRTable){
     global $con, $dbname, $date_version_published, $log;
 
     $sql_save = "CREATE TABLE $dbname.sm10_set (
@@ -40,10 +40,10 @@ function fnInitiateDatabase($noRedirect){
 
     $sql_save = "CREATE TABLE $dbname.sm11_pro (`profile_id` INT(11) NOT NULL AUTO_INCREMENT,`create_date` DATETIME NULL DEFAULT NULL,`delete_date` DATETIME NULL DEFAULT NULL,`update_date` DATETIME NULL DEFAULT NULL,`profile_name` VARCHAR(255) NULL DEFAULT NULL,`profile_drn` VARCHAR(255) NULL DEFAULT NULL,`profile_phone_number` VARCHAR(255) NULL DEFAULT NULL,`profile_pic` LONGTEXT NULL DEFAULT NULL,`profile_color_a` VARCHAR(255) NULL DEFAULT NULL,`profile_color_b` VARCHAR(255) NULL DEFAULT NULL,PRIMARY KEY (`profile_id`),UNIQUE INDEX `profile_id_UNIQUE` (`profile_id` ASC));";
     mysqli_multi_query($con,$sql_save);
-
-    $sql_save = "CREATE TABLE $dbname.sm12_rwr (`rr_id` INT(11) NOT NULL AUTO_INCREMENT,`Asset` VARCHAR(15) NULL DEFAULT NULL,`accNo` VARCHAR(5) NULL DEFAULT NULL, `InventNo` VARCHAR(30) NULL DEFAULT NULL, `AssetDesc1` VARCHAR(255) NULL DEFAULT NULL, `Class` VARCHAR(255) NULL DEFAULT NULL, `ParentName` VARCHAR(255) NULL DEFAULT NULL, `rr_included` int(11) DEFAULT NULL, PRIMARY KEY (`rr_id`),UNIQUE INDEX `rr_id_UNIQUE` (`rr_id` ASC));";
-    mysqli_multi_query($con,$sql_save);
-
+    if(! $noCreateRRTable){
+        $sql_save = "CREATE TABLE $dbname.sm12_rwr (`rr_id` INT(11) NOT NULL AUTO_INCREMENT,`Asset` VARCHAR(15) NULL DEFAULT NULL,`accNo` VARCHAR(5) NULL DEFAULT NULL, `InventNo` VARCHAR(30) NULL DEFAULT NULL, `AssetDesc1` VARCHAR(255) NULL DEFAULT NULL, `Class` VARCHAR(255) NULL DEFAULT NULL, `ParentName` VARCHAR(255) NULL DEFAULT NULL, `rr_included` int(11) DEFAULT NULL, PRIMARY KEY (`rr_id`),UNIQUE INDEX `rr_id_UNIQUE` (`rr_id` ASC));";
+        mysqli_multi_query($con,$sql_save);
+    }
     $sql_save = "CREATE TABLE $dbname.sm13_stk (
          `stkm_id` INT NOT NULL AUTO_INCREMENT,
          `stk_id` INT NULL,
@@ -476,6 +476,9 @@ function upload_reason_codes(){
     $sql            = "TRUNCATE TABLE smartdb.sm15_rc;";
     $res_truncate   = mysqli_multi_query($con,$sql);
     $filename       = get_file();
+    if(! $filename){
+        throw new Exception("SMARTM_reason_codes.txt is missing");
+    }
     $file_contents  = file_get_contents($filename);
     $string         = "[" . trim($file_contents) . "]";
     $json           = json_decode($string, true);
@@ -483,8 +486,6 @@ function upload_reason_codes(){
     
     $stmt   = $con->prepare("INSERT INTO smartdb.sm15_rc (res_reason_code, rc_desc, rc_long_desc, rc_example, rc_origin, rc_action, rc_states, rc_sorting_cat, rc_color) VALUES (?,?,?,?,?,?,?,?,?);");
     foreach ($header['reason_codes'] as $key => $val) {    
-        // echo "<br>";
-        // print_r($val);
         $stmt   ->bind_param("sssssssss", $val['res_reason_code'], $val['rc_desc'], $val['rc_long_desc'], $val['rc_example'], $val['rc_origin'], $val['rc_action'], $val['rc_states'], $val['rc_sorting_cat'], $val['rc_color']);
         $stmt   ->execute();
     }

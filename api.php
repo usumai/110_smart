@@ -103,8 +103,8 @@ if ($act=="create_ga_stocktake") {
         echo json_encode(new ResponseMessage("OK",$result));
     });
 }elseif ($act=='reset_data') {
-    execWithErrorHandler(function() {
-        $result = resetData();
+    execWithErrorHandler(function() use ($con, $request) {
+        $result = resetData($request->data->excludedRawRemainder);
         echo json_encode(new ResponseMessage("OK",$result));
     });   
 }elseif($act=="update_software") {
@@ -998,24 +998,36 @@ FROM
     echo json_encode(new ResponseMessage("OK", qget($sql)));
 }
 
-function resetData(){
+function resetData($excludedRR){
     global $con, $dbname, $hostname, $username, $password;
-	$con->query("DROP DATABASE $dbname;"); 
-	if($con->error){
-	 	throw new Exception($con->error);
-	}
-	 
-	$con->query("CREATE DATABASE $dbname;");
-	if($con->error){
-	 	throw new Exception($con->error);
-	}
 
-	$con=new mysqli($hostname, $username, $password, $dbname);
-	if ($con->connect_error) {
-		throw new Exception($con->connect_error);
-	} 
-	
- 	fnInitiateDatabase(true);
+    
+    if($excludedRR){
+        //Delete all tables except for RR
+        $con->query("DROP TABLE $dbname.sm10_set, $dbname.sm11_pro, $dbname.sm13_stk, $dbname.sm14_ass, $dbname.sm15_rc, $dbname.sm16_file, $dbname.sm17_history, $dbname.sm18_impairment, $dbname.sm19_result_cats, $dbname.sm20_quarantine;");
+        if($con->error){
+            throw new Exception($con->error);
+        }
+        fnInitiateDatabase(true, true);
+    }else{
+	    $con->query("DROP DATABASE $dbname;"); 
+	    if($con->error){
+	 	    throw new Exception($con->error);
+	    }
+	 
+	    $con->query("CREATE DATABASE $dbname;");
+	    if($con->error){
+	 	    throw new Exception($con->error);
+	    }
+
+        $con=new mysqli($hostname, $username, $password, $dbname);
+        if ($con->connect_error) {
+            throw new Exception($con->connect_error);
+        }         	
+        fnInitiateDatabase(true, false);
+    }
+    
+    return $excludedRR;
 }
 
 function checkAvailableSoftwareVersion(){
