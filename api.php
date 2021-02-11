@@ -1,6 +1,6 @@
 <?php 
 include "01_dbcon.php"; 
-include "php/common/common.php";
+include "05_db_designer.php";
 include "php/service/ActivityImport.php";
 include "php/service/ActivityExport.php";
 header("Cache-Control: no-store, max-age=0");
@@ -102,6 +102,11 @@ if ($act=="create_ga_stocktake") {
         
         echo json_encode(new ResponseMessage("OK",$result));
     });
+}elseif ($act=='reset_data') {
+    execWithErrorHandler(function() {
+        $result = resetData();
+        echo json_encode(new ResponseMessage("OK",$result));
+    });   
 }elseif($act=="update_software") {
     execWithErrorHandler(function() { 
         $result = updateSoftware();
@@ -426,20 +431,25 @@ if ($act=="create_ga_stocktake") {
     $a          = scandir("images/");
     $img_list   = "";
     $images     = "";
+    
     if ($genesis_cat=="nonoriginal") {
-         $photo_name_test	= $res_fingerprint;
+         $assetImageName	= $res_fingerprint;
     }else{
-         $photo_name_test	= $res_asset_id;
+         $assetImageName	= $res_asset_id;
     }
-    $filearr = [];
-    foreach ($a as $key => $photo_name) {
-         $photo_name_parts = explode("_",$photo_name);
-        if ($photo_name_parts[0]==$photo_name_test)  {
-            array_push($filearr,$photo_name);
-            //   $img_list .= "<button type='button' class='btn thumb_photo' value='".$photo_name."' data-toggle='modal' data-target='#modal_show_pic'><img src='images/".$photo_name."?".time()."' width='200px'></button>"; 
+    
+    $assetImages = [];
+    
+    foreach ($a as $key => $existImageName) {
+        
+        $name_parts = explode("_",$existImageName);
+        
+        if ($name_parts[0] == $assetImageName) {
+            array_push($assetImages,  $existImageName);
         }
     }
-    echo json_encode($filearr);
+    
+    echo json_encode($assetImages);
     
 }elseif ($act=='save_create_template') {
     $ass_id        = $_POST["ass_id"];
@@ -988,6 +998,26 @@ FROM
     echo json_encode(new ResponseMessage("OK", qget($sql)));
 }
 
+function resetData(){
+    global $con, $dbname, $hostname, $username, $password;
+	$con->query("DROP DATABASE $dbname;"); 
+	if($con->error){
+	 	throw new Exception($con->error);
+	}
+	 
+	$con->query("CREATE DATABASE $dbname;");
+	if($con->error){
+	 	throw new Exception($con->error);
+	}
+
+	$con=new mysqli($hostname, $username, $password, $dbname);
+	if ($con->connect_error) {
+		throw new Exception($con->connect_error);
+	} 
+	
+ 	fnInitiateDatabase(true);
+}
+
 function checkAvailableSoftwareVersion(){
     $versionInfo=getSoftwareVersion();
     $softwareLocalVersion=$versionInfo['localVersion'];
@@ -1034,6 +1064,7 @@ function updateSoftware() {
 	}
 
 	splitLines($output, shell_exec(GIT_CMD .' pull https://github.com/usumai/110_smart.git'));
+
 	$revision=shell_exec(GIT_CMD .' rev-parse --short HEAD');
 
 	$result = ["info" => $output, "revision" => $revision];

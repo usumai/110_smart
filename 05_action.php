@@ -49,18 +49,7 @@ if ($act=='sys_pull_master') {
 	header("Location: 05_action.php?act=sys_reset_data");
 
 }elseif ($act=='sys_initialise') {
-	fnInitiateDatabase();
-}elseif ($act=='sys_reset_data') {
-     $con->query("DROP DATABASE $dbname;"); 
-     $con->query("CREATE DATABASE $dbname;");
-	 if(! $con->error) 
-	 {
-		$con=new mysqli($hostname, $username, $password, $dbname);
-		if ($con->connect_error) {
-    		die("Connection failed: " . $con->connect_error);
-		} 
-     	fnInitiateDatabase();
-	 }
+	fnInitiateDatabase(false);
 }elseif ($act=='sys_reset_data_minus_rr') {
      //Delete all tables except for RR
      $sql_save = "DROP TABLE $dbname.sm10_set, $dbname.sm11_pro, $dbname.sm13_stk, $dbname.sm14_ass, $dbname.sm15_rc, $dbname.sm16_file, $dbname.sm17_history, $dbname.sm18_impairment, $dbname.sm19_result_cats, $dbname.sm20_quarantine;";
@@ -702,7 +691,7 @@ if ($act=='sys_pull_master') {
 // ####################################################################################
 }elseif ($act=='save_photo'){
      $ass_id   = $_POST["ass_id"];
-     $input    = $_POST["res_img_data"];
+     $imageDat   = $_POST["res_img_data"];
 
      $sql = "SELECT * FROM smartdb.sm14_ass WHERE ass_id = ".$ass_id."; ";
      $result = $con->query($sql);
@@ -711,7 +700,7 @@ if ($act=='sys_pull_master') {
                $res_asset_id           = $row["res_asset_id"];
                $res_fingerprint        = $row["res_fingerprint"];
      }}
-     if ($Asset=="First found") {
+     if ($res_asset_id =="firstfound") {
           $photo_name              = "images/".$res_fingerprint;
      }else{
           $photo_name              = "images/".$res_asset_id;
@@ -723,7 +712,7 @@ if ($act=='sys_pull_master') {
           $counter++;
           $photo_name = $original_photo_name.'_'.$counter.'.jpg';
      }
-     file_put_contents($photo_name, file_get_contents($input));
+     file_put_contents($photo_name, file_get_contents($imageDat));
      header("Location: 11_ass.php?current_row=$current_row&ass_id=".$ass_id);
 
 
@@ -1257,15 +1246,7 @@ if ($act=='sys_pull_master') {
      	res_assetdesc1) 
      VALUES('".$stkm_id."', NOW(), '".$active_profile_id."',1,'firstfound','nonoriginal',NOW(), '".$active_profile_id."','".$res_reason_code."', '".$asset_template."'); ";
      mysqli_multi_query($con,$sql_save);
-     echo "<br><br>".$sql_save;
-
-     $sql = "SELECT * FROM smartdb.sm14_ass ORDER BY ass_id DESC LIMIT 1;";
-     $result = $con->query($sql);
-     if ($result->num_rows > 0) {
-         while($row = $result->fetch_assoc()) {
-             $new_ass_id    = $row["ass_id"];
-     }}
-
+     $new_ass_id=$con->insert_id;
      header("Location: 11_ass.php?ass_id=".$new_ass_id);
 
 }elseif ($act=='save_delete_first_found'){

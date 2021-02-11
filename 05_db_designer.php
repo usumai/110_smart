@@ -1,7 +1,7 @@
 <?php
 include "php/common/common.php";
 
-function fnInitiateDatabase(){
+function fnInitiateDatabase($noRedirect){
     global $con, $dbname, $date_version_published, $log;
 
     $sql_save = "CREATE TABLE $dbname.sm10_set (
@@ -450,8 +450,8 @@ END"
     $sql_save = "UPDATE smartdb.sm10_set SET active_profile_id=1,rr_count = (SELECT COUNT(*) AS rr_count FROM smartdb.sm12_rwr) WHERE smartm_id =1";
     mysqli_multi_query($con,$sql_save);
 
-
-    header("Location: index.php");
+	if(!$noRedirect)
+    	header("Location: index.php");
 }
 
 
@@ -475,7 +475,7 @@ function upload_reason_codes(){
     global $con;
     $sql            = "TRUNCATE TABLE smartdb.sm15_rc;";
     $res_truncate   = mysqli_multi_query($con,$sql);
-    $filename       = get_file('reason_codes');
+    $filename       = get_file();
     $file_contents  = file_get_contents($filename);
     $string         = "[" . trim($file_contents) . "]";
     $json           = json_decode($string, true);

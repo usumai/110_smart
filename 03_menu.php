@@ -7,7 +7,6 @@ if(array_key_exists("current_row",$_POST)){
 }
 
 ?>
-
 <script src="includes/axios/axios.min.js" ></script>     
 <script>
   
@@ -83,7 +82,7 @@ if(array_key_exists("current_row",$_POST)){
 						<div class='dropdown-menu' aria-labelledby='dropdown01' id='dropdownHelp'>
 
 							<h6 class='dropdown-header'>System settings</h6>
-							<button type='button' class='dropdown-item btn btn-danger' data-toggle='modal' data-target='#modal_confirm_reset'>Reset all data</button>
+							<button type='button' class='dropdown-item btn btn-danger' @click="initResetData()" data-toggle='modal' data-target='#modal_confirm_reset'>Reset all data</button>
 							<a class='dropdown-item' href='05_action.php?act=save_invertcolors'>Invert Colour Scheme</a>
 							<!-- <a class='dropdown-item' href='05_action.php?act=sys_open_image_folder'>Image folder</a> -->
 
@@ -92,9 +91,7 @@ if(array_key_exists("current_row",$_POST)){
 							<h6 class='dropdown-header'>Available Version<span class='float-right'>v{{ sysd.versionRemote }}{{sysd.versionRemoteRevision? ('.'+sysd.versionRemoteRevision.substring(0,7)) : ''}}</span></h6>
 							<h6 class='dropdown-header'>Last checked<span class='float-right'>{{ sysd.date_last_update_check }}</span></h6>
 							<button type='button' v-if="sysd.versionLocal==sysd.versionRemote" class='dropdown-item btn' @click='checkAvailableSoftwareVersion()'>Check for new version</button>
-							<button type='button' class='dropdown-item btn' data-toggle="modal" v-on:click="initSoftwareUpdate()" data-target="#update_confirm_dlg"><i class="fas fa-cloud-download-alt ml-2"></i> Force Software Update</button>
-
-							<span v-if="vcheck==2" class='dropdown-item'>You need to be connected to the internet to check for a new version</span>
+							<button type="button" class="dropdown-item btn" data-toggle="modal" @click="initSoftwareUpdate()" data-target="#update_confirm_dlg"><i class="fas fa-cloud-download-alt ml-2"></i> Force Software Update</button>
 
 							<button type='button' v-if="sysd.versionLocal<sysd.versionRemote" class='dropdown-item btn text-danger' data-toggle='modal' data-target='#modal_confirm_update'>Update available v{{ sysd.versionRemote }}</button>
 							
@@ -276,24 +273,41 @@ if(array_key_exists("current_row",$_POST)){
 	</div>
 	</div>
 
-	<!-- System Reset Dialog -->
-	<div class="modal fade" id="modal_confirm_reset" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<!-- Reset Data Dialog -->
+<div class="modal fade" id="modal_confirm_reset" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
-		<div class="modal-header" style="background-color: #5a95ca;">
-			<h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke">Delete all data</h5>
-			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-			<span aria-hidden="true">&times;</span>
-			</button>
-		</div>
-		<div class="modal-body">  
-			<p class="lead">Reseting SMARTm will delete all data on this device.<br><br>Are you sure you want to proceed?</p>  
-		</div>
-		<div class="modal-footer">
-			<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-			<a class="btn btn-danger" href='05_action.php?act=sys_reset_data'>Reset</a>
-			<a class="btn btn-danger" href='05_action.php?act=sys_reset_data_minus_rr'>Reset excluding RR</a>
-		</div>
+			<div class="modal-header" style="background-color: #5a95ca;">
+				<h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke">Data Resets</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">  
+				<p class="lead">
+					<p style="text-align: left;"><strong>Warning: </strong></p>
+					<p style="text-align: justify;"><i style="color: red">You are about to wipe all SMARTm data on this device.</i></p>
+					<p style="text-align: left;">Are you sure you want to proceed?</p>
+				</p>
+				
+				<div ref="elResetDataSpinner" hidden class="spinner-border text-info" role="status" style="margin-left: 50%; left: -2rem">
+				  <span class="sr-only">SMARTM data resetting...</span>
+				</div>
+				<div ref="elResetDataStatus" hidden>
+					<div  v-if="resetDataError==''" class="alert alert-info">
+						<i>Data reset completed</strong>
+					</div>  
+					<div  v-if="resetDataError!=''" class="alert alert-danger">
+						<strong>Error!</strong>
+						<i>{{resetDataError}}</i>
+					</div> 	 
+				</div>	  
+			</div>
+			<div class="modal-footer">
+				<button ref="elCancel" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+				<a ref="elReset" class="btn btn-danger" @click="resetData()">Reset</a>
+				<a ref="elResetXrr" class="btn btn-danger" href='05_action.php?act=sys_reset_data_minus_rr'>Reset excluding RR</a>
+			</div>
 		</div>
 	</div>
 	</div>
@@ -431,8 +445,8 @@ let vm_menu = new Vue({
 		},
 		updateResponse:[],
 		updateRevision:'',
-		updateError: false
-		
+		updateError: false,
+		resetDataError:''
     },
     created() {
 		this.refresh_sys()
@@ -529,7 +543,31 @@ let vm_menu = new Vue({
 			this.rwrd 	= json[0]
 			console.log(this.rwrd)
 		},
-
+		initResetData(){
+			this.resetDataError='';
+			this.$refs.elReset.hidden=false;
+			this.$refs.elCancel.hidden=false;
+			this.$refs.elResetXrr.hidden=false;
+			this.$refs.elResetDataStatus.hidden=true
+			this.$refs.elResetDataSpinner.hidden=true;
+		},
+		resetData(){
+			this.$refs.elResetDataSpinner.hidden=false;
+			this.$refs.elReset.hidden=true;
+			this.$refs.elCancel.hidden=true;
+			this.$refs.elResetXrr.hidden=true;
+			apiRequest('reset_data', null, null, null, 
+					ok=>{
+						this.get_system();
+						this.$refs.elResetDataSpinner.hidden=true;
+						this.$refs.elResetDataStatus.hidden=false;
+					}, 
+					errors=>{
+						this.resetDataError=errors[0].info;
+						this.$refs.elResetDataSpinner.hidden=true;
+						this.$refs.elResetDataStatus.hidden=false;
+					});			
+		},
 		checkAvailableSoftwareVersion(){
 			apiRequest('check_available_software_version', null, null, null, 
 				ok=>{
@@ -549,6 +587,7 @@ let vm_menu = new Vue({
 		forceUpdateToLatest(){
 			this.$refs.update_ok.hidden=true;
 			this.$refs.update_spinner.hidden=false;
+			
 			updateSoftware(
 				success=>{
 					this.$refs.update_spinner.hidden=true;
