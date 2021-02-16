@@ -451,8 +451,8 @@ if ($act=="create_ga_stocktake") {
     
     echo json_encode($assetImages);
     
-}elseif ($act=='save_create_template') {
-    $ass_id        = $_POST["ass_id"];
+}elseif ($act=='ga_create_template') {
+    $ass_id = $_POST["ass_id"];
 
     $sql = "
     INSERT INTO smartdb.sm14_ass (
@@ -527,8 +527,6 @@ if ($act=="create_ga_stocktake") {
         res_responsible_ccc,
         res_mfr,
         res_inventory,
-        res_inventno,
-        res_serialno,
         res_site_no,
         res_grpcustod,
         res_plateno,
@@ -587,7 +585,7 @@ if ($act=="create_ga_stocktake") {
         res_reason_code,
         res_rc_desc,
         res_comment,
-        res_asset_id,
+        'firstfound',
         res_assetdesc1,
         res_assetdesc2,
         res_assettext,
@@ -612,8 +610,6 @@ if ($act=="create_ga_stocktake") {
         res_responsible_ccc,
         res_mfr,
         res_inventory,
-        res_inventno,
-        res_serialno,
         res_site_no,
         res_grpcustod,
         res_plateno,

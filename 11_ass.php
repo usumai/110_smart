@@ -242,7 +242,7 @@
                                 maxlen='255'
                                 ></textinput>
                             </div>
-                            <br><button type='button' class='btn btn-outline-dark float-right' @click='save_create_template'
+                            <br><button type='button' class='btn btn-outline-dark float-right' @click='ga_create_template'
                             v-if='!template_ass_id'>Copy as a template</button>
                             <a type='button' class='btn btn-outline-dark float-right' :href="'11_ass.php?ass_id='+template_ass_id" v-if='template_ass_id'>Template asset link</a>
                         </div>
@@ -513,12 +513,12 @@ let vm = new Vue({
             // console.log(json)
             this.get_stk_asset()
         }, 
-        save_create_template(direction){
-            payload     = {'act':'save_create_template', 'ass_id':this.ass_id}
+        ga_create_template(direction){
+            payload     = {'act':'ga_create_template', 'ass_id':this.ass_id}
             json        = fnapi(payload)
           
             this.template_ass_id = json.ass_id;
-            this.get_stk_asset();
+            window.location.reload();
         }, 
     }
 })
