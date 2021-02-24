@@ -303,14 +303,15 @@ let vm = new Vue({
                 header_obj['rc_orig']           = actv.rc_orig;
                 header_obj['rc_orig_complete']  = actv.rc_orig_complete;
                 header_obj['rc_extras']         = actv.rc_extras;
-                header_obj['rc_totalsent']      = actv.rc_totalsent;
+
                 header_obj['asset_lock_date']   = ''
 
                 payload                         = {'act':	'export_ga', 
                 								   'stkm_id': actv.stkm_id 
                 								};
-                
-                header_obj['assetlist']         = fnapi(payload);
+                list = fnapi(payload);
+                header_obj['rc_totalsent'] =  list.length;
+                header_obj['assetlist']         = list;
                 
                 
             }else if (actv.stk_type=="is_audit"){
