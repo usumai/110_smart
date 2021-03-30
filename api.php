@@ -21,7 +21,7 @@ if($request != null) {
 if ($act=="create_ga_stocktake") {  
     execWithErrorHandler(function() use ($con, $request){ 
     	 
-        $stocktakeId = createGaStocktake($con, $request->data);
+        $stocktakeId = createStocktakeActivity($con, $request->data);
         $result = ["stocktakeId" => $stocktakeId];
         echo json_encode(new ResponseMessage("OK", $result));
     });
@@ -83,7 +83,7 @@ if ($act=="create_ga_stocktake") {
     });              
 }elseif ($act=="create_is_audit") {      
     execWithErrorHandler(function() use ($con, $request){
-        $stocktakeId = createIsAudit($con, $request->data);
+        $stocktakeId = createStocktakeActivity($con, $request->data);
         $result = ["stocktakeId" => $stocktakeId];
         echo json_encode(new ResponseMessage("OK", $result));
     });
@@ -210,7 +210,7 @@ if ($act=="create_ga_stocktake") {
  	$activity= exportGaActivity($stkm_id);
     echo json_encode($activity);       
 }elseif ($act=="get_stk_progress") {
-    $sql = "    SELECT COUNT(*) as count_total, SUM(CASE WHEN res_reason_code<>'' THEN 1 ELSE 0 END) AS count_complete   FROM smartdb.sm14_ass WHERE stk_include = 1 AND delete_date IS NULL AND genesis_cat <> 'template'";
+    $sql = "    SELECT COUNT(*) as count_total, SUM(CASE WHEN a.res_reason_code<>'' THEN 1 ELSE 0 END) AS count_complete   FROM smartdb.sm14_ass a left join smartdb.sm13_stk s on a.stkm_id=s.stkm_id WHERE s.stk_include = 1 AND a.delete_date IS NULL AND a.genesis_cat <> 'template'";
     echo json_encode(qget($sql));
 
 }elseif ($act=="get_stk_asset") {
@@ -340,26 +340,26 @@ if ($act=="create_ga_stocktake") {
     $stkm_id        = $_POST["stkm_id"];
     $findingID      = $_POST["findingID"];
     $current_user   = "user_function_not_made";
-    $fingerprint    = time();
+
 
     $msg = "Not set";
     if($findingID==0){//NSTR
         $msg = "Clear results";
         $stmt   = $con->prepare("   UPDATE smartdb.sm18_impairment 
-                                    SET res_create_date=NULL, res_update_user=NULL, findingID=NULL,fingerprint=NULL
+                                    SET res_create_date=NULL, res_update_user=NULL, findingID=NULL
                                     WHERE BIN_CODE=? AND isType='b2r' AND stkm_id=?");
         $stmt   ->bind_param("ss", $BIN_CODE, $stkm_id);
     }else if($findingID==14){//NSTR
         $msg = "NSTR";
         $stmt   = $con->prepare("   UPDATE smartdb.sm18_impairment 
-                                    SET res_create_date=NOW(), res_update_user=?, findingID=?,fingerprint=?
+                                    SET res_create_date=NOW(), res_update_user=?, findingID=?
                                     WHERE BIN_CODE=? AND isType='b2r' AND stkm_id=?");
-        $stmt   ->bind_param("sssss", $current_user, $findingID, $fingerprint, $BIN_CODE, $stkm_id);
+        $stmt   ->bind_param("ssss", $current_user, $findingID, $BIN_CODE, $stkm_id);
     }else if($findingID==15){//There are extra stockcodes in the bin
         $stmt   = $con->prepare("   UPDATE smartdb.sm18_impairment 
-                                    SET res_create_date=NULL, res_update_user=NULL, findingID=?,fingerprint=?
+                                    SET res_create_date=NULL, res_update_user=NULL, findingID=?
                                     WHERE BIN_CODE=? AND isType='b2r' AND stkm_id=?");
-        $stmt   ->bind_param("ssss", $findingID, $fingerprint, $BIN_CODE, $stkm_id);
+        $stmt   ->bind_param("sss", $findingID, $BIN_CODE, $stkm_id);
     }
     $stmt   ->execute();
 
@@ -370,14 +370,36 @@ if ($act=="create_ga_stocktake") {
     $BIN_CODE       = $_POST["BIN_CODE"];
     $stkm_id        = $_POST["stkm_id"];
     $current_user   = "user_function_not_made";
-    $fingerprint    = time();
 
-    $stmt   = $con->prepare("   INSERT INTO smartdb.sm18_impairment (res_create_date, res_update_user, fingerprint, 
-                                res_parent_storageID, stkm_id, BIN_CODE, DSTRCT_CODE, WHOUSE_ID, isType, data_source)
-                                SELECT NOW(), ?, ?, storageID, stkm_id, BIN_CODE, DSTRCT_CODE, WHOUSE_ID, isType, 'extra'
-                                FROM smartdb.sm18_impairment
-                                WHERE BIN_CODE=? AND stkm_id=? AND data_source='skeleton'");
-    $stmt   ->bind_param("ssss",  $current_user, $fingerprint, $BIN_CODE, $stkm_id);
+    $stmt   = $con->prepare("
+    INSERT INTO smartdb.sm18_impairment (
+        stkm_id, 
+        isID,
+        BIN_CODE, 
+        DSTRCT_CODE, 
+        WHOUSE_ID, 
+        isType, 
+        res_parent_storageID,
+        data_source,
+        res_update_user,
+        res_create_date
+    ) SELECT
+        stkm_id, 
+        isID, 
+        BIN_CODE, 
+        DSTRCT_CODE, 
+        WHOUSE_ID, 
+        isType, 
+        storageID, 
+        'extra',
+        ?, 
+        NOW()
+    FROM smartdb.sm18_impairment
+    WHERE 
+        BIN_CODE=? AND 
+        stkm_id=? AND 
+        data_source='skeleton'");
+    $stmt   ->bind_param("sss",  $current_user, $BIN_CODE, $stkm_id);
     $stmt   ->execute();
     //update parent bin status
     updateB2RBinStatus($con, $stkm_id ,  $BIN_CODE, null);

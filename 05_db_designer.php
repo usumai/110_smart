@@ -66,7 +66,6 @@ function fnInitiateDatabase($noRedirect, $noCreateRRTable){
     mysqli_multi_query($con,$sql_save);
 
 
-    $log .= "<br>"."creating $dbname.sm14_ass_old ";
     $sql_save = "CREATE TABLE `$dbname`.`sm14_ass` (
               `ass_id` int(11) NOT NULL AUTO_INCREMENT,
               `stkm_id` int(11) DEFAULT NULL,
@@ -360,24 +359,110 @@ END"
         res_comment text NULL,
         res_evidence_desc VARCHAR(255) NULL,
         res_unserv_date datetime NULL,
-        res_parent_storageID VARCHAR(255) NULL,
+        res_parent_storageID INT(11) NULL,
         res_create_date datetime NULL,
         res_create_user VARCHAR(255) NULL, 
         res_update_user VARCHAR(255) NULL,
         finalResult VARCHAR(255) NULL,
         finalResultPath VARCHAR(255) NULL,
-        fingerprint varchar(255) DEFAULT NULL,
+        UUID varchar(255) DEFAULT NULL,
         checkFlag int(11) NULL,
         data_source varchar(30) DEFAULT NULL,
         extract_date datetime NULL,
+        duplicate int(11) DEFAULT -1,
         create_date datetime NULL,
         create_user VARCHAR(255) NULL,
         delete_date datetime NULL,
         delete_user VARCHAR(255) NULL,
+        modify_date datetime NULL,
+        modify_user VARCHAR(255) NULL,
+        version int NULL,
         PRIMARY KEY (auto_storageID));";
     mysqli_multi_query($con,$sql_save);
 
-
+    $con->query(
+"CREATE TRIGGER impairment_insert
+BEFORE INSERT
+ON sm18_impairment
+FOR EACH ROW
+BEGIN
+	IF(new.version is null) THEN
+		set new.version=0;
+	END IF;
+    set new.delete_date=null;
+    IF (new.create_date is null) THEN
+    	set new.create_date=now(),
+            new.create_user=getCurrentProfileName();
+    END IF;
+        
+    IF((new.storageID IS NULL) AND (new.UUID IS NULL)) THEN
+    	set new.UUID=UUID();
+    END IF;
+        
+	SELECT
+    	stk_id
+    into @new_stocktake_id
+    FROM sm13_stk
+    WHERE
+    	stkm_id=new.stkm_id;
+        
+    SET @edit_status='NEW', @old_ass_id=NULL;
+        
+    IF(new.storageID IS NULL) THEN
+		SELECT
+			(
+				CASE
+				WHEN (new.version > a.version) THEN 'NEW'
+				WHEN (new.version = a.version) THEN 'DUP'
+				WHEN (new.version < a.version) THEN 'OLD'
+				END
+			), a.auto_storageID, a.modify_date, a.version
+			INTO @edit_status, @old_auto_storageID, @old_modify_date, @old_version
+		FROM
+			sm18_impairment as a inner join
+			sm13_stk as t on ((a.stkm_id=t.stkm_id) and
+	                          (t.stk_id = @new_stocktake_id) and
+	                          (t.smm_delete_date is null))
+		WHERE
+			a.UUID=new.UUID;
+    ELSE
+        
+		SELECT
+			(
+				CASE
+				WHEN (new.version > a.version) THEN 'NEW'
+				WHEN (new.version = a.version) THEN 'DUP'
+				WHEN (new.version < a.version) THEN 'OLD'
+				END
+			), a.auto_storageID, a.modify_date, a.version
+			INTO @edit_status, @old_auto_storageID, @old_modify_date, @old_version
+		FROM
+			sm18_impairment as a inner join
+			sm13_stk as t on ((a.stkm_id=t.stkm_id) and
+	                          (t.stk_id = @new_stocktake_id) and
+	                          (t.smm_delete_date is null))
+		WHERE
+			a.storageID=new.storageID;
+	END IF;
+        
+	IF ((@edit_status='NEW') AND (@old_auto_storageID is not null))  THEN
+		SET new.duplicate=@old_auto_storageID;
+	ELSEIF (@edit_status='DUP') THEN
+    	IF((@old_modify_date IS NULL AND new.modify_date IS NOT NULL) OR (new.modify_date > @old_modify_date)) THEN
+            SET new.duplicate=@old_auto_storageID;
+        ELSE
+			SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT='Impairment record already exist',
+            MYSQL_ERRNO=20000;
+        END IF;
+    ELSEIF (@edit_status='OLD') THEN
+		SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT='Impairment record is older',
+        MYSQL_ERRNO=20000;
+	END IF;
+END"
+        );
+    
     $sql_save = "CREATE TABLE $dbname.sm19_result_cats (
          `findingID` INT(11) NOT NULL AUTO_INCREMENT, 
          `findingName` VARCHAR(255) NULL,

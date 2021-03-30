@@ -18,7 +18,7 @@ $sql = "SELECT *
 		FROM smartdb.sm14_ass 
 		WHERE delete_date IS NULL
 		GROUP BY stkm_id ) AS vt1
-		ON smartdb.sm13_stk.stkm_id= vt1.stkm_id;";
+		ON smartdb.sm13_stk.stkm_id= vt1.stkm_id WHERE smartdb.sm13_stk.stk_include=1;";
 $result2 = $con->query($sql);
 if ($result2->num_rows > 0) {
   while($row2 = $result2->fetch_assoc()) {

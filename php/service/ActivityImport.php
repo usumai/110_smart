@@ -86,7 +86,7 @@ function createIsImpairments($connection, $stocktakeId, $impairments) {
         	res_update_user,
 			finalResult,
 			finalResultPath,
-			fingerprint,
+			UUID,
 			data_source,
 			extract_date,
 			create_date,
@@ -139,13 +139,13 @@ function createIsImpairments($connection, $stocktakeId, $impairments) {
 			$record->res_comment,
 			$record->res_evidence_desc,
 			$record->res_unserv_date, 
-			$record->res_parent_storageID,
+			$record->res_parent_storage_id,
 			$record->res_create_date,
 			$record->res_create_user, 
 			$record->res_update_user,
 			$record->finalResult,
 			$record->finalResultPath,
-			$record->fingerprint,
+			$record->UUID,
 			$record->data_source,
 			$extractDate,
 			$createDate,
@@ -301,7 +301,7 @@ function updateSettings($connection, $record){
     mysqli_multi_query($connection, $sql);
 }
 
-function createGaStocktake($connection, $record) {
+function createStocktakeActivity($connection, $record) {
     $stk_id=$record->stk_id;
 
     $results=qget("SELECT stkm_id FROM smartdb.sm13_stk WHERE (stk_id= $stk_id) and ((smm_delete_date is null) || (date(smm_delete_date)='0000-00-00'))");
