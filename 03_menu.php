@@ -127,8 +127,10 @@ if(array_key_exists("current_row",$_POST)){
  				<div v-if="errorInfo !== ''" class="container">
             		<div class="alert alert-danger"><strong>Error: </strong>{{errorInfo}}</div>     
         		</div>
+        		
 				<a :href="'10_stk.php?current_row='+ <?=$current_row ?>" class='nav-link text-success' v-if="sysd.act_type=='ga_stk'">Summary</a>
 				<a :href="'15_impairment.php?current_row='+ <?=$current_row ?>" class='nav-link text-success' v-if="sysd.act_type=='is_audit'" >Summary</a>
+				<div style="font-style: italic; color: #007bff; border: yellow solid 1px; padding: 0px 7px; border-radius: 10px; "><i class="fa fa-user"></i> {{currentLogonUser}}</div>
 			</div>
 		</nav>
 		<hr>
@@ -426,6 +428,7 @@ let vm_menu = new Vue({
     data: {
         errorInfo: '<?=(array_key_exists("error_info",$_GET)?$_GET["error_info"]:"")?>',
 		userProfiles:[],
+		currentLogonUser: '<?= get_current_user() ?>',
         sysd:{},
 		templd:{},
 		actvd:{},

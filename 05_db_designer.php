@@ -530,7 +530,7 @@ END"
         UNIQUE KEY `index_single_storage_candidate` (`stkm_id_new`, `stID1`));";
 
     mysqli_multi_query($con,$sql_save);
-    $con->query("INSERT INTO $dbname.sm11_pro(profile_name,create_date) VALUES ('Default', now());");    
+    $con->query("INSERT INTO $dbname.sm11_pro(profile_name,create_date) VALUES ('".CURRENT_SYS_USER."', now());");    
     
     $sql_save = "UPDATE smartdb.sm10_set SET active_profile_id=1,rr_count = (SELECT COUNT(*) AS rr_count FROM smartdb.sm12_rwr) WHERE smartm_id =1";
     mysqli_multi_query($con,$sql_save);

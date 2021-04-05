@@ -17,6 +17,8 @@ define ('NET_NO_SERVICE','4');
 define ('DB_ERR_RECORD_EXIST',20000);
 define ('DB_ERR_STATE','45000');
 
+define ('CURRENT_SYS_USER', get_current_user());
+
 function getAPIAction() {
     if(!array_key_exists("CONTENT_TYPE",$_SERVER))
         return null;
