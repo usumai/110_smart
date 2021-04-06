@@ -1288,7 +1288,7 @@ if ($act=='sys_pull_master') {
      $sql = "DELETE FROM smartdb.sm18_impairment WHERE res_parent_storageID='$storageID' ";
      runSql($sql);
 
-     $fingerprint        = time();
+     //$fingerprint        = time();
      if($findingID==11){
 
           foreach ($_POST["splityRecord"] as $key => $value) {
@@ -1311,7 +1311,6 @@ if ($act=='sys_pull_master') {
                               res_parent_storageID, 
                               data_source,
                               SOH, 
-                              fingerprint, 
                               isType, 
                               stkm_id)
                          VALUES (
@@ -1322,8 +1321,7 @@ if ($act=='sys_pull_master') {
                                $splityDate,
                                $storageID,
                               'extra',
-                               $splityCount,
-                              '$fingerprint',                              
+                               $splityCount,                        
                               'imp', 
                               $stkm_id)";
                runSql($sql);
@@ -1342,6 +1340,7 @@ if ($act=='sys_pull_master') {
                     tblEdit.TRACKING_IND = tblSource.TRACKING_IND,
                     tblEdit.TRACKING_REFERENCE = tblSource.TRACKING_REFERENCE,
                     tblEdit.LAST_MOD_DATE = tblSource.LAST_MOD_DATE,
+                    tblEdit.isID = tblSource.isID
                WHERE tblEdit.res_parent_storageID = tblSource.storageID
                     AND tblEdit.storageID IS NULL
                     AND tblSource.auto_storageID=$auto_storageID ";
@@ -1361,7 +1360,6 @@ if ($act=='sys_pull_master') {
                res_comment='$res_comment',
                res_unserv_date=$res_unserv_date,
                res_create_date=NOW(),
-               fingerprint='$fingerprint',
                checked_to_milis=$milisFlag
             WHERE 
                auto_storageID=$auto_storageID";
