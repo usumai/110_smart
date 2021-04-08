@@ -146,7 +146,7 @@ function exportIsActivity($activityID) {
 				imp.res_update_user,
 				imp.finalResult,
 				imp.finalResultPath,
-				imp.fingerprint,
+				imp.UUID,
 				imp.checkFlag,
 				imp.data_source,
 				imp.extract_date as ExtractDate,
@@ -154,6 +154,9 @@ function exportIsActivity($activityID) {
 				imp.create_user,
 				imp.delete_date,
 				imp.delete_user,
+                imp.modify_date,
+                imp.modify_user,
+                imp.version,
 				cat.resAbbr
     		FROM 
 				smartdb.sm18_impairment imp 

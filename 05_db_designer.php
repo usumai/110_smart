@@ -380,8 +380,8 @@ END"
         PRIMARY KEY (auto_storageID));";
     mysqli_multi_query($con,$sql_save);
 
-    $con->query(
-"CREATE TRIGGER impairment_insert
+    $con->query("
+CREATE TRIGGER is_insert
 BEFORE INSERT
 ON sm18_impairment
 FOR EACH ROW
@@ -460,8 +460,23 @@ BEGIN
         SET MESSAGE_TEXT='Impairment record is older',
         MYSQL_ERRNO=20000;
 	END IF;
-END"
-        );
+END");
+    
+    
+    $con->query("
+CREATE TRIGGER `is_update` BEFORE UPDATE ON `sm18_impairment`
+FOR EACH ROW BEGIN
+	 IF((select smm_delete_date 
+        from sm13_stk 
+        WHERE 
+        	stkm_id=old.stkm_id) is NULL) THEN
+		IF(new.duplicate=old.duplicate) THEN
+			set new.version = old.version + 1,
+                new.modify_date = now(),
+                new.modify_user=getCurrentProfileName();
+    	END IF;
+    END IF;
+END");
     
     $sql_save = "CREATE TABLE $dbname.sm19_result_cats (
          `findingID` INT(11) NOT NULL AUTO_INCREMENT, 

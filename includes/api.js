@@ -1001,6 +1001,10 @@ const XSLX_IS_IMPAIRMENT_COL_HEADER = [
 		type: 'string'
 	},	     
 	{
+		value: 'UUID',
+		type: 'string'
+	},	
+	{
 		value: 'create_date',
 		type: 'string'
 	},
@@ -1017,9 +1021,17 @@ const XSLX_IS_IMPAIRMENT_COL_HEADER = [
 		type: 'string'
 	},
 	{
-		value: 'fingerprint',
+		value: 'modify_date',
 		type: 'string'
-	}		
+	},
+	{
+		value: 'modify_user',
+		type: 'string'
+	},
+	{
+		value: 'version',
+		type: 'string'
+	}
 ];
 
 function createExcelRow(headers, rec){
