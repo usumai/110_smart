@@ -1381,8 +1381,7 @@ if ($act=='sys_pull_master') {
      	res_evidence_desc=NULL,
      	res_unserv_date=NULL,
      	res_comment=NULL,
-     	checked_to_milis=0,
-     	fingerprint=NULL
+     	checked_to_milis=0
      WHERE 
      	auto_storageID='$auto_storageID' ";
      
@@ -1402,8 +1401,7 @@ if ($act=='sys_pull_master') {
      $sql = "UPDATE smartdb.sm18_impairment SET 
      res_create_date=NOW(),
      res_update_user=NULL,
-     findingID=14,
-     fingerprint='$fingerprint'
+     findingID=14
      WHERE BIN_CODE='$BIN_CODE' AND isType='b2r' AND stkm_id=$stkm_id";
      runSql($sql);
 
@@ -1415,8 +1413,8 @@ if ($act=='sys_pull_master') {
      $stkm_id  = $_GET["stkm_id"];
      $fingerprint        = time();
      $sql = "UPDATE smartdb.sm18_impairment SET 
-     findingID=15,
-     fingerprint='$fingerprint'
+     findingID=15
+
      WHERE BIN_CODE='$BIN_CODE'  AND isType='b2r' AND stkm_id=$stkm_id";
      runSql($sql);
      fnStats($stkm_id);
@@ -1432,8 +1430,7 @@ if ($act=='sys_pull_master') {
      findingID=NULL,  
      res_comment=NULL,  
      res_evidence_desc=NULL,
-     res_unserv_date=NULL,
-     fingerprint=NULL
+     res_unserv_date=NULL
      WHERE BIN_CODE='$BIN_CODE'  
      AND isType='b2r'
      AND stkm_id=$stkm_id";
@@ -1483,7 +1480,6 @@ if ($act=='sys_pull_master') {
                SOH, 
                isChild,
                isType,
-               fingerprint,
                res_comment)
           VALUES (
                NOW(),
@@ -1497,7 +1493,6 @@ if ($act=='sys_pull_master') {
                '$extraSOH',
                1,
                'b2r',
-               '$fingerprint',
                '$extraComments'
                )";         
      }else{
