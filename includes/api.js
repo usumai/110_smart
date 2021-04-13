@@ -201,7 +201,7 @@ function createGaStocktake (stocktake, progressCallback, completeCallback, error
 function createGaAssets (stocktakeId, assetList, progressCallback, completeCallback, errorCallback) {
 
 	apiRequestParallel('create_ga_assets',  
-					assetList, {stocktakeId: stocktakeId}, 50, 
+					assetList, {stocktakeId: stocktakeId}, 200, 
 					'GA asset records', progressCallback, 
 					completeCallback, errorCallback);
 }

@@ -550,23 +550,25 @@ function createGaAssets($connection, $stocktakeId, $assets) {
 	        }	    
 		}
 	}
+
 	qget("
         DELETE  d1 
         FROM    smartdb.sm14_ass d1 
             JOIN smartdb.sm14_ass d2 
             ON  (d1.ass_id = d2.duplicate) 
                 AND (d2.stkm_id=$stocktakeId) 
-                AND (d2.duplicate <> -1)");
-/*	    
+                AND (d2.duplicate > -1)");
+	/*	
 	qget("DELETE FROM smartdb.sm14_ass 
           WHERE ass_id in (
             SELECT duplicate 
             FROM smartdb.sm14_ass 
-            WHERE stkm_id=$stocktakeId AND duplicate <> -1)");
-*/	
+            WHERE stkm_id=$stocktakeId AND duplicate > -1)");
+
 	qget("UPDATE smartdb.sm14_ass 
           SET duplicate = -1
           WHERE duplicate >= 0");
+	*/          
 	$stmt->close();
 }
 ?>
