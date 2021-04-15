@@ -104,7 +104,7 @@ if ($act=="create_ga_stocktake") {
     });
 }elseif ($act=='reset_data') {
     execWithErrorHandler(function() use ($con, $request) {
-        $result = resetData( $request &&  $request.data ?  $request->data->excludedRawRemainder : false);
+        $result = resetData( $request &&  $request->data ?  $request->data->excludedRawRemainder : false);
         echo json_encode(new ResponseMessage("OK",$result));
     });   
 }elseif($act=="update_software") {
