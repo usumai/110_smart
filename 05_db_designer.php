@@ -25,19 +25,21 @@ function fnInitiateDatabase($noRedirect, $noCreateRRTable){
          `date_last_update_check` DATETIME NULL, 
          PRIMARY KEY (`smartm_id`),UNIQUE INDEX `smartm_id_UNIQUE` (`smartm_id` ASC));";
     mysqli_multi_query($con,$sql_save);
-	$versionInfo=getSoftwareVersion();
-
-	$softwareLocalVersion=$versionInfo['localVersion'];	
-	$softwareLocalRevision=$versionInfo['localRevision'];
-	$softwareRemoteVersion=$versionInfo['remoteVersion'];
-	$softwareRemoteRevision=$versionInfo['remoteRevision'];
-	
-    $sql_save = "INSERT INTO $dbname.sm10_set (create_date, update_date, last_access_date, journal_id, help_shown, theme_type, versionLocal, versionLocalRevision, versionRemote, versionRemoteRevision, date_last_update_check) 
-    					VALUES (NOW(), NOW(), NOW(),1,0,0, 
-    						$softwareLocalVersion,'$softwareLocalRevision', 
-    						$softwareRemoteVersion,'$softwareRemoteRevision', NOW()); ";
-    mysqli_multi_query($con,$sql_save);
-
+    try{
+    	$versionInfo=getSoftwareVersion();
+    
+    	$softwareLocalVersion=$versionInfo['localVersion'];	
+    	$softwareLocalRevision=$versionInfo['localRevision'];
+    	$softwareRemoteVersion=$versionInfo['remoteVersion'];
+    	$softwareRemoteRevision=$versionInfo['remoteRevision'];
+    	
+        $sql_save = "INSERT INTO $dbname.sm10_set (create_date, update_date, last_access_date, journal_id, help_shown, theme_type, versionLocal, versionLocalRevision, versionRemote, versionRemoteRevision, date_last_update_check) 
+        					VALUES (NOW(), NOW(), NOW(),1,0,0, 
+        						$softwareLocalVersion,'$softwareLocalRevision', 
+        						$softwareRemoteVersion,'$softwareRemoteRevision', NOW()); ";
+        mysqli_multi_query($con,$sql_save);
+    }catch(Throwable $e){
+    }
     $sql_save = "CREATE TABLE $dbname.sm11_pro (`profile_id` INT(11) NOT NULL AUTO_INCREMENT,`create_date` DATETIME NULL DEFAULT NULL,`delete_date` DATETIME NULL DEFAULT NULL,`update_date` DATETIME NULL DEFAULT NULL,`profile_name` VARCHAR(255) NULL DEFAULT NULL,`profile_drn` VARCHAR(255) NULL DEFAULT NULL,`profile_phone_number` VARCHAR(255) NULL DEFAULT NULL,`profile_pic` LONGTEXT NULL DEFAULT NULL,`profile_color_a` VARCHAR(255) NULL DEFAULT NULL,`profile_color_b` VARCHAR(255) NULL DEFAULT NULL,PRIMARY KEY (`profile_id`),UNIQUE INDEX `profile_id_UNIQUE` (`profile_id` ASC));";
     mysqli_multi_query($con,$sql_save);
     if(! $noCreateRRTable){

@@ -518,14 +518,14 @@ let vm_menu = new Vue({
 			return this.sysd
 		},
         get_system(){
-            payload     = {'act':'get_system'}
-            json   		= fnapi(payload)
-            this.sysd   = json[0]
-            console.log("sysd")
-			console.log(this.sysd)
-			if (this.sysd.act_type=="ga_stk"){
-        		this.get_stk_templates()
-			}
+            payload     = {'act':'get_system'};
+            json   		= fnapi(payload);
+            if(json.length>0){
+	            this.sysd   = json[0];
+				if (this.sysd.act_type=="ga_stk"){
+	        		this.get_stk_templates()
+				}
+            }
 		}, 
         get_stk_templates(){
             payload     = {'act':'get_stk_templates'}
