@@ -105,9 +105,10 @@ function createIsImpairments($connection, $stocktakeId, $impairments) {
     foreach( $impairments as $record) {
     	$createDate = DateTime::createFromFormat("d-m-Y h:i:s A", str_replace('/','-', $record->create_date));
     	$createDate = ($createDate ? $createDate->format("Y-m-d H:i:s") : "0000-00-00 00:00:00");
-    	$modifyDate = DateTime::createFromFormat("d-m-Y h:i:s A", str_replace('/','-', $record->modify_date));
-    	$modifyDate = ($modifyDate ? $modifyDate->format("Y-m-d H:i:s") : "0000-00-00 00:00:00");
-    	
+    	if(isset($record->modify_date)) {
+    		$modifyDate = DateTime::createFromFormat("d-m-Y h:i:s A", str_replace('/','-', $record->modify_date));
+    	 	$modifyDate = ($modifyDate ? $modifyDate->format("Y-m-d H:i:s") : "0000-00-00 00:00:00");
+    	}
     	
 		$modDate = DateTime::createFromFormat("d-m-Y", str_replace('/','-', $record->last_mod_date));
 		$modDate = ($modDate ? $modDate->format("Y-m-d") : "0000-00-00");

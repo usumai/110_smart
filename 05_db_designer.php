@@ -557,14 +557,6 @@ END");
 }
 
 
-
-
-
-
-
-
-
-
 function get_file(){
     foreach(glob('config/*.*') as $filename) {//find the filename in the config folder
         if (strpos($filename, 'reason_codes') !== false) {
