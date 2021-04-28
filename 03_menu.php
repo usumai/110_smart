@@ -185,7 +185,7 @@ if(array_key_exists("current_row",$_POST)){
 
 
 <!-- Force Update Modal dialog -->
-<div width='500px' height='300px' class="modal fade" id="update_confirm_dlg" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="update_confirm_dlg" data-backdrop="static" width='500px' height='300px'   tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header" style="background-color: #5a95ca;">
@@ -276,7 +276,7 @@ if(array_key_exists("current_row",$_POST)){
 	</div>
 
 <!-- Reset Data Dialog -->
-<div class="modal fade" id="modal_confirm_reset" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="modal_confirm_reset" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header" style="background-color: #5a95ca;">
