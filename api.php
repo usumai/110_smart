@@ -260,7 +260,7 @@ if ($act=="create_ga_stocktake") {
     // $sql        = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id = $stkm_id AND BIN_CODE = '$BIN_CODE'";
     $sql        = " SELECT DSTRCT_CODE, WHOUSE_ID, BIN_CODE, STOCK_CODE, ITEM_NAME, SUM(SOH) as SOH ";
     $sql       .= " FROM smartdb.sm18_impairment   ";
-    $sql       .= " WHERE isType = 'b2r' AND stkm_id = '$stkm_id' AND BIN_CODE = '$BIN_CODE' AND data_source <> 'skeleton' AND res_parent_storageID IS NULL  ";
+    $sql       .= " WHERE isType = 'b2r' AND stkm_id = $stkm_id AND BIN_CODE = '$BIN_CODE' AND (data_source NOT IN ('skeleton', 'extra'))";
     $sql       .= " GROUP BY DSTRCT_CODE, WHOUSE_ID, BIN_CODE, STOCK_CODE, ITEM_NAME ";
     echo json_encode(qget($sql));
 
@@ -268,7 +268,7 @@ if ($act=="create_ga_stocktake") {
     $stkm_id    = $_POST["stkm_id"];
     $BIN_CODE   = $_POST["BIN_CODE"];
     $sql        = " SELECT * FROM smartdb.sm18_impairment ";
-    $sql       .= " WHERE isType = 'b2r' AND stkm_id = '$stkm_id' AND BIN_CODE = '$BIN_CODE' AND data_source='extra' ";
+    $sql       .= " WHERE isType = 'b2r' AND stkm_id = $stkm_id AND BIN_CODE = '$BIN_CODE' AND data_source='extra' ";
     echo json_encode(qget($sql));
 
 }elseif ($act=='get_b2r_skeleton') {

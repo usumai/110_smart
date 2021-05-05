@@ -515,7 +515,7 @@ function fnStats($stkm_id){
           $sql2 = "SELECT 
                     SUM(CASE WHEN storageID IS NOT NULL THEN 1 ELSE 0 END) AS rc_orig, 
                     SUM(CASE WHEN storageID IS NOT NULL AND res_create_date IS NOT NULL THEN 1 ELSE 0 END) AS rc_orig_complete, 
-                    SUM(CASE WHEN res_parent_storageID IS NOT NULL THEN 1 ELSE 0 END) AS rc_extras
+                    SUM(CASE WHEN res_parent_storageID > 0 THEN 1 ELSE 0 END) AS rc_extras
                     FROM smartdb.sm18_impairment 
                     WHERE delete_date IS NULL 
                     AND LEFT(isType,3)='imp' 

@@ -1285,7 +1285,7 @@ if ($act=='sys_pull_master') {
      }
      // print_r($_POST);
      //Delete children
-     $sql = "DELETE FROM smartdb.sm18_impairment WHERE res_parent_storageID='$storageID' ";
+     $sql = "DELETE FROM smartdb.sm18_impairment WHERE res_parent_storageID=$storageID ";
      runSql($sql);
 
      //$fingerprint        = time();
@@ -1387,7 +1387,7 @@ if ($act=='sys_pull_master') {
      
      runSql($sql);
 
-     $sql = "DELETE FROM smartdb.sm18_impairment WHERE res_parent_storageID='$storageID' ";
+     $sql = "DELETE FROM smartdb.sm18_impairment WHERE res_parent_storageID=$storageID ";
      runSql($sql);
 
      header("Location: 16_imp.php?current_row=$current_row&auto_storageID=".$auto_storageID);
