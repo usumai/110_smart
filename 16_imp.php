@@ -489,19 +489,19 @@ function onSplityMilisChanged(key) {
             <tr><td colspan='2' id='resultSelection'>&nbsp;</td></tr>
             <tr><td><b>District</b></td><td><?=$DSTRCT_CODE?></td></tr>
             <tr><td><b>Warehouse</b></td><td><?=$WHOUSE_ID?></td></tr>
-            <tr><td><b>SCA</b></td><td><?=$SUPPLY_CUST_ID?></td></tr>
+
             <tr><td><b>Bin</b></td><td><?=$BIN_CODE?></td></tr>
             <tr><td><b>SOH</b></td><td><?=$SOH?></td></tr>
-            <tr><td nowrap><b>SC Account type</b></td><td><?=$SC_ACCOUNT_TYPE?></td></tr>
-            <tr><td nowrap><b>Tracking indicator</b></td><td><?=$TRACKING_IND?></td></tr>
-            <tr><td nowrap><b>Tracking reference</b></td><td><?=$TRACKING_REFERENCE?></td></tr>
+            <tr><td><b>Supply Customer Account</b></td><td><?=$SUPPLY_CUST_ID?></td></tr>
+            <tr><td nowrap><b>Supply Customer Account Type</b></td><td><?=$SC_ACCOUNT_TYPE?></td></tr>
+            <tr><td nowrap><b>Tracking Indicator</b></td><td><?=$TRACKING_IND?></td></tr>
+            <tr><td nowrap><b>Tracking Reference</b></td><td><?=$TRACKING_REFERENCE?></td></tr>       
+            <tr><td nowrap><b>Inventory Category</b></td><td><?=$INVENT_CAT?></td></tr>
             <tr><td nowrap><b>Last Modification Date</b></td><td><?=$LAST_MOD_DATE?></td></tr>
-            <tr><td nowrap><b>Inventory category</b></td><td><?=$INVENT_CAT?></td></tr>
             <tr id="checked_milis">
             	<td nowrap><b>Checked To MILIS</b></td>
             	<td><input  type="checkbox" class="form-control" id="checked_to_milis" name="checked_to_milis" value="1" <?=($checkedToMilis==1 ? 'checked' : '') ?>></input></td>
             </tr>
-
             <tr>
             	<td class='completezz'>
             		<b>Comments</b>
