@@ -322,7 +322,7 @@ let vm = new Vue({
                 								};
                 header_obj= fnapi(payload);
                 header_obj['type']              = actv.stk_type;
-                header_obj['file_version']      = 12;
+                header_obj['file_version']      = 14;
                 header_obj['smm_extract_date']  = new Date().toISOString().substring(0,19);
                 header_obj['smm_extract_user']  = null;
                 header_obj['unique_file_id']    = "TBA";		

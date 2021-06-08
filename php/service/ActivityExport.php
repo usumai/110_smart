@@ -1,4 +1,9 @@
 <?php 
+
+function saveIsExport($data){
+
+}
+
 function exportGaActivity($activityID){
    	$sql = " 
    		SELECT 
