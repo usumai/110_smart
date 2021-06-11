@@ -19,6 +19,7 @@
                                     v-if="!show_delete_options&&assd.genesis_cat=='nonoriginal'"
                                     class="text-center list-group-item list-group-item-action list-group-item-warning" 
                                     type="button" >Change<br>reason code</button>
+                                    
                             <button @click="select_rc('RE20')"
                                     v-if="!assd.res_reason_code&&assd.genesis_cat=='original'"
                                     class="text-center list-group-item list-group-item-action list-group-item-success mt-3" 
