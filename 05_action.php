@@ -1133,7 +1133,7 @@ if ($act=='sys_pull_master') {
      	'nonoriginal', 
      	Now(), 
      	'$create_user', 
-     	'AF20', 
+     	'RE21', 
      	Class, 
      	ParentName, 
      	1,  
