@@ -12,7 +12,7 @@
         <h1 class="mt-5 display-6">Activities</h1>
 
         <div v-if="message !== ''" class="container">
-            <div class="alert alert-danger"><strong>Error!</strong>{{message}}</div>     
+            <div class="alert alert-danger"><strong>System Error </strong><br/><br/>{{message}}</div>     
         </div>
         
 
@@ -23,27 +23,25 @@
                 </caption>
                 <thead class="table-dark">
                     <tr>
-                        <th style="width: 120px">SMARTM#</th>
-                        <th style="width: 120px">Type</th>
-                        <th style="width: 70px">ID</th>
+                        <th style="width: 40px">ID</th>
+                        <th style="width: 80px">Type</th>
                         <th >Name</th>
-                        <th style="width: 70px">Orig</th>
-                        <th style="width: 120px">Completed</th>
+                        <th style="width: 70px">Original</th>
+                        <th style="width: 80px">Completed</th>
                         <th style="width: 70px">Extra</th>
                         <th style="width: 70px">Status</th>
                         <th style="width: 12px">Included</th>
                         <th style="width: 12px">Deleted</th>
-                        <th style="width: 12px">Excel</th>
-                        <th style="width: 12px">Export</th>
+                        <th style="width: 215px">Data Export</th>
                     </tr>
                 </thead>
                 <tbody>
                 <tr v-for='(actv, actvidx) in actvd'  v-if='!actv.smm_delete_date||actv.smm_delete_date&&show_deleted'>
-
-                
-                    <td>{{ actv.stkm_id }}</td>
-                    <td>{{ actv.isCat}}</td>
                     <td>{{ actv.stk_id }}</td>
+                
+
+                    <td>{{ actv.isCat}}</td>
+                    
                     <td>{{ actv.stk_name }}</td>
                     <td >{{ actv.rc_orig }}</td>
                     <td >{{ actv.rc_orig_complete }}</td>
@@ -74,11 +72,9 @@
                         </button>
                     </td>
                     <td>
-                        <button class='btn btn-outline-dark float-left' v-on:click="export_activity(actvidx,'xslx')">Excel</button>
-                    </td>
-                    <td>
-                        <button class='btn btn-outline-dark float-left' v-on:click="export_activity(actvidx,'json')">JSON</button>
-                        <button class='btn btn-outline-dark float-left' v-on:click="export_activity(actvidx,'images')">Images</button>
+                        <button class='btn btn-outline-dark ' v-on:click="export_activity(actvidx,'xslx')">Excel</button>
+                        <button class='btn btn-outline-dark ' v-on:click="export_activity(actvidx,'json')">Json</button>
+                        <button class='btn btn-outline-dark ' v-on:click="export_activity(actvidx,'images')">Photos</button>
                     </td>
                 </tr>
                 </tbody>
@@ -144,20 +140,6 @@
 
 <script>
 
-
-function makeFileAndDL(filename, text) {
-    var element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-    element.setAttribute('download', filename);
-    element.style.display = 'none';
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-}
-function openLocation(url){
-	console.log(this.location);
-	this.location=url;
-}
 let vm = new Vue({
     el: '#app',
     data: {
@@ -332,20 +314,31 @@ let vm = new Vue({
             }
             
             date_name_short = new Date().toISOString().replace(/-/g,'').replace(/:/g,'').substring(2,8);
-            name_suffix     = name_suffix!='' ? '_'+name_suffix : name_suffix;
-            file_name       = date_name_short   + "_SMARTM" + name_suffix;
+            name_suffix     = name_suffix!='' ? '-'+name_suffix : name_suffix;
+            file_name       = 'SMARTM-'+date_name_short +'-'+actv.stkm_id+name_suffix;
                         
             if(exportFormat=='json'){
-            	file_name       = file_name + ".json";
-                json_string     = JSON.stringify(header_obj);
-                makeFileAndDL(file_name, json_string);
+                var fileBlob=createFileBlob(file_name + ".json", JSON.stringify(header_obj));
+                uploadFileBlob(fileBlob,
+                	ok=>{
+                		downloadFileBlob(fileBlob);
+                	},
+                	errors=>{
+                    	if(errors && errors[0]){
+                    		this.message=errors[0].info;
+                    	}else{
+                        	this.message=errors;
+                        }
+                    }
+                );
             }else if(exportFormat=='images'){
-            	exportGaAssetImages(actv.stkm_id,null,
+            	exportGaAssetImages(actv.stkm_id, file_name + ".zip",null,
                 	url => {
-                		openLocation(url);
+                		downloadFileBlob(url);
 				    },
                     error => {
-                        console.log(error);
+                        if(error && error.length > 0)
+                        	this.message=error[0].info;
                     });    
             }else if(exportFormat=='xslx'){
                 data = [

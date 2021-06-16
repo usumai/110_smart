@@ -1,11 +1,33 @@
 <?php 
 
-function saveIsExport($activityID){
+function backupExportJson(){
 
+    if ($_FILES['file']['error'] == UPLOAD_ERR_OK               
+        && is_uploaded_file($_FILES['file']['tmp_name'])) { 
+            
+            $fileName=  $_FILES['file']['name'];
+            $filePath = 'backup/' . $fileName;
+/*
+            $counter = 0;
+            while (file_exists($filePath)) {
+
+                $filePath = 'backup/' . $counter . '_' . $fileName;
+                $counter++;
+            }
+*/
+            file_put_contents($filePath, file_get_contents($_FILES['file']['tmp_name']));
+          
+    }
 }
-function exportGaImages($activityID){
+
+function exportGaImages($activityID, $filename){
+
+/*
 	$zipPath='images/' . uniqid('images_',true) . '_' . $activityID . '.zip';
-    $zip = new ZipArchive();
+*/
+	$zipPath='images/' . $filename;
+
+	$zip = new ZipArchive();
     $status=$zip->open($zipPath, ZIPARCHIVE::CREATE);
     
     if ($status === TRUE) {
@@ -49,7 +71,7 @@ function exportGaImages($activityID){
         $zip->close();
 		return $zipPath;
     } else {
-        throw new Exception("Unable to open zip archive file", 1);
+        throw new Exception("Unable to create zip archive file", -1);
     }
 }
 

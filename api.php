@@ -39,7 +39,13 @@ if ($act=="create_ga_stocktake") {
         				"taskId"=>$request->data->taskId];
         }
         echo json_encode(new ResponseMessage("OK",$result));
-    });   
+    });
+}elseif ($act=="backup_export_json"){
+    
+    execWithErrorHandler(function() use ($con, $request){
+        backupExportJson();
+        echo json_encode(new ResponseMessage("OK",0));
+    });  
 }elseif ($act=="clear_ga_rr"){
     execWithErrorHandler(function() use ($con, $request){ 
     	$result = ["processed" => 0]; 
@@ -211,7 +217,7 @@ if ($act=="create_ga_stocktake") {
     echo json_encode($activity);     
 }elseif ($act=="export_ga_asset_images") {
     execWithErrorHandler(function() use ($con, $request) {
-        $result= exportGaImages($request->data->stkm_id);
+        $result= exportGaImages($request->data->activityId, $request->data->fileName);
         echo json_encode(new ResponseMessage("OK",$result));
     });  
 }elseif ($act=="get_stk_progress") {

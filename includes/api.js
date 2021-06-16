@@ -177,11 +177,11 @@ function getIsRecords(completeCallback, errorCallback){
 	});
 }
 
-function exportGaAssetImages(stocktakeId, progressCallback, completeCallback, errorCallback){
+function exportGaAssetImages(activityId, fileName, progressCallback, completeCallback, errorCallback){
 	axios.post(API_ENDPOINT, 
 		{
 			action: 'export_ga_asset_images',
-			data: { stkm_id :  stocktakeId }
+			data: { activityId :  activityId, fileName: fileName }
 		}
 	)
 	.then(response=> {
@@ -1064,4 +1064,53 @@ function createExcelRow(headers, rec){
 		}
 	);
 	return row;
+}
+
+function uploadFileBlob(fileBlob, completeCallback, errorCallback){
+
+	var formData = new FormData();
+	formData.append('file', fileBlob);
+	axios.post(API_ENDPOINT, formData,
+	  {
+	    headers: {
+	        'Content-Type': 'multipart/form-data',
+	        'Content-Disposition': 'attachment; filename="'+fileBlob.name+'"'
+	    },
+	     params: {
+    		act: 'backup_export_json'
+  		}
+	  }
+	)
+	.then(
+		httpResponse=>{
+			processResponse(httpResponse, completeCallback, errorCallback)
+		}
+	)
+	.catch(errorCallback);
+	
+}
+function downloadFileBlob(fileBlob){
+	var type=type_of(fileBlob);
+	if((type == 'File') || (type == 'Blob')){
+		this.location=URL.createObjectURL(fileBlob);
+	}else if(type == 'String'){
+		this.location=fileBlob;
+	} 
+}
+
+/*
+Content-Type: application/octet-stream
+Content-Disposition: attachment; filename="picture.png"
+*/
+
+function createFileBlob(filename, data){
+ 	return new File([data], filename, {type: 'application/octet-stream'});	
+}
+
+function type_of(value) {
+  const return_value = Object.prototype.toString.call(value);
+  const type = return_value.substring(
+           return_value.indexOf(" ") + 1, 
+           return_value.indexOf("]"));
+  return type;
 }
