@@ -77,7 +77,8 @@
                         <button class='btn btn-outline-dark float-left' v-on:click="export_activity(actvidx,'xslx')">Excel</button>
                     </td>
                     <td>
-                        <button class='btn btn-outline-dark float-left' v-on:click="export_activity(actvidx,'json')">Export</button>
+                        <button class='btn btn-outline-dark float-left' v-on:click="export_activity(actvidx,'json')">JSON</button>
+                        <button class='btn btn-outline-dark float-left' v-on:click="export_activity(actvidx,'images')">Images</button>
                     </td>
                 </tr>
                 </tbody>
@@ -153,7 +154,10 @@ function makeFileAndDL(filename, text) {
     element.click();
     document.body.removeChild(element);
 }
-
+function openLocation(url){
+	console.log(this.location);
+	this.location=url;
+}
 let vm = new Vue({
     el: '#app',
     data: {
@@ -282,7 +286,6 @@ let vm = new Vue({
     	},
         export_activity(activity_id, exportFormat){
             actv = this.actvd[activity_id]
-            console.log(actv);
             header_obj                      = {};
             header_obj['type']              = actv.stk_type;
             header_obj['file_version']      = 12;
@@ -336,6 +339,14 @@ let vm = new Vue({
             	file_name       = file_name + ".json";
                 json_string     = JSON.stringify(header_obj);
                 makeFileAndDL(file_name, json_string);
+            }else if(exportFormat=='images'){
+            	exportGaAssetImages(actv.stkm_id,null,
+                	url => {
+                		openLocation(url);
+				    },
+                    error => {
+                        console.log(error);
+                    });    
             }else if(exportFormat=='xslx'){
                 data = [
                 	XSLX_ACTIVITY_COL_HEADER,

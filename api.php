@@ -208,7 +208,12 @@ if ($act=="create_ga_stocktake") {
 }elseif ($act=="export_ga") {
     $stkm_id    = $_POST["stkm_id"];  
  	$activity= exportGaActivity($stkm_id);
-    echo json_encode($activity);       
+    echo json_encode($activity);     
+}elseif ($act=="export_ga_asset_images") {
+    execWithErrorHandler(function() use ($con, $request) {
+        $result= exportGaImages($request->data->stkm_id);
+        echo json_encode(new ResponseMessage("OK",$result));
+    });  
 }elseif ($act=="get_stk_progress") {
     $sql = "    SELECT COUNT(*) as count_total, SUM(CASE WHEN a.res_reason_code<>'' THEN 1 ELSE 0 END) AS count_complete   FROM smartdb.sm14_ass a left join smartdb.sm13_stk s on a.stkm_id=s.stkm_id WHERE s.stk_include = 1 AND a.delete_date IS NULL AND a.genesis_cat <> 'template'";
     echo json_encode(qget($sql));

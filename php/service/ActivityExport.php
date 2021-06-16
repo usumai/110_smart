@@ -1,8 +1,58 @@
 <?php 
 
-function saveIsExport($data){
+function saveIsExport($activityID){
 
 }
+function exportGaImages($activityID){
+	$zipPath='images/' . uniqid('images_',true) . '_' . $activityID . '.zip';
+    $zip = new ZipArchive();
+    $status=$zip->open($zipPath, ZIPARCHIVE::CREATE);
+    
+    if ($status === TRUE) {
+		$zip->addEmptyDir("images");
+
+	   	$sql = " 
+	   		SELECT 
+	   			ass_id,
+	            stkm_id,
+	   			ledger_id,  
+	   			rr_id, 
+	 			res_asset_id,
+	            res_fingerprint
+	    FROM 	smartdb.sm14_ass 
+	    WHERE 	stkm_id = $activityID
+	    AND ((date(delete_date) IS NULL) OR (date(delete_date)='0000-00-00'))";
+
+	    $assetList = qget($sql);
+		
+	    foreach($assetList as $asset){
+	        $res_asset_id = $asset["res_asset_id"];
+	        $res_fingerprint = $asset["res_fingerprint"];
+	        if ($res_asset_id =="firstfound") {
+	            $photo_name = "images/".$res_fingerprint;
+	        }else{
+	            $photo_name = "images/".$res_asset_id;
+	        }
+
+	        $original_photo_name = $photo_name;
+	        $counter = 1;
+	        $photo_name = $photo_name.'_'.$counter.'.jpg';
+
+	        while (file_exists($photo_name)) {
+				$zip->addFile($photo_name, $photo_name);
+				$counter++;
+	            $photo_name = $original_photo_name.'_'.$counter.'.jpg';
+	        }
+	
+	    }        
+		
+        $zip->close();
+		return $zipPath;
+    } else {
+        throw new Exception("Unable to open zip archive file", 1);
+    }
+}
+
 
 function exportGaActivity($activityID){
    	$sql = " 
@@ -96,7 +146,8 @@ function exportGaActivity($activityID){
 			modify_date,
 			version
     FROM 	smartdb.sm14_ass 
-    WHERE 	stkm_id = $activityID";
+    WHERE 	stkm_id = $activityID
+    AND ((date(delete_date) IS NULL) OR (date(delete_date)='0000-00-00'))";
     return qget($sql);
 }
 

@@ -177,7 +177,27 @@ function getIsRecords(completeCallback, errorCallback){
 	});
 }
 
-
+function exportGaAssetImages(stocktakeId, progressCallback, completeCallback, errorCallback){
+	axios.post(API_ENDPOINT, 
+		{
+			action: 'export_ga_asset_images',
+			data: { stkm_id :  stocktakeId }
+		}
+	)
+	.then(response=> {
+		if(response.data.status=='ERROR') {
+			if(progressCallback)
+				progressCallback(0, 1, STATUS_ERROR, 'export GA asset images ');
+			if(errorCallback)
+				errorCallback(response.data.errors);
+		}else{
+			if(progressCallback)
+				progressCallback(1, 1, STATUS_COMPLETE, 'creates GA activity');
+			if(completeCallback)
+				completeCallback(response.data.result);
+		}
+	});
+}
 
 function createGaStocktake (stocktake, progressCallback, completeCallback, errorCallback) {
 	progressCallback(0, 1, STATUS_PROCESS, 'creates GA activity');
