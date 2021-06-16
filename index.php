@@ -74,7 +74,7 @@
                     <td>
                         <button class='btn btn-outline-dark ' v-on:click="export_activity(actvidx,'xslx')">Excel</button>
                         <button class='btn btn-outline-dark ' v-on:click="export_activity(actvidx,'json')">Json</button>
-                        <button class='btn btn-outline-dark ' v-on:click="export_activity(actvidx,'images')">Photos</button>
+                        <button v-if='actv.stk_type=="ga_stk"' class='btn btn-outline-dark ' v-on:click="export_activity(actvidx,'images')">Photos</button>
                     </td>
                 </tr>
                 </tbody>
