@@ -127,7 +127,7 @@
                                 maxlen='255'
                                 ></textinput>
                             </div>
-                            <div class="form-group"><label>InventNo</label>
+                            <div class="form-group"><label>Inventory No.</label>
                                 <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_inventno' 
                                 :bound_value='assd.res_inventno'
@@ -177,7 +177,7 @@
                                 maxlen='255'
                                 ></textinput>
                             </div>
-                            <div class="form-group"><label>GrpCustod</label>
+                            <div class="form-group"><label>Group Custodian</label>
                                 <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_grpcustod' 
                                 :bound_value='assd.res_grpcustod'
@@ -203,7 +203,7 @@
                                 maxlen='255'
                                 ></textinput>
                             </div>
-                            <div class="form-group"><label>TypeName</label>
+                            <div class="form-group"><label>Type Name</label>
                                 <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_class_ga_cat' 
                                 :bound_value='assd.res_class_ga_cat'
@@ -211,7 +211,7 @@
                                 maxlen='255'
                                 ></textinput>
                             </div>
-                            <div class="form-group"><label>CapDate {{assd.res_date_cap_clean}}</label>
+                            <div class="form-group"><label>Cap Date {{assd.res_date_cap_clean}}</label>
                                 <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_date_cap' 
                                 :bound_value='assd.res_date_cap_clean'
@@ -219,7 +219,7 @@
                                 inputtype='date'
                                 ></textinput>
                             </div>
-                            <div class="form-group"><label>LastInv {{assd.res_date_lastinv_clean}}</label>
+                            <div class="form-group"><label>Last Inv {{assd.res_date_lastinv_clean}}</label>
                                 <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_date_lastinv' 
                                 :bound_value='assd.res_date_lastinv_clean'
@@ -227,7 +227,7 @@
                                 inputtype='date'
                                 ></textinput>
                             </div>
-                            <div class="form-group"><label>CostCtr</label>
+                            <div class="form-group"><label>Cost Centre</label>
                                 <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_ccc' 
                                 :bound_value='assd.res_ccc'
@@ -235,7 +235,7 @@
                                 maxlen='255'
                                 ></textinput>
                             </div>
-                            <div class="form-group"><label>CurrentNBV</label>
+                            <div class="form-group"><label>Current NBV</label>
                                 <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
                                 column_name='res_val_nbv' 
                                 :bound_value='assd.res_val_nbv'

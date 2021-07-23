@@ -5,9 +5,9 @@
 
 
 <script src="includes/standalone.js"></script>
+<script src="includes/jszip/3.6.0.2/jszip.min.js"></script>
 
-
-<div id="app">
+<div id="app" @dragover="fileDrag" @drop="fileDrop">
     <div class='container-fluid'>
         <h1 class="mt-5 display-6">Activities</h1>
 
@@ -16,10 +16,10 @@
         </div>
         
 
-        <div class="table-responsive-sm">
-            <table id="tbl_stk" class="table table-sm table-striped table-hover" >
+        <div class="table-responsive-sm" >
+            <table id="tbl_stk" class="table table-sm table-striped table-hover"  >
                 <caption>
-                    <button type="button" class='btn btn-primary float-right' v-on:click="openUploadDlg">Upload<i class="fa fa-upload ml-2"></i></button>
+                    <button type="button" class='btn btn-primary float-right' @click="openUploadDlg">Upload<i class="fa fa-upload ml-2"></i></button>
                 </caption>
                 <thead class="table-dark">
                     <tr>
@@ -38,10 +38,7 @@
                 <tbody>
                 <tr v-for='(actv, actvidx) in actvd'  v-if='!actv.smm_delete_date||actv.smm_delete_date&&show_deleted'>
                     <td>{{ actv.stk_id }}</td>
-                
-
                     <td>{{ actv.isCat}}</td>
-                    
                     <td>{{ actv.stk_name }}</td>
                     <td >{{ actv.rc_orig }}</td>
                     <td >{{ actv.rc_orig_complete }}</td>
@@ -90,7 +87,7 @@
     <button ref="btn_open_progress" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#dlg_progress" style="visibility:hidden;">Open Progress Dlg</button>
 
     <!-- Modal -->
-    <div class="modal fade" id="dlg_progress" role="dialog">
+    <div class="modal fade" id="dlg_progress" role="dialog"  data-backdrop="static" >
         <div class="modal-dialog">
             <!-- Modal content-->
             <div class="modal-content">
@@ -109,7 +106,7 @@
                                 <span id="progress_value">0%</span>
                             </div>
                         </div>
-                        <div></div>
+                        <div>{{upload.taskDescription}}</div>
                         <div style="width: 100%; padding-top: 10px; display: flex;">
                             <span style="width: 50%">Current: {{upload.current}}</span>
                             <span style="width: 50%">Total: {{upload.total}}</span>
@@ -149,6 +146,7 @@ let vm = new Vue({
 
         upload: {
             current: 0,
+            taskDescription: 'testing',
             total: 0,
             status: '',
             message: ''
@@ -161,18 +159,63 @@ let vm = new Vue({
     	 this.get_activities();
     } ,
     methods:{
+        fileDrag(event){
+        	var isJSON = (event.dataTransfer.items.length>0) && ((event.dataTransfer.items[0].type=='application/json')||(event.dataTransfer.items[0].type=='application/x-zip-compressed')) ;
+	      	if (isJSON) {
+	      		event.preventDefault();
+	            event.dataTransfer.dropEffect='copy'; 
+	            event.dataTransfer.effectAllowed='copy';
+	      	}
+            
+        },
+        fileDrop(event){
+        	event.preventDefault();
+            var items=event.dataTransfer.items;
+            for(var i in items){
+            	console.log(items[i]);
+                if(items[i].kind=='file'){
+                    this.uploadData(items[i].getAsFile());                    
+                }
+            }
+
+            
+        },
         openUploadDlg(){
 
         	this.$refs.upload_file.value='';
             this.$refs.upload_file.click();
 
         },
-        uploadData(){
-
+        uploadData(uploadFile){
+            var type=type_of(uploadFile);
+            var file=null;
+            if(!uploadFile){
+            	file=this.$refs.upload_file.files[0];
+            }else if(type=='Blob' || type=='File'){
+				file=uploadFile;
+			}else{
+				file=uploadFile.target.files[0];
+			}
+			
             this.$refs.btn_open_progress.click();
 
-            let file=this.$refs.upload_file.files[0]
 
+			if(file.type == 'application/zip' || file.type == 'application/x-zip-compressed'){
+				importGaData(file, this.onUploadProgress,
+	                    (result)=>{
+	                        this.get_activities();
+					    },
+	                    (errors)=>{
+	                        this.upload.status='Error';
+	                        for( i in errors) {                            
+	                            this.upload.message=errors[i].code + ' - ' + errors[i].info;
+	                        }
+	                        console.log(this.message);
+	                    }						
+				);
+				return;
+			}
+			
             let reader = new FileReader();
             reader.onprogress = event => {
 
@@ -200,8 +243,9 @@ let vm = new Vue({
             };
             reader.readAsText(file);
         },
-        onUploadProgress (current, total, status, message){
+        onUploadProgress (current, total, status, message, currentTaskDescription){
             this.upload.current=current;
+            this.upload.taskDescription=currentTaskDescription;
             this.upload.total=total;
             this.upload.status=status;
             this.upload.message=message;
@@ -291,7 +335,7 @@ let vm = new Vue({
 
                 header_obj['asset_lock_date']   = ''
 
-                payload                         = {'act':	'export_ga', 
+                payload                         = {'act':	'export_ga_data', 
                 								   'stkm_id': actv.stkm_id 
                 								};
                 list = fnapi(payload);
@@ -319,7 +363,7 @@ let vm = new Vue({
                         
             if(exportFormat=='json'){
                 var fileBlob=createFileBlob(file_name + ".json", JSON.stringify(header_obj));
-                uploadFileBlob(fileBlob,
+                uploadFileBlob('backup_export_json', fileBlob,
                 	ok=>{
                 		downloadFileBlob(fileBlob);
                 	},
@@ -332,7 +376,7 @@ let vm = new Vue({
                     }
                 );
             }else if(exportFormat=='images'){
-            	exportGaAssetImages(actv.stkm_id, file_name + ".zip",null,
+            	exportGaData(actv.stkm_id, file_name + ".zip",null,
                 	url => {
                 		downloadFileBlob(url);
 				    },

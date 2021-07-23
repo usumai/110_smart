@@ -40,6 +40,11 @@ if ($act=="create_ga_stocktake") {
         }
         echo json_encode(new ResponseMessage("OK",$result));
     });
+}elseif($act=="import_ga_asset_images"){
+    execWithErrorHandler(function() use ($con, $request){
+        importGaImages($request->data->activity_id);
+        echo json_encode(new ResponseMessage("OK",0));
+    });
 }elseif ($act=="backup_export_json"){
     
     execWithErrorHandler(function() use ($con, $request){
@@ -167,7 +172,7 @@ if ($act=="create_ga_stocktake") {
     $delete_status  = $delete_status==1 ? " smm_delete_date=NOW(), stk_include=0 " :  " smm_delete_date=NULL ";
     $sql            = " UPDATE smartdb.sm13_stk SET $delete_status WHERE stkm_id = $stkm_id ";
     echo mysqli_multi_query($con,$sql);
-}elseif ($act=="get_stk_assets") {
+}elseif ($act=="get_ga_assets") {
     $sql = "
     SELECT 
     	ass.ass_id, 
@@ -211,7 +216,7 @@ if ($act=="create_ga_stocktake") {
 	$stkm_id = $_POST["stkm_id"];
 	$activity= exportIsActivity($stkm_id);
     echo json_encode($activity);	
-}elseif ($act=="export_ga") {
+}elseif ($act=="export_ga_data") {
     $stkm_id    = $_POST["stkm_id"];  
  	$activity= exportGaActivity($stkm_id);
     echo json_encode($activity);     

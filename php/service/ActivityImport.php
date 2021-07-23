@@ -572,4 +572,17 @@ function createGaAssets($connection, $stocktakeId, $assets) {
 	*/          
 	$stmt->close();
 }
+function importGaImages($activityID){
+    if ($_FILES['file']['error'] == UPLOAD_ERR_OK
+        && is_uploaded_file($_FILES['file']['tmp_name'])) {
+            
+            $fileName=  $_FILES['file']['name'];
+            $filePath = 'images/' . $fileName;
+            
+            
+            if (!file_exists($filePath)) {
+                file_put_contents($filePath, file_get_contents($_FILES['file']['tmp_name']));
+            }
+        }
+}
 ?>

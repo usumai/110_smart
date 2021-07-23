@@ -19,18 +19,53 @@ function backupExportJson(){
           
     }
 }
+function getActivity($activityID){
+	return qget("select * from smartdb.sm13_stk where stkm_id=" . $activityID);
+}
+
 
 function exportGaImages($activityID, $filename){
+	$actvList=getActivity($activityID);
 
-/*
-	$zipPath='images/' . uniqid('images_',true) . '_' . $activityID . '.zip';
-*/
+	if(count($actvList)==0)
+		throw new Exception("Activity $activityID not exist",-1);
+	$actv=$actvList[0];	
+	
+	/*echo json_encode(new ResponseMessage("OK",$actv));*/
+	
+    $assetList=exportGaActivity($activityID);
+	
+	
+    
+    $gaJson['file_version']      = 12;
+	$gaJson['unique_file_id']    = uniqid('GA_',true);
+	$gaJson['rc_totalsent'] =  count($assetList);
+    
+	$gaJson['stkm_id']           = $actv['stkm_id'];
+    $gaJson['stk_id']            =  $actv['stk_id'];
+ 	$gaJson['stk_name']          =  $actv['stk_name'];
+    $gaJson['type']              =  $actv['stk_type'];
+    $gaJson['rc_orig']           =  $actv['rc_orig'];
+    $gaJson['rc_orig_complete']  =  $actv['rc_orig_complete'];
+    $gaJson['rc_extras']         =  $actv['rc_extras'];   
+    $gaJson['dpn_extract_date']  =  $actv['dpn_extract_date'];
+    $gaJson['dpn_extract_user']  =  $actv['dpn_extract_user'];
+    $gaJson['smm_extract_date']  = date(DATE_ATOM);
+    $gaJson['smm_extract_user']  = get_current_user();
+	$gaJson['asset_lock_date']   = '';
+    $gaJson['assetlist']= $assetList;
+
+
+    
+
+
 	$zipPath='images/' . $filename;
 
 	$zip = new ZipArchive();
     $status=$zip->open($zipPath, ZIPARCHIVE::CREATE);
     
     if ($status === TRUE) {
+		$zip->addFromString('data.json',json_encode($gaJson));
 		$zip->addEmptyDir("images");
 
 	   	$sql = " 

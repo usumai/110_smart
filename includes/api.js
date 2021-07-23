@@ -177,7 +177,7 @@ function getIsRecords(completeCallback, errorCallback){
 	});
 }
 
-function exportGaAssetImages(activityId, fileName, progressCallback, completeCallback, errorCallback){
+function exportGaData(activityId, fileName, progressCallback, completeCallback, errorCallback){
 	axios.post(API_ENDPOINT, 
 		{
 			action: 'export_ga_asset_images',
@@ -199,8 +199,63 @@ function exportGaAssetImages(activityId, fileName, progressCallback, completeCal
 	});
 }
 
+var zipFileCount=0;
+
+function importGaData(zipFileBlob, progressCallback, completeCallback, errorCallback){
+	zipFileCount=0
+	let zip=new JSZip();
+	zip.loadAsync(zipFileBlob).then(
+	zipObj=>{
+		var jsonFile=zipObj.file('data.json');
+		if(!jsonFile){
+			errorCallback([{code: -1, info: 'Invalid GA Data File Format'}]);
+			return;	
+		}
+		
+		jsonFile.async('text').then(
+			data=>{
+		        let uploadData=JSON.parse(data);
+		        upload(uploadData, progressCallback, 
+		        	ok=>{		      
+		        		let folder=zip.folder('images');
+		        		var total=0;
+		        		folder.forEach((path, img)=>total++);  	
+		        		var current=0;
+		      			folder.forEach(
+		      				
+			      			(path, img)=>{
+			      				current++;
+			      				let imageName=img.name.substring(img.name.lastIndexOf('/')+1);
+			      				img.async('arraybuffer').then(
+			      					blob=>{
+			      						console.log(path+": "+imageName);
+			      						uploadFileBlob('import_ga_asset_images', new File([blob], imageName),
+			      							ok=>{
+			      								if(current==total){
+			      									progressCallback(current, total, STATUS_COMPLETE, 'Import GA asset images',imageName);
+			      								
+			      								}else{
+			      									progressCallback(current, total, STATUS_PROCESS, 'Import GA asset images',imageName);
+			      								}	
+			      							},
+			      							error=>{});
+			      						
+			      					}
+			      				);
+
+			      			}
+		      			);  
+		      			completeCallback(ok);	
+		        	}, 
+		        	errorCallback);					
+			}
+		);
+	});
+	
+
+}
 function createGaStocktake (stocktake, progressCallback, completeCallback, errorCallback) {
-	progressCallback(0, 1, STATUS_PROCESS, 'creates GA activity');
+	progressCallback(0, 1, STATUS_PROCESS, 'Import GA stocktake activity','Create activity');
 	axios.post(API_ENDPOINT, 
 		{
 			action: 'create_ga_stocktake',
@@ -209,10 +264,10 @@ function createGaStocktake (stocktake, progressCallback, completeCallback, error
 	)
 	.then(response=> {
 		if(response.data.status=='ERROR') {
-			progressCallback(0, 1, STATUS_ERROR, 'creates GA activity');
+			progressCallback(0, 1, STATUS_ERROR, 'Import GA stocktake activity','Create activity');
 			errorCallback(response.data.errors);
 		}else{
-			progressCallback(1, 1, STATUS_COMPLETE, 'creates GA activity');
+			progressCallback(1, 1, STATUS_COMPLETE, 'Import GA stocktake activity','Create activity completed!');
 			completeCallback(response.data.result);
 		}
 	});
@@ -222,7 +277,7 @@ function createGaAssets (stocktakeId, assetList, progressCallback, completeCallb
 
 	apiRequestParallel('create_ga_assets',  
 					assetList, {stocktakeId: stocktakeId}, 200, 
-					'GA asset records', progressCallback, 
+					'Import GA stocktake activity', progressCallback, 
 					completeCallback, errorCallback);
 }
 
@@ -1066,7 +1121,7 @@ function createExcelRow(headers, rec){
 	return row;
 }
 
-function uploadFileBlob(fileBlob, completeCallback, errorCallback){
+function uploadFileBlob(act, fileBlob, completeCallback, errorCallback){
 
 	var formData = new FormData();
 	formData.append('file', fileBlob);
@@ -1077,7 +1132,7 @@ function uploadFileBlob(fileBlob, completeCallback, errorCallback){
 	        'Content-Disposition': 'attachment; filename="'+fileBlob.name+'"'
 	    },
 	     params: {
-    		act: 'backup_export_json'
+    		act: act
   		}
 	  }
 	)
@@ -1098,10 +1153,6 @@ function downloadFileBlob(fileBlob){
 	} 
 }
 
-/*
-Content-Type: application/octet-stream
-Content-Disposition: attachment; filename="picture.png"
-*/
 
 function createFileBlob(filename, data){
  	return new File([data], filename, {type: 'application/octet-stream'});	

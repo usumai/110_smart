@@ -135,12 +135,12 @@ let vm = new Vue({
         stk_progressd:{},
     },
     created() {
-        this.get_stk_assets()
+        this.get_ga_assets()
         this.get_stk_progress()
     },
     methods:{
-        get_stk_assets(){
-            payload             = {'act':'get_stk_assets'}
+        get_ga_assets(){
+            payload             = {'act':'get_ga_assets'}
             this.assd           = fnapi(payload)
             console.log(this.assd)
         }, 
