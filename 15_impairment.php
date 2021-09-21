@@ -2,7 +2,9 @@
 <?php include "02_header.php"; ?>
 <?php include "03_menu.php"; ?>
 <style type="text/css">
-
+.current-row {
+    color: red;
+}
 </style>
 <div id="app">
     <div class="container-fluid">
@@ -65,7 +67,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for='(rec, recidx) in json_records' :ref="rec.auto_storageID == <?=$current_row ?> ? 'current_row' : ''" :id="rec.auto_storageID == <?=$current_row ?> ? 'current_row' : ''">
+                    <tr v-for='(rec, recidx) in json_records' :class="rec.auto_storageID==<?=$current_row ?>?'current-row':''" :ref="rec.auto_storageID == <?=$current_row ?> ? 'current_row' : ''" :id="rec.auto_storageID == <?=$current_row ?> ? 'current_row' : ''">
                         <td>
                             <a  class='btn btn-primary' v-if="rec.isType!='b2r'"
                                 :href="'16_imp.php?auto_storageID='+rec.auto_storageID" ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
@@ -166,11 +168,15 @@ let vm = new Vue({
     mounted() {
 
         console.log("Event Mounted...");
- /*       
+        
      	if(this.$refs.current_row) {
-    		this.$refs.current_row[0].scrollIntoView();
+    		this.$refs.current_row[0].scrollIntoView({
+        		behavior: 'smooth',
+        		block: 'end',
+        		inline: 'end'
+            });
     	}    
- */  	
+   	
     },
     beforeMount(){
     	console.log("Event BeforeMount...");
