@@ -69,8 +69,8 @@
                         </button>
                     </td>
                     <td>
-                        <button class='btn btn-outline-dark ' v-on:click="export_activity(actvidx,'xslx')">Excel</button>
-                        <button class='btn btn-outline-dark ' v-on:click="export_activity(actvidx,'json')">Json</button>
+                        <button class='btn btn-outline-dark ' @click="export_activity(actvidx,'xslx')">Excel</button>
+                        <button class='btn btn-outline-dark ' @click="exportValidation(actvidx,'json')">Json</button>
                         <button v-if='actv.stk_type=="ga_stk"' class='btn btn-outline-dark ' v-on:click="export_activity(actvidx,'images')">Photos</button>
                     </td>
                 </tr>
@@ -121,18 +121,33 @@
     </div>
 </div>
 						
-    
-    
-<!--     
-    <div class='row'>
-        <div class='col'>
-            <a href='00_status.html' class='btn btn-danger'>Fix me</a>
-        </div>
-    </div>    
--->    
+      
     <div hidden>
-        <input hidden type="file" ref="upload_file" v-on:change="uploadData" class="form-control-file">
+        <input hidden type="file" ref="upload_file" v-on:change="uploadData" />
+        <button ref="isExportWarnDlgRef" hidden type='button' data-toggle='modal' data-target='#modal_is_export_warning'></button>
     </div>
+    
+    
+	<!-- IS data export warning -->
+	<div class="modal fade" id="modal_is_export_warning" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+			<div class="modal-header" style="background-color: #5a95ca;">
+				<h5 class="modal-title" style="color: whitesmoke">Warning</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<p class="lead">There are {{isExportWarningDlg.notYetCompleteItems}} not yet complete items. Do you want to continue?</p>     
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+				<button type="button" class="btn btn-danger" data-dismiss="modal" @click="export_activity(isExportWarningDlg.activityId, isExportWarningDlg.format)">Continue</button>				
+			</div>
+			</div>
+		</div>
+	</div>    
 </div>
 
 <script>
@@ -143,7 +158,11 @@ let vm = new Vue({
         message: '',
         actvd:{},
         show_deleted:false,
-
+        isExportWarningDlg: {
+			notYetCompleteItems: 0,
+			activityId: -1,
+			format: 'json'
+		},
         upload: {
             current: 0,
             taskDescription: 'testing',
@@ -310,7 +329,27 @@ let vm = new Vue({
         	}
         	return false;
     	},
+
+    	exportValidation(activityIndex, exportFormat){
+    		var actv = this.actvd[activityIndex];
+        	if(actv.stk_type=='is_audit'){    		
+	    		countIsNotYetCompleteItems(actv.stkm_id).then(
+	    	    	count=>{
+			        	if(count>0){  
+			        		
+				        	this.isExportWarningDlg.notYetCompleteItems=count;
+				        	this.isExportWarningDlg.activityId=activityIndex;
+				        	this.isExportWarningDlg.format=exportFormat;      		
+			        		this.$refs.isExportWarnDlgRef.click();
+			        	}
+	    	    	}
+	    	    );
+    		}else{
+        		this.export_activity(activityIndex, exportFormat);
+        	}
+        },
         export_activity(activity_id, exportFormat){
+ 
             actv = this.actvd[activity_id]
             header_obj                      = {};
             header_obj['type']              = actv.stk_type;

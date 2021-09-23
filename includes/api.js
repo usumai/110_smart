@@ -373,6 +373,28 @@ function getIsImpairments(completeCallback, errorCallback){
 	});
 }
 
+async function countIsNotYetCompleteItems(activityId) {
+	var res=0;
+	const rq= await axios.post(API_ENDPOINT, {
+			action: 'count_is_NotYetComplete',
+			data: {
+				activityId: activityId
+			}		
+		}
+	).then(
+		httpResponse => {
+			if(httpResponse.data && httpResponse.data.status) {
+				if((httpResponse.data.status=='ERROR')) {
+					res=0;
+				}else if((httpResponse.data.status=='OK')){
+					res=httpResponse.data.result[0].NotYetCompleteItems;
+				}
+			}		
+		}
+	);
+	return res;
+}
+
 function processResponse(httpResponse, completeCallback, errorCallback){
 	if(httpResponse.data && httpResponse.data.status) {
 		if((httpResponse.data.status=='ERROR')&&(errorCallback)) {

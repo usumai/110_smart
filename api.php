@@ -92,6 +92,11 @@ if ($act=="create_ga_stocktake") {
         }
         echo json_encode(new ResponseMessage("OK",$result));
     });              
+}elseif($act=="count_is_NotYetComplete"){
+    execWithErrorHandler(function() use ($con, $request){
+        echo json_encode(new ResponseMessage("OK", countIsNotYetCompleteItems($request->data->activityId)));
+    });
+    
 }elseif ($act=="create_is_audit") {      
     execWithErrorHandler(function() use ($con, $request){
         $stocktakeId = createStocktakeActivity($con, $request->data);
@@ -828,7 +833,23 @@ function updateB2RBinStatus ($connection, $stkId, $binId, $findingCode) {
     $stmt->bind_param("sss", $status, $binId, $stkId);        
     $stmt->execute();
 }
-
+function countIsNotYetCompleteItems($stkm_id) {
+    $sql = "
+    SELECT count(*) as NotYetCompleteItems
+    FROM smartdb.sm18_impairment rec 
+    WHERE (rec.stkm_id = $stkm_id) AND (
+        ((rec.isType='b2r') AND (rec.data_source='skeleton') AND (rec.findingID=15)) OR 
+        ((rec.findingID in ( 
+                SELECT findingID 
+                FROM smartdb.sm19_result_cats 
+                WHERE 
+                    isType like 'imp%' AND resAbbr in ('USWD','USND')
+          ) AND rec.checked_to_milis=0)) OR 
+        (rec.findingID=13)
+     )
+    ";
+    return qget($sql);
+}
 function getB2RBinRecord($stkm_id, $BIN_CODE) {
   
     $sql = "
