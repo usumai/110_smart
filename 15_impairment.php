@@ -160,32 +160,26 @@ let vm = new Vue({
         }
     },
     created() {
-    	console.log("Event Created...");
 		this.updateMilisEnableFindingIDs();
         this.get_is_records()
         this.get_is_settings()
     },
     mounted() {
-
-        console.log("Event Mounted...");
-        
+      
      	if(this.$refs.current_row) {
     		this.$refs.current_row[0].scrollIntoView({
         		behavior: 'smooth',
         		block: 'end',
-        		inline: 'end'
+        		inline: 'start'
             });
     	}    
    	
     },
     beforeMount(){
-    	console.log("Event BeforeMount...");
     },
     beforeUpdate(){
-    	console.log("Event BeforeUpdate...");
     },    
     updated(){
-    	console.log("Event Updated...");
     	if(this.updateList==1){
             $('#tbl_stk').DataTable({
                 stateSave: true
@@ -193,16 +187,17 @@ let vm = new Vue({
             this.updateList=0;
     	}
      	if(this.$refs.current_row) {
-         	console.log("Scrolling into view: ");
-         	console.log(this.$refs.current_row);
-    		this.$refs.current_row[0].scrollIntoView();
+    		this.$refs.current_row[0].scrollIntoView({
+        		behavior: 'smooth',
+        		block: 'end',
+        		inline: 'start'
+            });
     	}    
     }, 
     beforeDestroy(){
-    	console.log("Event BeforeDestroy...");
+
     }, 
     Destroyed(){
-    	console.log("Event BeforeDestroy...");
     },               
     methods:{
 
