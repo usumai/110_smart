@@ -5,6 +5,10 @@
 .current-row {
     color: red;
 }
+.dropdown-menu {
+    max-height: 200px;
+    overflow-y: auto;
+}
 </style>
 <div id="app">
     <div class="container-fluid">
@@ -22,7 +26,7 @@
                                  		<span class="fas fa-sort-amount-down"></span>
                                   </a>                                
                                   <div class="dropdown-menu" aria-labelledby="warehouseFilter">
-                                    <a class="dropdown-item"  v-for="(rec, i) in  filters.warehouse" @click="search(rec)">{{rec}}</a>
+                                    <a class="dropdown-item"  v-for="(rec, i) in  filters.warehouse" @click="search(0,rec)">{{rec}}</a>
                                   </div>
                         	</div>                                     
                         </th>
@@ -33,7 +37,7 @@
                                  		<span class="fas fa-sort-amount-down"></span>
                                   </a>                                
                                   <div class="dropdown-menu" aria-labelledby="binFilter">
-                                    <a class="dropdown-item"  v-for="(rec, i) in  filters.bincode" @click="search(rec)">{{rec}}</a>
+                                    <a class="dropdown-item"  v-for="(rec, i) in  filters.bincode" @click="search(1,rec)">{{rec}}</a>
                                   </div>
                         	</div>                              
                         </th>
@@ -43,7 +47,7 @@
                                  		<span class="fas fa-sort-amount-down"></span>
                                   </a>                                
                                   <div class="dropdown-menu" aria-labelledby="stockFilter">
-                                    <a class="dropdown-item"  v-for="(rec, i) in  filters.stockcode" @click="search(rec)">{{rec}}</a>
+                                    <a class="dropdown-item"  v-for="(rec, i) in  filters.stockcode" @click="search(2,rec)">{{rec}}</a>
                                   </div>
                         	</div>                          
                         </th>
@@ -58,7 +62,7 @@
                                  		<span class="fas fa-sort-amount-down"></span>
                                   </a>                                
                                   <div class="dropdown-menu" aria-labelledby="typeFilter">
-                                    <a class="dropdown-item"  v-for="(rec, i) in  filters.type" @click="search(rec)">{{rec}}</a>
+                                    <a class="dropdown-item"  v-for="(rec, i) in  filters.type" @click="search(3,rec)">{{rec}}</a>
                                   </div>
                         	</div>                              
                         </th>
@@ -152,6 +156,7 @@ let vm = new Vue({
         json_is_settings:{},
         milisEnabled:[],
         updateList: 0,
+        filterColumns: [],
         filters:{
             warehouse:[],
             stockcode:[],
@@ -201,13 +206,15 @@ let vm = new Vue({
     },               
     methods:{
 
-        search(filterText) {
+        search(col, filterText) {
             if(filterText=='All'){
-            	$('#tbl_stk').DataTable().search('');
+            	this.filterColumns[col]='';
             }else{
-            	$('#tbl_stk').DataTable().search(filterText);
+                this.filterColumns[col]=filterText;
             }
-        	
+            var filter="";
+            this.filterColumns.forEach(val =>{ filter = filter+' '+val; });
+            $('#tbl_stk').DataTable().search(filter);
         },
 		updateMilisEnableFindingIDs(){
 			getMilisEnableFindingIDs(
@@ -268,21 +275,42 @@ let vm = new Vue({
                     bincodeMap[data[i].BIN_CODE]=1;
                     stockcodeMap[data[i].STOCK_CODE]=1;
                 }
+
+                var sorter=function (v1,v2){
+                    if(v1.length>v2.length){
+                        v1=v1.substring(0,v2.length);
+                    }else if(v1.length<v2.length){
+						v2=v2.substring(0,v1.length);
+                    }
+                    if(v1.toUpperCase() > v2.toUpperCase()){
+                        return 1;
+                    }else if(v1.toUpperCase() < v2.toUpperCase()){
+                        return -1;
+                    }else{
+                        return 0;
+                    }
+            	};               
                 var i=0;
-                this.filters.warehouse[i++]='All';
                 for(var key in warehouseMap){
                     this.filters.warehouse[i++]=key;
                 }
+                this.filters.warehouse.sort(sorter);
+                this.filters.warehouse.splice(0,0,'All');
+                
                 i=0;
-                this.filters.bincode[i++]='All';
                 for(var key in bincodeMap){
                     this.filters.bincode[i++]=key;
                 }
+                this.filters.bincode.sort(sorter);
+                this.filters.bincode.splice(0,0,'All');
+                
                 i=0;
-                this.filters.stockcode[i++]='All';
+                
                 for(var key in stockcodeMap){
                     this.filters.stockcode[i++]=key;
                 }
+                this.filters.stockcode.sort(sorter);
+                this.filters.stockcode.splice(0,0,'All');
             	this.json_records=data;
 
 
