@@ -101,7 +101,7 @@ let vm = new Vue({
                 No: "nstr",
             },
             2:{
-                name:   "Does the item belong to a SCA?",
+                name:   "Does the item belong to a SCA or is an X-CLASS item issued to a SCA?",
                 Yes:"nstr",
                 No: "3",
             },
