@@ -75,7 +75,7 @@
 					                        		<a 
 					                        			:href="'05_action.php?act=save_is_toggle_check&toggle='+(asset.SIGHTED==1?0:1)+'&STOCK_CODE='+asset.STOCK_CODE+'&BIN_CODE='+BIN_CODE+'&stkm_id='+stkm_id"	                        	
 					                        			class="btn btn-outline">
-					                        			<i :class="'fa' + (asset.SIGHTED==1 ? ' fa-check text-success':' fa-times text-danger')"></i>
+					                        			<i :class="'fa' + (asset.SIGHTED==1 ? ' fa-check text-success':' fa-times text-danger')">{{(asset.SIGHTED==1 ? ' ':'')}}</i>
 					                        		</a>
 					                        	</td> 
 					                        </tr>
@@ -242,7 +242,7 @@ let vm = new Vue({
         	    {targets: 0, orderable: true},
         	    {targets: 1, orderable: true},
         	    {targets: 2, orderable: true},
-        	    {targets: 3, orderable: false}
+        	    {targets: 3, orderable: true}
         	]
     	});       
     },
