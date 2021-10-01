@@ -51,26 +51,38 @@
                         <tr><td colspan='4' >&nbsp;</td></tr>
 
 	                    <tr>
-		                	<table class="table table-sm table-striped">
-		                        <caption>
-	                                <b>Bin contents</b>
-	                                <small>(Not all items listed must be sighted, but all additional stockcodes found must be registered.)</small>		                        
-		                        </caption>
-		                        <thead class="table-dark">
-			                        <tr>
-			                            <th>Stockcode</th>
-			                            <th>Name</th>
-<!-- 		                            <th>SOH</th> -->
-			                        </tr>
-		                        </thead>
-		                        <tbody>
-			                        <tr v-for="bin in json_bins_orig">
-			                            <td>{{ bin.STOCK_CODE }}</td>
-			                            <td>{{ bin.ITEM_NAME }}</td>
-<!-- 			                        <td>{{ bin.SOH }}</td> 	-->
-			                        </tr>
-		                        </tbody>
-							</table>
+	                    	<td colspan="4">
+		                    	<div class="table-responsive-sm">
+				                	<table id="bin_contents" class="table table-sm table-striped">
+				                        <caption>
+			                                <b>Bin contents</b><br/>
+			                                <small>(Not all items listed must be sighted, but all additional stockcodes found must be registered.)</small>		                        
+				                        </caption>
+				                        <thead class="table-dark">
+					                        <tr>
+					                            <th>Stockcode</th>
+					                            <th>Name</th>
+					                            <th>SOH</th>
+		 		                            	<th>Sighted</th> 
+					                        </tr>
+				                        </thead>
+				                        <tbody>
+					                        <tr v-for="asset in json_bins_orig">
+					                            <td>{{ asset.STOCK_CODE }}</td>
+					                            <td>{{ asset.ITEM_NAME }}</td>
+					                            <th>{{ asset.SOH }}</th>
+					                        	<td>
+					                        		<a 
+					                        			:href="'05_action.php?act=save_is_toggle_check&toggle='+(asset.SIGHTED==1?0:1)+'&STOCK_CODE='+asset.STOCK_CODE+'&BIN_CODE='+BIN_CODE+'&stkm_id='+stkm_id"	                        	
+					                        			class="btn btn-outline">
+					                        			<i :class="'fa' + (asset.SIGHTED==1 ? ' fa-check text-success':' fa-times text-danger')"></i>
+					                        		</a>
+					                        	</td> 
+					                        </tr>
+				                        </tbody>
+									</table>
+	                        	</div>
+                        	</td>
                         </tr>
                     </table>
 
@@ -184,8 +196,12 @@
     </div>
 -->
 </div>
-
+<script src='includes/datatables/jquery.dataTables.min.js'></script>
 <script>
+
+ 
+
+
 function fnapi(data){
     payload_res = $.ajax({
         type: "POST",
@@ -209,9 +225,35 @@ let vm = new Vue({
         json_bins_extr:{},
         json_skeleton:{},
         json_result_cats:{},
+        updateList: 0
     },
     created() {
+    	 
         this.refresh_page()
+    },
+    mounted(){
+    	$('#bin_contents').DataTable({
+    	    stateSave: true,
+    	    paging: false,
+    	    searching: false,
+    	    info: false,
+    	    order: [],
+    	    columnDefs: [
+        	    {targets: 0, orderable: true},
+        	    {targets: 1, orderable: true},
+        	    {targets: 2, orderable: true},
+        	    {targets: 3, orderable: false}
+        	]
+    	});       
+    },
+    
+    updated(){
+    	if(this.updateList==1){
+	        $('#bin_contents').DataTable({
+	            stateSave: true
+	        });
+	        this.updateList=0;
+    	}
     },
     methods:{
         refresh_page(){
@@ -226,6 +268,7 @@ let vm = new Vue({
             this.json_skeleton  = json[0];        
         }, 
         get_b2r_contents(){
+        	this.updateList=1;
             payload             = {'act':'get_b2r_contents', 'BIN_CODE':this.BIN_CODE, 'stkm_id':this.stkm_id}
             this.json_bins_orig = fnapi(payload)
         }, 

@@ -278,11 +278,27 @@ if ($act=="create_ga_stocktake") {
 }elseif ($act=='get_b2r_contents') {
     $stkm_id    = $_POST["stkm_id"];
     $BIN_CODE   = $_POST["BIN_CODE"];
-    // $sql        = " SELECT * FROM smartdb.sm18_impairment  WHERE stkm_id = $stkm_id AND BIN_CODE = '$BIN_CODE'";
-    $sql        = " SELECT DSTRCT_CODE, WHOUSE_ID, BIN_CODE, STOCK_CODE, ITEM_NAME, SUM(SOH) as SOH ";
-    $sql       .= " FROM smartdb.sm18_impairment   ";
-    $sql       .= " WHERE isType = 'b2r' AND stkm_id = $stkm_id AND BIN_CODE = '$BIN_CODE' AND (data_source NOT IN ('skeleton', 'extra'))";
-    $sql       .= " GROUP BY DSTRCT_CODE, WHOUSE_ID, BIN_CODE, STOCK_CODE, ITEM_NAME ";
+    $sql        = "
+
+SELECT 
+    DSTRCT_CODE, 
+    WHOUSE_ID, 
+    BIN_CODE, 
+    STOCK_CODE, 
+    ITEM_NAME, 
+    SUM(SOH) as SOH,
+    (CASE WHEN checkFlag=1 THEN 1 ELSE 0 END) as SIGHTED
+FROM 
+    smartdb.sm18_impairment   
+WHERE 
+    isType = 'b2r' AND 
+    stkm_id = $stkm_id AND 
+    BIN_CODE = '$BIN_CODE' AND 
+    (data_source NOT IN ('skeleton', 'extra'))
+GROUP BY DSTRCT_CODE, WHOUSE_ID, BIN_CODE, STOCK_CODE, ITEM_NAME
+ORDER BY 
+    STOCK_CODE ASC, ITEM_NAME ASC";
+
     echo json_encode(qget($sql));
 
 }elseif ($act=='get_b2r_extras') {

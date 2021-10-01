@@ -328,7 +328,6 @@ let vm = new Vue({
                 setting = json[idx]
                 this.json_is_settings[setting.findingID] = setting
             }
-            console.log(this.json_is_settings)
         }, 
     }
 })
