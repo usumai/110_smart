@@ -1331,6 +1331,7 @@ if ($act=='sys_pull_master') {
                SET 	tblEdit.DSTRCT_CODE = tblSource.DSTRCT_CODE,
                     tblEdit.WHOUSE_ID = tblSource.WHOUSE_ID,
                     tblEdit.SUPPLY_CUST_ID = tblSource.SUPPLY_CUST_ID,
+                    tblEdit.SUPPLY_ACCT_METH = tblSource.SUPPLY_ACCT_METH,
                     tblEdit.SC_ACCOUNT_TYPE = tblSource.SC_ACCOUNT_TYPE,
                     tblEdit.STOCK_CODE = tblSource.STOCK_CODE,
                     tblEdit.ITEM_NAME = tblSource.ITEM_NAME,
@@ -1340,7 +1341,10 @@ if ($act=='sys_pull_master') {
                     tblEdit.TRACKING_IND = tblSource.TRACKING_IND,
                     tblEdit.TRACKING_REFERENCE = tblSource.TRACKING_REFERENCE,
                     tblEdit.LAST_MOD_DATE = tblSource.LAST_MOD_DATE,
-                    tblEdit.isID = tblSource.isID
+                    tblEdit.isID = tblSource.isID,
+                    tblEdit.targetID=tblSource.targetID,
+                    tblEdit.targetItemID=tblSource.targetItemID,
+                    tblEdit.storageID=tblSource.storageID
                WHERE tblEdit.res_parent_storageID = tblSource.storageID
                     AND tblEdit.storageID IS NULL
                     AND tblSource.auto_storageID=$auto_storageID ";
