@@ -56,7 +56,10 @@ function exportGaImages($activityID, $filename){
     $gaJson['assetlist']= $assetList;
 
 
-    
+    if(!is_dir('images/')){
+        mkdir('images/',0777,true);
+    }
+
 
 
 	$zipPath='images/' . $filename;
@@ -64,7 +67,7 @@ function exportGaImages($activityID, $filename){
 	$zip = new ZipArchive();
     $status=$zip->open($zipPath, ZIPARCHIVE::CREATE);
     
-    if ($status === TRUE) {
+    if (($status === TRUE) && is_dir('images/')) {
 		$zip->addFromString('data.json',json_encode($gaJson));
 		$zip->addEmptyDir("images");
 
