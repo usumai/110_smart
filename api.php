@@ -491,7 +491,7 @@ ORDER BY
     $img_list   = "";
     $images     = "";
     
-    if ($genesis_cat=="nonoriginal") {
+    if ($res_asset_id=="firstfound") {
          $assetImageName	= $res_fingerprint;
     }else{
          $assetImageName	= $res_asset_id;

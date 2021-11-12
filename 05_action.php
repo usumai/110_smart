@@ -686,10 +686,11 @@ if ($act=='sys_pull_master') {
      $sql = "SELECT * FROM smartdb.sm14_ass WHERE ass_id = ".$ass_id."; ";
      $result = $con->query($sql);
      if ($result->num_rows > 0) {
-          while($row = $result->fetch_assoc()) {
+            while($row = $result->fetch_assoc()) {
                $res_asset_id           = $row["res_asset_id"];
                $res_fingerprint        = $row["res_fingerprint"];
-     }}
+            }
+     }
      if ($res_asset_id =="firstfound") {
           $photo_name              = "images/".$res_fingerprint;
      }else{

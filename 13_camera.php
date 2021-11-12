@@ -31,6 +31,7 @@ $ass_id	= $_GET["ass_id"];
 			<!-- <br><br><br><br><a href="107_help.php#camera_switching">Switch Cameras</a> -->
 			
 		</td>
+	
 		<td width="20%" align="right">
 			<form method="post" action="05_action.php" >
 				<input type="hidden" name="act" value="save_photo">
@@ -41,6 +42,7 @@ $ass_id	= $_GET["ass_id"];
 	        	<a href="11_ass.php?ass_id=<?=$ass_id?>" class="btn btn-danger" id="btn_cancelphoto"><span class='octicon octicon-x' style='font-size:30px'></span></a>
 			</form><br><br><br><br><br>
 		</td>
+
 	</tr>
 </table>
 
