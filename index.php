@@ -341,7 +341,9 @@ let vm = new Vue({
 				        	this.isExportWarningDlg.activityId=activityIndex;
 				        	this.isExportWarningDlg.format=exportFormat;      		
 			        		this.$refs.isExportWarnDlgRef.click();
-			        	}
+			        	}else{
+			        		this.export_activity(activityIndex, exportFormat);
+				        }
 	    	    	}
 	    	    );
     		}else{
