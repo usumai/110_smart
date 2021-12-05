@@ -78,7 +78,7 @@
             </table>
         </div>
         <button class='btn btn-primary float-right' 
-            v-on:click='show_deleted=!show_deleted'>Show deleted</button>
+            @click='show_deleted=!show_deleted'>Show deleted</button>
     </div>
 
 
@@ -237,7 +237,6 @@ let vm = new Vue({
 			
             let reader = new FileReader();
             reader.onprogress = event => {
-
             };
             reader.onload = event => {
 				try{
@@ -374,7 +373,7 @@ let vm = new Vue({
                 header_obj['rc_orig_complete']  = actv.rc_orig_complete;
                 header_obj['rc_extras']         = actv.rc_extras;
 
-                header_obj['asset_lock_date']   = ''
+                header_obj['asset_lock_date']   = '';
 
                 payload                         = {'act':	'export_ga_data', 
                 								   'stkm_id': actv.stkm_id 
@@ -382,7 +381,6 @@ let vm = new Vue({
                 list = fnapi(payload);
                 header_obj['rc_totalsent'] =  list.length;
                 header_obj['assetlist']         = list;
-                
                 
             }else if (actv.stk_type=="is_audit"){
                 name_suffix                     = actv.stk_name;
