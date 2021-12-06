@@ -62,7 +62,7 @@
 					                        <tr>
 					                            <th>Stockcode</th>
 					                            <th>Name</th>
-					                            <th>SOH</th>
+<!--					                        <th>SOH</th> -->
 		 		                            	<th>Sighted</th> 
 					                        </tr>
 				                        </thead>
@@ -70,7 +70,7 @@
 					                        <tr v-for="asset in json_bins_orig">
 					                            <td>{{ asset.STOCK_CODE }}</td>
 					                            <td>{{ asset.ITEM_NAME }}</td>
-					                            <th>{{ asset.SOH }}</th>
+<!--					                        <th>{{ asset.SOH }}</th>   -->
 					                        	<td>
 					                        		<a 
 					                        			:href="'05_action.php?act=save_is_toggle_check&toggle='+(asset.SIGHTED==1?0:1)+'&STOCK_CODE='+asset.STOCK_CODE+'&BIN_CODE='+BIN_CODE+'&stkm_id='+stkm_id"	                        	
