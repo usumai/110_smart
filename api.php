@@ -190,7 +190,7 @@ if ($act=="create_ga_stocktake") {
     	ass.res_assetdesc2,
     	ass.res_inventno, 
     	ass.res_serialno, 
-    	ass.res_plateno, 
+    	ass.res_grpcustod, 
     	ass.res_val_nbv, 
     	ass.res_reason_code, 
     	(

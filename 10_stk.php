@@ -43,7 +43,7 @@
                     <td>{{ ass.res_assetdesc1 }}<br><small>{{ ass.res_assetdesc2 }}</small></td>
                     <td>{{ ass.res_inventno }}<br><small>{{ ass.res_serialno }}</small></td>
                     <td class="text-right">{{ ass.res_val_nbv }}</td>
-                    <td>{{ ass.res_plateno }}</td>
+                    <td>{{ ass.res_grpcustod}}</td>
                     <td>
                         <!-- {{ ass.ass_status }} -->
                         <span v-if="ass.ass_status==1">FIN~</span>
