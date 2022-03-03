@@ -46,12 +46,6 @@
             <input type="radio" name="options" v-on:click='save_checkbox(0)' :disabled='disabled'>Off
         </label>
     </div>
-
-    <div class="alert" role="alert" v-if="internal_msg" 
-        v-bind:class="{'alert-danger': msg_color=='danger','alert-warning': msg_color=='warning','alert-success': msg_color=='success'}">
-        {{ internal_msg }}
-    </div>
-
     <div 
         v-if="inputtype=='checkyn'"
         class="btn-group btn-group-toggle" data-toggle="buttons">

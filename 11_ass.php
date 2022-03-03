@@ -100,7 +100,7 @@
                                 column_name='res_assetdesc1' 
                                 :bound_value='assd.res_assetdesc1'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
-                                maxlen='255'
+                                maxlen='50'
                                 ></textinput>
                             </div>
                             <div class="form-group"><label>Asset Description 2</label>
@@ -108,7 +108,7 @@
                                 column_name='res_assetdesc2' 
                                 :bound_value='assd.res_assetdesc2'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
-                                maxlen='255'
+                                maxlen='50'
                                 ></textinput>
                             </div>
                             <div class="form-group"><label>Asset Main No Text</label>
@@ -116,7 +116,7 @@
                                 column_name='res_assettext' 
                                 :bound_value='assd.res_assettext'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
-                                maxlen='255'
+                                maxlen='50'
                                 ></textinput>
                             </div>
                             <div class="form-group"><label>Inventory</label>
@@ -124,7 +124,7 @@
                                 column_name='res_inventory' 
                                 :bound_value='assd.res_inventory'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
-                                maxlen='255'
+                                maxlen='15'
                                 ></textinput>
                             </div>
                             <div class="form-group"><label>Inventory No.</label>
@@ -132,7 +132,7 @@
                                 column_name='res_inventno' 
                                 :bound_value='assd.res_inventno'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
-                                maxlen='255'
+                                maxlen='25'
                                 ></textinput>
                             </div>
                             <div class="form-group"><label>Serial No</label>
@@ -140,7 +140,7 @@
                                 column_name='res_serialno' 
                                 :bound_value='assd.res_serialno'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
-                                maxlen='255'
+                                maxlen='18'
                                 ></textinput>
                             </div>
                         </div>
@@ -158,7 +158,7 @@
                                 column_name='res_loc_room' 
                                 :bound_value='assd.res_loc_room'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
-                                maxlen='255'
+                                maxlen='8'
                                 ></textinput>
                             </div>
                             <div class="form-group"><label>Latitude</label>
@@ -208,7 +208,7 @@
                                 column_name='res_class_ga_cat' 
                                 :bound_value='assd.res_class_ga_cat'
                                 :disabled='true'
-                                maxlen='255'
+                                maxlen='15'
                                 ></textinput>
                             </div>
                             <div class="form-group"><label>Cap Date {{assd.res_date_cap_clean}}</label>
