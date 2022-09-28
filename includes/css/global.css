@@ -1,3 +1,36 @@
 .table caption {
 	caption-side: top;
 }
+.table {
+	overflow-y: scroll;
+}
+
+.nav-tabs {
+	border-bottom: none
+}
+
+.nav-tabs .nav-link.active {
+	z-index: 4;
+	border-bottom: 0px solid transparent;
+	border-radius: 6px 6px 0px 0px;
+	box-shadow: 5px 0px 7px 0px #ccc;
+	font-weight: bold;
+	color: black;
+}
+.nav-link {
+	color: lightslategrey;
+	font-weight: bold;
+}
+.nav-tabs .nav-item {
+	margin-bottom: -1px;
+}
+
+.tab-content> .active {
+	z-index: 3;
+	box-shadow: 5px 5px 7px 0px #ccc;
+	border-left: 1px solid #dee2e6;
+	border-right: 1px solid #dee2e6;
+	border-top: 1px solid #dee2e6;
+	border-bottom: 1px solid #dee2e6;
+	padding: 10px 5px 10px 5px;
+}

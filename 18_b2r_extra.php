@@ -42,12 +42,12 @@
                         <h1 v-if="qres=='nstr'||qres=='LE'||qres=='FF'" class="display-4">Final result: {{qres == 'nstr' ? 'No Further Investigation Required' : qres }}</h1>
                         <span>
                             <button class="btn btn-danger" 
-                                v-on:click="save_final_b2r_extra_result('clear')">
+                                @click="save_final_b2r_extra_result('clear')">
                                 Clear result
                             </button>
                             <button class="btn btn-dark" 
                                 v-if="qres=='nstr'||qres=='LE'||qres=='FF'"
-                                v-on:click="save_final_b2r_extra_result()">
+                                @click="save_final_b2r_extra_result()">
                                 Save
                             </button>
                         </span>
@@ -190,7 +190,7 @@ let vm = new Vue({
             this.build_path()
         }, 
         select_repeal(repeal_to_idx){
-            console.log("repeal to:"+repeal_to_idx)
+     
             if(repeal_to_idx==1){
                 this.json_path  = {}
                 this.qres       = 1
@@ -198,7 +198,6 @@ let vm = new Vue({
             for(idx in this.json_path){
                 if (idx>=repeal_to_idx) {
                     idx=String(idx)
-                    console.log("Deleteing:"+idx)
                     delete this.json_path[idx];
                 }
             }

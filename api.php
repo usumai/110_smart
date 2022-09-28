@@ -282,6 +282,7 @@ if ($act=="create_ga_stocktake") {
 
 SELECT 
     DSTRCT_CODE, 
+    isType,
     WHOUSE_ID, 
     BIN_CODE, 
     STOCK_CODE, 
@@ -291,7 +292,7 @@ SELECT
 FROM 
     smartdb.sm18_impairment   
 WHERE 
-    isType = 'b2r' AND 
+    isType in ('b2r','b2r_exc') AND 
     stkm_id = $stkm_id AND 
     BIN_CODE = '$BIN_CODE' AND 
     (data_source NOT IN ('skeleton', 'extra'))

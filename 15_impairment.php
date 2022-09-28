@@ -2,6 +2,16 @@
 <?php include "02_header.php"; ?>
 <?php include "03_menu.php"; ?>
 <style type="text/css">
+th{
+    position: sticky;
+    top: 0;
+    color: #fff;
+    background-color: #343a40;    
+    z-index: 2;
+}
+.fixed-top {
+    z-index: 2;
+}
 .current-row {
     color: red;
 }
@@ -62,7 +72,7 @@
                                  		<span class="fas fa-sort-amount-down"></span>
                                   </a>                                
                                   <div class="dropdown-menu" aria-labelledby="typeFilter">
-                                    <a class="dropdown-item"  v-for="(rec, i) in  filters.type" @click="search(3,rec)">{{rec}}</a>
+                                    <a class="dropdown-item"  v-for="(rec, i) in  filters.type" @click="search(3,rec.option)">{{rec.label}}</a>
                                   </div>
                         	</div>                              
                         </th>
@@ -91,6 +101,7 @@
                             <h4 v-if="rec.isType=='b2r'"><span class='badge badge-dark' style="color:#f7fcb9">{{ rec.isType }}</span></h4>
                             <h4 v-if="rec.isType=='impq'"><span class='badge badge-dark' style="color:#9ebcda">{{ rec.isType }}</span></h4>
                             <h4 v-if="rec.isType=='imps'"><span class='badge badge-dark' style="color:#fde0dd">{{ rec.isType }}</span></h4>
+                            <h4 v-if="rec.isType=='b2r_exc'"><span class='badge badge-dark' style="color:orange">{{ rec.isType }}</span></h4>
                         </td>
                         <td> 
                             <h4><span :class="'badge badge-'+getStatusColor(rec)">{{getStatusCode(rec)}}~{{rec.findingID ? json_is_settings[rec.findingID].fAbr : '' }}</span></h4>
@@ -161,7 +172,13 @@ let vm = new Vue({
             warehouse:[],
             stockcode:[],
             bincode: [],
-            type: ['All','b2r','imp','impq','imps']
+            type: [
+                	{option: 'All', label: 'All'},
+                	{option: 'b2r', label: 'b2r'},
+                	{option: 'impq', label:'impq'},
+                	{option: 'imps', label: 'imps'},
+                	{option: 'imp', label: 'impq+imps'}
+                 ]
         }
     },
     created() {

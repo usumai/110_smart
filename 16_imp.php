@@ -160,7 +160,7 @@ $(document).ready(function() {
     setPage()
 
     function setPage(){  
-        console.log(arS)
+
         if (arS[0]['findingID']){
             complete        = true;
         }else{
@@ -306,8 +306,16 @@ $(document).ready(function() {
 		changeMonth: true,
 		changeYear: true 
         });
-    $(".datepicker").change(function(){
-        setPage()
+    $(".datepicker").change(e=>{
+    	var selectedYear=new Date(e.target.value).getFullYear();
+    	var currentYear=new Date().getFullYear();
+    	if(currentYear==selectedYear){
+    		$("#date-alert").prop('hidden',false);
+    	}else{
+    		$("#date-alert").prop('hidden',true);
+        }
+		console.log("current year: %s ; selected year: %s; is same: %s",currentYear, selectedYear, currentYear==selectedYear );
+        setPage();
     })
 
 
@@ -414,6 +422,14 @@ function onSplityMilisChanged(key) {
 <style>
 .list-group-item{
     margin-bottom:10px;
+
+}
+.list-group-flush .list-group-item {
+	border-radius: 4px;	
+}
+.list-group-item-action {
+    
+    box-shadow: 3px 3px 4px;
 }
 </style>
 
@@ -484,7 +500,7 @@ function onSplityMilisChanged(key) {
 
     <div class='col-6 lead'>
 
-    <form action='05_action.php' method='POST'>
+    <form action='05_action.php' method='POST' >
         <table class='table table-sm'>
             <tr><td colspan='2' id='resultSelection'>&nbsp;</td></tr>
             <tr><td><b>District</b></td><td><?=$DSTRCT_CODE?></td></tr>
@@ -516,7 +532,16 @@ function onSplityMilisChanged(key) {
             		<textarea class='form-control' rows='5' name='res_comment' id='res_comment'><?=$res_comment?></textarea>
             	</td>
             </tr>      
-            <tr id='areaDate'><td><b>Date</b></td><td><input type='text' class='form-control datepicker' name='res_unserv_date' id='res_unserv_date' value='<?=$res_unserv_date?>' readonly></td></tr>
+            <tr id='areaDate'>
+            	<td><b>Date</b></td>
+            	<td>
+            		<input type='text' class='form-control datepicker' name='res_unserv_date' id='res_unserv_date' value='<?=$res_unserv_date?>' readonly>
+            		<span id="date-alert" hidden="true" 
+            				style="display: block; font-size: 0.8em; padding: 5px; text-align: justify;">
+            			<i style="color: red">*Impairment year is the same as current year</i>
+            		</span>
+            	</td>
+            </tr>
             <tr id='areaSplit'><td colspan='2'>
                 <b>Split area</b><br>
                 <table class='table' id='splityTable'>
