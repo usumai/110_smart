@@ -534,11 +534,11 @@ let vm_menu = new Vue({
             console.log(this.templd)
 		}, 
 		init_template(template){
-            payload     = {'act':'get_activities'}
-            json		= fnapi(payload)
-            this.actvd	= json["result"]
-			this.template_ass_id = template.ass_id
-			$('#modal_initiate_template').modal('show')
+            payload     = {'act':'get_activities'};
+            json		= fnapi(payload);
+            this.actvd	= json["result"];
+			this.template_ass_id = template.ass_id;
+			$('#modal_initiate_template').modal('show');
 		}, 
 		get_rr_stats(){
             payload     = {'act':'get_rr_stats'}

@@ -62,25 +62,27 @@
 				             		<li class="nav-item">
 				             			<a class="nav-link" data-toggle="tab" href="#tab1">Sighted <i style="font-size: 0.8em">({{this.countComplete()}})</i></a>
 				             		</li>
+				             	<!-- 	
 				             		<li class="nav-item">
 				             			<a class="nav-link" data-toggle="tab" href="#tab2">Excluded <i style="font-size: 0.8em">({{this.countExclude()}})</i></a>
 				             		</li>
+				             	-->	
 				             	</ul>         	
 					            <div class="tab-content">         
 			                    	<div class="tab-pane fade table-responsive-sm active show" id="tab0">
 					                	<table id="bin_contents" class="table table-sm table-striped">
 					                        <thead class="table-dark">
-						                        <tr>
-						                            <th style="width: 25%">Stockcode</th>
-						                            <th style="width: 50%">Name</th>
-			 		                            	<th style="width: 25%">Sighted</th> 
-						                        </tr>
+
+						                            <th style="width: 10%">Stockcode</th>
+						                            <th style="width: 80%">Name</th>
+			 		                            	<th style="width: 10%">Sighted</th> 
+
 					                        </thead>
 					                        <tbody>
-						                        <tr v-for="asset in json_bins_orig" v-if="asset.isType=='b2r' && asset.SIGHTED!=1">
-						                            <td>{{ asset.STOCK_CODE }}</td>
-						                            <td>{{ asset.ITEM_NAME }}</td>
-						                        	<td>
+						                        <tr v-for="asset in json_bins_orig" v-if="(asset.isType=='b2r' || asset.isType=='b2r_exc') &&  asset.SIGHTED!=1" :style="asset.isType=='b2r_exc'? 'color: red': '' ">
+						                            <td style="width: 10%">{{ asset.STOCK_CODE }}</td>
+						                            <td style="width: 80%">{{ asset.ITEM_NAME }}</td>
+						                        	<td style="width: 10%;text-align: center">
 						                        		<a 
 						                        			:href="'05_action.php?act=save_is_toggle_check&toggle='+(asset.SIGHTED==1?0:1)+'&STOCK_CODE='+asset.STOCK_CODE+'&BIN_CODE='+BIN_CODE+'&stkm_id='+stkm_id"	                        	
 						                        			class="btn btn-outline">
@@ -94,16 +96,17 @@
 			                    	<div class="tab-pane table-responsive-sm" id="tab1">
 					                	<table id="bin_contents1" class="table table-sm table-striped">		                	
 					                        <thead class="table-dark">
-						                            <th style="width: 25%">Stockcode</th>
-						                            <th style="width: 50%">Name</th>
-			 		                            	<th style="width: 25%">Sighted</th> 
-						                        </tr>
+
+						                            <th style="width: 10%">Stockcode</th>
+						                            <th style="width: 80%">Name</th>
+			 		                            	<th style="width: 10%">Sighted</th> 
+
 					                        </thead>
 					                        <tbody>
-						                        <tr v-for="asset in json_bins_orig" v-if="asset.isType=='b2r' && asset.SIGHTED==1">
-						                            <td>{{ asset.STOCK_CODE }}</td>
-						                            <td>{{ asset.ITEM_NAME }}</td>
-						                        	<td>
+						                        <tr v-for="asset in json_bins_orig" v-if="(asset.isType=='b2r' || asset.isType=='b2r_exc') && asset.SIGHTED==1" :style="asset.isType=='b2r_exc'? 'color: red': ''">
+						                            <td style="width: 10%">{{ asset.STOCK_CODE }}</td>
+						                            <td style="width: 80%">{{ asset.ITEM_NAME }}</td>
+						                        	<td style="width: 10%;text-align: center">
 						                        		<a 
 						                        			:href="'05_action.php?act=save_is_toggle_check&toggle='+(asset.SIGHTED==1?0:1)+'&STOCK_CODE='+asset.STOCK_CODE+'&BIN_CODE='+BIN_CODE+'&stkm_id='+stkm_id"	                        	
 						                        			class="btn btn-outline">
@@ -114,23 +117,25 @@
 					                        </tbody>
 										</table>
 		                        	</div>
+		                        	<!--
 			                    	<div class="tab-pane table-responsive-sm" id="tab2">
 					                	<table id="bin_contents2" class="table table-sm table-striped">		                	
 					                        <thead class="table-dark">
-						                        <tr>
-						                            <th  style="width: 25%">Stockcode</th>
-						                            <th  style="width: 75%">Name</th>
-						                        </tr>
+
+						                            <th  style="width: 10%">Stockcode</th>
+						                            <th  style="width: 90%">Name</th>
+
 					                        </thead>
 					                        <tbody>
 						                        <tr v-for="asset in json_bins_orig" v-if="asset.isType=='b2r_exc'">
-						                            <td>{{ asset.STOCK_CODE }}</td>
-						                            <td>{{ asset.ITEM_NAME }}</td>
+						                            <td style="width: 10%">{{ asset.STOCK_CODE }}</td>
+						                            <td style="width: 90%">{{ asset.ITEM_NAME }}</td>
 
 						                        </tr>
 					                        </tbody>
 										</table>
-		                        	</div>	     		                        		                        	
+		                        	</div>
+		                        	-->	     		                        		                        	
 				                </div>
                         	</td>
                         </tr>
@@ -267,7 +272,7 @@ let vm = new Vue({
         json_bins_extr:{},
         json_skeleton:{},
         json_result_cats:{},
-        updateList: 0
+        //updateList: 0
     },
     created() {
     	 
@@ -302,12 +307,15 @@ let vm = new Vue({
     },
     
     updated(){
+    	/*
     	if(this.updateList==1){
+
 	        $('#bin_contents').DataTable({
 	            stateSave: true
 	        });
 	        this.updateList=0;
     	}
+    	*/
     },
     methods:{
         refresh_page(){
@@ -323,7 +331,7 @@ let vm = new Vue({
             this.json_skeleton  = json[0];        
         }, 
         get_b2r_contents(){
-        	this.updateList=1;
+        	//this.updateList=1;
             payload             = {'act':'get_b2r_contents', 'BIN_CODE':this.BIN_CODE, 'stkm_id':this.stkm_id}
             this.json_bins_orig = fnapi(payload)
         }, 
