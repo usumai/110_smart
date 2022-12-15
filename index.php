@@ -1,15 +1,12 @@
-<?php include "01_dbcon.php"; ?>
 <?php include "02_header.php"; ?>
-<?php include "03_menu.php"; ?>
 
-
-
+	
 <script src="includes/standalone.js"></script>
 <script src="includes/jszip/3.6.0.2/jszip.min.js"></script>
 
 <div id="app" @dragover="fileDrag" @drop="fileDrop">
     <div class='container-fluid'>
-        <h1 class="mt-5 display-6">Activities</h1>
+        <h1 class="mt-4 display-4">Activities</h1>
 
         <div v-if="message !== ''" class="container">
             <div class="alert alert-danger"><strong>System Error </strong><br/><br/>{{message}}</div>     
@@ -488,4 +485,5 @@ let vm = new Vue({
     }
 })
 </script>
+
 <?php include "04_footer.php"; ?>

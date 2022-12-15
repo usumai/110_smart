@@ -1,60 +1,61 @@
-<?php include "01_dbcon.php"; ?>
-<?php include "02_header.php"; ?>
-<?php include "03_menu.php"; ?>
-<?php include "components/forminput.php"; ?>
+<?php 
+include "02_header.php"; 
+include "components/forminput.php";
+?>
 
-<div id="app">
-    <div class='container-fluid'>
-        <div class='row'>
-            <div class='col'>
-                <h1 class='display-4'>Bin to Register: {{ BIN_CODE }}</h1>
-            </div>
-        </div>
+<div id="app" class='container-fluid '>
 
-        <div class='row'>
-            <div class='col-3 lead' id='menuleft'>
-                <ul class="list-group list-group-flush text-center">
-                    <div class='text-center' v-if="json_skeleton.findingID">
-                        <div class='dropdown'>
-                            <button class='btn btn-outline-danger dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='dispBtnClear'>Delete</button>
-                            <div class='dropdown-menu bg-danger' aria-labelledby='dropdownMenuButton'>
-                                <button class='dropdown-item bg-danger text-light' @click="save_b2r_result(0)">I'm sure</button>
-                            </div>
-                        </div>
-                        <br><br><br>
-                    </div>
+    <h1 class='display-4'>Bin to Register: {{ BIN_CODE }}</h1>
 
-                    <button class="list-group-item list-group-item-action list-group-item-secondary" @click="save_b2r_extra()" v-if="json_skeleton.findingID&&json_skeleton.findingID!=14">Register extra stockcode</button>
-                    <li class="list-group-item"  v-if="!json_skeleton.findingID"><b>Are there any stockcodes in addition to this list?</b></li>
-                    <button class="list-group-item list-group-item-action list-group-item-success" @click="save_b2r_result(14)" v-if="!json_skeleton.findingID">No</button>
-                    <button class="list-group-item list-group-item-action list-group-item-danger" @click="save_b2r_result(15)" v-if="!json_skeleton.findingID">Yes</button>
-                </ul>
-            </div>
 
-            <div class='col-6 lead'>
+    <div class='row'>
+          <div class='col-2 lead' id='menuleft'>
+              <ul class="list-group list-group-flush">
+                  <div class='text-center' v-if="json_skeleton.findingID">
+                      <div class='dropdown'>
+                          <button class='btn btn-outline-danger dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='dispBtnClear'>Delete</button>
+                          <div class='dropdown-menu bg-danger' aria-labelledby='dropdownMenuButton'>
+                              <button class='dropdown-item bg-danger text-light' @click="save_b2r_result(0)">I'm sure</button>
+                          </div>
+                      </div>
+                      <br><br><br>
+                  </div>
+                  <button 
+                  	class="list-group-item list-group-item-action list-group-item-secondary" 
+                  	@click="save_b2r_extra()" 
+                  	v-if="json_skeleton.findingID&&json_skeleton.findingID!=14"
+                  	data-toggle="modal" 
+                  	data-target="#create_extra_dlg">Register extra stockcode</button>                   	
+                  <div class="tx-info"  v-if="!json_skeleton.findingID">Are there any stockcodes in addition to this list?</div>
+                  <button class="list-group-item list-group-item-action list-group-item-success text-center" @click="save_b2r_result(14)" v-if="!json_skeleton.findingID">No</button>
+                  <button class="list-group-item list-group-item-action list-group-item-danger text-center" @click="save_b2r_result(15)" v-if="!json_skeleton.findingID">Yes</button>
+              </ul>
+          </div>
 
-                <form action='05_action.php' method='POST'>
-                    <table class='table table-sm'>
-                        <tr>
-                            <td><strong>Status</strong></td>
-                            <td colspan="4">
-                                <div v-if="json_skeleton.findingID">
-                                    {{ json_skeleton.findingID }}:
-                                    <span class="badge" :class="{'badge-success':json_result_cats[json_skeleton.findingID].color=='success'}">{{ json_result_cats[json_skeleton.findingID].resAbbr }}</span>
-                                    {{ json_result_cats[json_skeleton.findingID].findingName }}
-                                </div>
-                            </td>
-                        </tr>
-                        <tr><td><b>District</b></td><td colspan='2' >{{ json_skeleton.DSTRCT_CODE }}</td><td></td></tr>
-                        <tr><td><b>Warehouse</b></td><td colspan='2' >{{ json_skeleton.WHOUSE_ID }}</td><td></td></tr>
-                        <tr><td><b>Bin</b></td><td colspan='2' >{{ BIN_CODE }}</td><td></td></tr>
-                        <tr><td colspan='4' >&nbsp;</td></tr>
+          <div class='col-8 lead'>
 
-	                    <tr>
-	                    	<td colspan="4">
-				                                <b>Bin contents</b><br/>
-				                                <small>(Not all items listed must be sighted, but all additional stockcodes found must be registered.)</small>		                        
-	                    	
+              <form action='05_action.php' method='POST'>
+                  <table class='table table-sm'>
+                      <tr>
+                          <td><strong>Status</strong></td>
+                          <td colspan="4">
+                              <div v-if="json_skeleton.findingID">
+                                  {{ json_skeleton.findingID }}:
+                                  <span class="badge" :class="{'badge-success':json_result_cats[json_skeleton.findingID].color=='success'}">{{ json_result_cats[json_skeleton.findingID].resAbbr }}</span>
+                                  {{ json_result_cats[json_skeleton.findingID].findingName }}
+                              </div>
+                          </td>
+                      </tr>
+                      <tr><td><b>District</b></td><td colspan='2' >{{ json_skeleton.DSTRCT_CODE }}</td><td></td></tr>
+                      <tr><td><b>Warehouse</b></td><td colspan='2' >{{ json_skeleton.WHOUSE_ID }}</td><td></td></tr>
+                      <tr><td><b>Bin</b></td><td colspan='2' >{{ BIN_CODE }}</td><td></td></tr>
+                      <tr><td colspan='4' >&nbsp;</td></tr>
+	
+	                  <tr>
+		                   <td colspan="4">
+		                        <b>Bin contents</b><br/>
+		                        <div class="tx-note">Not all items listed must be sighted, but all additional stockcodes found must be registered.<br></div>		                        
+		                   	
 				             	<ul class="nav nav-tabs">
 				             		<li class="nav-item">
 				             			<a class="nav-link active" data-toggle="tab" href="#tab0">Unsighted <i style="font-size: 0.8em">({{this.countIncomplete()}})</i></a>
@@ -62,21 +63,17 @@
 				             		<li class="nav-item">
 				             			<a class="nav-link" data-toggle="tab" href="#tab1">Sighted <i style="font-size: 0.8em">({{this.countComplete()}})</i></a>
 				             		</li>
-				             	<!-- 	
-				             		<li class="nav-item">
-				             			<a class="nav-link" data-toggle="tab" href="#tab2">Excluded <i style="font-size: 0.8em">({{this.countExclude()}})</i></a>
-				             		</li>
-				             	-->	
+		
 				             	</ul>         	
 					            <div class="tab-content">         
 			                    	<div class="tab-pane fade table-responsive-sm active show" id="tab0">
 					                	<table id="bin_contents" class="table table-sm table-striped">
 					                        <thead class="table-dark">
-
+		
 						                            <th style="width: 10%">Stockcode</th>
 						                            <th style="width: 80%">Name</th>
 			 		                            	<th style="width: 10%">Sighted</th> 
-
+		
 					                        </thead>
 					                        <tbody>
 						                        <tr v-for="asset in json_bins_orig" v-if="(asset.isType=='b2r' || asset.isType=='b2r_exc') &&  asset.SIGHTED!=1" :style="asset.isType=='b2r_exc'? 'color: red': '' ">
@@ -96,11 +93,11 @@
 			                    	<div class="tab-pane table-responsive-sm" id="tab1">
 					                	<table id="bin_contents1" class="table table-sm table-striped">		                	
 					                        <thead class="table-dark">
-
+		
 						                            <th style="width: 10%">Stockcode</th>
 						                            <th style="width: 80%">Name</th>
 			 		                            	<th style="width: 10%">Sighted</th> 
-
+		
 					                        </thead>
 					                        <tbody>
 						                        <tr v-for="asset in json_bins_orig" v-if="(asset.isType=='b2r' || asset.isType=='b2r_exc') && asset.SIGHTED==1" :style="asset.isType=='b2r_exc'? 'color: red': ''">
@@ -121,128 +118,235 @@
 			                    	<div class="tab-pane table-responsive-sm" id="tab2">
 					                	<table id="bin_contents2" class="table table-sm table-striped">		                	
 					                        <thead class="table-dark">
-
+		
 						                            <th  style="width: 10%">Stockcode</th>
 						                            <th  style="width: 90%">Name</th>
-
+		
 					                        </thead>
 					                        <tbody>
 						                        <tr v-for="asset in json_bins_orig" v-if="asset.isType=='b2r_exc'">
 						                            <td style="width: 10%">{{ asset.STOCK_CODE }}</td>
 						                            <td style="width: 90%">{{ asset.ITEM_NAME }}</td>
-
+		
 						                        </tr>
 					                        </tbody>
 										</table>
 		                        	</div>
 		                        	-->	     		                        		                        	
 				                </div>
-                        	</td>
-                        </tr>
-                    </table>
+		                      	</td>
+                      </tr>
+                  </table>
 
-                </form>
-            </div>
+              </form>
+          </div>
 
-            <div class='col-3 lead' id='menuleft'>
-                <ul class="list-group list-group-flush text-center">
-                    <div class='text-center' v-if="json_skeleton.findingID">
-                        <div class='dropdown'>
-                            <button class='btn btn-outline-danger dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='dispBtnClear'>Delete</button>
-                            <div class='dropdown-menu bg-danger' aria-labelledby='dropdownMenuButton'>
-                                <button class='dropdown-item bg-danger text-light' @click="save_b2r_result(0)">I'm sure</button>
-                            </div>
-                        </div>
-                        <br><br><br>
-                    </div>
+          <div class='col-2 lead' id='menuleft'>
+              <ul class="list-group list-group-flush">
+                  <div class='text-center' v-if="json_skeleton.findingID">
+                      <div class='dropdown'>
+                          <button class='btn btn-outline-danger dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' id='dispBtnClear'>Delete</button>
+                          <div class='dropdown-menu bg-danger' aria-labelledby='dropdownMenuButton'>
+                              <button class='dropdown-item bg-danger text-light' @click="save_b2r_result(0)">I'm sure</button>
+                          </div>
+                      </div>
+                      <br><br><br>
+                  </div>
 
-                    <button class="list-group-item list-group-item-action list-group-item-secondary" @click="save_b2r_extra()" v-if="json_skeleton.findingID&&json_skeleton.findingID!=14">Register extra stockcode</button>
-                    <li class="list-group-item"  v-if="!json_skeleton.findingID"><b>Are there any stockcodes in addition to this list?</b></li>
-                    <button class="list-group-item list-group-item-action list-group-item-success" @click="save_b2r_result(14)" v-if="!json_skeleton.findingID">No</button>
-                    <button class="list-group-item list-group-item-action list-group-item-danger" @click="save_b2r_result(15)" v-if="!json_skeleton.findingID">Yes</button>
-                </ul>
-            </div>
+                  <button 
+                  	class="list-group-item list-group-item-action list-group-item-secondary" 
+                  	@click="save_b2r_extra()" 
+                  	v-if="json_skeleton.findingID&&json_skeleton.findingID!=14"
+                  	data-toggle="modal" 
+                  	data-target="#create_extra_dlg">Register extra stockcode</button> 
+                  <div class="tx-info"   v-if="!json_skeleton.findingID">Are there any stockcodes in addition to this list?</div>
+                  <button class="list-group-item list-group-item-action list-group-item-success" @click="save_b2r_result(14)" v-if="!json_skeleton.findingID">No</button>
+                  <button class="list-group-item list-group-item-action list-group-item-danger" @click="save_b2r_result(15)" v-if="!json_skeleton.findingID">Yes</button>
+              </ul>
+          </div>
 
-        </div>
-    </div>
+      </div>
+   
     <div class="row">
-        <div class="col">
-	        <div class="col table-responsive-sm">          
-		           
-		        <table class="table table-sm table-striped table-hover ">
-		            <caption style="caption-side: top"><h3><b>Extra</b></h3></caption>
-		            <thead class="table-dark">
-		                <tr>
-		                    <th>Stockcode</th>
-		                    <th>Name</th>
-		                    <th>SOH</th>
-		                    <th>Comment</th>
-		                    <th class='text-right'>Status</th>
-		                    <th class='text-right'>Action</th>
-		
-		                </tr>
-		            </thead>
-		            <tbody>    
-		                <tr v-for="bin in json_bins_extr">
-		                    <td width='10%'>
-		                        <textinput :primary_key='bin.auto_storageID' 
-		                                    primary_key_name="auto_storageID" 
-		                                    db_name='smartdb' table_name='sm18_impairment' 
-		                                    column_name='STOCK_CODE' 
-		                                    :bound_value='bin.STOCK_CODE'
-		                                    :disabled='false'
-		                                    maxlen='255'
-		                                    ></textinput>
-		                    </td>
-		                    <td>
-		                        <textinput :primary_key='bin.auto_storageID' 
-		                                    primary_key_name="auto_storageID" 
-		                                    db_name='smartdb' table_name='sm18_impairment' 
-		                                    column_name='ITEM_NAME' 
-		                                    :bound_value='bin.ITEM_NAME'
-		                                    :disabled='false'
-		                                    maxlen='255'
-		                                    ></textinput>
-		                    </td>
-		                    <td width='10%'>
-		                        <textinput :primary_key='bin.auto_storageID' 
-		                                    primary_key_name="auto_storageID" 
-		                                    db_name='smartdb' table_name='sm18_impairment' 
-		                                    column_name='SOH' 
-		                                    :bound_value='bin.SOH'
-		                                    :disabled='false'
-		                                    maxlen='255'
-		                                    ></textinput>
-		                    </td>
-		                    <td>
-		                        <textinput :primary_key='bin.auto_storageID' 
-		                                    primary_key_name="auto_storageID" 
-		                                    db_name='smartdb' table_name='sm18_impairment' 
-		                                    column_name='res_comment' 
-		                                    :bound_value='bin.res_comment'
-		                                    :disabled='false'
-		                                    maxlen='255'
-		                                    inputtype='textarea'
-		                                    ></textinput>
-		                    </td>
-		                    <td width='10%'>
-		                        <a class='btn btn-outline-dark float-right' :href="'18_b2r_extra.php?current_row='+current_row+'&auto_storageID='+bin.auto_storageID" v-if="bin.finalResult">{{ bin.finalResult }}</a>
-		                        <a class='btn btn-outline-danger float-right' :href="'18_b2r_extra.php?current_row='+current_row+'&auto_storageID='+bin.auto_storageID"  v-if="!bin.finalResult">Incomplete</a>
-		                    </td>
-		                    <td width='10%' class="text-right">
-		                        <button class="btn btn-danger" @click="save_delete_b2r_extra(bin.auto_storageID)" >Delete</button>
-		                    </td>
-		
-		                </tr>
-		            </tbody>
-		        </table>
-		        
-	        </div>
-
+        
+        <div class="col table-responsive-sm">          
+	           
+	        <table class="table table-sm table-striped table-hover">
+	            <caption style="caption-side: top"><h3><b>Extra</b></h3></caption>
+	            <thead class="table-dark">
+	                <tr>
+	                    <th>Stockcode</th>
+	                    <th>Name</th>
+	                    <th>SOH</th>
+	                    <th>Comment</th>
+	                    <th class='text-right'>Status</th>
+	                    <th class='text-right'>Action</th>
+	
+	                </tr>
+	            </thead>
+	            <tbody>    
+	                <tr v-for="bin in json_bins_extr">
+	                    <td width='10%'>
+	                        <textinput :primary_key='bin.auto_storageID' 
+	                                    primary_key_name="auto_storageID" 
+	                                    db_name='smartdb' 
+	                                    table_name='sm18_impairment' 
+	                                    column_name='STOCK_CODE' 
+	                                    :bound_value='bin.STOCK_CODE'
+	                                    :disabled='false'
+	                                    maxlen='255'
+	                                    ></textinput>
+	                    </td>
+	                    <td>
+	                        <textinput :primary_key='bin.auto_storageID' 
+	                                    primary_key_name="auto_storageID" 
+	                                    db_name='smartdb' 
+	                                    table_name='sm18_impairment' 
+	                                    column_name='ITEM_NAME' 
+	                                    :bound_value='bin.ITEM_NAME'
+	                                    :disabled='false'
+	                                    maxlen='255'
+	                                    ></textinput>
+	                    </td>
+	                    <td width='10%'>
+	                        <textinput :primary_key='bin.auto_storageID' 
+	                                    primary_key_name="auto_storageID" 
+	                                    db_name='smartdb' 
+	                                    table_name='sm18_impairment' 
+	                                    column_name='SOH' 
+	                                    :bound_value='bin.SOH'
+	                                    :disabled='false'
+	                                    maxlen='255'
+	                                    ></textinput>
+	                    </td>
+	                    <td>
+	                        <textinput :primary_key='bin.auto_storageID' 
+	                                    primary_key_name="auto_storageID" 
+	                                    db_name='smartdb' 
+	                                    table_name='sm18_impairment' 
+	                                    column_name='res_comment' 
+	                                    :bound_value='bin.res_comment'
+	                                    :disabled='false'
+	                                    maxlen='255'
+	                                    inputtype='textarea'
+	                                    ></textinput>
+	                    </td>
+	                    <td width='10%'>
+	                        <a class='btn btn-outline-dark float-right' :href="'18_b2r_extra.php?current_row='+current_row+'&auto_storageID='+bin.auto_storageID" v-if="bin.finalResult">{{ bin.finalResult }}</a>
+	                        <a class='btn btn-outline-danger float-right' :href="'18_b2r_extra.php?current_row='+current_row+'&auto_storageID='+bin.auto_storageID"  v-if="!bin.finalResult">Incomplete</a>
+	                    </td>
+	                    <td width='10%' class="text-right">
+	                        <button class="btn btn-danger" @click="save_delete_b2r_extra(bin.auto_storageID)" >Delete</button>
+	                    </td>
+	
+	                </tr>
+	            </tbody>
+	        </table>
+	        
         </div>
+
+        
     </div>
 
+	
+	<div class="modal fade" id="create_extra_dlg" role="dialog" aria-labelledby="modal_selectsiteLabel" aria-hidden="true" data-backdrop="static">
+		<div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<div class="modal-title"><h4>New Extra Stockcode</h4></div>
+				</div>
+				<div class="modal-body table-responsive-sm">
+
+      
+						           
+						        <table class="table table-sm table-striped table-hover ">
+						            <thead class="table-dark">
+						                <tr>
+						                    <th>Stockcode</th>
+						                    <th>Name</th>
+						                    <th>SOH</th>
+						                    <th>Comment</th>
+						                    <th class='text-right'>Status</th>
+
+						
+						                </tr>
+						            </thead>
+						            <tbody>    
+						                <tr>
+						                    <td width='10%'>
+									            <textinput :primary_key='extra_item.auto_storageID' 
+									                        primary_key_name="auto_storageID" 
+									                        db_name='smartdb' 
+									                        table_name='sm18_impairment' 
+									                        column_name='STOCK_CODE' 
+									                        :bound_value='extra_item.STOCK_CODE'
+									                        :disabled='false'
+									                        :validate='checkStockCode'
+									                        validate_msg='Stock code already exist'
+									                        validate_level='warning'
+									                        maxlen='255'>
+								             	</textinput>
+								             	<span v-if="this.extra_item.warning">Stock code already exist</span>
+						                    </td>
+						                    <td>
+									            <textinput :primary_key='extra_item.auto_storageID' 
+									                        primary_key_name="auto_storageID" 
+									                        db_name='smartdb' 
+									                        table_name='sm18_impairment' 
+									                        column_name='ITEM_NAME' 
+									                        :bound_value='extra_item.ITEM_NAME'
+									                        :disabled='false'
+									                        maxlen='255'>
+							                    </textinput>
+						                    </td>
+						                    <td width='10%'>
+									            <textinput :primary_key='extra_item.auto_storageID' 
+									                        primary_key_name="auto_storageID" 
+									                        db_name='smartdb' t
+									                        table_name='sm18_impairment' 
+									                        column_name='SOH' 
+									                        :bound_value='extra_item.SOH'
+									                        :disabled='false'
+									                        maxlen='255'>
+						                        </textinput>
+						                    </td>
+						                    <td>
+									            <textinput :primary_key='extra_item.auto_storageID' 
+									                        primary_key_name="auto_storageID" 
+									                        db_name='smartdb' 
+									                        table_name='sm18_impairment' 
+									                        column_name='res_comment' 
+									                        :bound_value='extra_item.res_comment'
+									                        :disabled='false'
+									                        maxlen='255'
+									                        inputtype='textarea'>
+							                  	</textinput>
+						                    </td>
+						                    <td width='10%'>
+						                        <a class='btn btn-outline-danger float-right' :href="'18_b2r_extra.php?current_row='+current_row+'&auto_storageID='+extra_item.auto_storageID">Incomplete</a>
+						                    </td>
+						
+						                </tr>
+						            </tbody>
+						        </table>
+						        
+
+				
+
+
+			                			
+				</div>
+				<div class="modal-footer">
+					<button type="button" 
+						class="btn btn-secondary foat-right" 
+						@click="refresh_page()" 
+						data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
+
 <script src='includes/datatables/jquery.dataTables.min.js'></script>
 <script>
 
@@ -272,6 +376,14 @@ let vm = new Vue({
         json_bins_extr:{},
         json_skeleton:{},
         json_result_cats:{},
+        extra_item: {
+        	auto_storageID: '',
+        	STOCK_CODE: '',
+        	ITEM_NAME:'',
+        	SOH: '',
+        	res_comment:'',
+        	warning: false
+        }
         //updateList: 0
     },
     created() {
@@ -348,19 +460,18 @@ let vm = new Vue({
             }
         }, 
         save_b2r_result(findingID){
-            payload             = {'act':'save_b2r_result', 'BIN_CODE':this.BIN_CODE, 'stkm_id':this.stkm_id, findingID}
-            json = fnapi(payload)
-            this.refresh_page()
+            payload             = {'act':'save_b2r_result', 'BIN_CODE':this.BIN_CODE, 'stkm_id':this.stkm_id, findingID};
+            json = fnapi(payload);
+            this.refresh_page();
         }, 
         save_b2r_extra(){
-            payload             = {'act':'save_b2r_extra', 'BIN_CODE':this.BIN_CODE, 'stkm_id':this.stkm_id}
-            json = fnapi(payload)
-            this.refresh_page()
+            payload             = {'act':'save_b2r_extra', 'BIN_CODE':this.BIN_CODE, 'stkm_id':this.stkm_id};
+            this.extra_item = fnapi(payload);            
         }, 
         save_delete_b2r_extra(auto_storageID){
-            payload             = {'act':'save_delete_b2r_extra', auto_storageID}
-            json = fnapi(payload)
-            this.refresh_page()
+            payload             = {'act':'save_delete_b2r_extra', auto_storageID};
+            json = fnapi(payload);
+            this.refresh_page();
         }, 
         countComplete(){
             var r=0;
@@ -376,12 +487,21 @@ let vm = new Vue({
             var r=0;
             this.json_bins_orig.forEach((v,i)=>{v.isType=='b2r_exc'?r++:0});
             return r;            
+        },
+        checkStockCode(stockCode){
+            for (var i in this.json_bins_orig){
+                var item=this.json_bins_orig[i];
+                if(item.STOCK_CODE==stockCode){
+                    return false;
+                }
+            }
+            return true;
         }        
     }
 })
 </script>
 
-<?php include "04_footer.php"; ?>
+
 
 
 <form action='05_action.php' method='post' id='formAddExtra'>
@@ -427,3 +547,6 @@ let vm = new Vue({
         </div>
     </div>
 </form>
+
+<?php include "04_footer.php"; ?>
+

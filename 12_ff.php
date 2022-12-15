@@ -1,7 +1,6 @@
-<?php include "01_dbcon.php"; ?>
-<?php include "02_header.php"; ?>
-<?php include "03_menu.php"; ?>
-<?php
+<?php 
+
+include "02_header.php"; 
 
 $options_stks="";
 // $sql = "SELECT * FROM smartdb.sm13_stk WHERE stk_include=1 ORDER BY stk_name";
@@ -706,10 +705,5 @@ if ($result->num_rows > 0) {
 
 	</div>
 </form>
-
-
-
-
-
 
 <?php include "04_footer.php"; ?>

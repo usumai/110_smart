@@ -1,8 +1,11 @@
-.table caption {
-	caption-side: top;
+.fixed-top {
+    z-index: 2;
 }
-.table {
-	overflow-y: scroll;
+
+
+.dropdown-menu {
+    max-height: 200px;
+    overflow-y: auto;
 }
 
 .nav-tabs {
@@ -33,4 +36,45 @@
 	border-top: 1px solid #dee2e6;
 	border-bottom: 1px solid #dee2e6;
 	padding: 10px 5px 10px 5px;
+}
+
+
+
+
+.current-row {
+    color: red;
+}
+.row-top {
+	padding-top: 62px;
+}
+.tx-note {
+	color: red;
+	font-style: italic;
+	font-weight: 100;
+	font-size: large;
+}
+.tx-info {
+	font-weight: 200;
+	font-size: large;
+}
+
+body {
+    margin-top: 67px;
+    overflow-y: scroll;
+}
+.table caption {
+	caption-side: top;
+}
+
+.table {
+	overflow-y: scroll;
+}
+
+table.table thead th{
+    position: sticky;
+    top: 61px;
+    color: #fff;
+    background-color: #343a40;    
+    z-index: 1;
+    font-size: 1rem
 }

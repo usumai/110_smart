@@ -1,52 +1,50 @@
 <?php 
-include "01_dbcon.php"; 
 include "02_header.php"; 
 
 $ass_id	= $_GET["ass_id"];
 
 ?>
-<style type="text/css">
-	body{padding-top:0px;}
-</style>
+<div id="app">
+    <div class='container-fluid'>
+        <table width="100%">
+        	<tr>
+        		<td width="20%">
+        			<form method="post" action="05_action.php" >
+        				<input type="hidden" name="act" value="save_photo">
+        				<input type="hidden" name="ass_id" value="<?=$ass_id?>">
+        				<input type="hidden" name="res_img_data" id="res_img_data">
+        				<button type="submit" class="btn btn-success btn_acceptphoto" id="btn_acceptphoto"><span class='octicon octicon-check' style='font-size:30px'></span></button><br>
+        				<br><br>
+        	        	<a href="11_ass.php?ass_id=<?=$ass_id?>" class="btn btn-danger" id="btn_cancelphoto"><span class='octicon octicon-x' style='font-size:30px'></span></a>
+        			</form><br><br><br><br><br>
+        		</td>
+        		<td width="60%">
+        			<div class="row" id="area_photo">
+        			</div>
+        			<div class="row" id="area_video">
+        				<video id="video" width="100%" height="100%" autoplay></video>
+        			</div>
+        
+        			<!-- <br><br><br><br><a href="107_help.php#camera_switching">Switch Cameras</a> -->
+        			
+        		</td>
+        	
+        		<td width="20%" align="right">
+        			<form method="post" action="05_action.php" >
+        				<input type="hidden" name="act" value="save_photo">
+        				<input type="hidden" name="ass_id" value="<?=$ass_id?>">
+        				<input type="hidden" name="res_img_data" id="res_img_data2">
+        	        	<button type="submit" class="btn btn-success btn_acceptphoto" id="btn_acceptphoto"><span class='octicon octicon-check' style='font-size:30px'></span></button><br>
+        				<br><br>
+        	        	<a href="11_ass.php?ass_id=<?=$ass_id?>" class="btn btn-danger" id="btn_cancelphoto"><span class='octicon octicon-x' style='font-size:30px'></span></a>
+        			</form><br><br><br><br><br>
+        		</td>
+        
+        	</tr>
+        </table>
 
-<table width="100%">
-	<tr>
-		<td width="20%">
-			<form method="post" action="05_action.php" >
-				<input type="hidden" name="act" value="save_photo">
-				<input type="hidden" name="ass_id" value="<?=$ass_id?>">
-				<input type="hidden" name="res_img_data" id="res_img_data">
-				<button type="submit" class="btn btn-success btn_acceptphoto" id="btn_acceptphoto"><span class='octicon octicon-check' style='font-size:30px'></span></button><br>
-				<br><br>
-	        	<a href="11_ass.php?ass_id=<?=$ass_id?>" class="btn btn-danger" id="btn_cancelphoto"><span class='octicon octicon-x' style='font-size:30px'></span></a>
-			</form><br><br><br><br><br>
-		</td>
-		<td width="60%">
-			<div class="row" id="area_photo">
-			</div>
-			<div class="row" id="area_video">
-				<video id="video" width="100%" height="100%" autoplay></video>
-			</div>
-
-			<!-- <br><br><br><br><a href="107_help.php#camera_switching">Switch Cameras</a> -->
-			
-		</td>
-	
-		<td width="20%" align="right">
-			<form method="post" action="05_action.php" >
-				<input type="hidden" name="act" value="save_photo">
-				<input type="hidden" name="ass_id" value="<?=$ass_id?>">
-				<input type="hidden" name="res_img_data" id="res_img_data2">
-	        	<button type="submit" class="btn btn-success btn_acceptphoto" id="btn_acceptphoto"><span class='octicon octicon-check' style='font-size:30px'></span></button><br>
-				<br><br>
-	        	<a href="11_ass.php?ass_id=<?=$ass_id?>" class="btn btn-danger" id="btn_cancelphoto"><span class='octicon octicon-x' style='font-size:30px'></span></a>
-			</form><br><br><br><br><br>
-		</td>
-
-	</tr>
-</table>
-
-
+	</div>
+</div>
 <!-- <div class="container">
 	<div class="row">
 		<div class="col">
@@ -138,3 +136,4 @@ $(document).ready(function() {
 	});
 });
 </script>
+<?php include "04_footer.php"; ?>

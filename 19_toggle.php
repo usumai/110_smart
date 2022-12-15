@@ -1,8 +1,6 @@
-<?php include "01_dbcon.php"; ?>
-<?php include "02_header.php"; ?>
-<?php include "03_menu.php"; ?>
 
-<?php
+<?php 
+include "02_header.php"; 
 include "php/common/common.php";
 
 $sqlInclude = "

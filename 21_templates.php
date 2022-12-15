@@ -1,7 +1,5 @@
-<?php include "01_dbcon.php"; ?>
-<?php include "02_header.php"; ?>
-<?php include "03_menu.php"; ?>
-<?php
+<?php 
+include "02_header.php"; 
 
 $templates = [];
 $sql = "SELECT * FROM smartdb.sm14_ass WHERE flagTemplate=1 AND delete_date IS NULL ORDER BY AssetDesc1";
@@ -104,9 +102,6 @@ $( function() {
         </div>
 	</div>
 </div>
-
-
-
 
 <?php include "04_footer.php"; ?>
 

@@ -439,8 +439,14 @@ ORDER BY
         data_source='skeleton'");
     $stmt   ->bind_param("sss",  $current_user, $BIN_CODE, $stkm_id);
     $stmt   ->execute();
+    if(! $con->error){
+        
+        $result = ["auto_storageID" => $con->insert_id, "stkm_id" => $stkm_id, "BIN_CODE" => $BIN_CODE];
+        echo json_encode($result);
+    }  
     //update parent bin status
     updateB2RBinStatus($con, $stkm_id ,  $BIN_CODE, null);
+    
     
 }elseif ($act=="save_textinput") {
 	$full_table_name    = $_POST["full_table_name"];

@@ -1,7 +1,7 @@
-<?php include "01_dbcon.php"; ?>
-<?php include "02_header.php"; ?>
-<?php include "03_menu.php"; ?>
-<?php include "components/forminput.php"; ?>
+<?php 
+include "02_header.php"; 
+include "components/forminput.php"; 
+?>
 
 <div id="app">
     <div class='container-fluid'>
@@ -9,7 +9,7 @@
             <div class='col'>
                 <h1 class="display-4">
                     Extra investigation: {{ json_b2r_record.STOCK_CODE }}
-                    <a  class='btn btn-outline-dark float-right' 
+                    <a  class='btn btn-outline-dark float-right float-bottom' 
                         :href="'17_b2r.php?stkm_id='+json_b2r_record.stkm_id+'&BIN_CODE='+json_b2r_record.BIN_CODE" >Back</a>
                 </h1>
             </div>
@@ -106,7 +106,7 @@ let vm = new Vue({
                 No: "3",
             },
             3:{
-                name:   "Check dues in/out status. Check if the item was reciepted 72 hours pre-NAIS stocktake.",
+                name:   "Check dues in/out status. Check if item was receipted 72 hours pre-NAIS stocktake. Check if item now exist in this Bin (use MILIS or WMS)",
                 Yes:"nstr",
                 No: "4",
             },

@@ -1,6 +1,6 @@
-<?php include "01_dbcon.php"; ?>
-<?php include "02_header.php"; ?>
-<?php
+<?php 
+include "02_header.php";
+
 $search_term = $_GET["search_term"];
 
 $options_stks_template="";

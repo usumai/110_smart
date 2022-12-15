@@ -1,9 +1,6 @@
-<?php include "01_dbcon.php"; ?>
-<?php include "02_header.php"; ?>
-<?php include "03_menu.php"; ?>
-
 <?php
 
+include "02_header.php";
 include "php/common/common.php";
 
 // apply ajax calls to update db
@@ -432,19 +429,8 @@ function onSplityMilisChanged(key) {
     box-shadow: 3px 3px 4px;
 }
 </style>
-
-
-
-<br><br>
-
 <div class='container-fluid' style="margin-top: 18px">
-
-<div class='row' >
-    <div class='col'>
-        <h1 class='display-4'>Impairment for IS: <?="$STOCK_CODE- $ITEM_NAME"?></h1>
-    </div>
-</div>
-
+<h1 class='display-4'>Impairment for IS: <?="$STOCK_CODE- $ITEM_NAME"?></h1>
 
 
 <div class='row'>
@@ -499,87 +485,91 @@ function onSplityMilisChanged(key) {
     </div>
 
     <div class='col-6 lead'>
-
-    <form action='05_action.php' method='POST' >
-        <table class='table table-sm'>
-            <tr><td colspan='2' id='resultSelection'>&nbsp;</td></tr>
-            <tr><td><b>District</b></td><td><?=$DSTRCT_CODE?></td></tr>
-            <tr><td><b>Warehouse</b></td><td><?=$WHOUSE_ID?></td></tr>
-
-            <tr><td><b>Bin</b></td><td><?=$BIN_CODE?></td></tr>
-            <tr><td><b>SOH</b></td><td><?=$SOH?></td></tr>
-            <tr><td><b>Supply Customer Account</b></td><td><?=$SUPPLY_CUST_ID?></td></tr>
-            <tr><td nowrap><b>Supply Customer Account Type</b></td><td><?=$SC_ACCOUNT_TYPE?></td></tr>
-            <tr><td nowrap><b>Tracking Indicator</b></td><td><?=$TRACKING_IND?></td></tr>
-            <tr><td nowrap><b>Tracking Reference</b></td><td><?=$TRACKING_REFERENCE?></td></tr>       
-            <tr><td nowrap><b>Inventory Category</b></td><td><?=$INVENT_CAT?></td></tr>
-            <tr><td nowrap><b>Last Modification Date</b></td><td><?=$LAST_MOD_DATE?></td></tr>
-            <tr id="checked_milis">
-            	<td nowrap><b>Checked To MILIS</b></td>
-            	<td><input  type="checkbox" class="form-control" id="checked_to_milis" name="checked_to_milis" value="1" <?=($checkedToMilis==1 ? 'checked' : '') ?>></input></td>
-            </tr>
-            <tr>
-            	<td class='completezz'>
-            		<b>Comments</b>
-            	</td>
-            	<td style="color: red; font-size: 1.0rem">
-            		<div id="comment_warn_msg"><i>A valid reason must be entered in comments. Do not write "No Date". <br/>Please check the transaction history before selecting this option.</i>   
-            		</div>
-            	</td>
-            </tr>
-            <tr>
-            	<td colspan='2' class='completezz'>
-            		<textarea class='form-control' rows='5' name='res_comment' id='res_comment'><?=$res_comment?></textarea>
-            	</td>
-            </tr>      
-            <tr id='areaDate'>
-            	<td><b>Date</b></td>
-            	<td>
-            		<input type='text' class='form-control datepicker' name='res_unserv_date' id='res_unserv_date' value='<?=$res_unserv_date?>' readonly>
-            		<span id="date-alert" hidden="true" 
-            				style="display: block; font-size: 0.8em; padding: 5px; text-align: justify;">
-            			<i style="color: red">*Impairment year is the same as current year</i>
-            		</span>
-            	</td>
-            </tr>
-            <tr id='areaSplit'><td colspan='2'>
-                <b>Split area</b><br>
-                <table class='table' id='splityTable'>
-                    <tr>
-                        <td width='20%'>Count</td>
-                        <td>Sighted</td>
-                        <td>Date</td>
-                        <td>Checked To MILIS</td>
-                        <td>&nbsp;</td>
-                    </tr>
-                    <tr>
-                        <td><input type='text' class='form-control splity' name='splityCount' id='splityCount'></td>
-                        <td>
-                            <select class='form-control splity' name='splityResult' id='splityResult'>
-                                <option value=''></option>
-                            </select>
-                        </td>
-                        <td><input type='text' class='form-control datepicker splity' name='splityDate' id='splityDate' readonly></td>
-                        <td></td>               
-                        <td><button type='button' class='btn btn-outline-dark float-right' id='addSplity'><i class='fas fa-plus'></i></button></td>
-                    </tr>
-                    <tr><td id='splityTotal'></td><td>Total</td><td></td><td></td></tr>
-                </table>
-            </td></tr>
-            <tr><td colspan='2'>
-
-                    <span id='splityLanding'></span>
-
-                    <input type='hidden' name='act' value='save_msi_bin_stk'>
-                    <input type='hidden' name='current_row' id='current_row' value='<?=$current_row?>'>
-                    <input type='hidden' name='findingID' id='findingID' value='<?=$findingID?>'>
-                    <input type='hidden' name='stkm_id' id='stkm_id' value='<?=$stkm_id?>'>
-                    <input type='hidden' name='auto_storageID' value='<?=$auto_storageID?>'>
-                    <input type='hidden' name='storageID' id='storageID' value='<?=$storageID?>'>
-                    <input type='submit' id='btnSubmit' value='Save' class='btn btn-outline-dark float-right complete' >
-            </td></tr>
-        </table>
-        </form>
+	
+	    <form action='05_action.php' method='POST' >
+	        <table class='table table-sm'>
+	            <tr><td colspan='2' id='resultSelection'>&nbsp;</td></tr>
+	            <tr><td><b>District</b></td><td><?=$DSTRCT_CODE?></td></tr>
+	            <tr><td><b>Warehouse</b></td><td><?=$WHOUSE_ID?></td></tr>
+	
+	            <tr><td><b>Bin</b></td><td><?=$BIN_CODE?></td></tr>
+	            <tr><td><b>SOH</b></td><td><?=$SOH?></td></tr>
+	            <tr><td><b>Supply Customer Account</b></td><td><?=$SUPPLY_CUST_ID?></td></tr>
+	            <tr><td nowrap><b>Supply Customer Account Type</b></td><td><?=$SC_ACCOUNT_TYPE?></td></tr>
+	            <tr><td nowrap><b>Tracking Indicator</b></td><td><?=$TRACKING_IND?></td></tr>
+	            <tr><td nowrap><b>Tracking Reference</b></td><td><?=$TRACKING_REFERENCE?></td></tr>       
+	            <tr><td nowrap><b>Inventory Category</b></td><td><?=$INVENT_CAT?></td></tr>
+	            <tr><td nowrap><b>Last Modification Date</b></td><td><?=$LAST_MOD_DATE?></td></tr>
+	            <tr id="checked_milis">
+	            	<td nowrap><b>Checked To MILIS</b></td>
+	            	<td><input  type="checkbox" class="form-control" id="checked_to_milis" name="checked_to_milis" value="1" <?=($checkedToMilis==1 ? 'checked' : '') ?>></input></td>
+	            </tr>
+	            <tr>
+	            	<td class='completezz'>
+	            		<b>Comments</b>
+	            	</td>
+	            	<td style="color: red; font-size: 1.0rem">
+	            		<div id="comment_warn_msg"><i>A valid reason must be entered in comments. Do not write "No Date". <br/>Please check the transaction history before selecting this option.</i>   
+	            		</div>
+	            	</td>
+	            </tr>
+	            <tr>
+	            	<td colspan='2' class='completezz'>
+	            		<textarea class='form-control' rows='5' name='res_comment' id='res_comment'><?=$res_comment?></textarea>
+	            	</td>
+	            </tr>      
+	            <tr id='areaDate'>
+	            	<td><b>Date</b></td>
+	            	<td>
+	            		<input type='text' class='form-control datepicker' name='res_unserv_date' id='res_unserv_date' value='<?=$res_unserv_date?>' readonly>
+	            		<span id="date-alert" hidden="true" 
+	            				style="display: block; font-size: 0.8em; padding: 5px; text-align: justify;">
+	            			<i style="color: red">*Impairment year is the same as current year</i>
+	            		</span>
+	            	</td>
+	            </tr>
+	            <tr id='areaSplit'>
+	            	<td colspan='2'>
+		                <table class="table table-sm table-striped table-hover" id='splityTable'>
+				            <caption style="caption-side: top"><h3><b>Split area</b></h3></caption>
+				            <thead class="table-dark">                
+			                    <tr>
+			                        <th width='20%'>Count</th>
+			                        <th>Sighted</th>	                        
+			                        <th>Date</th>
+			                        <th>Checked To MILIS</th>
+			                        <th>&nbsp;</th>
+			                    </tr>
+			            	</thead>
+		                    <tr>
+		                        <td><input type='text' class='form-control splity' name='splityCount' id='splityCount'></td>
+		                        <td>
+		                            <select class='form-control splity' name='splityResult' id='splityResult'>
+		                                <option value=''></option>
+		                            </select>
+		                        </td>
+		                        <td><input type='text' class='form-control datepicker splity' name='splityDate' id='splityDate' readonly></td>
+		                        <td></td>               
+		                        <td><button type='button' class='btn btn-outline-dark float-right' id='addSplity'><i class='fas fa-plus'></i></button></td>
+		                    </tr>
+		                    <tr><td id='splityTotal'></td><td>Total</td><td></td><td></td></tr>
+		                </table>
+		            </td>
+	            </tr>
+	            <tr><td colspan='2'>
+	
+	                    <span id='splityLanding'></span>
+	
+	                    <input type='hidden' name='act' value='save_msi_bin_stk'>
+	                    <input type='hidden' name='current_row' id='current_row' value='<?=$current_row?>'>
+	                    <input type='hidden' name='findingID' id='findingID' value='<?=$findingID?>'>
+	                    <input type='hidden' name='stkm_id' id='stkm_id' value='<?=$stkm_id?>'>
+	                    <input type='hidden' name='auto_storageID' value='<?=$auto_storageID?>'>
+	                    <input type='hidden' name='storageID' id='storageID' value='<?=$storageID?>'>
+	                    <input type='submit' id='btnSubmit' value='Save' class='btn btn-outline-dark float-right complete' >
+	            </td></tr>
+	        </table>
+	    </form>
     </div>
 
     
@@ -587,5 +577,9 @@ function onSplityMilisChanged(key) {
 
 </div>
 
-
+<div class='row'>
+	<div class='col-12 lead'>
+		test
+	</div>
+</div>
 <?php include "04_footer.php"; ?>

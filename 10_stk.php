@@ -1,23 +1,8 @@
-<?php include "01_dbcon.php"; ?>
 <?php include "02_header.php"; ?>
-<?php include "03_menu.php"; ?>
-<style>
 
-th{
-    position: sticky;
-    top: 0;
-    color: #fff;
-    background-color: #343a40;    
-    z-index: 2;
-}
-.fixed-top {
-    z-index: 2;
-}
-
-</style>
 <div id="app">
     <div class='container-fluid'>
-        <h1 class="mt-5 display-4">General Assets Stocktake</h1>
+        <h1 class="display-4">General Assets Stocktake</h1>
 
         <h2>{{ stk_progressd.count_complete }}/ {{ stk_progressd.count_total }} total ( perc_complete )&nbsp;</h2>
 

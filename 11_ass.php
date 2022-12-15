@@ -1,11 +1,12 @@
-<?php include "01_dbcon.php"; ?>
-<?php include "02_header.php"; ?>
-<?php include "03_menu.php"; ?>
-<?php include "components/forminput.php"; ?>
+<?php 
+    include "02_header.php"; 
+    include "components/forminput.php";
+?>
+
 
 <div id="app">
     <div class='container-fluid'>
-        <h1 class="mt-5 display-4">
+        <h1 class="display-4">
             Asset:{{ assd.res_asset_id }} 
             <span class='text-danger' v-if='assd.delete_date'>DELETED</span>
             <span class='' v-if="assd.genesis_cat=='ga_template'">TEMPLATE</span>
@@ -425,9 +426,6 @@
     </div>
 
 
-
-
-
     <div class="modal" id="modal_show_pic" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -446,17 +444,6 @@
             </div>
         </div>
     </div>
-
-
-
-
-
-
-
-
-
-
-
 </div>
 
 <script>

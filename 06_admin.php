@@ -1,7 +1,6 @@
-<?php include "01_dbcon.php"; ?>
-<?php include "02_header.php"; ?>
-<?php include "03_menu.php"; ?>
-<?php
+<?php 
+include "02_header.php"; 
+
 $rw_stk = "";
 $sql = "SELECT * FROM smartdb.sm13_stk WHERE smm_delete_date IS NOT NULL;";
 $result = $con->query($sql);

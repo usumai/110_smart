@@ -129,6 +129,8 @@ Vue.component('textinput', {
         'min_date',
         'max_date',
         'follow_function',
+        'validate',
+        'validate_msg'
     ],
 
     template: '#textinput',
@@ -162,18 +164,38 @@ Vue.component('textinput', {
             //Do nothing for now
         },
         commit_value(){
+
             // console.log('saving')
             let validity_res    = this.assess_value()
             if (validity_res!='') {
                 format = "error"
                 disp_msg = validity_res
             } else { 
+                if(this.validate){
+                    if(this.validate(this.internal_val)){
+                        format = this.validate_level;
+                        disp_msg=this.validate_msg;
+
+                    }
+                }
+                
                 let save_res = this.save_value()
-                // console.log('save_res')
-                // console.log(save_res)
+
                 if (save_res){
-                    format = 'success'
-                    disp_msg = ''
+                    if(this.validate){
+                        if(!this.validate(this.internal_val)){
+                            format = this.validate_level;
+                            disp_msg=this.validate_msg;
+                        }else{
+                            format = 'success'
+                            disp_msg = ''
+                        }
+                    }else{
+                        format = 'success'
+                        disp_msg = ''                        
+                    }
+                    
+
                 } else { 
                     format = 'warning'
                     disp_msg = 'Issue with saving'

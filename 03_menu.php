@@ -29,7 +29,7 @@ if(array_key_exists("current_row",$_POST)){
 
 
 <div id="appmenu">
-	<body class="d-flex flex-column h-100">
+		
 	<header>
 		<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark lead">
 			<a class="navbar-brand" href="index.php">smartM</a>
@@ -133,7 +133,7 @@ if(array_key_exists("current_row",$_POST)){
 				<div style="font-style: italic; color: #007bff; border: yellow solid 1px; padding: 0px 7px; border-radius: 10px; "><i class="fa fa-user"></i> {{user.name}}</div>
 			</div>
 		</nav>
-		<hr>
+
 		<ul v-if="menu_search">
 			<a 	:href="'11_ass.php?ass_id='+result.ass_id" 
 				class="list-group-item list-group-item-action" 
@@ -152,166 +152,166 @@ if(array_key_exists("current_row",$_POST)){
 		</ul>
 		
 	</header>
-
-
-<!-- Initiate Asset Template Dialog -->
-<div class="modal fade" id="modal_initiate_template" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
+	
+	
+	<!-- Initiate Asset Template Dialog -->
+	<div class="modal fade" id="modal_initiate_template" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header" style="background-color: #5a95ca;">
+					<h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke">Initiate asset template</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+			
+				<form method='post' action='05_action.php'>
+					<div class="modal-body">  
+						<p class="lead">Please select a stocktake to initiate this template into</p>
+						<select name='stkm_id' class='form-control' v-if='actvd'>
+							<option v-for='(activity, index) in actvd' :value="activity.stkm_id">{{activity.stk_id }}. {{activity.stk_name}}</option>
+						</select>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+						<button type="submit" class="btn btn-outline-danger">Initiate</button>
+						<input type='hidden' name='act' value='save_initiate_template'>
+						<input type='hidden' name='ass_id' v-model="template_ass_id">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	
+	
+	<!-- Force Update Modal dialog -->
+	<div class="modal fade" id="update_confirm_dlg" data-backdrop="static" width='500px' height='300px'   tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header" style="background-color: #5a95ca;">
+	        <h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke">Software Update</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+			<table width='100%' height='100%'>
+				<tr>
+				  <td align='center'>
+				      <p style="text-align: left;"><strong>Warning:</strong></p>
+				      <p style="text-align: justify;"><i style="color: red">SmartM Software update and data reset. This will delete all application data stored on this device, so make sure you backup everything before attempting this.</i></p>
+				      <p style="text-align: left;">Please make sure you are connected to the internet.</p>
+				  </td>
+				</tr>
+				<tr>
+					<td ref="update_spinner" style="text-align: center">
+						<div class="spinner-border text-info" role="status">
+						  <span class="sr-only">Updating...</span>
+						</div>				
+					</td>
+					<td v-if="(updateResponse) && (updateResponse.length>0) && (!updateError)">
+						<div  class="alert alert-info"><strong>Update Completed!</strong>
+							<div v-if="updateRevision != ''"><strong>revision: </strong>{{updateRevision}}</div>
+							<div v-for='info in updateResponse'><i>{{info}}</i></div>
+						</div>   
+					</td>
+					<td v-if="(updateResponse) && (updateResponse.length>0) && (updateError)">
+						<div class="alert alert-danger">
+							<strong>Update Failed!</strong>
+							<div v-for='error in updateResponse'><i>{{error.code}}-{{error.info}}</i></div>
+						</div>    
+					</td>				
+				</tr>
+			</table>
+	      </div>
+	      <div class="modal-footer">
+	      	<button type="button" ref="update_ok" class="btn btn-outline-dark" @click="forceUpdateToLatest()">Update</button>
+	        <button type="button" ref="update_close" class="btn btn-outline-dark" data-dismiss="modal" @click="refreshPage()">Close</button>       
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	
+	
+	<!-- Update App Version Dialog -->
+	<div class="modal fade" id="modal_confirm_update" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
 			<div class="modal-header" style="background-color: #5a95ca;">
-				<h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke">Initiate asset template</h5>
+				<h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke">Update to latest version</h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
+				<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-		
-			<form method='post' action='05_action.php'>
-				<div class="modal-body">  
-					<p class="lead">Please select a stocktake to initiate this template into</p>
-					<select name='stkm_id' class='form-control' v-if='actvd'>
-						<option v-for='(activity, index) in actvd' :value="activity.stkm_id">{{activity.stk_id }}. {{activity.stk_name}}</option>
-					</select>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-					<button type="submit" class="btn btn-outline-danger">Initiate</button>
-					<input type='hidden' name='act' value='save_initiate_template'>
-					<input type='hidden' name='ass_id' v-model="template_ass_id">
-				</div>
-			</form>
+			<div class="modal-body">
+				<p class="lead">Updating to the latest version will delete all data on this device. Are you Sure you want to proceed with the update?<br><br>Please keep device connected to the internet until the update is finished.</p>     
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+				<a type="button" class="btn btn-danger" href='05_action.php?act=sys_pull_master'>Update</a>
+			</div>
+			</div>
 		</div>
 	</div>
-</div>
-
-
-<!-- Force Update Modal dialog -->
-<div class="modal fade" id="update_confirm_dlg" data-backdrop="static" width='500px' height='300px'   tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header" style="background-color: #5a95ca;">
-        <h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke">Software Update</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-		<table width='100%' height='100%'>
-			<tr>
-			  <td align='center'>
-			      <p style="text-align: left;"><strong>Warning:</strong></p>
-			      <p style="text-align: justify;"><i style="color: red">SmartM Software update and data reset. This will delete all application data stored on this device, so make sure you backup everything before attempting this.</i></p>
-			      <p style="text-align: left;">Please make sure you are connected to the internet.</p>
-			  </td>
-			</tr>
-			<tr>
-				<td ref="update_spinner" style="text-align: center">
-					<div class="spinner-border text-info" role="status">
-					  <span class="sr-only">Updating...</span>
-					</div>				
-				</td>
-				<td v-if="(updateResponse) && (updateResponse.length>0) && (!updateError)">
-					<div  class="alert alert-info"><strong>Update Completed!</strong>
-						<div v-if="updateRevision != ''"><strong>revision: </strong>{{updateRevision}}</div>
-						<div v-for='info in updateResponse'><i>{{info}}</i></div>
-					</div>   
-				</td>
-				<td v-if="(updateResponse) && (updateResponse.length>0) && (updateError)">
-					<div class="alert alert-danger">
-						<strong>Update Failed!</strong>
-						<div v-for='error in updateResponse'><i>{{error.code}}-{{error.info}}</i></div>
-					</div>    
-				</td>				
-			</tr>
-		</table>
-      </div>
-      <div class="modal-footer">
-      	<button type="button" ref="update_ok" class="btn btn-outline-dark" @click="forceUpdateToLatest()">Update</button>
-        <button type="button" ref="update_close" class="btn btn-outline-dark" data-dismiss="modal" @click="refreshPage()">Close</button>       
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- Update App Version Dialog -->
-<div class="modal fade" id="modal_confirm_update" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-		<div class="modal-header" style="background-color: #5a95ca;">
-			<h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke">Update to latest version</h5>
-			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-			<span aria-hidden="true">&times;</span>
-			</button>
-		</div>
-		<div class="modal-body">
-			<p class="lead">Updating to the latest version will delete all data on this device. Are you Sure you want to proceed with the update?<br><br>Please keep device connected to the internet until the update is finished.</p>     
-		</div>
-		<div class="modal-footer">
-			<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-			<a type="button" class="btn btn-danger" href='05_action.php?act=sys_pull_master'>Update</a>
-		</div>
-		</div>
-	</div>
-</div>
-
-	<!-- Push App Version Dialog -->
-	<div class="modal fade" id="modal_confirm_push" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-		<div class="modal-header" style="background-color: #5a95ca;">
-			<h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke">Push this version to the master</h5>
-			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-			<span aria-hidden="true">&times;</span>
-			</button>
-		</div>
-		<div class="modal-body">  
-			<p class="lead">This will overwrite the existing master file. Only do this if you are a guru developer.<br><br>Please keep device connected to the internet until the update is finished.</p>  
-		</div>
-		<div class="modal-footer">
-			<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-			<a type="button" class="btn btn-danger" href='05_action.php?act=sys_push_master'>Update</a>
-		</div>
-		</div>
-	</div>
-	</div>
-
-<!-- Reset Data Dialog -->
-<div class="modal fade" id="modal_confirm_reset" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
+	
+		<!-- Push App Version Dialog -->
+		<div class="modal fade" id="modal_confirm_push" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
 			<div class="modal-header" style="background-color: #5a95ca;">
-				<h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke">Data Resets</h5>
+				<h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke">Push this version to the master</h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 				<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
 			<div class="modal-body">  
-				<p class="lead">
-					<p style="text-align: left;"><strong>Warning: </strong></p>
-					<p style="text-align: justify;"><i style="color: red">You are about to wipe all SMARTm data on this device.</i></p>
-					<p style="text-align: left;">Are you sure you want to proceed?</p>
-				</p>
-				
-				<div ref="elResetDataSpinner" hidden class="spinner-border text-info" role="status" style="margin-left: 50%; left: -2rem">
-				  <span class="sr-only">SMARTM data resetting...</span>
-				</div>
-				<div ref="elResetDataStatus" hidden>
-					<div  v-if="resetDataError==''" class="alert alert-info">
-						<i>Data reset completed</strong>
-					</div>  
-					<div  v-if="resetDataError!=''" class="alert alert-danger">
-						<strong>Error!</strong>
-						<i>{{resetDataError}}</i>
-					</div> 	 
-				</div>	  
+				<p class="lead">This will overwrite the existing master file. Only do this if you are a guru developer.<br><br>Please keep device connected to the internet until the update is finished.</p>  
 			</div>
 			<div class="modal-footer">
-				<button ref="elReset" 			type="button" class="btn btn-danger" @click="resetData(false)">Reset</a>
-				<button ref="elResetExcludedRR" type="button" class="btn btn-danger" @click="resetData(true)">Reset excluding RR</a>
-				<button ref="elResetClose" 		type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>			
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+				<a type="button" class="btn btn-danger" href='05_action.php?act=sys_push_master'>Update</a>
+			</div>
 			</div>
 		</div>
-	</div>
+		</div>
+	
+	<!-- Reset Data Dialog -->
+	<div class="modal fade" id="modal_confirm_reset" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header" style="background-color: #5a95ca;">
+					<h5 class="modal-title" id="exampleModalLabel" style="color: whitesmoke">Data Resets</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">  
+					<p class="lead">
+						<p style="text-align: left;"><strong>Warning: </strong></p>
+						<p style="text-align: justify;"><i style="color: red">You are about to wipe all SMARTm data on this device.</i></p>
+						<p style="text-align: left;">Are you sure you want to proceed?</p>
+					</p>
+					
+					<div ref="elResetDataSpinner" hidden class="spinner-border text-info" role="status" style="margin-left: 50%; left: -2rem">
+					  <span class="sr-only">SMARTM data resetting...</span>
+					</div>
+					<div ref="elResetDataStatus" hidden>
+						<div  v-if="resetDataError==''" class="alert alert-info">
+							<i>Data reset completed</i>
+						</div>  
+						<div  v-if="resetDataError!=''" class="alert alert-danger">
+							<strong>Error!</strong>
+							<i>{{resetDataError}}</i>
+						</div> 	 
+					</div>	  
+				</div>
+				<div class="modal-footer">
+					<button ref="elReset" 			type="button" class="btn btn-danger" @click="resetData(false)">Reset</a>
+					<button ref="elResetExcludedRR" type="button" class="btn btn-danger" @click="resetData(true)">Reset excluding RR</a>
+					<button ref="elResetClose" 		type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>			
+				</div>
+			</div>
+		</div>
 	</div>
 
 
@@ -398,12 +398,6 @@ if(array_key_exists("current_row",$_POST)){
 
 
 </div>
-
-
-
-
-
-
 
 <style scoped>
 .modal-mask {
