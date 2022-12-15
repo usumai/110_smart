@@ -576,10 +576,11 @@ function onSplityMilisChanged(key) {
     <div class='col-3 lead' id='menuright'></div>
 
 </div>
-
+<!--  
 <div class='row'>
 	<div class='col-12 lead'>
-		test
+	
 	</div>
 </div>
+-->
 <?php include "04_footer.php"; ?>
