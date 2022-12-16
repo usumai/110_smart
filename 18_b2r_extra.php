@@ -111,7 +111,7 @@ let vm = new Vue({
                 No: "4",
             },
             4:{
-                name:   "Verify inventory category. Does it fall under an exclusion list? (i.e. AD, DC, DD, DP, DR, DU, DV or QS)",
+                name:   "Verify inventory category. Does it fall under an exclusion list? (i.e. AD, DC, DD, DP, DR, DU, DV)",
                 Yes:"nstr",
                 No: "5",
             },
