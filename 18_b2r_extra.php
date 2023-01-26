@@ -132,8 +132,8 @@ let vm = new Vue({
             },
             8:{
                 name:   "Is the physical SOH different to 1RB or 1RS? Conduct muster where applicable",
-                Yes:"LE",
-                No: "FF",
+                Yes:"FF",
+                No: "LE",
             },
         }
     },
