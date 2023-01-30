@@ -27,19 +27,19 @@ include "components/forminput.php";
                                 :class="{'list-group-item-success':trailval=='Yes','list-group-item-danger':trailval=='No'}">
                                 <b>
                                     {{ trailval }}
-                                    <button class="btn btn-outline-dark" v-on:click="select_repeal(trailidx)">X</button>
+                                    <button class="btn btn-outline-dark" @click="select_repeal(trailidx)">X</button>
                                 </b></li>
                         </div>
                     </div>
                     <div v-if="qres!='nstr'&&qres!='LE'&&qres!='FF'">
                         <li class='list-group-item'><b>{{ json_questions[qres]['name'] }}</b></li>
                         <button class='list-group-item list-group-item-action list-group-item-success'
-                                v-on:click="select_answer('Yes')">Yes</button>
+                                @click="select_answer('Yes')">Yes</button>
                         <button class='list-group-item list-group-item-action list-group-item-danger'
-                                v-on:click="select_answer('No')">No</button>
+                                @click="select_answer('No')">No</button>
                     </div>
                     <div>
-                        <h1 v-if="qres=='nstr'||qres=='LE'||qres=='FF'" class="display-4">Final result: {{qres == 'nstr' ? 'No Further Investigation Required' : qres }}</h1>
+                        <h1 v-if="qres=='nstr'||qres=='LE'||qres=='FF'" class="display-4">Final result: {{qres == 'nstr' ? 'No Further Investigation Required' : (qres == 'FF'? 'First Found (FF)' : (qres == 'LE'? 'Location Error (LE)' : qres)) }}</h1>
                         <span>
                             <button class="btn btn-danger" 
                                 @click="save_final_b2r_extra_result('clear')">
@@ -101,7 +101,7 @@ let vm = new Vue({
                 No: "nstr",
             },
             2:{
-                name:   "Does the item belong to a SCA or is an X class item that has been issued to a SCA?",
+                name:   "Does the item belong to a SCA or is an X class item that has been issued to a SCA? (Consumed?)",
                 Yes:"nstr",
                 No: "3",
             },
@@ -126,12 +126,12 @@ let vm = new Vue({
                 No: "FF",
             },
             7:{
-                name:   "Is the quantity tracked item(s) CURRENTLY held anywhere in the warehouse? Check the warehouse against the district.",
+                name:   "Is the quantity tracked item(s) currently held in any other bins in the warehouse (check MILIS/WMS). Check warehouse against district where applicable.",
                 Yes:"8",
                 No: "FF",
             },
             8:{
-                name:   "Is the physical SOH different to 1RB or 1RS? Conduct muster where applicable",
+                name:   "Conduct quantity check of other bins holding this item/stockcode in warehouse (Muster). Is the physical SOH in the other Bins same as MILIS/WMS (i.e. 1RB, 1RS)",
                 Yes:"FF",
                 No: "LE",
             },
