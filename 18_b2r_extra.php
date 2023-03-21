@@ -10,7 +10,7 @@ include "components/forminput.php";
                 <h1 class="display-4">
                     Extra investigation: {{ json_b2r_record.STOCK_CODE }}
                     <a  class='btn btn-outline-dark float-right float-bottom' 
-                        :href="'17_b2r.php?stkm_id='+json_b2r_record.stkm_id+'&BIN_CODE='+json_b2r_record.BIN_CODE" >Back</a>
+                        :href="'17_b2r.php?stkm_id='+json_b2r_record.stkm_id+'&BIN_CODE='+json_b2r_record.BIN_CODE.replace('&','%26')" >Back</a>
                 </h1>
             </div>
         </div>
@@ -222,7 +222,7 @@ let vm = new Vue({
                 	'finalResultPath':JSON.stringify(this.json_path),
                 	};
                 json    = fnapi(payload);
-                window.location.replace("17_b2r.php?current_row="+this.current_row+"&stkm_id="+this.json_b2r_record.stkm_id+"&BIN_CODE="+this.json_b2r_record.BIN_CODE);
+                window.location.replace("17_b2r.php?current_row="+this.current_row+"&stkm_id="+this.json_b2r_record.stkm_id+"&BIN_CODE="+this.json_b2r_record.BIN_CODE.replace("&","%26"));
             }
         }, 
     }

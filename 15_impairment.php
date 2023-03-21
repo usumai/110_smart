@@ -66,7 +66,7 @@
                         <a  class='btn btn-primary' v-if="rec.isType!='b2r'"
                             :href="'16_imp.php?auto_storageID='+rec.auto_storageID" ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
                         <a  class='btn btn-primary' v-if="rec.isType=='b2r'"
-                            :href="'17_b2r.php?stkm_id='+rec.stkm_id+'&BIN_CODE='+rec.BIN_CODE" ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
+                            :href="'17_b2r.php?stkm_id='+rec.stkm_id+'&BIN_CODE='+rec.BIN_CODE.replace('&','%26')" ><span class='octicon octicon-zap' style='font-size:30px'></span></a>
                     </td>
                     <td>{{rec.DSTRCT_CODE}}-{{rec.WHOUSE_ID}}</td>
                     <td>{{rec.SUPPLY_CUST_ID}}</td>
@@ -93,7 +93,7 @@
                             <span class='octicon octicon-zap' style='font-size:30px'></span>
                         </a>
                         <a  class='btn btn-primary' v-if="rec.isType=='b2r'"
-                            :href="'17_b2r.php?stkm_id='+rec.stkm_id+'&BIN_CODE='+rec.BIN_CODE+'&current_row='+rec.auto_storageID" >
+                            :href="'17_b2r.php?stkm_id='+rec.stkm_id+'&BIN_CODE='+rec.BIN_CODE.replace('&','%26')+'&current_row='+rec.auto_storageID" >
                             <span class='octicon octicon-zap' style='font-size:30px'></span>
                         </a>
                     </td>

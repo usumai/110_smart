@@ -282,15 +282,17 @@
                             <div class='form-group'>
                                 <h2>Images</h2>
                                 
-                                <span v-for='(img, imgidx) in imgsd'>
-                                   
-                                    
+                                <span v-for='(img, imgidx) in imgsd'>                                                                    
                                     <button type='button' class='btn thumb_photo' 
                                             data-toggle='modal' data-target='#modal_show_pic'
                                             @click="zoom_pic = 'images/' + img;">
                                             <img :src="'images/'+img" width='200px'>
                                     </button>
-                                    
+<!--                                     
+                                     <button type='button' class='btn'                            
+                                            @click="delete_image(img, imgidx)">X
+                                    </button>
+-->                                                                       
                                 </span>
                             
                             </div>
@@ -493,8 +495,11 @@ let vm = new Vue({
         get_images(){
             payload     = {'act':'get_images', 'ass_id':this.ass_id}
             this.imgsd    = fnapi(payload)
-            // console.log(this.imgsd)
         }, 
+        delete_image(image, indx){
+            console.log(image);
+            delete this.imgsd[indx];
+        },
         delete_stk_asset(direction){
             payload     = {'act':'save_stk_delete_no_ass', 'ass_id':this.ass_id, direction}
             json        = fnapi(payload)
