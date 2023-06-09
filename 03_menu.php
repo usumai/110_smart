@@ -98,7 +98,7 @@ if(array_key_exists("current_row",$_POST)){
 							<span v-if='true'>
 								<div class='dropdown-divider'></div>
 								<h6 class='dropdown-header'>User management</span></h6>
-								<tr v-for='(actv, actvidx) in actvd'  v-if='!actv.smm_delete_date||actv.smm_delete_date&&show_deleted'>
+								<tr v-for='(actv, actvidx) in actvd'  v-if='!actv.delete_date||actv.delete_date&&show_deleted'>
 								<div v-if="userProfiles.length==0">No users exist</div>
 								<button 
 									v-if="userProfiles.length>0"

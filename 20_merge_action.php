@@ -12,7 +12,7 @@ if(fnCheckPreMergeConditions()){
 
 function fnCheckPreMergeConditions(){
     global $con, $debugMode, $stk_type;
-    $sql = "SELECT count(*) AS mergeCount FROM smartdb.sm13_stk WHERE  stk_include = 1 and smm_delete_date IS NULL";
+    $sql = "SELECT count(*) AS mergeCount FROM smartdb.sm13_stk WHERE  stk_include = 1 and delete_date IS NULL";
     $result = $con->query($sql);
     if ($result->num_rows > 0) {
         while($row = $result->fetch_assoc()) {
@@ -218,7 +218,7 @@ function fnGetStkDetails(){// Returns stkm_id_one, stkm_id_two, stkm_id_new
     $stkd = [];
     $cherry = 0;
 
-    $sql = "SELECT * FROM smartdb.sm13_stk WHERE  stk_include = 1 and smm_delete_date IS NULL";
+    $sql = "SELECT * FROM smartdb.sm13_stk WHERE  stk_include = 1 and delete_date IS NULL";
     $result = $con->query($sql);
     if ($result->num_rows > 0) {
         while($row = $result->fetch_assoc()) {

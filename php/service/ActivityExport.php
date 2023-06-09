@@ -214,13 +214,29 @@ function exportGaActivity($activityID){
 function exportIsActivity($activityID) {
 
 	$activity=array();
+
+
 	
 	$activityRes=qget(" 
-			SELECT * 
-			FROM smartdb.sm13_stk
-			WHERE 
-				stkm_id=$activityID");
-					
+SELECT 
+     a.stk_id,
+     a.stk_name,
+     a.stk_type as type,
+     f.file_ref as unique_file_id,
+     f.file_name,
+     a.rc_orig,
+     a.dpn_extract_user,
+     a.dpn_extract_date
+FROM
+    smartdb.sm13_stk a 
+    left join 
+    smartdb.sm16_file f 
+    on a.file_id =f.file_id
+WHERE 
+	stkm_id=$activityID");
+
+		
+		
 	if(count($activityRes)>0)
 	{
 		$activity=$activityRes[0];
@@ -283,13 +299,16 @@ function exportIsActivity($activityID) {
     			stkm_id=$activityID
 				AND ((date(delete_date) IS NULL) OR (date(delete_date)='0000-00-00'))
 		");
-    			  
+
+        $activity['smm_extract_user']  = get_current_user();
+        $activity['smm_extract_date']  = date(DATE_ATOM);        
+        $activity['file_version']  = 15;				  
     	if(count($imps)>0){
+            $activity["rc_totalsent"]=count($imps);
     		$activity["impairments"]=$imps;
-    		$activity["rc_totalsent"]=count($imps);
     	}else{
+            $activity["rc_totalsent"]=0;
     		$activity["impairments"]=array();
-    		$activity["rc_totalsent"]=0;
     	}
     		  
 	};

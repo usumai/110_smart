@@ -2,7 +2,7 @@
 include "02_header.php"; 
 
 $rw_stk = "";
-$sql = "SELECT * FROM smartdb.sm13_stk WHERE smm_delete_date IS NOT NULL;";
+$sql = "SELECT * FROM smartdb.sm13_stk WHERE delete_date IS NOT NULL;";
 $result = $con->query($sql);
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
@@ -13,8 +13,8 @@ if ($result->num_rows > 0) {
         $dpn_extract_user   = $row["dpn_extract_user"];
         $smm_extract_date   = $row["smm_extract_date"];
         $smm_extract_user   = $row["smm_extract_user"];
-        $smm_delete_date    = $row["smm_delete_date"];
-        $smm_delete_user    = $row["smm_delete_user"];
+        $delete_date        = $row["delete_date"];
+        $delete_user        = $row["delete_user"];
         $stk_include        = $row["stk_include"];
         $journal_text       = $row["journal_text"];
         if ($stk_include==1) {

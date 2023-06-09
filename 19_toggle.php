@@ -8,7 +8,7 @@ $sqlInclude = "
 	FROM smartdb.sm13_stk 
 	WHERE 
 		stk_include=1 AND 
-		((smm_delete_date IS NULL) OR (date(smm_delete_date)='0000-00-00'))";
+		((delete_date IS NULL) OR (date(delete_date)='0000-00-00'))";
 
 
 $rws = '';

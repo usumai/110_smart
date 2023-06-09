@@ -174,7 +174,7 @@ if ($act=="create_ga_stocktake") {
 }elseif ($act=="save_activity_toggle_delete") {
 	$stkm_id        = $_POST["stkm_id"];
     $delete_status  = $_POST["delete_status"];
-    $delete_status  = $delete_status==1 ? " smm_delete_date=NOW(), stk_include=0 " :  " smm_delete_date=NULL ";
+    $delete_status  = $delete_status==1 ? " delete_date=NOW(), stk_include=0 " :  " delete_date=NULL ";
     $sql            = " UPDATE smartdb.sm13_stk SET $delete_status WHERE stkm_id = $stkm_id ";
     echo mysqli_multi_query($con,$sql);
 }elseif ($act=="get_ga_assets") {
@@ -206,7 +206,7 @@ if ($act=="create_ga_stocktake") {
     	ON ass.stkm_id=act.stkm_id   	
     WHERE 
     	act.stk_include=1 
-    	AND ((act.smm_delete_date IS NULL) OR (date(act.smm_delete_date)='0000-00-00')) 
+    	AND ((act.delete_date IS NULL) OR (date(act.delete_date)='0000-00-00')) 
     	AND (ass.genesis_cat <> 'ga_template')";
     
     
@@ -736,7 +736,7 @@ function getIsDistrictList() {
                     smartdb.sm13_stk 
                 WHERE 
                     stk_include=1 AND 
-                    date(smm_delete_date) IS NULL
+                    date(delete_date) IS NULL
                 ) AND 
                 isBackup=0 AND 
                 LEFT(isType,3)='imp' AND 
@@ -746,7 +746,7 @@ function getIsDistrictList() {
 }
 
 function getIsImpairments() {
-    $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND ((smm_delete_date IS NULL) OR (date(smm_delete_date)='0000-00-00'))";
+    $sqlInclude = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include=1 AND ((delete_date IS NULL) OR (date(delete_date)='0000-00-00'))";
     $sql  = "
     		SELECT * 
     		FROM smartdb.sm18_impairment  
@@ -917,7 +917,7 @@ function getIsRecords (){
     	SELECT stkm_id 
     	FROM smartdb.sm13_stk 
     	WHERE stk_include=1 
-    		AND ((date(smm_delete_date) IS NULL) OR (date(smm_delete_date)='0000-00-00'))";
+    		AND ((date(delete_date) IS NULL) OR (date(delete_date)='0000-00-00'))";
  
     $sqlimp  = "
     	SELECT 

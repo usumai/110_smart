@@ -54,7 +54,7 @@ if ($act=='sys_pull_master') {
 }elseif ($act=='get_system'){
      $stks = $sett = $pro = [];
  
-     $sql = "SELECT * FROM smartdb.sm13_stk WHERE smm_delete_date IS NULL;";
+     $sql = "SELECT * FROM smartdb.sm13_stk WHERE delete_date IS NULL;";
      $result = $con->query($sql);
      if ($result->num_rows > 0) {
          while($row = $result->fetch_assoc()) {
@@ -75,7 +75,7 @@ if ($act=='sys_pull_master') {
              $pro[] = $row;
      }}
  
-     $sql = "SELECT stk_type FROM smartdb.sm13_stk WHERE smm_delete_date IS NULL AND stk_include =1;";
+     $sql = "SELECT stk_type FROM smartdb.sm13_stk WHERE delete_date IS NULL AND stk_include =1;";
      $result = $con->query($sql);
      if ($result->num_rows > 0) {
          while($row = $result->fetch_assoc()) {
@@ -97,7 +97,7 @@ if ($act=='sys_pull_master') {
  }elseif ($act=='get_SystemStkType'){
       // Get what the tool is configured for: stocktake, impairment or nothing
       
-      $sql = "SELECT stk_type FROM smartdb.sm13_stk WHERE smm_delete_date IS NULL AND stk_include =1;";
+      $sql = "SELECT stk_type FROM smartdb.sm13_stk WHERE delete_date IS NULL AND stk_include =1;";
       $result = $con->query($sql);
       if ($result->num_rows > 0) {
           while($row = $result->fetch_assoc()) {
@@ -452,7 +452,7 @@ if ($act=='sys_pull_master') {
              $active_profile_id    = $row["active_profile_id"];
      }}
 
-     $sql_save = "UPDATE smartdb.sm13_stk SET smm_delete_date=NOW(),smm_delete_user='$active_profile_id' WHERE stkm_id = $stkm_id;";
+     $sql_save = "UPDATE smartdb.sm13_stk SET delete_date=NOW(),delete_user='$active_profile_id' WHERE stkm_id = $stkm_id;";
      echo $sql_save;
      mysqli_multi_query($con,$sql_save);
      header("Location: index.php");
@@ -461,7 +461,7 @@ if ($act=='sys_pull_master') {
 
 
 }elseif ($act=='get_check_merge_criteria') {
-     $sql = "SELECT COUNT(DISTINCT stk_id) as CountDistinctStk, COUNT(*) AS CountActiveStks FROM smartdb.sm13_stk WHERE stk_include = 1 AND smm_delete_date IS NULL";
+     $sql = "SELECT COUNT(DISTINCT stk_id) as CountDistinctStk, COUNT(*) AS CountActiveStks FROM smartdb.sm13_stk WHERE stk_include = 1 AND delete_date IS NULL";
      $result = $con->query($sql);
      if ($result->num_rows > 0) {
           while($row = $result->fetch_assoc()) {
@@ -605,7 +605,7 @@ if ($act=='sys_pull_master') {
 
 }elseif ($act=='save_dearchive_stk'){
      $stkm_id = $_GET["stkm_id"];
-     $sql_save = "UPDATE smartdb.sm13_stk SET smm_delete_date=null,smm_delete_user=null WHERE stkm_id = $stkm_id;";
+     $sql_save = "UPDATE smartdb.sm13_stk SET delete_date=null,delete_user=null WHERE stkm_id = $stkm_id;";
      echo $sql_save;
      mysqli_multi_query($con,$sql_save);
      header("Location: index.php");
@@ -647,7 +647,7 @@ if ($act=='sys_pull_master') {
              $active_profile_id    = $row["active_profile_id"];
      }}
 
-     $sql = "UPDATE smartdb.sm13_stk SET smm_delete_date=NOW(),smm_delete_user='$active_profile_id' WHERE stkm_id = $stkm_id; ";
+     $sql = "UPDATE smartdb.sm13_stk SET delete_date=NOW(),delete_user='$active_profile_id' WHERE stkm_id = $stkm_id; ";
      $sql .= "UPDATE smartdb.sm14_ass SET stk_include=NULL WHERE stkm_id = $stkm_id; ";
      // echo $sql_save;
      echo runSql($sql);
@@ -1411,7 +1411,7 @@ if ($act=='sys_pull_master') {
      runSql($sql);
 
      fnStats($stkm_id);
-     header("Location: 17_b2r.php?current_row=$current_row&BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
+     header("Location: 17_b2r.php?current_row=$current_row&BIN_CODE=" . str_replace("&","%26",$BIN_CODE) . "&stkm_id=$stkm_id");
 
 }elseif ($act=='save_b2r_extras') {
      $BIN_CODE = $_GET["BIN_CODE"];
@@ -1423,7 +1423,7 @@ if ($act=='sys_pull_master') {
      WHERE BIN_CODE='$BIN_CODE'  AND isType='b2r' AND stkm_id=$stkm_id";
      runSql($sql);
      fnStats($stkm_id);
-     header("Location: 17_b2r.php?BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
+     header("Location: 17_b2r.php?BIN_CODE=" . str_replace("&","%26",$BIN_CODE) . "&stkm_id=$stkm_id");
      
 }elseif ($act=='save_clear_b2r') {
      $BIN_CODE       = $_GET["BIN_CODE"];
@@ -1446,7 +1446,7 @@ if ($act=='sys_pull_master') {
      runSql($sql);
 
      fnStats($stkm_id);
-     header("Location: 17_b2r.php?current_row=$current_row&BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
+     header("Location: 17_b2r.php?current_row=$current_row&BIN_CODE=" . str_replace("&","%26",$BIN_CODE) . "&stkm_id=$stkm_id");
 
 }elseif ($act=='save_delete_extra') {
      $auto_storageID     = $_GET["auto_storageID"];
@@ -1456,7 +1456,7 @@ if ($act=='sys_pull_master') {
      // echo $sql;
      runSql($sql);
      checkExtrasFinished($BIN_CODE, $stkm_id);
-     header("Location: 17_b2r.php?current_row=$current_row&BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
+     header("Location: 17_b2r.php?current_row=$current_row&BIN_CODE=" . str_replace("&","%26",$BIN_CODE) . "&stkm_id=$stkm_id");
 
 }elseif ($act=='save_b2r_add_extra') {
      $auto_storageID     = $_POST["auto_storageID"];
@@ -1511,7 +1511,7 @@ if ($act=='sys_pull_master') {
      echo $sql;
      runSql($sql);
      checkExtrasFinished($BIN_CODE, $stkm_id);
-     header("Location: 17_b2r.php?current_row=$current_row&BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
+     header("Location: 17_b2r.php?current_row=$current_row&BIN_CODE=" . str_replace("&","%26",$BIN_CODE) . "&stkm_id=$stkm_id");
 
 }elseif ($act=='save_b2r_extra') {
      $auto_storageID     = $_POST["auto_storageID"];
@@ -1538,7 +1538,7 @@ if ($act=='sys_pull_master') {
      echo runSql($sql);
      checkExtrasFinished($BIN_CODE, $stkm_id);
 
-     header("Location: 17_b2r.php?current_row=$current_row&BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
+     header("Location: 17_b2r.php?current_row=$current_row&BIN_CODE=" . str_replace("&","%26",$BIN_CODE) . "&stkm_id=$stkm_id");
 
 }elseif ($act=='save_is_toggle_check') {
      $toggle        = $_GET["toggle"];
@@ -1548,7 +1548,7 @@ if ($act=='sys_pull_master') {
      $sql = "UPDATE smartdb.sm18_impairment SET checkFlag=$toggle WHERE STOCK_CODE='$STOCK_CODE' AND BIN_CODE='$BIN_CODE'";
      echo runSql($sql);
 
-     header("Location: 17_b2r.php?current_row=$current_row&BIN_CODE=$BIN_CODE&stkm_id=$stkm_id");
+     header("Location: 17_b2r.php?current_row=$current_row&BIN_CODE=" . str_replace("&","%26",$BIN_CODE) . "&stkm_id=$stkm_id");
      
 }elseif ($act=='save_toggle_imp_backup') {
      $stkm_id       = $_GET["stkm_id"];
@@ -1588,7 +1588,7 @@ if ($act=='sys_pull_master') {
 
      $log = !$debugMode ? $log: "<br><br>Getting details of two stocktakes being merged";
      $cherry = 0;
-     $sql = "SELECT * FROM smartdb.sm13_stk WHERE  stk_include = 1 and smm_delete_date IS NULL";
+     $sql = "SELECT * FROM smartdb.sm13_stk WHERE  stk_include = 1 and delete_date IS NULL";
      $result = $con->query($sql);
      if ($result->num_rows > 0) {
          while($row = $result->fetch_assoc()) {

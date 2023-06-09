@@ -81,7 +81,7 @@ include "components/forminput.php";
 						                            <td style="width: 80%">{{ asset.ITEM_NAME }}</td>
 						                        	<td style="width: 10%;text-align: center">
 						                        		<a 
-						                        			:href="'05_action.php?act=save_is_toggle_check&toggle='+(asset.SIGHTED==1?0:1)+'&STOCK_CODE='+asset.STOCK_CODE+'&BIN_CODE='+BIN_CODE+'&stkm_id='+stkm_id"	                        	
+						                        			:href="'05_action.php?act=save_is_toggle_check&toggle='+(asset.SIGHTED==1?0:1)+'&STOCK_CODE='+asset.STOCK_CODE+'&BIN_CODE='+BIN_CODE.replace('&','%26')+'&stkm_id='+stkm_id"	                        	
 						                        			class="btn btn-outline">
 						                        			<i :class="'fa' + (asset.SIGHTED==1 ? ' fa-check text-success':' fa-times text-danger')">{{(asset.SIGHTED==1 ? ' ':'')}}</i>
 						                        		</a>
@@ -105,7 +105,7 @@ include "components/forminput.php";
 						                            <td style="width: 80%">{{ asset.ITEM_NAME }}</td>
 						                        	<td style="width: 10%;text-align: center">
 						                        		<a 
-						                        			:href="'05_action.php?act=save_is_toggle_check&toggle='+(asset.SIGHTED==1?0:1)+'&STOCK_CODE='+asset.STOCK_CODE+'&BIN_CODE='+BIN_CODE+'&stkm_id='+stkm_id"	                        	
+						                        			:href="'05_action.php?act=save_is_toggle_check&toggle='+(asset.SIGHTED==1?0:1)+'&STOCK_CODE='+asset.STOCK_CODE+'&BIN_CODE='+BIN_CODE.replace('&','%26')+'&stkm_id='+stkm_id"	                        	
 						                        			class="btn btn-outline">
 						                        			<i :class="'fa' + (asset.SIGHTED==1 ? ' fa-check text-success':' fa-times text-danger')">{{(asset.SIGHTED==1 ? ' ':'')}}</i>
 						                        		</a>
@@ -113,26 +113,7 @@ include "components/forminput.php";
 						                        </tr>
 					                        </tbody>
 										</table>
-		                        	</div>
-		                        	<!--
-			                    	<div class="tab-pane table-responsive-sm" id="tab2">
-					                	<table id="bin_contents2" class="table table-sm table-striped">		                	
-					                        <thead class="table-dark">
-		
-						                            <th  style="width: 10%">Stockcode</th>
-						                            <th  style="width: 90%">Name</th>
-		
-					                        </thead>
-					                        <tbody>
-						                        <tr v-for="asset in json_bins_orig" v-if="asset.isType=='b2r_exc'">
-						                            <td style="width: 10%">{{ asset.STOCK_CODE }}</td>
-						                            <td style="width: 90%">{{ asset.ITEM_NAME }}</td>
-		
-						                        </tr>
-					                        </tbody>
-										</table>
-		                        	</div>
-		                        	-->	     		                        		                        	
+		                        	</div>   		                        		                        	
 				                </div>
 		                      	</td>
                       </tr>

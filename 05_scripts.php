@@ -395,7 +395,7 @@ function fnUpload_rawremainder($arr, $dev){
 //     global $con;
 
     
-//     $sql = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include = 1 AND smm_delete_date IS NULL";
+//     $sql = "SELECT stkm_id FROM smartdb.sm13_stk WHERE stk_include = 1 AND delete_date IS NULL";
 //     $result = $con->query($sql);
 //     if ($result->num_rows > 0) {
 //         while($row = $result->fetch_assoc()) {

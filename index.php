@@ -33,7 +33,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                <tr v-for='(actv, actvidx) in actvd'  v-if='!actv.smm_delete_date||actv.smm_delete_date&&show_deleted'>
+                <tr v-for='(actv, actvidx) in actvd'  v-if='!actv.delete_date||actv.delete_date&&show_deleted'>
                     <td>{{ actv.stk_id }}</td>
                     <td>{{ actv.isCat}}</td>
                     <td>{{ actv.stk_name }}</td>
@@ -42,24 +42,24 @@
                     <td >{{ actv.rc_extras }}</td>
                     <td >{{ ((actv.rc_orig_complete/actv.rc_orig)*100).toFixed(1) +'%' }}</td>
                     <td>
-                        <button v-if='(actv.stk_include==1) && (!actv.smm_delete_date)' 
+                        <button v-if='(actv.stk_include==1) && (!actv.delete_date)' 
                             v-on:click='save_activity_toggle_include(actv.stkm_id,0,actv.stk_type)' 
                             class='btn btn-dark float-left'>
                             <i class="fa fa-folder-minus ml-2"></i>
                         </button>
-                        <button v-if='(actv.stk_include!=1) && (!actv.smm_delete_date)' 
+                        <button v-if='(actv.stk_include!=1) && (!actv.delete_date)' 
                             v-on:click='save_activity_toggle_include(actv.stkm_id,1,actv.stk_type)' 
                             class='btn btn-outline-dark float-left'>
                             <i class="fa fa-folder-plus ml-2"></i>
                         </button>
                     </td>
                     <td>
-                        <button v-if='!actv.smm_delete_date'  
+                        <button v-if='!actv.delete_date'  
                             v-on:click='save_activity_toggle_delete(actv.stkm_id,actv.stk_id,1)' 
                             class='btn btn-outline-danger float-left'>
                             <i class="fas fa-trash-alt ml-2"></i>
                         </button>
-                        <button v-if='actv.smm_delete_date' 
+                        <button v-if='actv.delete_date' 
                         	v-on:click='save_activity_toggle_delete(actv.stkm_id,actv.stk_id,0)' 
                         	class='btn btn-outline-secondary float-left'>
                         	<i class="fas fa-check ml-2"></i>
@@ -237,7 +237,14 @@ let vm = new Vue({
             };
             reader.onload = event => {
 				try{
-	                let uploadData=JSON.parse(event.target.result);
+	                var uploadData=JSON.parse(event.target.result);
+	                uploadData.file_name=file.name;
+	                uploadData.file_type="json";
+	                uploadData.file_desc="smartm data import";
+	                uploadData.file_ref=uploadData.unique_file_id;
+	                uploadData.format_version=uploadData.file_version;
+	                uploadData.import_date=new Date();
+	                
 	                upload( uploadData, this.onUploadProgress,				
 	                    (result)=>{
 	                        this.get_activities();
@@ -289,7 +296,7 @@ let vm = new Vue({
         isInclude(act_type){
             var includeAct=null;
             for(var act in this.actvd){
-                if((this.actvd[act].stk_include==1) && (!this.actvd[act].smm_delete_date)){
+                if((this.actvd[act].stk_include==1) && (!this.actvd[act].delete_date)){
                     includeAct=this.actvd[act];
                     break;
                 }
@@ -319,7 +326,7 @@ let vm = new Vue({
         }, 
 		isActivityActive(stk_id){
     		for (i in this.actvd){
-        		if((this.actvd[i].stk_id == stk_id) && (!this.actvd[i].smm_delete_date)){
+        		if((this.actvd[i].stk_id == stk_id) && (!this.actvd[i].delete_date)){
 					return true;
             	}
         	}
@@ -386,16 +393,12 @@ let vm = new Vue({
                 									'stkm_id': actv.stkm_id 
                 								};
                 header_obj= fnapi(payload);
-                header_obj['type']              = actv.stk_type;
-                header_obj['file_version']      = 14;
-                header_obj['smm_extract_date']  = new Date().toISOString().substring(0,19);
-                header_obj['smm_extract_user']  = null;
-                header_obj['unique_file_id']    = "TBA";		
+//                header_obj['smm_extract_date']  = new Date().toISOString().substring(0,19);
             }
             
             date_name_short = new Date().toISOString().replace(/-/g,'').replace(/:/g,'').substring(2,8);
             name_suffix     = name_suffix!='' ? '-'+name_suffix : name_suffix;
-            file_name       = 'SMARTM-'+date_name_short +'-'+actv.stkm_id+name_suffix;
+            file_name       = 'SMARTM-'+date_name_short +'-'+actv.stk_id+name_suffix;
                         
             if(exportFormat=='json'){
                 var fileBlob=createFileBlob(file_name + ".json", JSON.stringify(header_obj));

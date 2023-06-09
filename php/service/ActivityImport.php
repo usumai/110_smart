@@ -1,33 +1,28 @@
 <?php
 
 
-function createIsAudit($connection, $record) {
+function addFile($connection, $record) {
 
     $stmt   = $connection->prepare(
-        "INSERT INTO smartdb.sm13_stk (
-            stk_id,
-            stk_name,
-            dpn_extract_date,
-            dpn_extract_user,
-            smm_extract_date,
-            smm_extract_user,
-            rc_orig,
-            rc_orig_complete, 
-            rc_extras, 
-            stk_type) 
-        VALUES(?,?,?,?,?,?,?,?,?,?);");
+        "INSERT INTO smartdb.sm16_File (
+            file_name,
+            file_type,
+            file_ref,
+            format_version,
+            file_desc,
+            import_date
+        ) 
+        VALUES(?,?,?,?,?,?);");
 
-    $stmt->bind_param("ssssssssss", 
-		$record->stk_id, 
-		$record->stk_name, 
-		$record->dpn_extract_date, 
-		$record->dpn_extract_user, 
-		$record->smm_extract_date, 
-		$record->smm_extract_user, 
-		$record->rc_orig, 
-		$record->rc_orig_complete, 
-		$record->rc_extras,
-		$record->type);            
+    $stmt->bind_param("ssssss", 
+		$record->file_name, 
+		$record->file_type, 
+        $record->file_ref,
+        $record->format_version,
+		$record->file_desc, 
+		$record->import_date
+		 
+	);            
     $stmt->execute();
     if($stmt->error){
 		$errorMsg = $stmt->error;
@@ -312,9 +307,12 @@ function updateSettings($connection, $record){
 }
 
 function createStocktakeActivity($connection, $record) {
+    
+    $file_id=addFile($connection, $record);
+    
     $stk_id=$record->stk_id;
 
-    $results=qget("SELECT stkm_id FROM smartdb.sm13_stk WHERE (stk_id= $stk_id) and ((smm_delete_date is null) || (date(smm_delete_date)='0000-00-00'))");
+    $results=qget("SELECT stkm_id FROM smartdb.sm13_stk WHERE (stk_id= $stk_id) and ((delete_date is null) || (date(delete_date)='0000-00-00'))");
     if(count($results)>0){
         $id=$results[0]['stkm_id'];
     }else{
@@ -324,26 +322,20 @@ function createStocktakeActivity($connection, $record) {
     			stk_id, 
     			stk_name, 
     			stk_type, 
+                file_id,
     			dpn_extract_date, 
     			dpn_extract_user, 
-    			smm_extract_date, 
-    			smm_extract_user, 
-    			rc_orig, 
-    			rc_orig_complete, 
-    			rc_extras) 
-    		VALUES(?,?,?,?,?,?,?,?,?,?);");
+    			rc_orig) 
+    		VALUES(?,?,?,?,?,?,?);");
         
-        $stmt->bind_param("ssssssssss", 
+        $stmt->bind_param("sssssss", 
     		$record->stk_id, 
     		$record->stk_name, 
     		$record->type, 
+            $file_id,
     		$record->dpn_extract_date, 
     		$record->dpn_extract_user, 
-    		$record->smm_extract_date, 
-    		$record->smm_extract_user, 
-    		$record->rc_orig, 
-    		$record->rc_orig_complete, 
-    		$record->rc_extras);
+     		$record->rc_orig);
         
         $stmt->execute();
         

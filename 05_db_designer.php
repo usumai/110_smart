@@ -50,19 +50,14 @@ function fnInitiateDatabase($noRedirect, $noCreateRRTable){
          `stkm_id` INT NOT NULL AUTO_INCREMENT,
          `stk_id` INT NULL,
          `stk_name` VARCHAR(255) NULL,
+         `stk_type` VARCHAR(255) NULL,
+         `file_id` INT NOT NULL,
+         `dpn_extract_user` VARCHAR(255) NULL,
          `dpn_extract_date` DATETIME NULL,
-         `dpn_extract_user` VARCHAR(255) NULL,`smm_extract_date` DATETIME NULL,
-         `smm_extract_user` VARCHAR(255) NULL,
-         `smm_delete_date` DATETIME NULL,
-         `smm_delete_user` VARCHAR(255) NULL,
          `stk_include` INT NULL,
          `rc_orig` INT NULL,
-         `rc_orig_complete` INT NULL,
-         `rc_extras` INT NULL,
-         `stk_type` VARCHAR(255) NULL, 
-         `journal_text` LONGTEXT NULL,
-         `merge_lock` INT NULL, 
-         
+         `delete_user` VARCHAR(255) NULL,
+         `delete_date` DATETIME NULL,         
          PRIMARY KEY (`stkm_id`),
          UNIQUE INDEX `stkm_id_UNIQUE` (`stkm_id` ASC));";
     mysqli_multi_query($con,$sql_save);
@@ -212,7 +207,7 @@ BEGIN
 			sm14_ass as a inner join 
 			sm13_stk as t on ((a.stkm_id=t.stkm_id) and 
 	                          (t.stk_id = @new_stocktake_id) and 
-	                          (t.smm_delete_date is null))
+	                          (t.delete_date is null))
 		WHERE
 			a.res_fingerprint=new.res_fingerprint;     					
     ELSE
@@ -230,7 +225,7 @@ BEGIN
 			sm14_ass as a inner join 
 			sm13_stk as t on ((a.stkm_id=t.stkm_id) and 
 	                          (t.stk_id = @new_stocktake_id) and 
-	                          (t.smm_delete_date is null))
+	                          (t.delete_date is null))
 		WHERE
 			a.ledger_id=new.ledger_id; 
 	END IF;		
@@ -260,7 +255,7 @@ BEFORE UPDATE
 ON sm14_ass
 FOR EACH ROW 
 BEGIN
-	 IF((select smm_delete_date 
+	 IF((select delete_date 
         from sm13_stk 
         WHERE 
         	stkm_id=old.stkm_id) is NULL) THEN
@@ -318,7 +313,7 @@ END"
     upload_reason_codes();
 
 
-    $sql_save = "CREATE TABLE $dbname.sm16_file (`file_id` INT NOT NULL AUTO_INCREMENT,`file_type` VARCHAR(255) NULL,`file_ref` VARCHAR(255) NULL,`file_desc` VARCHAR(255) NULL,PRIMARY KEY (`file_id`),UNIQUE INDEX `file_id_UNIQUE` (`file_id` ASC));";
+    $sql_save = "CREATE TABLE $dbname.sm16_file (`file_id` INT NOT NULL AUTO_INCREMENT,`file_name` VARCHAR(255) NOT NULL,`file_type` VARCHAR(255) NOT NULL,`file_ref` VARCHAR(255) NOT NULL,`format_version` VARCHAR(25) NULL, `file_desc` VARCHAR(255) NULL, `import_date` DATETIME NOT NULL, PRIMARY KEY (`file_id`),UNIQUE INDEX `file_id_UNIQUE` (`file_id` ASC));";
 //     echo "<br><br>".$sql_save;
     mysqli_multi_query($con,$sql_save);
 
@@ -424,7 +419,7 @@ BEGIN
 			sm18_impairment as a inner join
 			sm13_stk as t on ((a.stkm_id=t.stkm_id) and
 	                          (t.stk_id = @new_stocktake_id) and
-	                          (t.smm_delete_date is null))
+	                          (t.delete_date is null))
 		WHERE
 			a.UUID=new.UUID;
     ELSE
@@ -442,7 +437,7 @@ BEGIN
 			sm18_impairment as a inner join
 			sm13_stk as t on ((a.stkm_id=t.stkm_id) and
 	                          (t.stk_id = @new_stocktake_id) and
-	                          (t.smm_delete_date is null))
+	                          (t.delete_date is null))
 		WHERE
 			a.storageID=new.storageID;
 	END IF;
@@ -468,7 +463,7 @@ END");
     $con->query("
 CREATE TRIGGER `is_update` BEFORE UPDATE ON `sm18_impairment`
 FOR EACH ROW BEGIN
-	 IF((select smm_delete_date 
+	 IF((select delete_date 
         from sm13_stk 
         WHERE 
         	stkm_id=old.stkm_id) is NULL) THEN

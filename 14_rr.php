@@ -4,7 +4,7 @@ include "02_header.php";
 $search_term = $_GET["search_term"];
 
 $options_stks_template="";
-$sql = "SELECT * FROM smartdb.sm13_stk WHERE smm_delete_date IS NULL";
+$sql = "SELECT * FROM smartdb.sm13_stk WHERE delete_date IS NULL";
 // echo $sql;
 $result2 = $con->query($sql);
 if ($result2->num_rows > 0) {
