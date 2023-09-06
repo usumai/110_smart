@@ -124,7 +124,7 @@ if ($act=="create_ga_stocktake") {
         echo json_encode(new ResponseMessage("OK",$result));
     });   
 }elseif($act=="update_software") {
-    execWithErrorHandler(function() { 
+    execWithErrorHandler(function() use ($request) { 
         $result = updateSoftware($request->data->qaUpdate);
         echo json_encode(new ResponseMessage("OK",$result));
     });         
