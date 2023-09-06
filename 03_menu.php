@@ -91,8 +91,8 @@ if(array_key_exists("current_row",$_POST)){
 							<h6 class='dropdown-header'>Available Version<span class='float-right'>v{{ sysd.versionRemote }}{{sysd.versionRemoteRevision? ('.'+sysd.versionRemoteRevision.substring(0,7)) : ''}}</span></h6>
 							<h6 class='dropdown-header'>Last checked<span class='float-right'>{{ sysd.date_last_update_check }}</span></h6>
 							<button type='button' v-if="sysd.versionLocal==sysd.versionRemote" class='dropdown-item btn' @click='checkAvailableSoftwareVersion()'>Check for new version</button>
-							<button type="button" class="dropdown-item btn" data-toggle="modal" @click="initSoftwareUpdate()" data-target="#update_confirm_dlg"><i class="fas fa-cloud-download-alt ml-2"></i> Force Software Update</button>
-
+							<button type="button" class="dropdown-item btn" data-toggle="modal" @click="initSoftwareUpdate()" data-target="#update_confirm_dlg"><i class="fas fa-cloud-download-alt ml-2"></i>Install Latest Version</button>
+							<button type="button" class="dropdown-item btn" data-toggle="modal" @click="installQAVersion()" data-target="#install_qa_version_dlg"><i class="fas fa-cloud-download-alt ml-2"></i>Install a QA Version</button>
 							<button type='button' v-if="sysd.versionLocal<sysd.versionRemote" class='dropdown-item btn text-danger' data-toggle='modal' data-target='#modal_confirm_update'>Update available v{{ sysd.versionRemote }}</button>
 							
 							<span v-if='true'>
