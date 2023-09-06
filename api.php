@@ -125,7 +125,7 @@ if ($act=="create_ga_stocktake") {
     });   
 }elseif($act=="update_software") {
     execWithErrorHandler(function() { 
-        $result = updateSoftware($_POST["qaUpdate"]);
+        $result = updateSoftware($request->data->qaUpdate);
         echo json_encode(new ResponseMessage("OK",$result));
     });         
 }elseif($act=="get_is_impairments") {
