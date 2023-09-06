@@ -320,11 +320,12 @@ function saveUserProfile(profileId, userName, userPhone, completeCallback, error
 		processResponse(response,completeCallback, errorCallback);
 	});
 }
-function updateSoftware(completeCallback, errorCallback){
+function updateSoftware(qaUpdate, completeCallback, errorCallback){
 	axios.post(API_ENDPOINT, 
 		{
 			action: 'update_software',
 			data: {
+				qaUpdate: qaUpdate
 			}
 		}
 	)

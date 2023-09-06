@@ -125,7 +125,7 @@ if ($act=="create_ga_stocktake") {
     });   
 }elseif($act=="update_software") {
     execWithErrorHandler(function() { 
-        $result = updateSoftware();
+        $result = updateSoftware($_POST["qaUpdate"]);
         echo json_encode(new ResponseMessage("OK",$result));
     });         
 }elseif($act=="get_is_impairments") {
@@ -1124,7 +1124,7 @@ function checkAvailableSoftwareVersion(){
     qget($sql_save);
 }
 
-function updateSoftware() {
+function updateSoftware($qaUpdate) {
 	$networkStatus=getNetworkStatus();  
 
     $errCode=0;
@@ -1153,7 +1153,7 @@ function updateSoftware() {
 	    splitLines($output, shell_exec(GIT_CMD .' config --unset http.proxy'));
 	}
 
-	splitLines($output, shell_exec(GIT_CMD .' pull https://github.com/usumai/110_smart.git'));
+	splitLines($output, shell_exec(GIT_CMD .' pull https://github.com/usumai/110_smart.git'. ($qaUpdate=='true' ? ' qa' : '')));
 
 	$revision=shell_exec(GIT_CMD .' rev-parse --short HEAD');
 
