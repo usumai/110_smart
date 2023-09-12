@@ -261,6 +261,7 @@ WHERE
 				imp.TRACKING_REFERENCE,
 				imp.LAST_MOD_DATE as last_mod_date,
 				imp.sampleFlag as sample_flag,
+                imp.stat4Flag as stat4_flag,
 				imp.serviceableFlag,
 				imp.checked_to_milis,
 				imp.findingID,

@@ -1270,6 +1270,7 @@ if ($act=='sys_pull_master') {
      $storageID          = $_POST["storageID"];
      $stkm_id            = $_POST["stkm_id"];
      $res_update_user    = "";
+     $stat4Flag          = (array_key_exists("stat4Flag",$_POST) && $_POST["stat4Flag"] == "1") ? 1 : 0;
      $milisFlag          = (array_key_exists("checked_to_milis",$_POST) && $_POST["checked_to_milis"] == "1") ? 1 : 0;
      $findingID          = $_POST["findingID"];
      $res_comment 		 = $_POST["res_comment"];
@@ -1365,7 +1366,8 @@ if ($act=='sys_pull_master') {
                res_comment='$res_comment',
                res_unserv_date=$res_unserv_date,
                res_create_date=NOW(),
-               checked_to_milis=$milisFlag
+               checked_to_milis=$milisFlag,
+               stat4Flag=$stat4Flag
             WHERE 
                auto_storageID=$auto_storageID";
      runSql($sql);

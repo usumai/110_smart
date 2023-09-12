@@ -36,13 +36,14 @@ if ($result->num_rows > 0) {
         $TRACKING_REFERENCE = $row['TRACKING_REFERENCE'];
         $STK_DESC           = $row['STK_DESC'];
         $sampleFlag         = $row['sampleFlag'];
+        $stat4Flag          = $row['stat4Flag'];
         $res_create_date    = $row['res_create_date'];
         $res_update_user    = $row['res_update_user'];
         $findingID          = $row['findingID'];
         $res_comment        = $row['res_comment'];
         $res_unserv_date    = $row['res_unserv_date'];
         $LAST_MOD_DATE      = $row['LAST_MOD_DATE'];
-        $checkedToMilis     = $row['checked_to_milis'];
+        $checkedToMilis     = $row['checked_to_milis'];       
         $stkm_id            = $row['stkm_id'];
         $arrSample[] = $row;
 }}
@@ -172,9 +173,12 @@ $(document).ready(function() {
         $('.complete').toggle(complete);
         $('#checked_milis').hide();
         $('#checked_milis').prop('disabled', true);
+        $('#stat4').hide();
+        $('#stat4').prop('disabled', true);
         $('#comment_warn_msg').hide();
-
+		$('#obsoleteWarn').hide();
         if(arS[0]['findingID']){
+        	$('#stat4').show();
             let fID = arS[0]['findingID']
             if(milisEnabled.findIndex((v)=>(v==fID))>=0){
                 $('#checked_milis').show();
@@ -207,9 +211,10 @@ $(document).ready(function() {
             }
 
             //Check if comment required, comment is set
-            let res_comment = $('#res_comment').val();
+            let res_comment = $('#res_comment').val();            
             if(arS['rl'][fID-1]['reqComment']==1&& res_comment.length<=5){
                 $('#btnSubmit').hide();
+                $('#obsoleteWarn').show();
             }
 
             //Check if splity values all add up sufficient to submit.
@@ -504,17 +509,21 @@ function onSplityMilisChanged(key) {
 	            	<td nowrap><b>Checked To MILIS</b></td>
 	            	<td><input  type="checkbox" class="form-control" id="checked_to_milis" name="checked_to_milis" value="1" <?=($checkedToMilis==1 ? 'checked' : '') ?>></input></td>
 	            </tr>
+	            <tr id="stat4">
+	            	<td nowrap><b>Is Item STAT 4</b></td>
+	            	<td><input  type="checkbox" class="form-control" id="stat4Flag" name="stat4Flag" value="1" <?=($stat4Flag==1 ? 'checked' : '') ?>></input></td>
+	            </tr>
 	            <tr>
-	            	<td class='completezz'>
-	            		<b>Comments</b>
+	            	<td >
+	            		<b>Comments:</b>
 	            	</td>
 	            	<td style="color: red; font-size: 1.0rem">
-	            		<div id="comment_warn_msg"><i>A valid reason must be entered in comments. Do not write "No Date". <br/>Please check the transaction history before selecting this option.</i>   
-	            		</div>
+	            		<i id="comment_warn_msg" tyle="color: red">A valid reason must be entered in comments. Do not write "No Date". <br/>Please check the transaction history before selecting this option.<br/></i>   	            		
+	            		<i id="obsoleteWarn" style="color: red">Is this item obsolete? Can it still be physically used?<br/></i>
 	            	</td>
 	            </tr>
 	            <tr>
-	            	<td colspan='2' class='completezz'>
+	            	<td colspan='2' >
 	            		<textarea class='form-control' rows='5' name='res_comment' id='res_comment'><?=$res_comment?></textarea>
 	            	</td>
 	            </tr>      

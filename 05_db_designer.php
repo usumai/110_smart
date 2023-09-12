@@ -346,6 +346,7 @@ END"
         LAST_MOD_DATE DATETIME NULL,
         sampleFlag INT(11),
         serviceableFlag INT(11), 
+        stat4Flag int(11) NULL DEFAULT 0,
         checked_to_milis int(11) NULL DEFAULT 0,
         findingID VARCHAR(255) NULL,
         isID INT(11),
@@ -491,10 +492,10 @@ END");
 
 
     $sql_save = "INSERT INTO $dbname.sm19_result_cats (findingID, findingName, isType, color, reqDate, reqSplit, reqComment, resAbbr, resHelp) VALUES 
-    (1, 'Serial tracked - Item sighted - Serviceable','imp','success',0,0,0,'SER','Also includes items currently in use.'),
+    (1, 'Serial tracked - Item sighted - Serviceable','imp','success',0,0,1,'SER','Also includes items currently in use.'),
     (2, 'Serial tracked - Item sighted - Unserviceable - with date','imp','success',1,0,1,'USWD','Comments and Date mandatory with this option. Date must be cross-checked with MILIS, the date refers to the date the item inventory category first changed to unserviceable.'),
     (3, 'Serial tracked - Item sighted - Unserviceable - no date','imp','success',0,0,1,'USND','Comments mandatory with this option. Only select this option if a date cannot be verified within MILIS. Ensure evidence has been provided to support this option.'),
-    (4, 'Serial tracked - Item not sighted - Serviceable','imp','warning',0,0,0,'SER','Also includes items currently in use.'),
+    (4, 'Serial tracked - Item not sighted - Serviceable','imp','warning',0,0,1,'SER','Also includes items currently in use.'),
     (5, 'Serial tracked - Item not sighted - Unserviceable - with date','imp','warning',1,0,1,'USWD','Comments and Date mandatory with this option. Date must be cross-checked with MILIS, the date refers to the date the item inventory category first changed to unserviceable.'),
     (6, 'Serial tracked - Item not sighted - Unserviceable - no date','imp','warning',0,0,1,'USND','Comments mandatory with this option. Only select this option if a date cannot be verified within MILIS. Ensure evidence has been provided to support this option.'),
     (7, 'Serial tracked - Item not found, no evidence provided','imp','danger',0,0,1,'NIC','Comments mandatory with this option. Ensure communication to EDLA and DLAP and site Point of Contact is aware of evidential requirements.'),

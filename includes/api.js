@@ -1028,6 +1028,10 @@ const XSLX_IS_IMPAIRMENT_COL_HEADER = [
 		type: 'string'
 	}, 		
 	{
+		value: 'stat4_flag',
+		type: 'string'
+	},	
+	{
 		value: 'isID',
 		type: 'string'
 	},
