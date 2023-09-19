@@ -435,7 +435,7 @@ function onSplityMilisChanged(key) {
 }
 </style>
 <div class='container-fluid' style="margin-top: 18px">
-<h1 class='display-4'>Impairment for IS: <?="$STOCK_CODE- $ITEM_NAME"?></h1>
+	<h1 class='display-4'>Impairment for IS: <?="$STOCK_CODE- $ITEM_NAME"?></h1>
 
 
 <div class='row'>
@@ -507,11 +507,11 @@ function onSplityMilisChanged(key) {
 	            <tr><td nowrap><b>Last Modification Date</b></td><td><?=$LAST_MOD_DATE?></td></tr>
 	            <tr id="checked_milis">
 	            	<td nowrap><b>Checked To MILIS</b></td>
-	            	<td><input  type="checkbox" class="form-control" id="checked_to_milis" name="checked_to_milis" value="1" <?=($checkedToMilis==1 ? 'checked' : '') ?>></input></td>
+	            	<td><input  type="checkbox" class="form-control" id="checked_to_milis" name="checked_to_milis" value="1" <?=($checkedToMilis==1 ? 'checked' : '') ?> /></td>
 	            </tr>
 	            <tr id="stat4">
 	            	<td nowrap><b>Is Item STAT 4</b></td>
-	            	<td><input  type="checkbox" class="form-control" id="stat4Flag" name="stat4Flag" value="1" <?=($stat4Flag==1 ? 'checked' : '') ?>></input></td>
+	            	<td><input  type="checkbox" class="form-control" id="stat4Flag" name="stat4Flag" value="1" <?=($stat4Flag==1 ? 'checked' : '') ?> /></td>
 	            </tr>
 	            <tr>
 	            	<td >
@@ -585,11 +585,4 @@ function onSplityMilisChanged(key) {
     <div class='col-3 lead' id='menuright'></div>
 
 </div>
-<!--  
-<div class='row'>
-	<div class='col-12 lead'>
-	
-	</div>
-</div>
--->
 <?php include "04_footer.php"; ?>
