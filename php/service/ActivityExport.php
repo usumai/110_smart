@@ -303,7 +303,7 @@ WHERE
 
         $activity['smm_extract_user']  = get_current_user();
         $activity['smm_extract_date']  = date(DATE_ATOM);        
-        $activity['file_version']  = 15;				  
+        $activity['file_version']  = 16;				  
     	if(count($imps)>0){
             $activity["rc_totalsent"]=count($imps);
     		$activity["impairments"]=$imps;
