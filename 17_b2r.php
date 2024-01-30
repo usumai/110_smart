@@ -238,7 +238,7 @@ include "components/forminput.php";
 				</div>
 				<div class="modal-body table-responsive">				   
 					<table class="table table-striped table-hover ">
-						<thead class="table-dark sticky-top">
+						<thead class="table-dark">
 							<tr>
 								<th>Stockcode</th>
 								<th>Name</th>
