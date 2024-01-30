@@ -14,7 +14,7 @@
         
 
         <div class="table-responsive-sm" >
-            <table id="tbl_stk" class="table table-sm table-striped table-hover"  >
+            <table id="tbl_stk" class="table table-sm table-striped table-hover caption-top"  >
                 <caption>
                     <button type="button" class='btn btn-primary float-right' @click="openUploadDlg">Upload<i class="fa fa-upload ml-2"></i></button>
                 </caption>
@@ -80,43 +80,43 @@
 
 
 <!-- upload progress dialog  -->
-<div class="container">
-    <button ref="btn_open_progress" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#dlg_progress" style="visibility:hidden;">Open Progress Dlg</button>
-
-    <!-- Modal -->
-    <div class="modal fade" id="dlg_progress" role="dialog"  data-backdrop="static" >
-        <div class="modal-dialog">
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header" style="background-color: #5a95ca;">                       
-                    <h5 class="modal-title" style="color: whitesmoke">File Upload</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="container" style="width:100%">
-
-                        <div v-if="upload.status == 'Processing'" class="alert alert-info"><strong>{{upload.status}}!</strong> {{upload.message}}</div>     
-                        <div v-if="upload.status == 'Completed'" class="alert alert-success"><strong>{{upload.status}}!</strong> {{upload.message}}</div>     
-                        <div v-if="upload.status == 'Error'" class="alert alert-danger"><strong>{{upload.status}}!</strong> {{upload.message}}</div>     
-                        <div class="progress">
-                            <div id="progress_bar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%">
-                                <span id="progress_value">0%</span>
-                            </div>
-                        </div>
-                        <div>{{upload.taskDescription}}</div>
-                        <div style="width: 100%; padding-top: 10px; display: flex;">
-                            <span style="width: 50%">Current: {{upload.current}}</span>
-                            <span style="width: 50%">Total: {{upload.total}}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class='btn btn-outline-dark' data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+	<div class="container">
+	    <button ref="btn_open_progress" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#dlg_progress" style="visibility:hidden;">Open Progress Dlg</button>
+	
+	    <!-- Modal -->
+	    <div class="modal fade" id="dlg_progress" role="dialog"  data-backdrop="static" >
+	        <div class="modal-dialog">
+	            <!-- Modal content-->
+	            <div class="modal-content">
+	                <div class="modal-header" style="background-color: #5a95ca;">                       
+	                    <h5 class="modal-title" style="color: whitesmoke">File Upload</h5>
+	                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+	                </div>
+	                <div class="modal-body">
+	                    <div class="container" style="width:100%">
+	
+	                        <div v-if="upload.status == 'Processing'" class="alert alert-info"><strong>{{upload.status}}!</strong> {{upload.message}}</div>     
+	                        <div v-if="upload.status == 'Completed'" class="alert alert-success"><strong>{{upload.status}}!</strong> {{upload.message}}</div>     
+	                        <div v-if="upload.status == 'Error'" class="alert alert-danger"><strong>{{upload.status}}!</strong> {{upload.message}}</div>     
+	                        <div class="progress">
+	                            <div id="progress_bar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%">
+	                                <span id="progress_value">0%</span>
+	                            </div>
+	                        </div>
+	                        <div>{{upload.taskDescription}}</div>
+	                        <div style="width: 100%; padding-top: 10px; display: flex;">
+	                            <span style="width: 50%">Current: {{upload.current}}</span>
+	                            <span style="width: 50%">Total: {{upload.total}}</span>
+	                        </div>
+	                    </div>
+	                </div>
+	                <div class="modal-footer">
+	                    <button type="button" class='btn btn-outline-dark' data-dismiss="modal">Close</button>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	</div>
 						
       
     <div hidden>

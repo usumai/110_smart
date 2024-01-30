@@ -6,23 +6,25 @@
 
         <h2>{{ stk_progressd.count_complete }}/ {{ stk_progressd.count_total }} total ( perc_complete )&nbsp;</h2>
 
-        <button class='btn btn-outline-dark' v-on:click="stk_table_search('~FF')">First found</button>
-        <button class='btn btn-outline-dark' v-on:click="stk_table_search('FIN~')">Completed</button>
-        <button class='btn btn-outline-dark' v-on:click="stk_table_search('NYC~')">Incomplete</button>
-        <button class='btn btn-warning' v-on:click="stk_table_search('clear')">Clear search terms</button>
-        <span id="area_rr_count">Enter a search term greater than four characters to search the Raw Remainder dataset.</span>
         <div class="table-responsive-sm">
             <table id="tbl_stk" class="table table-sm table-striped table-hover">
-                <thead class="table-dark">
+            	<caption>
+                    <button class='btn btn-outline-dark' v-on:click="stk_table_search('~FF')">First found</button>
+                    <button class='btn btn-outline-dark' v-on:click="stk_table_search('FIN~')">Completed</button>
+                    <button class='btn btn-outline-dark' v-on:click="stk_table_search('NYC~')">Incomplete</button>
+                    <button class='btn btn-warning' v-on:click="stk_table_search('clear')">Clear search terms</button>
+                    <span id="area_rr_count">Enter a search term greater than four characters to search the Raw Remainder dataset.</span>        	
+            	</caption>
+                <thead class="table-dark sticky-top">
                     <tr >
                         <th>Action<br>&nbsp;</th>
-                        <th class="text-center">AssetID<br>Class</th>
+                        <th class="text-left">AssetID<br>Class</th>
                         <!-- <th>Inventory</th> -->
-                        <th class="text-center">Location<br>Room</th>
+                        <th class="text-left">Location<br>Room</th>
                         <th>Description<br>&nbsp;</th>
-                        <th class="text-center">InventNo<br>SerialNo</th>
-                        <th class="text-right">$NBV<br>&nbsp;</th>
-                        <th class="text-right">Custodian<br>&nbsp;</th>
+                        <th class="text-left">InventNo<br>SerialNo</th>
+                        <th class="text-left">$NBV<br>&nbsp;</th>
+                        <th class="text-left">Custodian<br>&nbsp;</th>
                         <th class="text-center">Status<br>&nbsp;</th>
                         <th>Timestamp<br>&nbsp;</th>
                         <th>Action<br>&nbsp;</th>
@@ -68,7 +70,21 @@
 <script>
 $(document).ready(function() {
     $('#tbl_stk').DataTable({
-        stateSave: true
+        stateSave: true,
+        ordering: true,
+        paging: true,
+        info: true,
+        /*lengthMenu: [],*/
+        orderMulti: true,
+        order: [[1, 'asc']], 
+        pagingType: 'simple_numbers',     
+        columnDefs:[
+            { 
+                targets: [1], 
+            	orderData: [1] 
+        	}
+        ],   
+        dom: '<"row"<"col"><"col"f>><"row"<"col"l><"col"p>><"row"<"col"t>><"row"<"col"i><"col"p>>'    
     });
     
     $('#tbl_stk').on('search.dt', function() {

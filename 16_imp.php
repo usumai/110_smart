@@ -507,7 +507,7 @@ function onSplityMilisChanged(key) {
 	            <tr><td nowrap><b>Last Modification Date</b></td><td><?=$LAST_MOD_DATE?></td></tr>
 	            <tr id="checked_milis">
 	            	<td nowrap><b>Checked To MILIS</b></td>
-	            	<td><input  type="checkbox" class="form-control" id="checked_to_milis" name="checked_to_milis" value="1" <?=($checkedToMilis==1 ? 'checked' : '') ?> /></td>
+	            	<td class="align-left"><input  type="checkbox" class="form-control" id="checked_to_milis" name="checked_to_milis" value="1" <?=($checkedToMilis==1 ? 'checked' : '') ?> /></td>
 	            </tr>
 	            <tr id="stat4">
 	            	<td nowrap><b>Is Item STAT 4</b></td>

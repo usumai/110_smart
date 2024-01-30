@@ -1,5 +1,8 @@
-.fixed-top {
-    z-index: 2;
+.sticky-top {
+	top: 61px;
+}
+.table caption {
+	caption-side: top;
 }
 
 
@@ -38,9 +41,6 @@
 	padding: 10px 5px 10px 5px;
 }
 
-
-
-
 .current-row {
     color: red;
 }
@@ -62,17 +62,14 @@ body {
     margin-top: 67px;
     overflow-y: scroll;
 }
-.table caption {
-	caption-side: top;
-}
+
+
 
 .table {
 	overflow-y: scroll;
 }
 
 table.table thead th{
-    position: sticky;
-    top: 61px;
     color: #fff;
     background-color: #343a40;    
     z-index: 1;

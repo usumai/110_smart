@@ -35,7 +35,7 @@ include "components/forminput.php";
           <div class='col-8 lead'>
 
               <form action='05_action.php' method='POST'>
-                  <table class='table table-sm'>
+                  <table class="table">
                       <tr>
                           <td><strong>Status</strong></td>
                           <td colspan="4">
@@ -66,9 +66,9 @@ include "components/forminput.php";
 		
 				             	</ul>         	
 					            <div class="tab-content">         
-			                    	<div class="tab-pane fade table-responsive-sm active show" id="tab0">
-					                	<table id="bin_contents" class="table table-sm table-striped">
-					                        <thead class="table-dark">
+			                    	<div class="tab-pane fade active show" id="tab0">
+					                	<table id="bin_contents" class="table table-striped">
+					                        <thead class="table-dark sticky-top">
 		
 						                            <th style="width: 10%">Stockcode</th>
 						                            <th style="width: 80%">Name</th>
@@ -90,9 +90,9 @@ include "components/forminput.php";
 					                        </tbody>
 										</table>
 		                        	</div>
-			                    	<div class="tab-pane table-responsive-sm" id="tab1">
-					                	<table id="bin_contents1" class="table table-sm table-striped">		                	
-					                        <thead class="table-dark">
+			                    	<div class="tab-pane" id="tab1">
+					                	<table id="bin_contents1" class="table table-striped">		                	
+					                        <thead class="table-dark sticky-top">
 		
 						                            <th style="width: 10%">Stockcode</th>
 						                            <th style="width: 80%">Name</th>
@@ -150,11 +150,11 @@ include "components/forminput.php";
    
     <div class="row">
         
-        <div class="col table-responsive-sm">          
+        <div class="col ">          
 	           
-	        <table class="table table-sm table-striped table-hover">
+	        <table class="table table-striped table-hover">
 	            <caption style="caption-side: top"><h3><b>Extra</b></h3></caption>
-	            <thead class="table-dark">
+	            <thead class="table-dark sticky-top">
 	                <tr>
 	                    <th>Stockcode</th>
 	                    <th>Name</th>
@@ -236,83 +236,78 @@ include "components/forminput.php";
 				<div class="modal-header">
 					<div class="modal-title"><h4>New Extra Stockcode</h4></div>
 				</div>
-				<div class="modal-body table-responsive-sm">
+				<div class="modal-body table-responsive">				   
+					<table class="table table-striped table-hover ">
+						<thead class="table-dark sticky-top">
+							<tr>
+								<th>Stockcode</th>
+								<th>Name</th>
+								<th>SOH</th>
+								<th>Comment</th>
+								<th class='text-right'>Status</th>			
+							</tr>
+						</thead>
+						<tbody>    
+							<tr>
+								<td width='10%'>
+									<textinput :primary_key='extra_item.auto_storageID' 
+												primary_key_name="auto_storageID" 
+												db_name='smartdb' 
+												table_name='sm18_impairment' 
+												column_name='STOCK_CODE' 
+												:bound_value='extra_item.STOCK_CODE'
+												:disabled='false'
+												:validate='checkStockCode'
+												validate_msg='Stock code already exist'
+												validate_level='warning'
+												maxlen='255'>
+									</textinput>
+									<span v-if="this.extra_item.warning">Stock code already exist</span>
+								</td>
+								<td>
+									<textinput :primary_key='extra_item.auto_storageID' 
+												primary_key_name="auto_storageID" 
+												db_name='smartdb' 
+												table_name='sm18_impairment' 
+												column_name='ITEM_NAME' 
+												:bound_value='extra_item.ITEM_NAME'
+												:disabled='false'
+												maxlen='255'>
+									</textinput>
+								</td>
+								<td width='10%'>
+									<textinput :primary_key='extra_item.auto_storageID' 
+												primary_key_name="auto_storageID" 
+												db_name='smartdb' t
+												table_name='sm18_impairment' 
+												column_name='SOH' 
+												:bound_value='extra_item.SOH'
+												:disabled='false'
+												maxlen='255'>
+									</textinput>
+								</td>
+								<td>
+									<textinput :primary_key='extra_item.auto_storageID' 
+												primary_key_name="auto_storageID" 
+												db_name='smartdb' 
+												table_name='sm18_impairment' 
+												column_name='res_comment' 
+												:bound_value='extra_item.res_comment'
+												:disabled='false'
+												maxlen='255'
+												inputtype='textarea'>
+									</textinput>
+								</td>
+								<td width='10%'>
+									<a class='btn btn-outline-danger float-right' :href="'18_b2r_extra.php?current_row='+current_row+'&auto_storageID='+extra_item.auto_storageID">Incomplete</a>
+								</td>
+			
+							</tr>
+						</tbody>
+					</table>
+					
 
-      
-						           
-						        <table class="table table-sm table-striped table-hover ">
-						            <thead class="table-dark">
-						                <tr>
-						                    <th>Stockcode</th>
-						                    <th>Name</th>
-						                    <th>SOH</th>
-						                    <th>Comment</th>
-						                    <th class='text-right'>Status</th>
-
-						
-						                </tr>
-						            </thead>
-						            <tbody>    
-						                <tr>
-						                    <td width='10%'>
-									            <textinput :primary_key='extra_item.auto_storageID' 
-									                        primary_key_name="auto_storageID" 
-									                        db_name='smartdb' 
-									                        table_name='sm18_impairment' 
-									                        column_name='STOCK_CODE' 
-									                        :bound_value='extra_item.STOCK_CODE'
-									                        :disabled='false'
-									                        :validate='checkStockCode'
-									                        validate_msg='Stock code already exist'
-									                        validate_level='warning'
-									                        maxlen='255'>
-								             	</textinput>
-								             	<span v-if="this.extra_item.warning">Stock code already exist</span>
-						                    </td>
-						                    <td>
-									            <textinput :primary_key='extra_item.auto_storageID' 
-									                        primary_key_name="auto_storageID" 
-									                        db_name='smartdb' 
-									                        table_name='sm18_impairment' 
-									                        column_name='ITEM_NAME' 
-									                        :bound_value='extra_item.ITEM_NAME'
-									                        :disabled='false'
-									                        maxlen='255'>
-							                    </textinput>
-						                    </td>
-						                    <td width='10%'>
-									            <textinput :primary_key='extra_item.auto_storageID' 
-									                        primary_key_name="auto_storageID" 
-									                        db_name='smartdb' t
-									                        table_name='sm18_impairment' 
-									                        column_name='SOH' 
-									                        :bound_value='extra_item.SOH'
-									                        :disabled='false'
-									                        maxlen='255'>
-						                        </textinput>
-						                    </td>
-						                    <td>
-									            <textinput :primary_key='extra_item.auto_storageID' 
-									                        primary_key_name="auto_storageID" 
-									                        db_name='smartdb' 
-									                        table_name='sm18_impairment' 
-									                        column_name='res_comment' 
-									                        :bound_value='extra_item.res_comment'
-									                        :disabled='false'
-									                        maxlen='255'
-									                        inputtype='textarea'>
-							                  	</textinput>
-						                    </td>
-						                    <td width='10%'>
-						                        <a class='btn btn-outline-danger float-right' :href="'18_b2r_extra.php?current_row='+current_row+'&auto_storageID='+extra_item.auto_storageID">Incomplete</a>
-						                    </td>
-						
-						                </tr>
-						            </tbody>
-						        </table>
-						        
-
-				
+	
 
 
 			                			

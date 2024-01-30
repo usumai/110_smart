@@ -6,13 +6,13 @@
 
 <div id="app">
     <div class='container-fluid'>
-        <h1 class="display-4">
+        <h1 class="display-4 mt-4">
             Asset:{{ assd.res_asset_id }} 
             <span class='text-danger' v-if='assd.delete_date'>DELETED</span>
             <span class='' v-if="assd.genesis_cat=='ga_template'">TEMPLATE</span>
         </h1>
         <div class='row' v-if="!subselector">
-            <div class='col-12 col-md-1 col-xl-1 bd-sidebar'  >
+            <div class='col-1'  >
                 <nav class='nav flex-column'>
                     <span v-if='!assd.delete_date'>
                         <div class="list-group list-group-flush">
@@ -74,7 +74,7 @@
                             <a      :href="'13_camera.php?ass_id='+ass_id"
                                     v-if="assd.res_reason_code"
                                     class="text-center list-group-item list-group-item-action list-group-item-dark mt-3" 
-                                    type="button"><span class='octicon octicon-device-camera' style='font-size:30px'></span></a>
+                                    ><span class='octicon octicon-device-camera' style='font-size:30px'></span></a>
                         </div>
                     </span>
                     
@@ -88,9 +88,7 @@
 
 
             </div>
-            <div class='col-10'>
-
-                <span id='areaInputs'>
+            <div class='col-10' id='areaInputs'>
                     <div class='row'>
                         <div class='col-6'>
                             <div class="form-group"><label>Reason Code</label>
@@ -248,32 +246,6 @@
                             v-if='!template_ass_id'>Copy as a template</button>
                             <a type='button' class='btn btn-outline-dark float-right' :href="'11_ass.php?ass_id='+template_ass_id" v-if='template_ass_id'>Template asset link</a>
                         </div>
-                        <!-- <div class='col-3'>
-                            <div class="form-group"><label>Manufacturer</label>
-                            </div>
-                            <div class="form-group"><label>DeactDate</label>
-                            </div>
-                            <div class="form-group"><label>PlRetDate</label>
-                            </div>
-                            <div class="form-group"><label>State</label>
-                            </div>
-                            <div class="form-group"><label>AcqValue</label>
-                            </div>
-                            <div class="form-group"><label>OrigValue</label>
-                            </div>
-                            <div class="form-group"><label>ScrapVal</label>
-                            </div>
-                            <div class="form-group"><label>ValMethod</label>
-                            </div>
-                            <div class="form-group"><label>WBSElem</label>
-                            </div>
-                            <div class="form-group"><label>Fund</label>
-                            </div>
-                            <div class="form-group"><label>RspCCtr</label>
-                            </div>
-                            <div class="form-group"><label>RevOdep</label>
-                            </div>
-                        </div> -->
                     </div>
 
                     
@@ -314,10 +286,10 @@
                             </div>
                         </div>
                     </div>
-                </span>
+
             </div>
             
-            <div class='col-12 col-md-1 col-xl-1 bd-sidebar'  >
+            <div class='col-1'  >
                 <nav class='nav flex-column'>
                     <span v-if='!assd.delete_date'>
                         
@@ -411,10 +383,10 @@
                             type="button" >{{ rc.res_reason_code }}</button>
                     </td>
                     <td>
-                    <strong>{{ rc.rc_desc }}</strong>
-                    {{ rc.rc_example }}
-                    {{ rc.rc_long_desc }}
-                </td>
+                        <strong>{{ rc.rc_desc }}</strong>
+                        {{ rc.rc_example }}
+                        {{ rc.rc_long_desc }}
+                    </td>
                     <td>
                         <button @click="select_rc(rc.res_reason_code)"
                             v-if="assd.genesis_cat==rc.rc_origin"
