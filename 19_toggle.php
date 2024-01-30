@@ -380,7 +380,7 @@ $(document).ready(function() {
 <div class='row'>
     <div class='col lead table-responsive-sm'> 
         <table id='table_backup' class='table table-sm table-striped table-hover'>
-            <thead class="table-dark">
+            <thead class="table-dark sticky-top">
                 <tr>
                     <th>Type</th>
                     <th>TargetID</th>

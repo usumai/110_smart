@@ -54,7 +54,7 @@ if ($result->num_rows > 0) {
 	    <div class="col-lg">    	
 
       		<table id="table_assets" class="table table-sm table-striped table-border" width="100%">
-	        	<thead class="table-dark">
+	        	<thead class="table-dark sticky-top">
 		    		<tr>
 		    			<th>Action</th>
 		    			<th>Asset</th>

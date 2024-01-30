@@ -18,7 +18,7 @@
                 <caption>
                     <button type="button" class='btn btn-primary float-right' @click="openUploadDlg">Upload<i class="fa fa-upload ml-2"></i></button>
                 </caption>
-                <thead class="table-dark">
+                <thead class="table-dark sticky-top">
                     <tr>
                         <th style="width: 40px">ID</th>
                         <th style="width: 80px">Type</th>

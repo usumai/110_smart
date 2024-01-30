@@ -541,7 +541,7 @@ function onSplityMilisChanged(key) {
 	            	<td colspan='2'>
 		                <table class="table table-sm table-striped table-hover" id='splityTable'>
 				            <caption style="caption-side: top"><h3><b>Split area</b></h3></caption>
-				            <thead class="table-dark">                
+				            <thead class="table-dark sticky-top">                
 			                    <tr>
 			                        <th width='20%'>Count</th>
 			                        <th>Sighted</th>	                        
