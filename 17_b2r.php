@@ -167,7 +167,7 @@ include "components/forminput.php";
 	            </thead>
 	            <tbody>    
 	                <tr v-for="bin in json_bins_extr">
-	                    <td width='10%'>
+	                    <td width='15%'>
 	                        <textinput :primary_key='bin.auto_storageID' 
 	                                    primary_key_name="auto_storageID" 
 	                                    db_name='smartdb' 

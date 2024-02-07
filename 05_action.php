@@ -1358,12 +1358,12 @@ if ($act=='sys_pull_master') {
      }else{
           $res_unserv_date = 'null';
      }
-
-     
+     $comm1 = str_replace("\\","\\\\",$res_comment);
+     $comm1 = str_replace("'","\'",$comm1);
 
      $sql = "UPDATE smartdb.sm18_impairment SET 
                findingID='$findingID',
-               res_comment='$res_comment',
+               res_comment='$comm1',
                res_unserv_date=$res_unserv_date,
                res_create_date=NOW(),
                checked_to_milis=$milisFlag,
