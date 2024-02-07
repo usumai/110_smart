@@ -249,7 +249,7 @@ include "components/forminput.php";
 						</thead>
 						<tbody>    
 							<tr>
-								<td width='10%'>
+								<td width='15%'>
 									<textinput :primary_key='extra_item.auto_storageID' 
 												primary_key_name="auto_storageID" 
 												db_name='smartdb' 
