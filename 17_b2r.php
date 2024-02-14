@@ -54,8 +54,8 @@ include "components/forminput.php";
 	                  <tr>
 		                   <td colspan="4">
 		                        <b>Bin contents</b><br/>
-		                        <div class="tx-note">Not all items listed must be sighted, but all additional stockcodes found must be registered.<br></div>		                        
-		                   	
+		                        <div>Not all items listed must be sighted, but all additional stockcodes found must be registered.</div>		                        
+		                   		<div class="tx-note">Below are all items present in the bin. Any items displayed in red are excluded items and do not need to be assessed but have been displayed to capture completeness.<br/></div>
 				             	<ul class="nav nav-tabs">
 				             		<li class="nav-item">
 				             			<a class="nav-link active" data-toggle="tab" href="#tab0">Unsighted <i style="font-size: 0.8em">({{this.countIncomplete()}})</i></a>
