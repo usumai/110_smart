@@ -365,10 +365,10 @@ let vm = new Vue({
             header_obj['smm_extract_date']  = new Date().toISOString().substring(0,19);
             header_obj['smm_extract_user']  = null;
             header_obj['unique_file_id']    = "TBA";
-            name_suffix = "";
+            name_suffix                     = actv.stk_name;
             
             if (actv.stk_type=="ga_stk"){
-                name_suffix                     = actv.stk_name;
+                    
                 header_obj['stkm_id']           = actv.stkm_id;
                 header_obj['stk_id']            = actv.stk_id;
                 header_obj['stk_name']          = actv.stk_name;
@@ -387,7 +387,6 @@ let vm = new Vue({
                 header_obj['assetlist']         = list;
                 
             }else if (actv.stk_type=="is_audit"){
-                name_suffix                     = actv.stk_name;
 
                 payload 						= {	'act': 'export_is', 
                 									'stkm_id': actv.stkm_id 
