@@ -24,7 +24,7 @@
                         <th>Description<br>&nbsp;</th>
                         <th class="text-left">InventNo<br>SerialNo</th>
                         <th class="text-left">$NBV<br>&nbsp;</th>
-                        <th class="text-left">Custodian<br>&nbsp;</th>
+                        <th class="text-left">Type Name<br>&nbsp;</th>
                         <th class="text-center">Status<br>&nbsp;</th>
                         <th>Timestamp<br>&nbsp;</th>
                         <th>Action<br>&nbsp;</th>
@@ -43,7 +43,7 @@
                     <td>{{ ass.res_assetdesc1 }}<br><small>{{ ass.res_assetdesc2 }}</small></td>
                     <td>{{ ass.res_inventno }}<br><small>{{ ass.res_serialno }}</small></td>
                     <td class="text-right">{{ ass.res_val_nbv }}</td>
-                    <td>{{ ass.res_grpcustod}}</td>
+                    <td>{{ ass.res_type_name}}</td>
                     <td>
                         <!-- {{ ass.ass_status }} -->
                         <span v-if="ass.ass_status==1">FIN~</span>
