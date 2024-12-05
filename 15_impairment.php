@@ -19,7 +19,16 @@
         						  </div>
         					</div>                                     
         				</th>
-        				<th class="align-top ">SCA</th>
+        				<th class="align-top ">SCA<br/>      					
+        					<div class="dropdown"  style="display: inline">
+        						  <a class="btn-outline" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        								<span class="fas fa-sort-amount-down"></span>
+        						  </a>                                
+        						  <div class="dropdown-menu" aria-labelledby="binFilter">
+        							<a class="dropdown-item"  v-for="(rec, i) in  filters.sca" @click="search(1,rec)">{{rec}}</a>
+        						  </div>
+        					</div>           				
+        				</th>
         				<th class="align-top ">Bin<br/>No.
         					<div class="dropdown"  style="display: inline">
         						  <a class="btn-outline" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -45,7 +54,7 @@
         				<th class="align-top ">SOH</th>
         				<th class="align-top ">Tracking</th>
         				<th class="align-top">Reference <br/>No.</th>
-        				<th class="align-top ">Type
+        				<th class="align-top ">Type<br/>
         					<div class="dropdown"  style="display: inline">
         						  <a class="btn-outline" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         								<span class="fas fa-sort-amount-down"></span>
@@ -145,6 +154,7 @@ let vm = new Vue({
         filterColumns: [],
         filters:{
             warehouse:[],
+            sca:[],
             stockcode:[],
             bincode: [],
             type: [
@@ -277,8 +287,10 @@ let vm = new Vue({
                 var warehouseMap=[];
                 var bincodeMap=[];
                 var stockcodeMap=[];
+                var scaMap=[];
                 for(i in data){
                 	warehouseMap[data[i].DSTRCT_CODE+'-'+data[i].WHOUSE_ID]=1;
+                	scaMap[data[i].SUPPLY_CUST_ID]=1;
                     bincodeMap[data[i].BIN_CODE]=1;
                     stockcodeMap[data[i].STOCK_CODE]=1;
                 }
@@ -303,6 +315,13 @@ let vm = new Vue({
                 }
                 this.filters.warehouse.sort(sorter);
                 this.filters.warehouse.splice(0,0,'All');
+
+                i=0;
+                for(var key in scaMap){
+                    this.filters.sca[i++]=key;
+                }
+                this.filters.sca.sort(sorter);
+                this.filters.sca.splice(0,0,'All');
                 
                 i=0;
                 for(var key in bincodeMap){

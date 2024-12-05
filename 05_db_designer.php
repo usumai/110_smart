@@ -98,9 +98,9 @@ function fnInitiateDatabase($noRedirect, $noCreateRRTable){
               `sto_serialno` varchar(30) DEFAULT NULL,
               `sto_site_no` varchar(10) DEFAULT NULL,
               `sto_grpcustod` varchar(30) DEFAULT NULL,
+              `sto_type_name` varchar(30) DEFAULT NULL,
               `sto_plateno` varchar(30) DEFAULT NULL,
               `sto_revodep` varchar(30) DEFAULT NULL,
-
               `sto_date_lastinv` datetime DEFAULT NULL,
               `sto_date_cap` datetime DEFAULT NULL,
               `sto_date_pl_ret` datetime DEFAULT NULL,
@@ -143,6 +143,7 @@ function fnInitiateDatabase($noRedirect, $noCreateRRTable){
               `res_serialno` varchar(30) DEFAULT NULL,
               `res_site_no` varchar(10) DEFAULT NULL,
               `res_grpcustod` varchar(30) DEFAULT NULL,
+              `res_type_name` varchar(30) DEFAULT NULL,
               `res_plateno` varchar(30) DEFAULT NULL,
               `res_revodep` varchar(50) DEFAULT NULL,
               `res_date_lastinv` datetime DEFAULT NULL,

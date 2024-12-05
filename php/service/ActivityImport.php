@@ -390,7 +390,8 @@ function createGaAssets($connection, $stocktakeId, $assets) {
 			sto_inventno,
 			sto_serialno,
 			sto_site_no, 
-			sto_grpcustod, 
+			sto_grpcustod,
+			sto_type_name, 
 			sto_plateno, 
 			sto_date_lastinv, 
 			sto_date_cap,
@@ -431,6 +432,7 @@ function createGaAssets($connection, $stocktakeId, $assets) {
 			res_serialno, 
 			res_site_no, 
 			res_grpcustod, 
+			res_type_name,
 			res_plateno, 
 			res_date_lastinv, 
 			res_date_cap, 
@@ -443,10 +445,10 @@ function createGaAssets($connection, $stocktakeId, $assets) {
             modify_user,
             modify_date,
             version
-		) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+		) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
 	
 	foreach ($assets as $row) {
-		$stmt->bind_param("sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss", 
+		$stmt->bind_param("sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss", 
 			$stocktakeId, 
 			$row->ledger_id,
 			$row->rr_id,
@@ -478,6 +480,7 @@ function createGaAssets($connection, $stocktakeId, $assets) {
 			$row->sto_serialno, 
 			$row->sto_site_no, 
 			$row->sto_grpcustod, 
+			$row->sto_type_name, 
 			$row->sto_plateno, 
 			$row->sto_date_lastinv, 
 			$row->sto_date_cap, 
@@ -518,6 +521,7 @@ function createGaAssets($connection, $stocktakeId, $assets) {
 			$row->res_serialno, 
 			$row->res_site_no, 
 			$row->res_grpcustod, 
+			$row->res_type_name, 
 			$row->res_plateno, 
 			$row->res_date_lastinv, 
 			$row->res_date_cap, 
