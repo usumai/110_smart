@@ -176,10 +176,10 @@
                                 maxlen='255'
                                 ></textinput>
                             </div>
-                            <div class="form-group"><label>Group Custodian</label>
+                            <div class="form-group"><label>Type Name</label>
                                 <textinput :primary_key='ass_id' primary_key_name="ass_id" db_name='smartdb' table_name='sm14_ass' 
-                                column_name='res_grpcustod' 
-                                :bound_value='assd.res_grpcustod'
+                                column_name='res_type_name' 
+                                :bound_value='assd.res_type_name'
                                 :disabled="assd.delete_date||assd.res_reason_code==''"
                                 maxlen='255'
                                 ></textinput>
