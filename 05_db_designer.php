@@ -25,9 +25,19 @@ function fnInitiateDatabase($noRedirect, $noCreateRRTable){
          `date_last_update_check` DATETIME NULL, 
          PRIMARY KEY (`smartm_id`),UNIQUE INDEX `smartm_id_UNIQUE` (`smartm_id` ASC));";
     mysqli_multi_query($con,$sql_save);
+    	
+	$versionInfo['localVersion']=12;
+	$versionInfo['localRevision']=str_replace("\n", "", shell_exec(GIT_CMD .' rev-parse --short HEAD'));	
+	$versionInfo['remoteVersion']=12;
+	$versionInfo['remoteRevision']='xxxxx';
+
     try{
     	$versionInfo=getSoftwareVersion();
-    
+
+        
+    }catch(Throwable $e){
+    }
+	
     	$softwareLocalVersion=$versionInfo['localVersion'];	
     	$softwareLocalRevision=$versionInfo['localRevision'];
     	$softwareRemoteVersion=$versionInfo['remoteVersion'];
@@ -38,8 +48,7 @@ function fnInitiateDatabase($noRedirect, $noCreateRRTable){
         						$softwareLocalVersion,'$softwareLocalRevision', 
         						$softwareRemoteVersion,'$softwareRemoteRevision', NOW()); ";
         mysqli_multi_query($con,$sql_save);
-    }catch(Throwable $e){
-    }
+
     $sql_save = "CREATE TABLE $dbname.sm11_pro (`profile_id` INT(11) NOT NULL AUTO_INCREMENT,`create_date` DATETIME NULL DEFAULT NULL,`delete_date` DATETIME NULL DEFAULT NULL,`update_date` DATETIME NULL DEFAULT NULL,`profile_name` VARCHAR(255) NULL DEFAULT NULL,`profile_drn` VARCHAR(255) NULL DEFAULT NULL,`profile_phone_number` VARCHAR(255) NULL DEFAULT NULL,`profile_pic` LONGTEXT NULL DEFAULT NULL,`profile_color_a` VARCHAR(255) NULL DEFAULT NULL,`profile_color_b` VARCHAR(255) NULL DEFAULT NULL,PRIMARY KEY (`profile_id`),UNIQUE INDEX `profile_id_UNIQUE` (`profile_id` ASC));";
     mysqli_multi_query($con,$sql_save);
     if(! $noCreateRRTable){

@@ -6,7 +6,7 @@ $isImpAbbrsCompletedStatus = ["SER","USWD","USND","NIC","SPLT"];
 $isB2rAbbrsCompletedStatus = ["INV","NSTR"];
 
 define ('GIT_CMD','"\Program Files\Git\bin\git"');
-define ('HTTP_PROXY',"10.3.135.2:80");
+define ('HTTP_PROXY',"10.3.10.2:80");
 define ('SMART_VERSION_URL',"https://raw.githubusercontent.com/usumai/110_smart/master/08_version.json");
 
 define ('NET_OK','1');

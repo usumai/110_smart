@@ -12,6 +12,38 @@ $dbname="smartdb";
 // memory_limit=3000000M
 // post_max_size=3000000M
 // upload_max_filesize=3000000M
+//ini_set('display_errors','Off');
+
+
+$mysqlExecutable = "C:\\xampp\\mysql\\bin\\mysqld.exe"; // Update this to the actual path of mysql.exe
+
+function isMySQLRunning() {
+    $output = [];
+    exec("tasklist", $output);
+    foreach ($output as $line) {
+        if (stripos($line, "mysqld.exe") !== false) { // Check for MySQL process
+            return true;
+        }
+    }
+    return false;
+}
+
+function startMySQL($mysqlExecutable) {
+    $command = "start /B {$mysqlExecutable} --defaults-file=\"C:\\xampp\\mysql\\bin\\my.ini\""; // Provide path to your MySQL configuration file
+    $output = [];
+
+    exec($command, $output, $status);
+    return $status === 0;
+}
+
+
+if (!isMySQLRunning()) {
+	
+    if (!startMySQL($mysqlExecutable)) {
+        die ("Failed to start MySQL server. Please check the executable path and configuration file.\n");
+    }
+	
+}
 
 // Create connection
 $con = new mysqli($hostname, $username, $password);
