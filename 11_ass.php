@@ -254,7 +254,7 @@
                             <div class='form-group'>
                                 <h2>Images</h2>
                                 
-                                <span v-for='(img, imgidx) in imgsd'>                                                                    
+                            <span v-for='(img, idx) in imgsd'>                                                                    
                                     <button type='button' class='btn thumb_photo' 
                                             data-toggle='modal' data-target='#modal_show_pic'
                                             @click="zoom_pic = 'images/' + img;">
@@ -262,7 +262,7 @@
                                     </button>
 <!--                                     
                                      <button type='button' class='btn'                            
-                                            @click="delete_image(img, imgidx)">X
+                                        @click="delete_image(img, idx)">X
                                     </button>
 -->                                                                       
                                 </span>
