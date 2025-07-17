@@ -214,7 +214,14 @@ function importGaData(zipFileBlob, progressCallback, completeCallback, errorCall
 		
 		jsonFile.async('text').then(
 			data=>{
-		        let uploadData=JSON.parse(data);
+		        var uploadData=JSON.parse(data);
+				uploadData.file_name=zipFileBlob.name;
+				uploadData.file_type="zip";
+				uploadData.file_desc="General asset data and images import";
+				uploadData.file_ref=uploadData.unique_file_id;
+				uploadData.format_version=uploadData.file_version;
+				uploadData.import_date=new Date();
+
 		        upload(uploadData, progressCallback, 
 		        	ok=>{		      
 		        		let folder=zip.folder('images');
