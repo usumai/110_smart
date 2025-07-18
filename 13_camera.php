@@ -4,7 +4,40 @@ include "02_header.php";
 $ass_id	= $_GET["ass_id"];
 
 ?>
+
+  <style>
+    .img-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .img-container video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .camera-switch-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 10;
+      background-color: transparent;
+      border: none;
+      color: white; /* or any color that contrasts with the image */
+      font-size: 1.5rem;
+      padding: 0.5rem;
+      cursor: pointer;
+    }
+
+	.camera-switch-btn:hover {
+      color: #ffc107; /* optional hover effect */
+    }
+  </style>
 <div id="app">
+	<canvas ref="canvas" width="800" height="600" hidden></canvas>
+
     <div class='container-fluid'>
         <table width="100%">
         	<tr>
@@ -12,29 +45,33 @@ $ass_id	= $_GET["ass_id"];
         			<form method="post" action="05_action.php" >
         				<input type="hidden" name="act" value="save_photo">
         				<input type="hidden" name="ass_id" value="<?=$ass_id?>">
-        				<input type="hidden" name="res_img_data" id="res_img_data">
-        				<button type="submit" class="btn btn-success btn_acceptphoto" id="btn_acceptphoto"><span class='octicon octicon-check' style='font-size:30px'></span></button><br>
-        				<br><br>
+        				<input type="hidden" name="res_img_data" :value="photoUrl">
+        				<button v-if="mode=='p'" type="submit" class="btn btn-success btn_acceptphoto" id="btn_acceptphoto"><span class='octicon octicon-check' style='font-size:30px'></span></button>
+						<br><br><br>
         	        	<a href="11_ass.php?ass_id=<?=$ass_id?>" class="btn btn-danger" id="btn_cancelphoto"><span class='octicon octicon-x' style='font-size:30px'></span></a>
         			</form><br><br><br><br><br>
         		</td>
         		<td width="60%">
-        			<div class="row" id="area_photo">
+        			<div v-if="mode=='p'" class="row"  @click="savePhoto()">
+						<img  :src="photoUrl" width='100%' height='90%'/>
         			</div>
-        			<div class="row" id="area_video">
-        				<video id="video" width="100%" height="100%" autoplay></video>
-        			</div>
-        
-        			<!-- <br><br><br><br><a href="107_help.php#camera_switching">Switch Cameras</a> -->
-        			
+        			<div v-if="mode=='v'" class="row" >
+						<div class="col alert alert-info">Resolution: {{settings.width}}x{{settings.height}}</div>
+        				<div class="img-container">
+							<video  ref="video" width="100%" height="100%" @click="capturePhoto()" autoplay ></video>
+        					<button class="btn btn-primary camera-switch-btn" @click="switchCamera()">
+								<i class="fa fa-camera"></i>
+							</button>
+						</div>
+					</div>
         		</td>
         	
         		<td width="20%" align="right">
         			<form method="post" action="05_action.php" >
         				<input type="hidden" name="act" value="save_photo">
         				<input type="hidden" name="ass_id" value="<?=$ass_id?>">
-        				<input type="hidden" name="res_img_data" id="res_img_data2">
-        	        	<button type="submit" class="btn btn-success btn_acceptphoto" id="btn_acceptphoto"><span class='octicon octicon-check' style='font-size:30px'></span></button><br>
+        				<input type="hidden" name="res_img_data" :value="photoUrl">
+        	        	<button v-if="mode=='p'" type="submit" class="btn btn-success btn_acceptphoto" id="btn_acceptphoto"><span class='octicon octicon-check' style='font-size:30px'></span></button><br>
         				<br><br>
         	        	<a href="11_ass.php?ass_id=<?=$ass_id?>" class="btn btn-danger" id="btn_cancelphoto"><span class='octicon octicon-x' style='font-size:30px'></span></a>
         			</form><br><br><br><br><br>
@@ -45,27 +82,9 @@ $ass_id	= $_GET["ass_id"];
 
 	</div>
 </div>
-<!-- <div class="container">
-	<div class="row">
-		<div class="col">
-			<div class="form-row text-center">
-			    <div class="col-12">
-			    </div>
-			</div>			
-		</div>
-		<div class="col-10">
-		</div>
-		<div class="col">
-			<div class="form-row text-right">
-			    <div class="col-12">
-			    </div>
-			</div>	
-		</div>
-	</div>
-</div> -->
 
 
-<canvas id="canvas" width="800" height="600"></canvas>
+
 <!-- <canvas id="canvas" width="1600" height="1200"></canvas> -->
 <!-- <div id="test"></div> -->
 
@@ -73,34 +92,12 @@ $ass_id	= $_GET["ass_id"];
 
 <script>
 // Grab elements, create settings, etc.
-var video = document.getElementById('video');
-
-navigator.mediaDevices.enumerateDevices()
-    .then(function(devices) {
-        // devices is an array of accessible audio and video inputs. deviceId is the property I used to switch cameras
-    })
-    .catch(function(err) {
-        console.log(err.name + ": " + error.message);
-});
+//var video = document.getElementById('video');
 
 
-// Get access to the camera!
-if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    // Not adding `{ audio: true }` since we only want video now
-    // navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
-    //     video.src = window.URL.createObjectURL(stream);
-    //     video.play();
-    // });
-	navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-	  .then(stream => video.srcObject = stream)
-	  .catch(e => log(e.name + ": "+ e.message));
-	var log = msg => div.innerHTML += msg + "<br>";
-
-
-}
 // Elements for taking the snapshot
-var canvas = document.getElementById('canvas');
-var context = canvas.getContext('2d');
+//var canvas = document.getElementById('canvas');
+//var context = canvas.getContext('2d');
 //var video = document.getElementById('video');
 
 // Trigger photo take
@@ -111,7 +108,7 @@ var context = canvas.getContext('2d');
 // 	$("#test").text(res_img_data);
 // });
 
-
+/*
 $(document).ready(function() {
 	$("#canvas").hide();
 	$("#area_photo").hide();
@@ -134,6 +131,76 @@ $(document).ready(function() {
 		$("#area_photo").hide();
 		$(".btn_acceptphoto").hide();
 	});
+});
+*/
+
+
+
+</script>
+<script>
+const app = new Vue({
+    el: '#app',
+    data: {
+		cameras: [],
+		currentCamera:0,
+		settings: {},
+		mode: 'v',
+		photoUrl:""
+    },
+    created() {
+		
+    },
+    mounted () {
+        navigator.mediaDevices.enumerateDevices().then(
+			devices=>{
+				this.cameras=devices.filter(d=>d.kind=="videoinput");	
+				this.switchCamera();				
+			}
+		);
+    } ,
+    methods:{
+		capturePhoto(){
+			this.mode = 'p';
+			var context=this.$refs.canvas.getContext('2d');			
+			this.$refs.canvas.height=this.settings.height;
+			this.$refs.canvas.width=this.settings.width;
+			context.drawImage(this.$refs.video, 0, 0, this.settings.width, this.settings.height);
+
+
+			var res_img_data = this.$refs.canvas.toDataURL();
+			this.photoUrl=res_img_data;
+		},
+		savePhoto(){
+			this.mode='v';
+		},
+		nextCamera(){
+			this.currentCamera++;
+			if(this.currentCamera>=this.cameras.length){
+				this.currentCamera=0;
+			}
+		},
+		async switchCamera(){
+			this.nextCamera();
+			var cap=this.cameras[this.currentCamera].getCapabilities();
+			const constraints = {
+				video: { 
+					facingMode: { exact: cap.facingMode[0] },
+					width: { ideal: 3840 },
+      				height: { ideal: 2160 }
+				}
+			};
+			try {
+				const stream = await navigator.mediaDevices.getUserMedia(constraints);
+				
+				this.$refs.video.srcObject = stream;
+				var tracks=stream.getVideoTracks();
+				this.settings=tracks[0].getSettings();
+
+			} catch (err) {
+				console.error("Camera access error:", err);
+			}
+		}
+	}
 });
 </script>
 <?php include "04_footer.php"; ?>

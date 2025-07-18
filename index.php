@@ -188,7 +188,7 @@ let vm = new Vue({
         	event.preventDefault();
             var items=event.dataTransfer.items;
             for(var i in items){
-            	console.log(items[i]);
+            	//console.log(items[i]);
                 if(items[i].kind=='file'){
                     this.uploadData(items[i].getAsFile());                    
                 }
@@ -282,7 +282,7 @@ let vm = new Vue({
         get_activities(){
             axios.get('api.php', {params: {act:'get_activities'}})
             .then(response => {
-            	console.log(response);
+            	//console.log(response);
             	processResponse(response,
             		data=>{
             			this.actvd   = data;
