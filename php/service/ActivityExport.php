@@ -20,7 +20,28 @@ function backupExportJson(){
     }
 }
 function getActivity($activityID){
-	return qget("select * from smartdb.sm13_stk where stkm_id=" . $activityID);
+	$sql="
+SELECT 
+    act.*, 
+    asset.*
+FROM 
+    smartdb.sm13_stk as act 
+    LEFT JOIN 
+    (       
+		SELECT stkm_id,
+			'Stocktake' as isCat,
+			SUM(CASE WHEN genesis_cat='original' THEN 1 ELSE 0 END) AS rc_orig,
+			SUM(CASE WHEN genesis_cat='nonoriginal' THEN 1 ELSE 0 END) AS rc_extras,
+			SUM(CASE WHEN res_reason_code <>'' AND genesis_cat='original' THEN 1 ELSE 0 END) AS rc_orig_complete,
+			COUNT(*) AS rc_totalsent
+		FROM smartdb.sm14_ass 
+		WHERE ((date(delete_date) IS NULL) or (date(delete_date)='0000-00-00'))
+		GROUP BY stkm_id       
+	) as asset
+    ON act.stkm_id=asset.stkm_id
+	WHERE act.stkm_id=" . $activityID;
+
+	return qget($sql);
 }
 
 
